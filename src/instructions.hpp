@@ -50,7 +50,7 @@
 
 #define JR_NZ_n			0x20
 #define LD_HL_nn		0x21
-#define LDI_HLm_A		0x22
+#define LD_HLm_I_A		0x22
 #define INC_HL			0x23
 #define INC_H			0x24
 #define DEC_H			0x25

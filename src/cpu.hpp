@@ -16,7 +16,7 @@ private:
 	void process(const byte& opCode);
 
 	// frequency of the CPU, 4.194304MHz
-	int frequency;
+	float frequency;
 
 	// registers
 	byte a;
