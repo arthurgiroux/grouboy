@@ -58,7 +58,7 @@
 #define DAA				0x27
 #define JR_Z_n			0x28
 #define ADD_HL_HL		0x29
-#define LDI_A_HLm		0x2A
+#define LD_A_HLm_I		0x2A
 #define DEC_HL			0x2B
 #define INC_L			0x2C
 #define DEC_L			0x2D
@@ -67,7 +67,7 @@
 
 #define JR_NC_n			0x30
 #define LD_SP_nn		0x31
-#define LDD_HLm_A		0x32
+#define LD_HLm_D_A		0x32
 #define INC_SP			0x33
 #define INC_HLm			0x34
 #define DEC_HLm			0x35
@@ -75,7 +75,7 @@
 #define SCF				0x37
 #define JR_C_n			0x38
 #define ADD_HL_SP		0x39
-#define LDD_A_HLm		0x3A
+#define LD_A_HLm_D		0x3A
 #define DEC_SP			0x3B
 #define INC_A			0x3C
 #define DEC_A			0x3D

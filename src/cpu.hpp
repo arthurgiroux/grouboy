@@ -39,6 +39,8 @@ private:
 	uint16_t sp;
 
 	MMU* mmu;
+
+	bool halted = false;
 };
 
 #endif
