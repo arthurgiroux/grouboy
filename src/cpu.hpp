@@ -40,7 +40,13 @@ private:
 
 	MMU* mmu;
 
-	bool halted = false;
+	bool halted;
+
+	bool interrupts;
+
+	byte ticksBeforeEnablingInterrupts;
+
+	byte ticksBeforeDisablingInterrupts;
 };
 
 #endif

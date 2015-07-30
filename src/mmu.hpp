@@ -11,7 +11,9 @@ public:
 	~MMU();
 
 	byte read(const uint16_t& addr);
+	uint16_t readWord(const uint16_t& addr);
 	void write(const uint16_t& addr, const byte& value);
+	void writeWord(const uint16_t& addr, const uint16_t& value);
 
 private:
 	byte memory[TOTAL_MEMORY];

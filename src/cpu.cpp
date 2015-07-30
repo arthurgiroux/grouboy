@@ -15,12 +15,34 @@ CPU::CPU(MMU* mmu_) {
 	pc = 0;
 	sp = 0;
 	mmu = mmu_;
+	halted = false;
+	interrupts = false;
+	ticksBeforeEnablingInterrupts = 0;
+	ticksBeforeDisablingInterrupts = 0;
 }
 
 void CPU::exec() {
+
+	if (ticksBeforeEnablingInterrupts > 0) {
+		ticksBeforeEnablingInterrupts--;
+	}
+	else if (ticksBeforeDisablingInterrupts > 0) {
+		ticksBeforeDisablingInterrupts--;
+	}
+
 	process(mmu->read(pc));
 	pc++;
 	tick += lastInstructionTicks;
+
+	if (ticksBeforeEnablingInterrupts == 1) {
+		interrupts = true;
+		ticksBeforeEnablingInterrupts = 0;
+	}
+	else if (ticksBeforeDisablingInterrupts == 1) {
+		interrupts = false;
+		ticksBeforeDisablingInterrupts = 0;
+	}
+
 }
 
 CPU::~CPU() {
@@ -32,9 +54,27 @@ CPU::~CPU() {
 						pc += 2; \
 						lastInstructionTicks = 3;
 
+#define LD_XY_Z_N(X, Y, Z) { \
+							uint16_t value = (X << 8) | Y; \
+							uint16_t xy = mmu->read(pc) + Z; \
+							pc++; \
+							X = (xy >> 8); \
+							Y = xy & 0x00FF; \
+							f &= RESET_ZERO & RESET_SUB; \
+							if (value > xy) f |= FLAG_CARRY; \
+							else f &= RESET_CARRY; \
+							if (value <= 0x00FF && xy > 0x00FF) f |= FLAG_HALF_CARRY; \
+							else f &= RESET_HALF_CARRY; \
+							lastInstructionTicks = 3; \
+						}
+
 #define LD_X_NN(X) 		X = mmu->read(pc); \
 						pc += 2; \
 						lastInstructionTicks = 3;
+
+#define LD_X_NNm(X) 	X = mmu->read(mmu->readWord(pc)); \
+						pc += 2; \
+						lastInstructionTicks = 4;
 
 #define LD_X_N(X) 		X = mmu->read(pc); \
 						pc++; \
@@ -85,23 +125,23 @@ CPU::~CPU() {
 						lastInstructionTicks = 2;
 
 #define INC_XYm(X, Y) 	{ \
-						byte value = mmu->read((X << 8) | Y); \
-						value++; \
-						mmu->write((X << 8) | Y, value); \
-						if (value == 0) f |= FLAG_ZERO; \
-						else if (!((value-1) & 0x10) && (value & 0x10)) f |= FLAG_HALF_CARRY; \
-						f &= RESET_SUB; \
-						lastInstructionTicks = 3; \
+							byte value = mmu->read((X << 8) | Y); \
+							value++; \
+							mmu->write((X << 8) | Y, value); \
+							if (value == 0) f |= FLAG_ZERO; \
+							else if (!((value-1) & 0x10) && (value & 0x10)) f |= FLAG_HALF_CARRY; \
+							f &= RESET_SUB; \
+							lastInstructionTicks = 3; \
 						} \
 
 #define DEC_XYm(X, Y) 	{ \
-						byte value = mmu->read((X << 8) | Y); \
-						value--; \
-						mmu->write((X << 8) | Y, value); \
-						if (value == 0) f |= FLAG_ZERO; \
-						else if (((value+1) & 0x10) && !(value & 0x10)) f |= FLAG_HALF_CARRY; /* TODO: NOT SURE ABOUT THIS */ \
-						f |= RESET_SUB; \
-						lastInstructionTicks = 3; \
+							byte value = mmu->read((X << 8) | Y); \
+							value--; \
+							mmu->write((X << 8) | Y, value); \
+							if (value == 0) f |= FLAG_ZERO; \
+							else if (((value+1) & 0x10) && !(value & 0x10)) f |= FLAG_HALF_CARRY; /* TODO: NOT SURE ABOUT THIS */ \
+							f |= RESET_SUB; \
+							lastInstructionTicks = 3; \
 						} \
 
 #define INC_X(X) 		X++; \
@@ -187,6 +227,18 @@ CPU::~CPU() {
 						lastInstructionTicks = 1; \
 					}
 
+#define ADD_X_N(X) 	{ \
+						byte value = X; \
+						X += mmu->read(pc); \
+						pc++; \
+						if (!X) f |= FLAG_CARRY | FLAG_ZERO; \
+						else f &= RESET_CARRY & RESET_ZERO; \
+						if (!(value & 0x10) && (X & 0x10)) f |= FLAG_HALF_CARRY; \
+						else f &= FLAG_HALF_CARRY; \
+						f &= RESET_SUB; \
+						lastInstructionTicks = 2; \
+					}
+
 #define ADC_X_Y(X, Y) { \
 						byte value = X; \
 						X += Y; \
@@ -199,6 +251,19 @@ CPU::~CPU() {
 						lastInstructionTicks = 1; \
 					}
 
+#define ADC_X_N(X) { \
+						byte value = X; \
+						X += mmu->read(pc); \
+						pc++; \
+						if (f & FLAG_CARRY) X++; \
+						if (!X) f |= FLAG_CARRY | FLAG_ZERO; \
+						else f &= RESET_CARRY & RESET_ZERO; \
+						if (!(value & 0x10) && (X & 0x10)) f |= FLAG_HALF_CARRY; \
+						else f &= FLAG_HALF_CARRY; \
+						f &= RESET_SUB; \
+						lastInstructionTicks = 2; \
+					}
+
 #define ADD_X_YZm(X, Y, Z) { \
 						byte value = X; \
 						X += mmu->read((Y << 8) | Z); \
@@ -207,7 +272,7 @@ CPU::~CPU() {
 						if (!(value & 0x10) && (X & 0x10)) f |= FLAG_HALF_CARRY; \
 						else f &= FLAG_HALF_CARRY; \
 						f &= RESET_SUB; \
-						lastInstructionTicks = 1; \
+						lastInstructionTicks = 2; \
 					}
 
 #define ADC_X_YZm(X, Y, Z) { \
@@ -219,7 +284,7 @@ CPU::~CPU() {
 						if (!(value & 0x10) && (X & 0x10)) f |= FLAG_HALF_CARRY; \
 						else f &= FLAG_HALF_CARRY; \
 						f &= RESET_SUB; \
-						lastInstructionTicks = 1; \
+						lastInstructionTicks = 2; \
 					}
 
 
@@ -234,6 +299,18 @@ CPU::~CPU() {
 						lastInstructionTicks = 1; \
 					}
 
+#define SUB_X_N(X) { \
+						byte value = X; \
+						X -= mmu->read(pc); \
+						pc++; \
+						if (!X) f |= FLAG_CARRY | FLAG_ZERO; \
+						else f &= RESET_CARRY & RESET_ZERO; \
+						if (!(value & 0x10) && (X & 0x10)) f |= FLAG_HALF_CARRY; \
+						else f &= FLAG_HALF_CARRY; \
+						f |= FLAG_SUB; \
+						lastInstructionTicks = 2; \
+					}
+
 #define SBC_X_Y(X, Y) { \
 						byte value = X; \
 						X -= Y; \
@@ -244,6 +321,19 @@ CPU::~CPU() {
 						else f &= FLAG_HALF_CARRY; \
 						f |= FLAG_SUB; \
 						lastInstructionTicks = 1; \
+					}
+
+#define SBC_X_N(X) { \
+						byte value = X; \
+						X -= mmu->read(pc); \
+						pc++; \
+						if (f & FLAG_CARRY) X--; \
+						if (!X) f |= FLAG_CARRY | FLAG_ZERO; \
+						else f &= RESET_CARRY & RESET_ZERO; \
+						if (!(value & 0x10) && (X & 0x10)) f |= FLAG_HALF_CARRY; \
+						else f &= FLAG_HALF_CARRY; \
+						f |= FLAG_SUB; \
+						lastInstructionTicks = 2; \
 					}
 
 #define SUB_X_YZm(X, Y, Z) { \
@@ -301,6 +391,13 @@ CPU::~CPU() {
 					f &= RESET_HALF_CARRY & RESET_CARRY & RESET_SUB; \
 					lastInstructionTicks = 1;
 
+#define OR_N()		a |= mmu->read(pc); \
+					pc++; \
+					if (!a) f |= FLAG_ZERO; \
+					else f &= RESET_ZERO; \
+					f &= RESET_HALF_CARRY & RESET_CARRY & RESET_SUB; \
+					lastInstructionTicks = 2;
+
 #define OR_XYm(X, Y)	a |= mmu->read((X << 8) | Y); \
 						if (!a) f |= FLAG_ZERO; \
 						else f &= RESET_ZERO; \
@@ -308,6 +405,7 @@ CPU::~CPU() {
 						lastInstructionTicks = 2;
 
 #define CP_X(X)		f &= RESET_SUB & RESET_ZERO & RESET_CARRY & RESET_HALF_CARRY; \
+					f |= FLAG_SUB; \
 					if (a == X) f |= FLAG_ZERO; \
 					else if (a > X) f |= FLAG_HALF_CARRY; \
 					else f |= FLAG_CARRY; \
@@ -316,11 +414,66 @@ CPU::~CPU() {
 #define CP_XYm(X, Y)	{ \
 							byte value = mmu->read((X << 8) | Y); \
 							f &= RESET_SUB & RESET_ZERO & RESET_CARRY & RESET_HALF_CARRY; \
+							f |= FLAG_SUB; \
 							if (a == value) f |= FLAG_ZERO; \
 							else if (a > value) f |= FLAG_HALF_CARRY; \
 							else f |= FLAG_CARRY; \
 							lastInstructionTicks = 1; \
 						}
+
+#define POP_XY(X, Y)	Y = mmu->read(sp); \
+						X = mmu->read(sp+1); \
+						sp += 2; \
+						lastInstructionTicks = 3;
+
+#define RET_X(cond) 	{ \
+						uint16_t addr = mmu->readWord(sp); \
+						sp += 2; \
+						if (cond) { pc = addr; lastInstructionTicks = 5; } \
+						else { lastInstructionTicks = 2; } \
+						}
+
+#define JP_X_NN(cond) 	{ \
+							uint16_t addr = ((mmu->read(pc+1) << 8) | mmu->read(pc));\
+							pc += 2;\
+							if (cond) { pc = addr; lastInstructionTicks = 4; } \
+							else { lastInstructionTicks = 3; } \
+						}
+
+#define CALL_X_NN(cond) if (cond) { \
+							sp--; \
+							mmu->write(sp, (pc >> 8)); \
+							sp--; \
+							mmu->write(sp, (pc & 0x00FF)); \
+							pc = mmu->read(pc); \
+							lastInstructionTicks = 6; \
+						} \
+						else lastInstructionTicks = 3; \
+
+#define PUSH_XY(X, Y)	sp -= 2; \
+						mmu->write(sp, (pc & 0x00FF)); \
+						mmu->write(sp+1, (pc > 8)); \
+						lastInstructionTicks = 4; \
+						
+
+#define RST_X(X)		sp -= 2; \
+						mmu->write(sp, (pc & 0x00FF)); \
+						mmu->write(sp+1, (pc > 8)); \
+						pc = X; \
+						lastInstructionTicks = 4; \
+
+#define LDH_Nm_X(X)		mmu->write(0xFF00 + mmu->read(pc), X); \
+						pc++; \
+						lastInstructionTicks = 3;
+
+#define LDH_Xm_Y(X)		mmu->write(0xFF00 + mmu->read(X), Y); \
+						lastInstructionTicks = 3;
+
+#define LDH_X_Nm(X)		mmu->write(X, 0xFF00 + mmu->read(pc)); \
+						pc++; \
+						lastInstructionTicks = 3;
+
+
 
 void CPU::process(const byte& opCode) {
 	switch (opCode) {
@@ -1197,6 +1350,196 @@ void CPU::process(const byte& opCode) {
 
 		case CP_A:
 			CP_X(a);
+			break;
+
+
+		/******************************************************/
+		/************************ 0xC0 ************************/
+		/******************************************************/
+
+		case RET_NZ:
+			RET_X((f & FLAG_ZERO) == 0);
+			break;
+
+		case POP_BC:
+			POP_XY(b, c);
+			break;
+
+		case JP_NZ_nn:
+			JP_X_NN((f & FLAG_ZERO) == 0);
+			break;
+
+		case JP_nn:
+			JP_X_NN(true);
+			break;
+
+		case CALL_NZ_nn:
+			CALL_X_NN((f & FLAG_ZERO) == 0);
+			break;
+
+		case PUSH_BC:
+			PUSH_XY(b, c);
+			break;
+
+		case ADD_A_n:
+			ADD_X_N(a);
+			break;
+
+		case RST_0:
+			RST_X(0x00);
+			break;
+
+		case RET_Z:
+			RET_X(f & FLAG_ZERO);
+			break;
+
+		case RET:
+			RET_X(true);
+			break;
+
+		case JP_Z_nn:
+			JP_X_NN(f & FLAG_ZERO);
+			break;
+
+		case EXT_OPS:
+			// TODO:
+			break;
+
+		case CALL_Z_nn:
+			CALL_X_NN(f & FLAG_ZERO);
+			break;
+
+		case CALL_nn:
+			CALL_X_NN(true);
+			break;
+
+		case ADC_A_n:
+			ADC_X_N(a);
+			break;
+
+		case RST_8:
+			RST_X(0x08);
+			break;
+
+		/******************************************************/
+		/************************ 0xD0 ************************/
+		/******************************************************/
+
+		case RET_NC:
+			RET_X((f & FLAG_CARRY) == 0);
+			break;
+
+		case POP_DE:
+			POP_XY(d, e);
+			break;
+
+		case JP_NC_nn:
+			JP_X_NN((f & FLAG_CARRY) == 0);
+			break;
+
+		case CALL_NC_nn:
+			CALL_X_NN((f & FLAG_CARRY) == 0);
+			break;
+
+		case PUSH_DE:
+			PUSH_XY(d, e);
+			break;
+
+		case SUB_A_n:
+			SUB_X_N(a);
+			break;
+
+		case RST_10:
+			RST_X(0x10);
+			break;
+
+		case RET_C:
+			RET_X(f & FLAG_CARRY);
+			break;
+
+		case RETI:
+			RET_X(true);
+			interrupts = true;
+			break;
+
+		case JP_C_nn:
+			JP_X_NN(f & FLAG_CARRY);
+			break;
+
+		case CALL_C_nn:
+			CALL_X_NN(f & FLAG_CARRY);
+			break;
+
+		case SBC_A_n:
+			SBC_X_N(a);
+			break;
+
+		case RST_18:
+			RST_X(0x18);
+			break;
+
+		/******************************************************/
+		/************************ 0xE0 ************************/
+		/******************************************************/
+
+		case LDH_nm_A:
+			LDH_Nm_X(a);
+			break;
+
+		case POP_AF:
+			POP_XY(a, f);
+			break;
+
+		case DI:
+			ticksBeforeDisablingInterrupts = 2;
+			lastInstructionTicks = 1;
+			break;
+
+		case PUSH_AF:
+			PUSH_XY(a, f);
+			break;
+
+		case OR_n:
+			OR_N();
+			break;
+
+		case RST_30:
+			RST_X(0x30);
+			break;
+
+		case LDHL_SP_d:
+			LD_XY_Z_N(h, l, sp);
+			break;
+
+		case LD_SP_HL:
+			mmu->writeWord(sp, (h << 8) | l);
+			lastInstructionTicks = 2;
+			break;
+
+		case LD_A_nnm:
+			LD_X_NNm(a);
+			break;
+
+		case EI:
+			ticksBeforeEnablingInterrupts = 2;
+			lastInstructionTicks = 1;
+			break;
+
+		case CP_n:
+			{		
+				f &= RESET_SUB & RESET_ZERO & RESET_CARRY & RESET_HALF_CARRY;
+				f |= FLAG_SUB;
+				byte n = mmu->read(pc);
+				pc++;
+				if (a == n) f |= FLAG_ZERO;
+				else if (a > n) f |= FLAG_HALF_CARRY;
+				else f |= FLAG_CARRY;
+				lastInstructionTicks = 2;
+			}
+			break;
+
+		case RST_38:
+			RST_X(0x38);
 			break;
 
 		default:
