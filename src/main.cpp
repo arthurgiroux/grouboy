@@ -2,4 +2,5 @@
 
 int main() {
 	Emulator emulator;
+	emulator.start();
 }
