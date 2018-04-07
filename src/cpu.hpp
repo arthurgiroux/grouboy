@@ -69,6 +69,9 @@ private:
 	// Load the byte pointed by the address pointed by pc into X
 	void LD_X_NNm(byte& X);
 
+	// Load X in the address pointed by pc
+	void LD_NNm_X(byte X);
+
 	// Load the byte pointed by pc into X
 	void LD_X_N(byte& X);
 
@@ -92,7 +95,7 @@ private:
 
 	// Load the byte Z at the address pointed by the word XY and
 	// decrement the address XY
-	void LD_XYm_D_Z(byte X, byte& Y, byte& Z);
+	void LD_XYm_D_Z(byte& X, byte& Y, byte& Z);
 
 	// Load the byte pointed by YZ into X
 	void LD_X_YZm(byte& X, byte Y, byte Z);
@@ -252,6 +255,9 @@ private:
 	// Perform the logical OR between the "a" register and value pointed by pc
 	void OR_N();
 
+	// Perform the logical AND between the "a" register and value pointed by pc
+	void AND_N();
+
 	//Compare the value of the register "a" and the value X
 	// If a == X then flag zero is set
 	// If a > X then flag half carry is set
@@ -272,6 +278,9 @@ private:
 
 	// If the condition is satisfied, jump to the address stored in memory
 	void JP_X_NN(bool cond);
+
+	// jump to the address stored at memory pointed by XY
+	void JP_XYm(byte X, byte Y);
 
 	// if the condition is satisfied, push the current address to the stack
 	// and jump to the label
@@ -301,6 +310,15 @@ private:
 
 	// Load the value of X in the value pointed by 0xFF00 + pc
 	void LDH_Nm_X(byte X);
+
+	// Load the value pointed by 0xFF00 + pc in X
+	void LDH_X_Nm(byte& X);
+
+	void LD_Xm_Y(byte X, byte Y);
+
+	void LD_X_Ym(byte& X, byte Y);
+
+	void ADD_SP_X(sbyte X);
 
 	// Load the value of X in the value pointed by 0xFF00 + pc
 	//void LDH_Xm_Y(byte X, byte Y);

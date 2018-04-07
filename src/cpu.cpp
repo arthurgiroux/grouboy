@@ -18,6 +18,14 @@ CPU::CPU(MMU* mmu_) {
 	lastInstructionTicks = 0;
 	pc = 0;
 	sp = 0;
+	f = 0xb0;
+	a = 0x01;
+	b = 0x00;
+	c = 0x13;
+	d = 0x00;
+	e = 0xd8;
+	h = 0x01;
+	l = 0x4D;
 	mmu = mmu_;
 	halted = false;
 	interrupts = false;
@@ -86,7 +94,7 @@ void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z) {
 	unsetFlag(FLAG_ZERO);
 	unsetFlag(FLAG_SUB);
 	uint16_t value = (X << 8) | Y;
-	uint16_t xy = mmu->read(pc) + Z;
+	uint16_t xy = static_cast<int8_t>(mmu->read(pc)) + Z;
 	pc++;
 	X = (xy >> 8);
 	Y = xy & 0x00FF;
@@ -105,6 +113,12 @@ void CPU::LD_X_NN(uint16_t& X) {
 
 void CPU::LD_X_NNm(byte& X) {
 	X = mmu->read(mmu->readWord(pc));
+	pc += 2;
+	lastInstructionTicks = 4;
+}
+
+void CPU::LD_NNm_X(byte X) {
+	mmu->write(mmu->readWord(pc), X);
 	pc += 2;
 	lastInstructionTicks = 4;
 }
@@ -161,16 +175,20 @@ void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_XYm_D_Z(byte X, byte& Y, byte& Z) {
-	mmu->write((X << 8) | Y, Z);
-	// Decrement the MSB part of the address if it's set
-	if (Y > 0) {
-		Y--;
-	}
-	// Decrement the LSB part otherwise
-	else {
-		Z--;
-	}
+void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z) {
+	uint16_t XY = (X << 8) | Y;
+	mmu->write(XY, Z);
+	XY--;
+	X = XY >> 8;
+	Y = XY & 0xFF;
+	//// Decrement the MSB part of the address if it's set
+	//if (Y > 0) {
+	//	Y--;
+	//}
+	//// Decrement the LSB part otherwise
+	//else {
+	//	X--;
+	//}
 	lastInstructionTicks = 2;
 }
 
@@ -180,8 +198,7 @@ void CPU::LD_X_YZm(byte& X, byte Y, byte Z) {
 }
 
 void CPU::LD_NNm_X(uint16_t& X) {
-	uint16_t addr = ((mmu->read(pc) << 8) & mmu->read(pc + 1));
-	X = mmu->readWord(addr);
+	mmu->writeWord(mmu->readWord(pc), X);
 	pc += 2;
 	lastInstructionTicks = 5;
 }
@@ -470,7 +487,7 @@ void CPU::ADD_WX_YZ(byte& W, byte& X, byte Y, byte Z) {
 
 void CPU::ADD_XY_Z(byte& X, byte& Y, byte Z) {
 	uint32_t comp = (X << 8) | Y;
-	ADD_WX_YZ(X, Y, Z, 0);
+	ADD_WX_YZ(X, Y, 0, Z);
 	lastInstructionTicks = 2;
 }
 
@@ -484,6 +501,18 @@ void CPU::ADD_X_Y(byte& X, byte Y) {
 	setFlagIfTrue((value <= 0x0F) && (X > 0x0F), FLAG_HALF_CARRY);
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 1;
+}
+
+void CPU::ADD_SP_X(sbyte X) {
+	unsetFlag(FLAG_SUB);
+	unsetFlag(FLAG_ZERO);
+	uint16_t value = sp;
+	sp += X;
+	// we check for overflow
+	setFlagIfTrue((value > sp), FLAG_CARRY);
+	// check for half carry
+	setFlagIfTrue((value <= 0x00FF) && (sp > 0x00FF), FLAG_HALF_CARRY);
+	lastInstructionTicks = 4;
 }
 
 void CPU::ADD_X_N(byte& X) {
@@ -616,6 +645,11 @@ void CPU::OR_N() {
 	lastInstructionTicks = 2;
 }
 
+void CPU::AND_N() {
+	AND_X(mmu->read(pc));
+	lastInstructionTicks = 2;
+}
+
 void CPU::CP_X(byte X) {
 	setFlag(FLAG_SUB);
 	setFlagIfTrue(a == X, FLAG_ZERO);
@@ -660,6 +694,11 @@ void CPU::JP_X_NN(bool cond) {
 	}
 }
 
+void CPU::JP_XYm(byte X, byte Y) {
+	pc = mmu->read((X << 8) | Y);
+	lastInstructionTicks = 1;
+}
+
 void CPU::CALL_X_NN(bool cond) {
 	if (cond) {
 		sp--;
@@ -669,7 +708,9 @@ void CPU::CALL_X_NN(bool cond) {
 		pc = mmu->read(pc);
 		lastInstructionTicks = 6;
 	}
-	else lastInstructionTicks = 3;
+	else {
+		lastInstructionTicks = 3;
+	}
 }
 
 void CPU::PUSH_XY(byte X, byte Y) {
@@ -689,13 +730,29 @@ void CPU::RST_X(byte X) {
 }
 
 void CPU::LDH_Nm_X(byte X) {
-	mmu->write(mmu->read(0xFF00 + mmu->read(pc)), X);
+	mmu->write(0xFF00 | mmu->read(pc), X);
 	pc++;
 	lastInstructionTicks = 3;
 }
 
+void CPU::LDH_X_Nm(byte& X) {
+	X = mmu->read(0xFF00 + mmu->read(pc));
+	pc++;
+	lastInstructionTicks = 3;
+}
+
+void CPU::LD_Xm_Y(byte X, byte Y) {
+	mmu->write(0xFF00 | X, Y);
+	lastInstructionTicks = 2;
+}
+
+void CPU::LD_X_Ym(byte& X, byte Y) {
+	X = mmu->read(0xFF00 | Y);
+	lastInstructionTicks = 2;
+}
+
 void CPU::JR_COND_N(bool condition) {
-	byte addr = mmu->read(pc);
+	int8_t addr = static_cast<int8_t>(mmu->read(pc));
 	pc++;
 	if (condition) {
 		pc += addr;
@@ -762,6 +819,7 @@ void CPU::LDH_X_Nm(byte& X) {
 	lastInstructionTicks = 3;
 }*/
 
+static int instruction = 0;
 
 
 void CPU::process(const byte& opCode) {
@@ -1721,8 +1779,59 @@ void CPU::process(const byte& opCode) {
 		LDH_Nm_X(a);
 		break;
 
+	case POP_HL:
+		POP_XY(h, l);
+		break;
+
+	case LD_Cm_A:
+		LD_Xm_Y(c, a);
+		break;
+
+	case PUSH_HL:
+		PUSH_XY(h, l);
+		break;
+
+	case AND_n:
+		AND_N();
+		break;
+
+	case RST_20:
+		RST_X(0x20);
+		break;
+
+	case ADD_SP_d:
+		ADD_SP_X(static_cast<sbyte>(mmu->read(pc++)));
+		break;
+
+	case JP_HLm:
+		JP_XYm(h, l);
+		break;
+
+	case LD_nnm_A:
+		LD_NNm_X(a);
+		break;
+
+	case XOR_n:
+		XOR_X(mmu->read(pc));
+		break;
+
+	case RST_28:
+		RST_X(0x28);
+		break;
+		/******************************************************/
+		/************************ 0xF0 ************************/
+		/******************************************************/
+
+	case LDH_A_nm:
+		LDH_X_Nm(a);
+		break;
+
 	case POP_AF:
 		POP_XY(a, f);
+		break;
+
+	case LD_A_Cm:
+		LD_Xm_Y(h, l);
 		break;
 
 	case DI:
@@ -1769,8 +1878,8 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	default:
-		std::cerr << "OPCODE :" << opCode << " not implemented" << std::endl;
-
+		std::cerr << "OPCODE :" << std::hex << static_cast<int>(opCode) << " not implemented" << std::endl;
+		return;
 	}
 }
 
@@ -2745,6 +2854,7 @@ void CPU::processExtended(const byte& opCode) {
 		break;
 
 	default:
-		std::cerr << "OPCODE :" << opCode << " not implemented" << std::endl;
+		std::cerr << "OPCODE EXTENDED :" << std::hex << static_cast<int>(opCode) << " not implemented" << std::endl;
+		return;
 	}
 }

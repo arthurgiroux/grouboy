@@ -250,8 +250,7 @@
 
 #define LDH_nm_A		0xE0
 #define POP_HL			0xE1
-#define LDH_Cm_A		0xE2
-/* NOT IMPLEMENTED		0xE3*/
+#define LD_Cm_A			0xE2
 /* NOT IMPLEMENTED		0xE4*/
 #define PUSH_HL			0xE5
 #define AND_n			0xE6
@@ -267,7 +266,7 @@
 
 #define LDH_A_nm		0xF0
 #define POP_AF			0xF1
-/* NOT IMPLEMENTED		0xF2*/
+#define LD_A_Cm			0xF2
 #define DI				0xF3
 /* NOT IMPLEMENTED		0xF4*/
 #define PUSH_AF			0xF5
