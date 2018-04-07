@@ -35,6 +35,10 @@ private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 	SDL_Surface* currentFrame;
+
+	SDL_Window* windowDebug;
+	SDL_Renderer* rendererDebug;
+	SDL_Surface* currentFrameDebug;
 	MMU* mmu;
 
 	void updateParameters();

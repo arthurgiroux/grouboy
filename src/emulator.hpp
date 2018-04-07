@@ -19,9 +19,9 @@ public:
 	void start();
 
 private:
-	CPU* cpu;
-	MMU* mmu;
-	Graphics* graphics;
+	MMU mmu;
+	CPU cpu;
+	Graphics graphics;
 	GPUMode gpuMode;
 	int tickCounter;
 };
