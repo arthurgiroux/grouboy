@@ -3,8 +3,8 @@
 #include <iostream>
 
 Emulator::Emulator() :
-	graphics(&mmu),
-	cpu(&mmu) {
+	graphics(mmu),
+	cpu(mmu) {
 	tickCounter = 0;
 	gpuMode = HBLANK;
 }

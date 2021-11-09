@@ -6,7 +6,7 @@
 
 class CPU {
 public:
-	CPU(MMU* mmu);
+	CPU(MMU& mmu);
 	~CPU();
 	int exec();
 
@@ -44,7 +44,7 @@ private:
 	uint16_t sp;
 
 	// Memory managment unit
-	MMU* mmu;
+	MMU& mmu;
 
 	// Whether of not the CPU is halted
 	bool halted;

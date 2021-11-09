@@ -11,9 +11,7 @@
 	http://gameboy.mongenel.com/dmg/opcodes.html
 */
 
-CPU::CPU(MMU* mmu_) {
-	assert(mmu_ != NULL);
-
+CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	tick = 0;
 	lastInstructionTicks = 0;
 	pc = 0;
@@ -26,7 +24,6 @@ CPU::CPU(MMU* mmu_) {
 	e = 0xd8;
 	h = 0x01;
 	l = 0x4D;
-	mmu = mmu_;
 	halted = false;
 	interrupts = false;
 	ticksBeforeEnablingInterrupts = 0;
@@ -42,7 +39,7 @@ int CPU::exec() {
 		ticksBeforeDisablingInterrupts--;
 	}
 
-	process(mmu->read(pc++));
+	process(mmu.read(pc++));
 	tick += lastInstructionTicks;
 
 	if (ticksBeforeEnablingInterrupts == 1) {
@@ -84,8 +81,8 @@ CPU::~CPU() {
 }
 
 void CPU::LD_XY_NN(byte& X, byte& Y) {
-	Y = mmu->read(pc);
-	X = mmu->read(pc + 1);
+	Y = mmu.read(pc);
+	X = mmu.read(pc + 1);
 	pc += 2;
 	lastInstructionTicks = 3;
 }
@@ -94,7 +91,7 @@ void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z) {
 	unsetFlag(FLAG_ZERO);
 	unsetFlag(FLAG_SUB);
 	uint16_t value = (X << 8) | Y;
-	uint16_t xy = static_cast<int8_t>(mmu->read(pc)) + Z;
+	uint16_t xy = static_cast<int8_t>(mmu.read(pc)) + Z;
 	pc++;
 	X = (xy >> 8);
 	Y = xy & 0x00FF;
@@ -106,42 +103,42 @@ void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z) {
 }
 
 void CPU::LD_X_NN(uint16_t& X) {
-	X = mmu->readWord(pc);
+	X = mmu.readWord(pc);
 	pc += 2;
 	lastInstructionTicks = 3;
 }
 
 void CPU::LD_X_NNm(byte& X) {
-	X = mmu->read(mmu->readWord(pc));
+	X = mmu.read(mmu.readWord(pc));
 	pc += 2;
 	lastInstructionTicks = 4;
 }
 
 void CPU::LD_NNm_X(byte X) {
-	mmu->write(mmu->readWord(pc), X);
+	mmu.write(mmu.readWord(pc), X);
 	pc += 2;
 	lastInstructionTicks = 4;
 }
 
 void CPU::LD_X_N(byte& X) {
-	X = mmu->read(pc);
+	X = mmu.read(pc);
 	pc++;
 	lastInstructionTicks = 2;
 }
 
 void CPU::LD_XYm_Z(byte X, byte Y, byte Z) {
-	mmu->write((X << 8) | Y, Z);
+	mmu.write((X << 8) | Y, Z);
 	lastInstructionTicks = 2;
 }
 
 void CPU::LD_XYm_N(byte X, byte Y) {
-	mmu->write((X << 8) | Y, mmu->read(pc));
+	mmu.write((X << 8) | Y, mmu.read(pc));
 	pc++;
 	lastInstructionTicks = 3;
 }
 
 void CPU::LD_XYm_I_Z(byte& X, byte& Y, byte Z) {
-	mmu->write((X << 8) | Y, Z);
+	mmu.write((X << 8) | Y, Z);
 	// Increment the LSB part of the address
 	Y++;
 	// If we overflowed then we increment the MSB part
@@ -152,7 +149,7 @@ void CPU::LD_XYm_I_Z(byte& X, byte& Y, byte Z) {
 }
 
 void CPU::LD_X_YZm_I(byte& X, byte& Y, byte& Z) {
-	X = mmu->read((Y << 8) | Z);
+	X = mmu.read((Y << 8) | Z);
 	// Increment the LSB part of the address
 	Z++;
 	// If we overflowed then we increment the MSB part
@@ -163,7 +160,7 @@ void CPU::LD_X_YZm_I(byte& X, byte& Y, byte& Z) {
 }
 
 void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z) {
-	X = mmu->read((Y << 8) | Z);
+	X = mmu.read((Y << 8) | Z);
 	// Decrement the MSB part of the address if it's set
 	if (Y > 0) {
 		Y--;
@@ -177,7 +174,7 @@ void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z) {
 
 void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z) {
 	uint16_t XY = (X << 8) | Y;
-	mmu->write(XY, Z);
+	mmu.write(XY, Z);
 	XY--;
 	X = XY >> 8;
 	Y = XY & 0xFF;
@@ -193,12 +190,12 @@ void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z) {
 }
 
 void CPU::LD_X_YZm(byte& X, byte Y, byte Z) {
-	X = mmu->read((Y << 8) | Z);
+	X = mmu.read((Y << 8) | Z);
 	lastInstructionTicks = 2;
 }
 
 void CPU::LD_NNm_X(uint16_t& X) {
-	mmu->writeWord(mmu->readWord(pc), X);
+	mmu.writeWord(mmu.readWord(pc), X);
 	pc += 2;
 	lastInstructionTicks = 5;
 }
@@ -226,9 +223,9 @@ void CPU::INC_XY(uint16_t& XY) {
 
 void CPU::INC_XYm(byte X, byte Y) {
 	unsetFlag(FLAG_SUB);
-	byte oldvalue = mmu->read((X << 8) | Y);
+	byte oldvalue = mmu.read((X << 8) | Y);
 	byte value = oldvalue + 1;
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	// Set the ZERO flag if the value overflowed
 	changeZeroValueFlag(value);
 	// we check if we have an half carry
@@ -241,9 +238,9 @@ void CPU::INC_XYm(byte X, byte Y) {
 
 void CPU::DEC_XYm(byte X, byte Y) {
 	setFlag(FLAG_SUB);
-	byte oldvalue = mmu->read((X << 8) | Y);
+	byte oldvalue = mmu.read((X << 8) | Y);
 	byte value = oldvalue - 1;
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	// Set the ZERO flag if the value overflowed
 	changeZeroValueFlag(value);
 	// we check if we have an half carry
@@ -299,9 +296,9 @@ void CPU::RLC_X(byte& X) {
 }
 
 void CPU::RLC_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	RLC_X(value);
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -319,10 +316,10 @@ void CPU::RRC_X(byte& X) {
 }
 
 void CPU::RRC_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	RRC_X(value);
 	// Write back the value to memory
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -337,10 +334,10 @@ void CPU::RL_X(byte& X) {
 }
 
 void CPU::RL_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	RL_X(value);
 	// Write back the value to memory
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -355,10 +352,10 @@ void CPU::RR_X(byte& X) {
 }
 
 void CPU::RR_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	RR_X(value);
 	// Write back the value to memory
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -373,9 +370,9 @@ void CPU::SLA_X(byte& X) {
 }
 
 void CPU::SLA_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	SLA_X(value);
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -390,9 +387,9 @@ void CPU::SRA_X(byte X) {
 }
 
 void CPU::SRA_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	SRA_X(value);
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -408,9 +405,9 @@ void CPU::SRL_X(byte& X) {
 }
 
 void CPU::SRL_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	SRL_X(value);
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -427,9 +424,9 @@ void CPU::SWAP_X(byte& X) {
 }
 
 void CPU::SWAP_XYm(byte X, byte Y) {
-	byte value = mmu->read((X << 8) | Y);
+	byte value = mmu.read((X << 8) | Y);
 	SWAP_X(value);
-	mmu->write((X << 8) | Y, value);
+	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
@@ -442,7 +439,7 @@ void CPU::BIT_X_Y(byte X, byte Y) {
 }
 
 void CPU::BIT_X_YZm(byte X, byte Y, byte Z) {
-	byte value = mmu->read((Y << 8) | Z);
+	byte value = mmu.read((Y << 8) | Z);
 	BIT_X_Y(X, value);
 	lastInstructionTicks = 4;
 }
@@ -453,9 +450,9 @@ void CPU::RES_X_Y(byte X, byte& Y) {
 }
 
 void CPU::RES_X_YZm(byte X, byte Y, byte Z) {
-	byte value = mmu->read((Y << 8) | Z);
+	byte value = mmu.read((Y << 8) | Z);
 	RES_X_Y(X, value);
-	mmu->write((Y << 8) | Z, value);
+	mmu.write((Y << 8) | Z, value);
 	lastInstructionTicks = 4;
 }
 
@@ -465,9 +462,9 @@ void CPU::SET_X_Y(byte X, byte& Y) {
 }
 
 void CPU::SET_X_YZm(byte X, byte Y, byte Z) {
-	byte value = mmu->read((Y << 8) | Z);
+	byte value = mmu.read((Y << 8) | Z);
 	SET_X_Y(X, value);
-	mmu->write((Y << 8) | Z, value);
+	mmu.write((Y << 8) | Z, value);
 	lastInstructionTicks = 4;
 }
 
@@ -516,7 +513,7 @@ void CPU::ADD_SP_X(sbyte X) {
 }
 
 void CPU::ADD_X_N(byte& X) {
-	ADD_X_Y(X, mmu->read(pc));
+	ADD_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
@@ -536,17 +533,17 @@ void CPU::ADC_X_Y(byte& X, byte Y) {
 }
 
 void CPU::ADC_X_N(byte X) {
-	ADC_X_Y(X, mmu->read(pc));
+	ADC_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
 void CPU::ADD_X_YZm(byte& X, byte Y, byte Z) {
-	ADD_X_Y(X, mmu->read((Y << 8) | Z));
+	ADD_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
 void CPU::ADC_X_YZm(byte& X, byte Y, byte Z) {
-	ADC_X_Y(X, mmu->read((Y << 8) | Z));
+	ADC_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
@@ -564,7 +561,7 @@ void CPU::SUB_X_Y(byte& X, byte Y) {
 }
 
 void CPU::SUB_X_N(byte& X) {
-	SUB_X_Y(X, mmu->read(pc));
+	SUB_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
@@ -584,17 +581,17 @@ void CPU::SBC_X_Y(byte& X, byte Y) {
 }
 
 void CPU::SBC_X_N(byte& X) {
-	SBC_X_Y(X, mmu->read(pc));
+	SBC_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
 void CPU::SUB_X_YZm(byte& X, byte Y, byte Z) {
-	SUB_X_Y(X, mmu->read((Y << 8) | Z));
+	SUB_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
 void CPU::SBC_X_YZm(byte& X, byte Y, byte Z) {
-	SBC_X_Y(X, mmu->read((Y << 8) | Z));
+	SBC_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
@@ -608,7 +605,7 @@ void CPU::AND_X(byte X) {
 }
 
 void CPU::AND_XYm(byte X, byte Y) {
-	AND_X(mmu->read((X << 8) | Y));
+	AND_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
@@ -622,7 +619,7 @@ void CPU::XOR_X(byte X) {
 }
 
 void CPU::XOR_XYm(byte X, byte Y) {
-	XOR_X(mmu->read((X << 8) | Y));
+	XOR_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
@@ -636,17 +633,17 @@ void CPU::OR_X(byte X) {
 }
 
 void CPU::OR_XYm(byte X, byte Y) {
-	OR_X(mmu->read((X << 8) | Y));
+	OR_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
 void CPU::OR_N() {
-	OR_X(mmu->read(pc));
+	OR_X(mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
 void CPU::AND_N() {
-	AND_X(mmu->read(pc));
+	AND_X(mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
@@ -659,19 +656,19 @@ void CPU::CP_X(byte X) {
 }
 
 void CPU::CP_XYm(byte X, byte Y) {
-	CP_X(mmu->read((X << 8) | Y));
+	CP_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
 void CPU::POP_XY(byte X, byte Y) {
-	Y = mmu->read(sp);
-	X = mmu->read(sp + 1);
+	Y = mmu.read(sp);
+	X = mmu.read(sp + 1);
 	sp += 2;
 	lastInstructionTicks = 3;
 }
 
 void CPU::RET_X(bool cond) {
-	uint16_t addr = mmu->readWord(sp);
+	uint16_t addr = mmu.readWord(sp);
 	sp += 2;
 	if (cond) {
 		pc = addr;
@@ -683,7 +680,7 @@ void CPU::RET_X(bool cond) {
 }
 
 void CPU::JP_X_NN(bool cond) {
-	uint16_t addr = ((mmu->read(pc + 1) << 8) | mmu->read(pc));
+	uint16_t addr = ((mmu.read(pc + 1) << 8) | mmu.read(pc));
 	pc += 2;
 	if (cond) {
 		pc = addr;
@@ -695,17 +692,17 @@ void CPU::JP_X_NN(bool cond) {
 }
 
 void CPU::JP_XYm(byte X, byte Y) {
-	pc = mmu->read((X << 8) | Y);
+	pc = mmu.read((X << 8) | Y);
 	lastInstructionTicks = 1;
 }
 
 void CPU::CALL_X_NN(bool cond) {
 	if (cond) {
 		sp--;
-		mmu->write(sp, (pc >> 8));
+		mmu.write(sp, (pc >> 8));
 		sp--;
-		mmu->write(sp, (pc & 0x00FF));
-		pc = mmu->read(pc);
+		mmu.write(sp, (pc & 0x00FF));
+		pc = mmu.read(pc);
 		lastInstructionTicks = 6;
 	}
 	else {
@@ -715,44 +712,44 @@ void CPU::CALL_X_NN(bool cond) {
 
 void CPU::PUSH_XY(byte X, byte Y) {
 	sp -= 2;
-	mmu->write(sp, X);
-	mmu->write(sp + 1, Y);
+	mmu.write(sp, X);
+	mmu.write(sp + 1, Y);
 	lastInstructionTicks = 4;
 }
 
 
 void CPU::RST_X(byte X) {
 	sp -= 2;
-	mmu->write(sp, (pc & 0x00FF));
-	mmu->write(sp + 1, (pc >> 8));
+	mmu.write(sp, (pc & 0x00FF));
+	mmu.write(sp + 1, (pc >> 8));
 	pc = X;
 	lastInstructionTicks = 4;
 }
 
 void CPU::LDH_Nm_X(byte X) {
-	mmu->write(0xFF00 | mmu->read(pc), X);
+	mmu.write(0xFF00 | mmu.read(pc), X);
 	pc++;
 	lastInstructionTicks = 3;
 }
 
 void CPU::LDH_X_Nm(byte& X) {
-	X = mmu->read(0xFF00 + mmu->read(pc));
+	X = mmu.read(0xFF00 + mmu.read(pc));
 	pc++;
 	lastInstructionTicks = 3;
 }
 
 void CPU::LD_Xm_Y(byte X, byte Y) {
-	mmu->write(0xFF00 | X, Y);
+	mmu.write(0xFF00 | X, Y);
 	lastInstructionTicks = 2;
 }
 
 void CPU::LD_X_Ym(byte& X, byte Y) {
-	X = mmu->read(0xFF00 | Y);
+	X = mmu.read(0xFF00 | Y);
 	lastInstructionTicks = 2;
 }
 
 void CPU::JR_COND_N(bool condition) {
-	int8_t addr = static_cast<int8_t>(mmu->read(pc));
+	int8_t addr = static_cast<int8_t>(mmu.read(pc));
 	pc++;
 	if (condition) {
 		pc += addr;
@@ -808,13 +805,13 @@ void CPU::CCF_() {
 
 /*
 void CPU::LDH_Xm_Y(byte X, byte Y) {
-	mmu->write(mmu->read(0xFF00 + mmu->read(pc)), X);
-	mmu->write(0xFF00 + mmu->read(X), Y);
+	mmu.write(mmu.read(0xFF00 + mmu.read(pc)), X);
+	mmu.write(0xFF00 + mmu.read(X), Y);
 	lastInstructionTicks = 3;
 }
 
 void CPU::LDH_X_Nm(byte& X) {
-	(X = mmu->read(0xFF00 + mmu->read(pc));
+	(X = mmu.read(0xFF00 + mmu.read(pc));
 	pc++;
 	lastInstructionTicks = 3;
 }*/
@@ -1695,7 +1692,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case EXT_OPS:
-		processExtended(mmu->read(pc++));
+		processExtended(mmu.read(pc++));
 		break;
 
 	case CALL_Z_nn:
@@ -1800,7 +1797,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case ADD_SP_d:
-		ADD_SP_X(static_cast<sbyte>(mmu->read(pc++)));
+		ADD_SP_X(static_cast<sbyte>(mmu.read(pc++)));
 		break;
 
 	case JP_HLm:
@@ -1812,7 +1809,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case XOR_n:
-		XOR_X(mmu->read(pc));
+		XOR_X(mmu.read(pc));
 		break;
 
 	case RST_28:
@@ -1856,7 +1853,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case LD_SP_HL:
-		mmu->writeWord(sp, (h << 8) | l);
+		mmu.writeWord(sp, (h << 8) | l);
 		lastInstructionTicks = 2;
 		break;
 
@@ -1870,7 +1867,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case CP_n:
-		CP_X(mmu->read(pc));
+		CP_X(mmu.read(pc));
 		break;
 
 	case RST_38:

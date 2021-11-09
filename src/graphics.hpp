@@ -24,7 +24,7 @@
 class Graphics {
 
 public:
-	Graphics(MMU* _mmu);
+	Graphics(MMU& _mmu);
 	~Graphics();
 	void renderCurrentFrame();
 	byte getScanline();
@@ -39,7 +39,7 @@ private:
 	SDL_Window* windowDebug;
 	SDL_Renderer* rendererDebug;
 	SDL_Surface* currentFrameDebug;
-	MMU* mmu;
+	MMU& mmu;
 
 	void updateParameters();
 

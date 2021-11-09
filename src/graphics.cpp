@@ -1,16 +1,14 @@
 #include <iostream>
 #include <cassert>
 #include <SDL2/SDL.h>
-#include <stdint.h>
+#include <cstdint>
 #include <cassert>
 #include <chrono>
 
 #include "graphics.hpp"
 
-Graphics::Graphics(MMU* _mmu) :
-	scanline(0) {
-	assert(_mmu != nullptr);
-	mmu = _mmu;
+Graphics::Graphics(MMU& _mmu) :
+	scanline(0), mmu(_mmu) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) == -1) {
 		std::cout << "error while initiliazing sdl library : " << SDL_GetError() << std::endl;
@@ -67,7 +65,7 @@ void Graphics::renderCurrentFrame() {
 	uint16_t map = paramBackgroundTileMap ? ADDR_MAP_0 : ADDR_MAP_1;
 
 	for (int tile = 0; tile < TILES_PER_LINE; ++tile) {
-		byte tileId = mmu->read((map + y + scrollX) / 8);
+		byte tileId = mmu.read((map + y + scrollX) / 8);
 
 		uint16_t tileAddr;
 		if (!paramBackgroundTileMap) {
@@ -82,7 +80,7 @@ void Graphics::renderCurrentFrame() {
 
 
 		//for (int i = 0; i < 8; ++i) {
-		uint16_t colors = mmu->readWord(tileAddr + 2 * (y / 8));
+		uint16_t colors = mmu.readWord(tileAddr + 2 * (y / 8));
 
 		/* Colors are stored on the two adjacents bytes,
 		   the first byte is the LSB and the second the MSB
@@ -157,7 +155,7 @@ void Graphics::updateScreen() {
 		/*byte color = ((((colors >> 8) & j) >> (j - 2)) |
 		((colors & j) >> (j - 1)));*/
 
-		uint16_t colors = mmu->readWord(tileAddr + i * 2);
+		uint16_t colors = mmu.readWord(tileAddr + i * 2);
 
 		for (int j = 7; j >= 0; j--) {
 			byte color = (((colors >> j) << 1) & 0x02) | ((colors >> 8 >> j) & 0x01);
@@ -233,15 +231,15 @@ byte Graphics::getScanline() {
 
 void Graphics::setScanline(byte value) {
 	scanline = value;
-	mmu->write(ADDR_SCANLINE, value);
+	mmu.write(ADDR_SCANLINE, value);
 }
 
 void Graphics::updateParameters() {
-	scrollX = mmu->read(ADDR_SCROLL_X);
-	scrollY = mmu->read(ADDR_SCROLL_Y);
-	scanline = mmu->read(ADDR_SCANLINE);
+	scrollX = mmu.read(ADDR_SCROLL_X);
+	scrollY = mmu.read(ADDR_SCROLL_Y);
+	scanline = mmu.read(ADDR_SCANLINE);
 
-	byte lcdGpuControl = mmu->read(ADDR_LCD_GPU_CONTROL);
+	byte lcdGpuControl = mmu.read(ADDR_LCD_GPU_CONTROL);
 	paramBackgroundStatus = ((lcdGpuControl & 1) == 1);
 	paramBackgroundStatus = ((lcdGpuControl & 2) == 2);
 	paramSpriteSize = ((lcdGpuControl & 3) == 3);

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <memory>
+#include <cstring>
 #include "mmu.hpp"
 
 MMU::MMU() {
