@@ -15,7 +15,10 @@ add_executable(
         ../src/mmu.hpp
         ../src/cpu.cpp
         ../src/cpu.hpp
+        ../src/gpu.cpp
+        ../src/gpu.hpp
         test_mmu.cpp
+        test_gpu.cpp
         test_cpu.cpp
 )
 
