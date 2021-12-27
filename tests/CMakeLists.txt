@@ -13,7 +13,10 @@ add_executable(
         emulator_tests
         ../src/mmu.cpp
         ../src/mmu.hpp
+        ../src/cpu.cpp
+        ../src/cpu.hpp
         test_mmu.cpp
+        test_cpu.cpp
 )
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)

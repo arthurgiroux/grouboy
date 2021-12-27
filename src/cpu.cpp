@@ -827,7 +827,7 @@ void CPU::process(const byte& opCode) {
 		/******************************************************/
 
 	case NOP:
-		lastInstructionTicks = 1;
+            lastInstructionTicks = 1;
 		break;
 
 	case LD_BC_nn:

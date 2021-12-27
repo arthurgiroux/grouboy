@@ -10,7 +10,9 @@ public:
 	~CPU();
 	int exec();
 
+#ifndef UNIT_TESTING
 private:
+#endif
 
 	// Process the given opcode as a base opcode
 	void process(const byte& opCode);
@@ -43,7 +45,7 @@ private:
 	// stack pointer
 	uint16_t sp;
 
-	// Memory managment unit
+	// Memory management unit
 	MMU& mmu;
 
 	// Whether of not the CPU is halted
