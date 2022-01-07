@@ -10,52 +10,12 @@
 Graphics::Graphics(MMU& _mmu) :
 	scanline(0), mmu(_mmu) {
 
-	if (SDL_Init(SDL_INIT_VIDEO) == -1) {
-		std::cout << "error while initiliazing sdl library : " << SDL_GetError() << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	window = SDL_CreateWindow("Gameboy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-	windowDebug = SDL_CreateWindow("Gameboy Emulator Debug", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 8, 8, SDL_WINDOW_SHOWN | SDL_WINDOW_MAXIMIZED);
-
-	if (window == nullptr) {
-		std::cout << "error while creating window : " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		exit(EXIT_FAILURE);
-	}
-
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	rendererDebug = SDL_CreateRenderer(windowDebug, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-	if (renderer == nullptr) {
-		SDL_DestroyWindow(window);
-		std::cout << "error while creating renderer : " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		exit(EXIT_FAILURE);
-	}
-
-	currentFrame = SDL_CreateRGBSurface(SDL_SWSURFACE, WINDOW_WIDTH, WINDOW_HEIGHT, 32, 0, 0, 0, 0);
-	currentFrameDebug = SDL_CreateRGBSurface(SDL_SWSURFACE, 8, 8, 32, 0, 0, 0, 0);
-
 }
 
 Graphics::~Graphics() {
-	if (renderer != nullptr) {
-		SDL_DestroyRenderer(renderer);
-	}
-
-	if (window != nullptr) {
-		SDL_DestroyWindow(window);
-	}
-
-	if (currentFrame != nullptr) {
-		SDL_FreeSurface(currentFrame);
-	}
-
-	SDL_Quit();
 }
 
-void Graphics::renderCurrentFrame() {
+void Graphics::renderScanline() {
 
 	updateParameters();
 
@@ -134,95 +94,6 @@ void Graphics::renderCurrentFrame() {
 		}
 	}
 
-	SDL_LockSurface(currentFrame);
-	//memset(currentFrame->pixels, 0, currentFrame->pitch * currentFrame->w);
-	memcpy(static_cast<Uint8*>(currentFrame->pixels) + (scanline * currentFrame->pitch), line, currentFrame->pitch);
-	SDL_UnlockSurface(currentFrame);
-
-}
-
-void Graphics::updateScreen() {
-
-
-
-	byte tileDebug[8 * 8 * 4] = { 255 };
-
-	//for (int a = 0; a < 256; ++a) {
-	int a = 0;
-	uint16_t tileAddr = ADDR_TILE_MAP_0 + a * 8 * 2;
-
-	for (int i = 0; i < 8; i++) {
-		/*byte color = ((((colors >> 8) & j) >> (j - 2)) |
-		((colors & j) >> (j - 1)));*/
-
-		uint16_t colors = mmu.readWord(tileAddr + i * 2);
-
-		for (int j = 7; j >= 0; j--) {
-			byte color = (((colors >> j) << 1) & 0x02) | ((colors >> 8 >> j) & 0x01);
-
-			byte colorChosen = 0;
-			switch (color) {
-			case 0:
-				colorChosen = 255;
-				break;
-
-			case 1:
-				colorChosen = 192;
-				break;
-
-			case 2:
-				colorChosen = 96;
-				break;
-
-			case 3:
-				colorChosen = 0;
-				break;
-
-			default:
-				std::cout << "something went wrong during color computation" << std::endl;
-				exit(EXIT_FAILURE);
-				break;
-
-			}
-
-			tileDebug[4 * (8 * i + (7 - j))] = colorChosen;
-			tileDebug[4 * (8 * i + (7 - j)) + 1] = colorChosen;
-			tileDebug[4 * (8 * i + (7 - j)) + 2] = colorChosen;
-
-
-			//tileDebug[4 * (8 * i + j)] = j / 7.0f * 255;
-			//tileDebug[4 * (8 * i + j) + 1] = i / 7.0f * 255;
-			//tileDebug[4 * (8 * i + j) + 2] = 0;
-		}
-	}
-
-	SDL_LockSurface(currentFrameDebug);
-	//memset(currentFrame->pixels, 0, currentFrame->pitch * currentFrame->w);
-	memcpy(static_cast<Uint8*>(currentFrameDebug->pixels), tileDebug, sizeof(tileDebug));
-	SDL_UnlockSurface(currentFrameDebug);
-	//}
-
-	static std::chrono::high_resolution_clock::time_point last = std::chrono::high_resolution_clock::now();
-
-	std::chrono::high_resolution_clock::time_point curTime = std::chrono::high_resolution_clock::now();
-
-	std::cout << "last update was : " << std::chrono::duration_cast<std::chrono::milliseconds>(curTime - last).count() << std::endl;
-	last = curTime;
-
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, currentFrame);
-	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
-	SDL_RenderPresent(renderer);
-	SDL_DestroyTexture(texture);
-
-	SDL_Texture *textureDebug = SDL_CreateTextureFromSurface(rendererDebug, currentFrameDebug);
-	SDL_RenderClear(rendererDebug);
-	SDL_RenderCopy(rendererDebug, textureDebug, NULL, NULL);
-	SDL_RenderPresent(rendererDebug);
-	SDL_DestroyTexture(textureDebug);
-
-	SDL_Event events = { 0 };
-	SDL_WaitEvent(&events);
 }
 
 byte Graphics::getScanline() {
@@ -248,5 +119,4 @@ void Graphics::updateParameters() {
 	paramWindowStatus = ((lcdGpuControl & 6) == 6);
 	paramWindowTileMap = ((lcdGpuControl & 7) == 7);
 	paramDisplayStatus = ((lcdGpuControl & 8) == 8);
-
 }

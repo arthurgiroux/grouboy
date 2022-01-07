@@ -20,11 +20,18 @@ set(SOURCE_FILES
 	src/main.cpp
 	src/gpu.cpp
 	src/gpu.hpp
-	)
+#	src/imgui/imgui.cpp
+#		src/imgui/imgui_impl_sdl.cpp
+#		src/imgui/imgui_impl_sdlrenderer.cpp
+#		src/imgui/imgui_impl_win32.cpp
+#		src/imgui/imgui_draw.cpp
+#		src/imgui/imgui_tables.cpp
+#		src/imgui/imgui_widgets.cpp
+		src/tile.cpp src/tile.hpp)
 
 link_directories(${SDL_LIB_DIR})
 add_executable(gbemulator ${SOURCE_FILES})
-target_include_directories(gbemulator PUBLIC ${SDL_INCLUDE_DIR})
-target_link_libraries(gbemulator SDL2)
+target_include_directories(gbemulator PUBLIC ${SDL_INCLUDE_DIR} src/imgui)
+target_link_libraries(gbemulator SDL2 SDL2main)
 
 add_subdirectory(tests/)

@@ -1,11 +1,8 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include <SDL2/SDL.h>
 #include "mmu.hpp"
-
-#define WINDOW_WIDTH 160
-#define WINDOW_HEIGHT 144
+#include <array>
 
 #define ADDR_LCD_GPU_CONTROL    0xFF40
 #define ADDR_SCROLL_Y           0xFF42
@@ -26,20 +23,18 @@ class Graphics {
 public:
 	Graphics(MMU& _mmu);
 	~Graphics();
-	void renderCurrentFrame();
+	void renderScanline();
 	byte getScanline();
 	void setScanline(byte value);
-	void updateScreen();
+
+    static const int SCREEN_WIDTH = 160;
+    static const int SCREEN_HEIGHT = 144;
+    static const int BYTE_PER_PIXEL = 4;
+    static const int SCREEN_SIZE_BYTES = SCREEN_WIDTH * SCREEN_HEIGHT * BYTE_PER_PIXEL;
 
 private:
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	SDL_Surface* currentFrame;
-
-	SDL_Window* windowDebug;
-	SDL_Renderer* rendererDebug;
-	SDL_Surface* currentFrameDebug;
-	MMU& mmu;
+    MMU& mmu;
+    std::array<byte, SCREEN_SIZE_BYTES> screenPixels;
 
 	void updateParameters();
 
