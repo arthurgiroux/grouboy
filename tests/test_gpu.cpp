@@ -3,7 +3,8 @@
 
 class GpuTest : public ::testing::Test {
 protected:
-    GPU gpu;
+    MMU mmu;
+    GPU gpu = GPU(mmu);
 };
 
 TEST_F(GpuTest, DefaultModeShouldBeOam) {

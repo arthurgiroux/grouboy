@@ -29,6 +29,11 @@ private:
 
     TileDataArray data = {};
     TileRGBArray pixels = {};
+
+    static const int COLOR_BLACK;
+    static const int COLOR_WHITE;
+    static const int COLOR_DARK_GRAY;
+    static const int COLOR_LIGHT_GRAY;
 };
 
 #endif //GBEMULATOR_TILE_H

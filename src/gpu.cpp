@@ -39,15 +39,7 @@ void GPU::renderScanline(int scanline) {
 
     for (int tile = 0; tile < TILES_PER_LINE; ++tile) {
         byte tileId = mmu.read( baseAddr + tile);
-
-        uint16_t tileAddr;
-        if (!useBackgroundTileMap0) {
-            tileAddr = ADDR_TILE_MAP_1 + tileId * 8;
-        } else if (tileId >= 128) {
-            tileAddr = ADDR_TILE_MAP_0 - (tileId - 127) * 8;
-        } else {
-            tileAddr = ADDR_TILE_MAP_0 + tileId * 8;
-        }
+        // TODO: update pixels
     }
 }
 
@@ -74,8 +66,18 @@ void GPU::updateParameters() {
     paramDisplayStatus = ((lcdGpuControl & 8) == 8);
 }
 
-GPU::Tile GPU::getTileById(int16_t tileId, int8_t tileSetId) {
-    uint16_t tileAddr = mmu.readWord(ADDR_TILE_SET_0 + GPU::BYTES_PER_TILE * tileId);
+Tile GPU::getTileById(int16_t tileId, int8_t tileSetId) {
+    int tileSetOffset = ADDR_TILE_SET_0;
+    if (tileSetId == 1) {
+        tileSetOffset = ADDR_TILE_SET_1;
+    }
 
-    return GPU::Tile();
+    uint16_t tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileId;
+    Tile::TileDataArray dataArray;
+    // TODO: Read word
+    for (int i = 0; i < Tile::BYTES_PER_TILE; ++i) {
+        dataArray[i] = mmu.read(tileBaseAddr + i);
+    }
+
+    return Tile(dataArray);
 }

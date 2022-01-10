@@ -17,10 +17,12 @@ add_executable(
         ../src/cpu.hpp
         ../src/gpu.cpp
         ../src/gpu.hpp
+        ../src/tile.cpp
+        ../src/tile.hpp
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp
-)
+        test_tile.cpp)
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
 

@@ -3,6 +3,7 @@
 
 #include "mmu.hpp"
 #include <array>
+#include "tile.hpp"
 
 class GPU {
 public:
@@ -21,6 +22,8 @@ public:
         return currentScanline;
     }
 
+    Tile getTileById(int16_t tileId, int8_t tileSetId);
+
 #ifndef UNIT_TESTING
 private:
 #endif
@@ -33,7 +36,6 @@ private:
     void renderScanline(int scanline);
     void renderFrame();
     void updateParameters();
-    Tile getTileById(int16_t tileId, int8_t tileSetId);
 
     int ticksSpentInCurrentMode = 0;
     Mode currentMode = OAM_ACCESS;
