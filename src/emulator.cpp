@@ -1,7 +1,8 @@
 #include "emulator.hpp"
 
 Emulator::Emulator() :
-	cpu(mmu) {
+	cpu(mmu),
+	gpu(mmu) {
 }
 
 Emulator::~Emulator() = default;
