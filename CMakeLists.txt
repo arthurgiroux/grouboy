@@ -11,8 +11,6 @@ set(SOURCE_FILES
 	src/cpu.hpp
 	src/emulator.hpp
 	src/emulator.cpp
-	#src/graphics.cpp
-	#src/graphics.hpp
 	src/instructions.hpp
 	src/mmu.cpp
 	src/mmu.hpp
