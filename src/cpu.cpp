@@ -16,14 +16,6 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	lastInstructionTicks = 0;
 	pc = 0;
 	sp = 0;
-	f = 0xb0;
-	a = 0x01;
-	b = 0x00;
-	c = 0x13;
-	d = 0x00;
-	e = 0xd8;
-	h = 0x01;
-	l = 0x4D;
 	halted = false;
 	interrupts = false;
 	ticksBeforeEnablingInterrupts = 0;
@@ -680,7 +672,7 @@ void CPU::RET_X(bool cond) {
 }
 
 void CPU::JP_X_NN(bool cond) {
-	uint16_t addr = ((mmu.read(pc + 1) << 8) | mmu.read(pc));
+	uint16_t addr = mmu.readWord(pc);
 	pc += 2;
 	if (cond) {
 		pc = addr;
@@ -698,10 +690,8 @@ void CPU::JP_XYm(byte X, byte Y) {
 
 void CPU::CALL_X_NN(bool cond) {
 	if (cond) {
-		sp--;
-		mmu.write(sp, (pc >> 8));
-		sp--;
-		mmu.write(sp, (pc & 0x00FF));
+	    sp -= 2;
+	    mmu.writeWord(sp, pc+2);
 		pc = mmu.read(pc);
 		lastInstructionTicks = 6;
 	}
@@ -720,8 +710,7 @@ void CPU::PUSH_XY(byte X, byte Y) {
 
 void CPU::RST_X(byte X) {
 	sp -= 2;
-	mmu.write(sp, (pc & 0x00FF));
-	mmu.write(sp + 1, (pc >> 8));
+	mmu.writeWord(sp, pc);
 	pc = X;
 	lastInstructionTicks = 4;
 }
@@ -1809,7 +1798,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case XOR_n:
-		XOR_X(mmu.read(pc));
+		XOR_X(mmu.read(pc++));
 		break;
 
 	case RST_28:
@@ -1867,7 +1856,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case CP_n:
-		CP_X(mmu.read(pc));
+		CP_X(mmu.read(pc++));
 		break;
 
 	case RST_38:

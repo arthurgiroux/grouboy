@@ -11,10 +11,27 @@ public:
 	~Emulator();
 	void exec();
 
+	GPU& getGPU() {
+	    return gpu;
+	}
+
+    MMU& getMMU() {
+        return mmu;
+    }
+
+    CPU& getCPU() {
+	    return cpu;
+	}
+
+	int getCurrentTicks() const {
+	    return currentTicks;
+	}
+
 private:
     MMU mmu;
 	CPU cpu;
 	GPU gpu;
+	int currentTicks = 0;
 };
 
 #endif

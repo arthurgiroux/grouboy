@@ -45,6 +45,7 @@ void GPU::renderScanline(int scanline) {
 
 void GPU::renderFrame() {
     currentFrame = temporaryFrame;
+    frameId++;
 }
 
 GPU::GPU(MMU& mmu_) : mmu(mmu_) {
@@ -73,11 +74,23 @@ Tile GPU::getTileById(int16_t tileId, int8_t tileSetId) {
     }
 
     uint16_t tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileId;
-    Tile::TileDataArray dataArray;
+    Tile::TileDataArray dataArray = {};
     // TODO: Read word
     for (int i = 0; i < Tile::BYTES_PER_TILE; ++i) {
         dataArray[i] = mmu.read(tileBaseAddr + i);
     }
 
     return Tile(dataArray);
+}
+
+GPU::TileMap GPU::getTileMap(int index) {
+    int tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
+    TileMap map = {};
+
+    for (int i = 0; i < TILEMAP_WIDTH*TILEMAP_HEIGHT; ++i) {
+        sbyte tileId = mmu.read(tileMapAddr + i);
+        map.push_back(getTileById(tileId, index));
+    }
+
+    return map;
 }

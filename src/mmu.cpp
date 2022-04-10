@@ -1,9 +1,10 @@
 #include <cassert>
 #include <memory>
 #include <cstring>
+#include <fstream>
 #include "mmu.hpp"
 
-const byte MMU::BIOS[256] = {
+const std::array<byte, 256> MMU::BIOS = {
 0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
 0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3, 0xE2, 0x32, 0x3E, 0x77, 0x77, 0x3E, 0xFC, 0xE0,
 0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A, 0xCD, 0x95, 0x00, 0xCD, 0x96, 0x00, 0x13, 0x7B,
@@ -23,8 +24,8 @@ const byte MMU::BIOS[256] = {
 };
 
 MMU::MMU() {
-	memset(memory, 0, sizeof(memory));
-	memcpy(memory, BIOS, sizeof(BIOS));
+    memory.fill(0);
+    std::copy(BIOS.begin(), BIOS.end(), memory.begin());
 }
 
 byte MMU::read(const uint16_t& addr) {
@@ -58,6 +59,19 @@ void MMU::writeWord(const uint16_t& addr, const uint16_t& value) {
 
 	memory[addr] = value & 0x00FFu;
 	memory[addr+1] = value >> 8u;
+}
+
+bool MMU::loadROM(const std::string& filepath) {
+    std::ifstream input(filepath, std::ios::binary);
+    bool ret = false;
+    if (input.good()) {
+        std::copy(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>(),
+                  memory.begin() + START_ROM_OFFSET);
+        ret = true;
+    }
+
+    input.close();
+    return ret;
 }
 
 MMU::~MMU() = default;

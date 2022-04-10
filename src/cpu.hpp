@@ -10,6 +10,46 @@ public:
 	~CPU();
 	int exec();
 
+	byte getRegisterA() const {
+	    return a;
+	}
+
+	byte getRegisterB() const {
+	    return b;
+	}
+
+    byte getRegisterC() const {
+	    return c;
+	}
+
+    byte getRegisterD() const {
+	    return d;
+	}
+
+    byte getRegisterE() const {
+	    return e;
+	}
+
+    byte getRegisterF() const {
+	    return f;
+	}
+
+    byte getRegisterH() const {
+	    return h;
+	}
+
+    byte getRegisterL() const {
+	    return l;
+	}
+
+    uint16_t getProgramCounter() const {
+	    return pc;
+	}
+
+    uint16_t getStackPointer() const {
+	    return sp;
+	}
+
 #ifndef UNIT_TESTING
 private:
 #endif

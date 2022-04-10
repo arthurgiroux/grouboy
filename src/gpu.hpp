@@ -3,10 +3,20 @@
 
 #include "mmu.hpp"
 #include <array>
+#include <vector>
 #include "tile.hpp"
 
 class GPU {
 public:
+    static const int SCREEN_WIDTH = 160;
+    static const int SCREEN_HEIGHT = 144;
+    using FrameRGB = std::array<byte, SCREEN_WIDTH * SCREEN_HEIGHT * 3>;
+
+    static const int TILEMAP_HEIGHT = 32;
+    static const int TILEMAP_WIDTH = 32;
+    using TileMap = std::vector<Tile>;
+    TileMap getTileMap(int index);
+
     GPU(MMU& mmu);
     ~GPU() = default;
 
@@ -24,6 +34,14 @@ public:
 
     Tile getTileById(int16_t tileId, int8_t tileSetId);
 
+    const FrameRGB& getCurrentFrame() const {
+        return currentFrame;
+    }
+
+    int getFrameId() const {
+        return frameId;
+    }
+
 #ifndef UNIT_TESTING
 private:
 #endif
@@ -37,6 +55,7 @@ private:
     void renderFrame();
     void updateParameters();
 
+    int frameId = 0;
     int ticksSpentInCurrentMode = 0;
     Mode currentMode = OAM_ACCESS;
     int currentScanline = 0;
@@ -45,9 +64,6 @@ private:
     static const int VRAM_ACCESS_TICKS = 172;
     static const int  HBLANK_TICKS = 204;
     static const int VBLANK_TICKS = 4560;
-
-    static const int SCREEN_WIDTH = 160;
-    static const int SCREEN_HEIGHT = 144;
 
     MMU& mmu;
 
@@ -79,7 +95,6 @@ private:
     bool paramWindowStatus;
     bool paramWindowTileMap;
     bool paramDisplayStatus;
-
 };
 
 

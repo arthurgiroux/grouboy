@@ -2,6 +2,8 @@
 #define MMU_H
 
 #include <stdexcept>
+#include <array>
+
 #include "types.hpp"
 
 /***********************************
@@ -22,6 +24,7 @@ public:
 	uint16_t readWord(const uint16_t& addr);
 	void write(const uint16_t& addr, const byte& value);
 	void writeWord(const uint16_t& addr, const uint16_t& value);
+	bool loadROM(const std::string& filepath);
 
     class InvalidMemoryAccessException : public std::exception
     {
@@ -34,10 +37,11 @@ private:
 #endif
 
 	static const size_t TOTAL_MEMORY = 65536;
+	static const size_t START_ROM_OFFSET = 256;
 
-	byte memory[TOTAL_MEMORY] {};
+	std::array<byte, TOTAL_MEMORY> memory {};
 
-	static const byte BIOS[256];
+	static const std::array<byte, 256> BIOS;
 };
 
 #endif

@@ -12,4 +12,6 @@ void Emulator::exec() {
     int lastInstructionTicks = cpu.exec();
 
     gpu.step(lastInstructionTicks);
+
+    currentTicks += lastInstructionTicks;
 }
