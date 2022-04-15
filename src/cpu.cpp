@@ -4,13 +4,6 @@
 #include "instructions.hpp"
 #include "mmu.hpp"
 
-/* RESSOURCES:
-	http://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
-	http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
-	http://www.8052.com/
-	http://gameboy.mongenel.com/dmg/opcodes.html
-*/
-
 CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	tick = 0;
 	lastInstructionTicks = 0;
