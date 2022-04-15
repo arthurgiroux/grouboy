@@ -20,6 +20,14 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	interrupts = false;
 	ticksBeforeEnablingInterrupts = 0;
 	ticksBeforeDisablingInterrupts = 0;
+	a = 0;
+	b = 0;
+	c = 0;
+	d = 0;
+	e = 0;
+	h = 0;
+	l = 0;
+	f = 0;
 }
 
 int CPU::exec() {
@@ -47,15 +55,15 @@ int CPU::exec() {
 
 }
 
-void CPU::setFlag(byte flag) {
+void CPU::setFlag(CpuFlags flag) {
 	f |= flag;
 }
 
-void CPU::unsetFlag(byte flag) {
-	f &= ~flag;
+void CPU::unsetFlag(CpuFlags flag) {
+	f &= static_cast<byte>(~flag);
 }
 
-void CPU::setFlagIfTrue(bool condition, byte flag) {
+void CPU::setFlagIfTrue(bool condition, CpuFlags flag) {
 	if (condition) {
 		setFlag(flag);
 	}
@@ -65,12 +73,10 @@ void CPU::setFlagIfTrue(bool condition, byte flag) {
 }
 
 void CPU::changeZeroValueFlag(byte value) {
-	setFlagIfTrue(value == 0, FLAG_ZERO);
+	setFlagIfTrue(value == 0, CpuFlags::ZERO);
 }
 
-CPU::~CPU() {
-
-}
+CPU::~CPU() = default;
 
 void CPU::LD_XY_NN(byte& X, byte& Y) {
 	Y = mmu.read(pc);
@@ -80,17 +86,15 @@ void CPU::LD_XY_NN(byte& X, byte& Y) {
 }
 
 void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z) {
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 	uint16_t value = (X << 8) | Y;
 	uint16_t xy = static_cast<int8_t>(mmu.read(pc)) + Z;
 	pc++;
 	X = (xy >> 8);
 	Y = xy & 0x00FF;
-	// we check for overflow
-	setFlagIfTrue((value > xy), FLAG_CARRY);
-	// check for half carry
-	setFlagIfTrue((value <= 0xFF) && (xy > 0xFF), FLAG_HALF_CARRY);
+	setCarryFlag((value > xy));
+	setHalfCarryFlag((value <= 0xFF) && (xy > 0xFF));
 	lastInstructionTicks = 3;
 }
 
@@ -214,49 +218,42 @@ void CPU::INC_XY(uint16_t& XY) {
 }
 
 void CPU::INC_XYm(byte X, byte Y) {
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 	byte oldvalue = mmu.read((X << 8) | Y);
 	byte value = oldvalue + 1;
 	mmu.write((X << 8) | Y, value);
-	// Set the ZERO flag if the value overflowed
 	changeZeroValueFlag(value);
-	// we check if we have an half carry
-	if ((oldvalue & 0x10) == 0 && (value & 0x10) > 0) {
-		setFlag(FLAG_HALF_CARRY);
-	}
+	setHalfCarryFlag((oldvalue & 0x10) == 0 && (value & 0x10) > 0);
 
 	lastInstructionTicks = 3;
 }
 
 void CPU::DEC_XYm(byte X, byte Y) {
-	setFlag(FLAG_SUB);
+	setFlag(CpuFlags::SUBSTRACTION);
 	byte oldvalue = mmu.read((X << 8) | Y);
 	byte value = oldvalue - 1;
 	mmu.write((X << 8) | Y, value);
-	// Set the ZERO flag if the value overflowed
 	changeZeroValueFlag(value);
-	// we check if we have an half carry
-	setFlagIfTrue((oldvalue & 0x10) > 0 && (value & 0x10) == 0, FLAG_HALF_CARRY);
+    setHalfCarryFlag((oldvalue & 0x10) > 0 && (value & 0x10) == 0);
 	lastInstructionTicks = 3;
 }
 
 void CPU::INC_X(byte& X) {
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 
 	X++;
-	// If we overflowed we set the half carry and zero flags
-	setFlagIfTrue((X == 0), FLAG_HALF_CARRY);
+	setHalfCarryFlag(X == 0);
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 1;
 }
 
 // TODO: check reset flags
 void CPU::DEC_X(byte& X) {
-	X--;
-	// If we underflowed we set the half carry flag
-	setFlagIfTrue((X == 0xFF), FLAG_HALF_CARRY);
+    setFlag(CpuFlags::SUBSTRACTION);
+
+    X--;
+    setHalfCarryFlag(X == 0xFF);
 	changeZeroValueFlag(X);
-	setFlag(FLAG_SUB);
 	lastInstructionTicks = 1;
 }
 
@@ -275,14 +272,15 @@ void CPU::DEC_XY(uint16_t& XY) {
 
 
 void CPU::RLC_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	byte curFlag = f & FLAG_CARRY;
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
+
+	byte currentCarry = isFlagSet(CpuFlags::CARRY);
 	/* Set the carry flag to the highest bit of X */
-	setFlagIfTrue((X & 0x80) > 0, FLAG_CARRY);
+    setCarryFlag((X & 0x80) > 0);
 	/* Rotate the accumulator and set the last bit to the original carry flag */
-	X = ((X << 1) | (curFlag >> 4));
+	X = (X << 1) | currentCarry;
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
 }
@@ -295,14 +293,15 @@ void CPU::RLC_XYm(byte X, byte Y) {
 }
 
 void CPU::RRC_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	byte curFlag = f & FLAG_CARRY;
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+
+    byte currentCarry = isFlagSet(CpuFlags::CARRY);
 	/* Set the carry flag to the lowest bit of X */
-	setFlagIfTrue((X & 0x01) > 0, FLAG_CARRY);
+    setCarryFlag((X & 0x01) > 0);
 	/* Rotate the accumulator and set the first bit to the original carry flag */
-	X = ((curFlag << 3) | (X >> 1));
+	X = ((currentCarry << 7) | (X >> 1));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
 }
@@ -316,10 +315,10 @@ void CPU::RRC_XYm(byte X, byte Y) {
 }
 
 void CPU::RL_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	setFlagIfTrue((X & 0x80) > 0, FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    setCarryFlag((X & 0x80) > 0);
 	X = ((X << 1) | (X >> 7));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
@@ -334,10 +333,10 @@ void CPU::RL_XYm(byte X, byte Y) {
 }
 
 void CPU::RR_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	setFlagIfTrue((X & 0x01) > 0, FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    setCarryFlag((X & 0x01) > 0);
 	X = ((X << 7) | (X >> 1));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
@@ -352,10 +351,10 @@ void CPU::RR_XYm(byte X, byte Y) {
 }
 
 void CPU::SLA_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	setFlagIfTrue((X & 0x80) > 0, FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    setCarryFlag((X & 0x80) > 0);
 	X = (X << 1);
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
@@ -369,10 +368,11 @@ void CPU::SLA_XYm(byte X, byte Y) {
 }
 
 void CPU::SRA_X(byte X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
+
 	X = ((X & 0x80) | (X >> 1));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
@@ -387,10 +387,11 @@ void CPU::SRA_XYm(byte X, byte Y) {
 
 
 void CPU::SRL_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	setFlagIfTrue((X & 0x01) > 0, FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+
+	setCarryFlag((X & 0x01) > 0);
 	X = (X >> 1);
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
@@ -405,10 +406,11 @@ void CPU::SRL_XYm(byte X, byte Y) {
 
 
 void CPU::SWAP_X(byte& X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
-	unsetFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
+
 	// swap the two nibbles
 	X = ((X >> 4) | (X << 4));
 	changeZeroValueFlag(X);
@@ -423,8 +425,8 @@ void CPU::SWAP_XYm(byte X, byte Y) {
 }
 
 void CPU::BIT_X_Y(byte X, byte Y) {
-	unsetFlag(FLAG_SUB);
-	setFlag(FLAG_HALF_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    setFlag(CpuFlags::HALF_CARRY);
 	// If the value of the bit is set then we set the flag zero
 	changeZeroValueFlag((Y >> X) & 0x01);
 	lastInstructionTicks = 2;
@@ -462,13 +464,11 @@ void CPU::SET_X_YZm(byte X, byte Y, byte Z) {
 
 
 void CPU::ADD_WX_YZ(byte& W, byte& X, byte Y, byte Z) {
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 	uint32_t comp = (W << 8) | X;
 	comp += (Y << 8) | Z;
-	// If we overflowed we set the carry
-	setFlagIfTrue(comp > 0xFFFF, FLAG_CARRY);
-	// If we overflowed the lower part then we set the carry
-	setFlagIfTrue(comp > X, FLAG_HALF_CARRY);
+	setCarryFlag(comp > 0xFFFF);
+	setHalfCarryFlag(comp > X);
 	W = ((comp & 0xFF00) >> 8);
 	X = (comp & 0xFF);
 	lastInstructionTicks = 2;
@@ -481,26 +481,22 @@ void CPU::ADD_XY_Z(byte& X, byte& Y, byte Z) {
 }
 
 void CPU::ADD_X_Y(byte& X, byte Y) {
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X += Y;
-	// we check for overflow
-	setFlagIfTrue((value > X), FLAG_CARRY);
-	// check for half carry
-	setFlagIfTrue((value <= 0x0F) && (X > 0x0F), FLAG_HALF_CARRY);
+	setCarryFlag(value > X);
+	setHalfCarryFlag((value <= 0x0F) && (X > 0x0F));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 1;
 }
 
 void CPU::ADD_SP_X(sbyte X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_ZERO);
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
 	uint16_t value = sp;
 	sp += X;
-	// we check for overflow
-	setFlagIfTrue((value > sp), FLAG_CARRY);
-	// check for half carry
-	setFlagIfTrue((value <= 0x00FF) && (sp > 0x00FF), FLAG_HALF_CARRY);
+	setCarryFlag(value > sp);
+	setHalfCarryFlag((value <= 0x00FF) && (sp > 0x00FF));
 	lastInstructionTicks = 4;
 }
 
@@ -510,16 +506,14 @@ void CPU::ADD_X_N(byte& X) {
 }
 
 void CPU::ADC_X_Y(byte& X, byte Y) {
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X += Y;
-	if ((f & FLAG_CARRY) > 0) {
+	if (isFlagSet(CpuFlags::CARRY)) {
 		X++;
 	}
-	// we check for overflow
-	setFlagIfTrue((value > X), FLAG_CARRY);
-	// check for half carry
-	setFlagIfTrue((value <= 0x0F) && (X > 0x0F), FLAG_HALF_CARRY);
+	setCarryFlag(value > X);
+	setHalfCarryFlag((value <= 0x0F) && (X > 0x0F));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 1;
 }
@@ -541,13 +535,11 @@ void CPU::ADC_X_YZm(byte& X, byte Y, byte Z) {
 
 
 void CPU::SUB_X_Y(byte& X, byte Y) {
-	setFlag(FLAG_SUB);
+	setFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X -= Y;
-	// we check for overflow
-	setFlagIfTrue((value < X), FLAG_CARRY);
-	// check for half carry
-	setFlagIfTrue((value > 0x0F) && (X <= 0x0F), FLAG_HALF_CARRY);
+	setCarryFlag(value < X);
+	setHalfCarryFlag((value > 0x0F) && (X <= 0x0F));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 1;
 }
@@ -558,16 +550,14 @@ void CPU::SUB_X_N(byte& X) {
 }
 
 void CPU::SBC_X_Y(byte& X, byte Y) {
-	setFlag(FLAG_SUB);
+	setFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X -= Y;
-	if ((f & FLAG_CARRY) > 0) {
+	if (isFlagSet(CpuFlags::CARRY)) {
 		X--;
 	}
-	// we check for overflow
-	setFlagIfTrue((value < X), FLAG_CARRY);
-	// check for half carry
-	setFlagIfTrue((value > 0x0F) && (X <= 0x0F), FLAG_HALF_CARRY);
+	setCarryFlag(value < X);
+	setHalfCarryFlag((value > 0x0F) && (X <= 0x0F));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 1;
 }
@@ -588,9 +578,9 @@ void CPU::SBC_X_YZm(byte& X, byte Y, byte Z) {
 }
 
 void CPU::AND_X(byte X) {
-	unsetFlag(FLAG_SUB);
-	setFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
 	a &= X;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
@@ -602,9 +592,9 @@ void CPU::AND_XYm(byte X, byte Y) {
 }
 
 void CPU::XOR_X(byte X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
 	a ^= X;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
@@ -616,9 +606,9 @@ void CPU::XOR_XYm(byte X, byte Y) {
 }
 
 void CPU::OR_X(byte X) {
-	unsetFlag(FLAG_SUB);
-	unsetFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_CARRY);
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
 	a |= X;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
@@ -640,10 +630,10 @@ void CPU::AND_N() {
 }
 
 void CPU::CP_X(byte X) {
-	setFlag(FLAG_SUB);
-	setFlagIfTrue(a == X, FLAG_ZERO);
-	setFlagIfTrue(a > X, FLAG_HALF_CARRY);
-	setFlagIfTrue(a < X, FLAG_CARRY);
+	setFlag(CpuFlags::SUBSTRACTION);
+	setFlagIfTrue(a == X, CpuFlags::ZERO);
+	setHalfCarryFlag(a > X);
+	setCarryFlag(a < X);
 	lastInstructionTicks = 1;
 }
 
@@ -750,22 +740,22 @@ void CPU::JR_COND_N(bool condition) {
 }
 
 void CPU::DAA_() {
-	unsetFlag(FLAG_SUB);
+	unsetFlag(CpuFlags::SUBSTRACTION);
 
-	if (((a & 0x0F) > 9) || (f & FLAG_HALF_CARRY) > 0) {
+	if (((a & 0x0F) > 9) || isFlagSet(CpuFlags::HALF_CARRY)) {
 		a += 0x06;
-		setFlag(FLAG_HALF_CARRY);
+		setFlag(CpuFlags::HALF_CARRY);
 	}
 	else {
-		unsetFlag(FLAG_HALF_CARRY);
+		unsetFlag(CpuFlags::HALF_CARRY);
 	}
 
-	if (((a >> 4) > 9) || (f & FLAG_CARRY) > 0) {
+	if (((a >> 4) > 9) || isFlagSet(CpuFlags::CARRY)) {
 		a += 0x60;
-		setFlag(FLAG_CARRY);
+		setFlag(CpuFlags::CARRY);
 	}
 	else {
-		unsetFlag(FLAG_CARRY);
+		unsetFlag(CpuFlags::CARRY);
 	}
 	lastInstructionTicks = 1;
 }
@@ -773,22 +763,22 @@ void CPU::DAA_() {
 void CPU::CPL_() {
 	// a = ~a
 	a ^= 0xFF;
-	setFlag(FLAG_SUB);
-	setFlag(FLAG_HALF_CARRY);
+	setFlag(CpuFlags::SUBSTRACTION);
+	setFlag(CpuFlags::HALF_CARRY);
 	lastInstructionTicks = 1;
 }
 
 void CPU::SCF_() {
-	unsetFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_SUB);
-	setFlag(FLAG_CARRY);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	setFlag(CpuFlags::CARRY);
 	lastInstructionTicks = 1;
 }
 
 void CPU::CCF_() {
-	unsetFlag(FLAG_HALF_CARRY);
-	unsetFlag(FLAG_SUB);
-	setFlagIfTrue((f & FLAG_CARRY) == 0, FLAG_CARRY);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	setCarryFlag(!isFlagSet(CpuFlags::CARRY));
 	lastInstructionTicks = 1;
 }
 
@@ -954,7 +944,7 @@ void CPU::process(const byte& opCode) {
 		/******************************************************/
 
 	case JR_NZ_n:
-		JR_COND_N((f & FLAG_ZERO) == 0);
+		JR_COND_N(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case LD_HL_nn:
@@ -986,7 +976,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case JR_Z_n:
-		JR_COND_N((f & FLAG_ZERO) > 0);
+		JR_COND_N(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case ADD_HL_HL:
@@ -1022,7 +1012,7 @@ void CPU::process(const byte& opCode) {
 		/******************************************************/
 
 	case JR_NC_n:
-		JR_COND_N((f & FLAG_CARRY) == 0);
+		JR_COND_N(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case LD_SP_nn:
@@ -1054,7 +1044,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case JR_C_n:
-		JR_COND_N((f & FLAG_CARRY) > 0);
+		JR_COND_N(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case ADD_HL_SP:
@@ -1637,7 +1627,7 @@ void CPU::process(const byte& opCode) {
 		/******************************************************/
 
 	case RET_NZ:
-		RET_X((f & FLAG_ZERO) == 0);
+		RET_X(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case POP_BC:
@@ -1645,7 +1635,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case JP_NZ_nn:
-		JP_X_NN((f & FLAG_ZERO) == 0);
+		JP_X_NN(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case JP_nn:
@@ -1653,7 +1643,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case CALL_NZ_nn:
-		CALL_X_NN((f & FLAG_ZERO) == 0);
+		CALL_X_NN(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case PUSH_BC:
@@ -1669,7 +1659,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case RET_Z:
-		RET_X((f & FLAG_ZERO) > 0);
+		RET_X(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case RET:
@@ -1677,7 +1667,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case JP_Z_nn:
-		JP_X_NN((f & FLAG_ZERO) > 0);
+		JP_X_NN(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case EXT_OPS:
@@ -1685,7 +1675,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case CALL_Z_nn:
-		CALL_X_NN((f & FLAG_ZERO) > 0);
+		CALL_X_NN(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case CALL_nn:
@@ -1705,7 +1695,7 @@ void CPU::process(const byte& opCode) {
 		/******************************************************/
 
 	case RET_NC:
-		RET_X((f & FLAG_CARRY) == 0);
+		RET_X(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case POP_DE:
@@ -1713,11 +1703,11 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case JP_NC_nn:
-		JP_X_NN((f & FLAG_CARRY) == 0);
+		JP_X_NN(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case CALL_NC_nn:
-		CALL_X_NN((f & FLAG_CARRY) == 0);
+		CALL_X_NN(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case PUSH_DE:
@@ -1733,7 +1723,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case RET_C:
-		RET_X((f & FLAG_CARRY) > 0);
+		RET_X(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case RETI:
@@ -1742,11 +1732,11 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case JP_C_nn:
-		JP_X_NN((f & FLAG_CARRY) > 0);
+		JP_X_NN(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case CALL_C_nn:
-		CALL_X_NN((f & FLAG_CARRY) > 0);
+		CALL_X_NN(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case SBC_A_n:
@@ -2843,4 +2833,16 @@ void CPU::processExtended(const byte& opCode) {
 		std::cerr << "OPCODE EXTENDED :" << std::hex << static_cast<int>(opCode) << " not implemented" << std::endl;
 		return;
 	}
+}
+
+bool CPU::isFlagSet(CPU::CpuFlags flag) const {
+    return (f & flag) > 0;
+}
+
+void CPU::setHalfCarryFlag(bool state) {
+    setFlagIfTrue(state, CpuFlags::HALF_CARRY);
+}
+
+void CPU::setCarryFlag(bool state) {
+    setFlagIfTrue(state, CpuFlags::CARRY);
 }

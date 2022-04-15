@@ -3,10 +3,11 @@
 
 #include "types.hpp"
 #include "mmu.hpp"
+#include "instructions.hpp"
 
 class CPU {
 public:
-	CPU(MMU& mmu);
+	explicit CPU(MMU& mmu);
 	~CPU();
 	int exec();
 
@@ -54,25 +55,29 @@ public:
 private:
 #endif
 
+    enum CpuFlags : byte {
+        ZERO = 0x80, // Set if the last cpu operation result is 0
+        SUBSTRACTION = 0x40, // Set if the last cpu operation was a substraction
+        HALF_CARRY = 0x20, // Set if the last cpu operation result overflowed past 4 bits
+        CARRY = 0x10 // Set if the last cpu operation result overflowed past 8 bits
+    };
+
 	// Process the given opcode as a base opcode
 	void process(const byte& opCode);
 
 	// Process the given opcode as an extended opcode
 	void processExtended(const byte& opCode);
 
-	// frequency of the CPU, 4.194304MHz
-	float frequency;
-
 	// registers
-	byte a;
-	byte b;
-	byte c;
-	byte d;
-	byte e;
-	byte h;
-	byte l;
+	byte a{};
+	byte b{};
+	byte c{};
+	byte d{};
+	byte e{};
+	byte h{};
+	byte l{};
 	// flag register
-	byte f;
+	byte f{};
 
 	// current CPU tick
 	int tick;
@@ -372,13 +377,20 @@ private:
 	void changeZeroValueFlag(byte value);
 
 	// Set the given flag if the condition is true, reset it otherwise
-	void setFlagIfTrue(bool condition, byte flag);
+	void setFlagIfTrue(bool condition, CpuFlags flag);
 
 	// Set the given flag
-	void setFlag(byte flag);
+	void setFlag(CpuFlags flag);
 
 	// Unset the given flag
-	void unsetFlag(byte flag);
+	void unsetFlag(CpuFlags flag);
+
+    // Set the given flag
+    bool isFlagSet(CpuFlags flag) const;
+
+    void setHalfCarryFlag(bool state);
+
+    void setCarryFlag(bool state);
 
 };
 

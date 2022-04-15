@@ -1,15 +1,6 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-
-#define FLAG_ZERO 0x80 // If the last operation produced 0
-
-#define FLAG_SUB 0x40 // If the last operation was a substraction
-
-#define FLAG_HALF_CARRY 0x20 // If we the result of operation overflowed past 15
-
-#define FLAG_CARRY 0x10 // If the last operation overflowed (> 255 for addition or 0 < for substraction)
-
 #define NOP				0x00
 #define LD_BC_nn		0x01
 #define LD_BCm_A		0x02
