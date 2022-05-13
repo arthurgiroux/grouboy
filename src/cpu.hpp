@@ -56,10 +56,10 @@ private:
 #endif
 
     enum CpuFlags : byte {
-        ZERO = 0x80, // Set if the last cpu operation result is 0
-        SUBSTRACTION = 0x40, // Set if the last cpu operation was a substraction
-        HALF_CARRY = 0x20, // Set if the last cpu operation result overflowed past 4 bits
-        CARRY = 0x10 // Set if the last cpu operation result overflowed past 8 bits
+        ZERO = 0x80, // Set when the result of a math operation is zero or two values match when using the CP instruction.
+        SUBSTRACTION = 0x40, // Set if a subtraction was performed in the last math instruction.
+        HALF_CARRY = 0x20, // Set if a carry occurred from the lower nibble in the last math operation.
+        CARRY = 0x10 // Set if a carry occurred from the last math operation or if register A is the smaller value when executing the CP instruction.
     };
 
 	// Process the given opcode as a base opcode
