@@ -792,7 +792,9 @@ static int instruction = 0;
 
 
 void CPU::process(const byte& opCode) {
-	switch (opCode) {
+    using namespace standardInstructions;
+
+    switch (opCode) {
 
 		/******************************************************/
 		/************************ 0x00 ************************/
@@ -1855,6 +1857,8 @@ void CPU::process(const byte& opCode) {
 
 
 void CPU::processExtended(const byte& opCode) {
+    using namespace extendedInstructions;
+
 	switch (opCode) {
 
 		/******************************************************/

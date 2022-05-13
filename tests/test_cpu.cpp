@@ -57,7 +57,7 @@ TEST_F(CpuTest, CheckCpuStateAtInit) {
 }
 
 TEST_F(CpuTest, OpcodeNop) {
-    mmu.write(0, NOP);
+    mmu.write(0, standardInstructions::NOP);
     int ticks = cpu.exec();
     ASSERT_EQ(ticks, 1);
     ASSERT_EQ(cpu.tick, 1);
