@@ -31,15 +31,35 @@ void GPU::step(int nbrTicks) {
 void GPU::renderScanline(int scanline) {
     updateParameters();
 
-    uint16_t y = scanline + scrollY;
+    byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * 3;
 
-    uint16_t map = useBackgroundTileMap0 ? ADDR_MAP_0 : ADDR_MAP_1;
+    TileMap background = getTileMap(useBackgroundTileMap0 ? 0 : 1);
 
-    uint16_t baseAddr = map + (scrollX + scanline) * TILE_MAP_SIZE + scrollX;
+    // Retrieve the lines in the Tilemap that corresponds to the current scanline
+    int lineInTileMap = (((scanline + scrollY) / Tile::TILE_HEIGHT) * TILEMAP_WIDTH);
 
-    for (int tile = 0; tile < TILES_PER_LINE; ++tile) {
-        byte tileId = mmu.read( baseAddr + tile);
-        // TODO: update pixels
+    /*
+     * For each pixels in the line, we are going to retrieve the corresponding tile and copy the
+     * pixels that corresponds in the current frame buffer.
+     */
+    for (int i = 0; i < SCREEN_WIDTH; ++i) {
+        int xIndexOffset = scrollX + i;
+        // The background map is not clamped, if we go "too far right",
+        // it will display tiles that are on the left.
+        if (xIndexOffset > TILEMAP_WIDTH * Tile::TILE_WIDTH) {
+            xIndexOffset = (TILEMAP_WIDTH * Tile::TILE_WIDTH) - xIndexOffset;
+        }
+
+        int tileIndex = lineInTileMap + (xIndexOffset / Tile::TILE_WIDTH);
+        const Tile::TileRGBArray& tileRGBArray = background[tileIndex].toRGB();
+
+        int xOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
+        int yOffsetTile = (xIndexOffset % Tile::TILE_WIDTH);
+
+        // TODO: Encapsulate in a Frame class.
+        frameScanlineStartAddr[i * 3] = tileRGBArray[xOffsetTile * Tile::TILE_WIDTH * 3 + yOffsetTile];
+        frameScanlineStartAddr[i * 3 + 1] = tileRGBArray[xOffsetTile * Tile::TILE_WIDTH * 3 + yOffsetTile + 1];
+        frameScanlineStartAddr[i * 3 + 2] = tileRGBArray[xOffsetTile * Tile::TILE_WIDTH * 3 + yOffsetTile + 2];
     }
 }
 
@@ -54,7 +74,6 @@ GPU::GPU(MMU& mmu_) : mmu(mmu_) {
 void GPU::updateParameters() {
     scrollX = mmu.read(ADDR_SCROLL_X);
     scrollY = mmu.read(ADDR_SCROLL_Y);
-    //scanline = mmu.read(ADDR_SCANLINE);
 
     byte lcdGpuControl = mmu.read(ADDR_LCD_GPU_CONTROL);
     paramBackgroundStatus = ((lcdGpuControl & 1) == 1);
