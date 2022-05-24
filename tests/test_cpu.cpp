@@ -34,6 +34,20 @@ protected:
     }
 };
 
+class CpuInstructionTest : public ::testing::Test {
+protected:
+    MMU mmu;
+    CPU cpu = CPU(mmu);
+
+    void performInstructionAndAssertTicksAndFlag(byte instruction, int expectedTicks, byte expectedFlag) {
+        mmu.write(0, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, expectedTicks);
+        ASSERT_EQ(cpu.tick, expectedTicks);
+        ASSERT_EQ(cpu.getFlag(), expectedFlag);
+    }
+};
+
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
     ASSERT_EQ(cpu.a, 0x00);
     ASSERT_EQ(cpu.b, 0x00);
@@ -56,14 +70,6 @@ TEST_F(CpuTest, CheckCpuStateAtInit) {
     ASSERT_EQ(cpu.interrupts, false);
 }
 
-TEST_F(CpuTest, OpcodeNop) {
-    mmu.write(0, standardInstructions::NOP);
-    int ticks = cpu.exec();
-    ASSERT_EQ(ticks, 1);
-    ASSERT_EQ(cpu.tick, 1);
-}
-
-
 TEST_F(CpuTest, FlagAreUnsetByDefault) {
     ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
     ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
@@ -85,4 +91,8 @@ TEST_F(CpuTest, FlagCarryCanBeSet) {
 
 TEST_F(CpuTest, FlagHalfCarryCanBeSet) {
     assertFlagCanBeSetAndUnset(CPU::CpuFlags::HALF_CARRY);
+}
+
+TEST_F(CpuInstructionTest, InstructionNoop) {
+    performInstructionAndAssertTicksAndFlag(standardInstructions::NOP, 1, 0x00);
 }

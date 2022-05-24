@@ -23,7 +23,7 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	f = 0;
 }
 
-int CPU::exec() {
+int CPU::fetchDecodeAndExecute() {
 
 	if (ticksBeforeEnablingInterrupts > 0) {
 		ticksBeforeEnablingInterrupts--;
@@ -32,7 +32,7 @@ int CPU::exec() {
 		ticksBeforeDisablingInterrupts--;
 	}
 
-	process(mmu.read(pc++));
+    executeInstruction(mmu.read(pc++));
 	tick += lastInstructionTicks;
 
 	if (ticksBeforeEnablingInterrupts == 1) {
@@ -791,7 +791,7 @@ void CPU::LDH_X_Nm(byte& X) {
 static int instruction = 0;
 
 
-void CPU::process(const byte& opCode) {
+void CPU::executeInstruction(const byte& opCode) {
     using namespace standardInstructions;
 
     switch (opCode) {
@@ -801,7 +801,7 @@ void CPU::process(const byte& opCode) {
 		/******************************************************/
 
 	case NOP:
-            lastInstructionTicks = 1;
+        NoOperation();
 		break;
 
 	case LD_BC_nn:
@@ -1666,7 +1666,7 @@ void CPU::process(const byte& opCode) {
 		break;
 
 	case EXT_OPS:
-		processExtended(mmu.read(pc++));
+        executeExtendedInstruction(mmu.read(pc++));
 		break;
 
 	case CALL_Z_nn:
@@ -1856,7 +1856,7 @@ void CPU::process(const byte& opCode) {
 
 
 
-void CPU::processExtended(const byte& opCode) {
+void CPU::executeExtendedInstruction(const byte& opCode) {
     using namespace extendedInstructions;
 
 	switch (opCode) {
@@ -2842,4 +2842,12 @@ void CPU::setHalfCarryFlag(bool state) {
 
 void CPU::setCarryFlag(bool state) {
     setFlagIfTrue(state, CpuFlags::CARRY);
+}
+
+void CPU::NoOperation() {
+    lastInstructionTicks = 1;
+}
+
+byte CPU::getFlag() const {
+    return f;
 }

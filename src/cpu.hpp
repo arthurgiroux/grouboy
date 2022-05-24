@@ -5,47 +5,99 @@
 #include "mmu.hpp"
 #include "instructions.hpp"
 
+/**
+ * Implementation of the CPU for the classic GameBoy.
+ *
+ * The GameBoy CPU is based on a Z80 with some extra instructions and
+ * some other instructions are removed.
+ * It has a 7 internal registers, one flag register a program counter and a stack pointer.
+ * It has a standard instruction set + an extended instruction set available through a special opcode.
+ */
 class CPU {
 public:
 	explicit CPU(MMU& mmu);
 	~CPU();
-	int exec();
 
+	/**
+	 * Fetch the next instruction from the memory, decode it and execute it.
+	 *
+	 * @return the number of ticks taken by the instructions to be executed
+	 */
+	int fetchDecodeAndExecute();
+
+	/**
+	 * Get the current value of the 8 bits register A.
+	 * @return the value of the register
+	 */
 	byte getRegisterA() const {
 	    return a;
 	}
 
+    /**
+     * Get the current value of the 8 bits register B.
+     * @return the value of the register
+     */
 	byte getRegisterB() const {
 	    return b;
 	}
 
+    /**
+     * Get the current value of the 8 bits register C.
+     * @return the value of the register
+     */
     byte getRegisterC() const {
 	    return c;
 	}
 
+    /**
+     * Get the current value of the 8 bits register D.
+     * @return the value of the register
+     */
     byte getRegisterD() const {
 	    return d;
 	}
 
+    /**
+     * Get the current value of the 8 bits register E.
+     * @return the value of the register
+     */
     byte getRegisterE() const {
 	    return e;
 	}
 
-    byte getRegisterF() const {
-	    return f;
-	}
-
+    /**
+     * Get the current value of the 8 bits register H.
+     * @return the value of the register
+     */
     byte getRegisterH() const {
 	    return h;
 	}
 
+    /**
+     * Get the current value of the 8 bits register L.
+     * @return the value of the register
+     */
     byte getRegisterL() const {
 	    return l;
 	}
 
+	/**
+	 * Retrieve the current address of the program counter.
+	 * The program counter is the address in memory of the next instruction to fetch.
+	 *
+	 * @return the 16 bits value of the program counter.
+	 */
     uint16_t getProgramCounter() const {
 	    return pc;
 	}
+
+	/**
+	 * Retrieve the current address of the stack pointer.
+	 * The stack pointer is the address in memory of the stack,
+	 * a reserved area used for internal operations.
+	 *
+	 * @return the 16 bits value of the stack pointer.
+	 */
 
     uint16_t getStackPointer() const {
 	    return sp;
@@ -55,20 +107,31 @@ public:
 private:
 #endif
 
+    /**
+     * Possible values for the CPU flag.
+     */
     enum CpuFlags : byte {
-        ZERO = 0x80, // Set when the result of a math operation is zero or two values match when using the CP instruction.
-        SUBSTRACTION = 0x40, // Set if a subtraction was performed in the last math instruction.
-        HALF_CARRY = 0x20, // Set if a carry occurred from the lower nibble in the last math operation.
-        CARRY = 0x10 // Set if a carry occurred from the last math operation or if register A is the smaller value when executing the CP instruction.
+        ZERO = 0x80, /// Set when the result of a math operation is zero or two values match when using the CP instruction.
+        SUBSTRACTION = 0x40, /// Set if a subtraction was performed in the last math instruction.
+        HALF_CARRY = 0x20, /// Set if a carry occurred from the lower nibble in the last math operation.
+        CARRY = 0x10 /// Set if a carry occurred from the last math operation or if register A is the smaller value when executing the CP instruction.
     };
 
-	// Process the given opcode as a base opcode
-	void process(const byte& opCode);
+	/**
+	 * Execute an instruction that is part of the standard instruction set.
+	 *
+	 * @param opCode the opcode of the instruction to execute
+	 */
+	void executeInstruction(const byte& opCode);
 
-	// Process the given opcode as an extended opcode
-	void processExtended(const byte& opCode);
+    /**
+     * Execute an instruction that is part of the extended instruction set.
+     *
+     * @param opCode the opcode of the instruction to execute
+     */
+	void executeExtendedInstruction(const byte& opCode);
 
-	// registers
+	// internal registers
 	byte a{};
 	byte b{};
 	byte c{};
@@ -76,6 +139,7 @@ private:
 	byte e{};
 	byte h{};
 	byte l{};
+
 	// flag register
 	byte f{};
 
@@ -87,6 +151,7 @@ private:
 
 	// program counter
 	uint16_t pc;
+
 	// stack pointer
 	uint16_t sp;
 
@@ -103,6 +168,16 @@ private:
 
 	// How many ticks left before disabling the interrupts
 	byte ticksBeforeDisablingInterrupts;
+
+    /**
+     * Perform no operation.
+     *
+     * @opcodes:
+     *     0x00
+     * @flags_affected: N/A
+     * @number_of_ticks: 1
+     */
+    void NoOperation();
 
 	// Load the byte pointed by pc into X and the value pointed by pc+1 into Y
 	void LD_XY_NN(byte& X, byte& Y);
@@ -387,6 +462,9 @@ private:
 
     // Set the given flag
     bool isFlagSet(CpuFlags flag) const;
+
+    // Retrieve the current flag value
+    byte getFlag() const;
 
     void setHalfCarryFlag(bool state);
 
