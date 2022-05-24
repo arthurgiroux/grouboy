@@ -71,9 +71,9 @@ void CPU::changeZeroValueFlag(byte value) {
 
 CPU::~CPU() = default;
 
-void CPU::LD_XY_NN(byte& X, byte& Y) {
-	Y = mmu.read(pc);
-	X = mmu.read(pc + 1);
+void CPU::load16BitsValueInRegisters(byte& msbRegister, byte& lsbRegister) {
+    lsbRegister = mmu.read(pc);
+    msbRegister = mmu.read(pc + 1);
 	pc += 2;
 	lastInstructionTicks = 3;
 }
@@ -788,9 +788,6 @@ void CPU::LDH_X_Nm(byte& X) {
 	lastInstructionTicks = 3;
 }*/
 
-static int instruction = 0;
-
-
 void CPU::executeInstruction(const byte& opCode) {
     using namespace standardInstructions;
 
@@ -805,7 +802,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_BC_nn:
-		LD_XY_NN(b, c);
+        load16BitsValueInRegisters(b, c);
 		break;
 
 	case LD_BCm_A:
@@ -875,7 +872,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_DE_nn:
-		LD_XY_NN(d, e);
+        load16BitsValueInRegisters(d, e);
 		break;
 
 	case LD_DEm_A:
@@ -943,7 +940,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_HL_nn:
-		LD_XY_NN(h, l);
+        load16BitsValueInRegisters(h, l);
 		break;
 
 	case LD_HLm_I_A:

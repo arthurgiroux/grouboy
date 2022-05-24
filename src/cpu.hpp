@@ -179,8 +179,17 @@ private:
      */
     void NoOperation();
 
-	// Load the byte pointed by pc into X and the value pointed by pc+1 into Y
-	void LD_XY_NN(byte& X, byte& Y);
+	/**
+	 * Load the 16 bits pointed by the program counter into registers.
+	 *
+	 * @param msbRegister the register that will be set to the 8 bit MSB of the value.
+	 * @param lsbRegister the register that will be set to the 8 bit LSB of the value.
+     * @opcodes:
+     *     0x01 0x11 0x21 0x31
+     * @flags_affected: N/A
+     * @number_of_ticks: 3
+	 */
+	void load16BitsValueInRegisters(byte& msbRegister, byte& lsbRegister);
 
 	// Load the 
 	void LD_XY_Z_N(byte& X, byte& Y, uint16_t Z);

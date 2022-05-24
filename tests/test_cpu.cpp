@@ -46,6 +46,27 @@ protected:
         ASSERT_EQ(cpu.tick, expectedTicks);
         ASSERT_EQ(cpu.getFlag(), expectedFlag);
     }
+
+    void testLoad16BitsValueInRegisters(byte instruction, uint16_t value, byte& msbRegister, byte& lsbRegister) {
+        cpu.pc = 0x00;
+        mmu.write(cpu.pc, instruction);
+        mmu.writeWord(cpu.pc + 1, value);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 3);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(msbRegister, value >> 8);
+        ASSERT_EQ(lsbRegister, value & 0xFF);
+    }
+
+    void testLoad16BitsValueInRegisters(byte instruction, uint16_t value, uint16_t& reg) {
+        cpu.pc = 0x00;
+        mmu.write(cpu.pc, instruction);
+        mmu.writeWord(cpu.pc + 1, value);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 3);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(reg, value);
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -95,4 +116,22 @@ TEST_F(CpuTest, FlagHalfCarryCanBeSet) {
 
 TEST_F(CpuInstructionTest, InstructionNoop) {
     performInstructionAndAssertTicksAndFlag(standardInstructions::NOP, 1, 0x00);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoad16BitsValueInRegisters) {
+    testLoad16BitsValueInRegisters(standardInstructions::LD_BC_nn, 0x0012, cpu.b, cpu.c);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_BC_nn, 0x1200, cpu.b, cpu.c);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_BC_nn, 0x1234, cpu.b, cpu.c);
+
+    testLoad16BitsValueInRegisters(standardInstructions::LD_DE_nn, 0x0012, cpu.d, cpu.e);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_DE_nn, 0x1200, cpu.d, cpu.e);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_DE_nn, 0x1234, cpu.d, cpu.e);
+
+    testLoad16BitsValueInRegisters(standardInstructions::LD_HL_nn, 0x0012, cpu.h, cpu.l);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_HL_nn, 0x1200, cpu.h, cpu.l);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_HL_nn, 0x1234, cpu.h, cpu.l);
+
+    testLoad16BitsValueInRegisters(standardInstructions::LD_SP_nn, 0x0012, cpu.sp);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_SP_nn, 0x1200, cpu.sp);
+    testLoad16BitsValueInRegisters(standardInstructions::LD_SP_nn, 0x1234, cpu.sp);
 }
