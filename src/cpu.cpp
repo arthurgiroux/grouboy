@@ -3,6 +3,9 @@
 #include "cpu.hpp"
 #include "instructions.hpp"
 #include "mmu.hpp"
+#include "utils.hpp"
+
+using namespace utils;
 
 CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	tick = 0;
@@ -115,8 +118,8 @@ void CPU::LD_X_N(byte& X) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_XYm_Z(byte X, byte Y, byte Z) {
-	mmu.write((X << 8) | Y, Z);
+void CPU::loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value) {
+	mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
 	lastInstructionTicks = 2;
 }
 
@@ -806,7 +809,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_BCm_A:
-		LD_XYm_Z(b, c, a);
+        loadValueToMemoryAtAddr(b, c, a);
 		break;
 
 	case INC_BC:
@@ -876,7 +879,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_DEm_A:
-		LD_XYm_Z(d, e, a);
+        loadValueToMemoryAtAddr(d, e, a);
 		break;
 
 	case INC_DE:
@@ -1277,27 +1280,27 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case LD_HLm_B:
-		LD_XYm_Z(h, l, b);
+        loadValueToMemoryAtAddr(h, l, b);
 		break;
 
 	case LD_HLm_C:
-		LD_XYm_Z(h, l, c);
+        loadValueToMemoryAtAddr(h, l, c);
 		break;
 
 	case LD_HLm_D:
-		LD_XYm_Z(h, l, d);
+        loadValueToMemoryAtAddr(h, l, d);
 		break;
 
 	case LD_HLm_E:
-		LD_XYm_Z(h, l, e);
+        loadValueToMemoryAtAddr(h, l, e);
 		break;
 
 	case LD_HLm_H:
-		LD_XYm_Z(h, l, h);
+        loadValueToMemoryAtAddr(h, l, h);
 		break;
 
 	case LD_HLm_L:
-		LD_XYm_Z(h, l, l);
+        loadValueToMemoryAtAddr(h, l, l);
 		break;
 
 	case HALT:
@@ -1306,7 +1309,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_HLm_A:
-		LD_XYm_Z(h, l, a);
+        loadValueToMemoryAtAddr(h, l, a);
 		break;
 
 	case LD_A_B:

@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include "cpu.hpp"
 #include "instructions.hpp"
+#include "utils.hpp"
+
+using namespace utils;
 
 class CpuTest : public ::testing::Test {
 protected:
@@ -56,6 +59,7 @@ protected:
         ASSERT_EQ(cpu.getFlag(), 0x00);
         ASSERT_EQ(msbRegister, value >> 8);
         ASSERT_EQ(lsbRegister, value & 0xFF);
+        ASSERT_EQ(cpu.pc, 0x03);
     }
 
     void testLoad16BitsValueInRegisters(byte instruction, uint16_t value, uint16_t& reg) {
@@ -66,6 +70,20 @@ protected:
         ASSERT_EQ(ticks, 3);
         ASSERT_EQ(cpu.getFlag(), 0x00);
         ASSERT_EQ(reg, value);
+        ASSERT_EQ(cpu.pc, 0x03);
+    }
+
+    void testLoad8BitsValueInMemoryAddr(byte instruction, byte& msb, byte& lsb, byte& value) {
+        cpu.pc = 0x00;
+        value = 42;
+        msb = 0x05;
+        lsb = 0x60;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 2);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+        ASSERT_EQ(cpu.pc, 0x01);
     }
 };
 
@@ -116,6 +134,7 @@ TEST_F(CpuTest, FlagHalfCarryCanBeSet) {
 
 TEST_F(CpuInstructionTest, InstructionNoop) {
     performInstructionAndAssertTicksAndFlag(standardInstructions::NOP, 1, 0x00);
+    ASSERT_EQ(cpu.pc, 0x01);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoad16BitsValueInRegisters) {
@@ -134,4 +153,16 @@ TEST_F(CpuInstructionTest, InstructionLoad16BitsValueInRegisters) {
     testLoad16BitsValueInRegisters(standardInstructions::LD_SP_nn, 0x0012, cpu.sp);
     testLoad16BitsValueInRegisters(standardInstructions::LD_SP_nn, 0x1200, cpu.sp);
     testLoad16BitsValueInRegisters(standardInstructions::LD_SP_nn, 0x1234, cpu.sp);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoad8BitsValueInMemoryAddr) {
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_BCm_A, cpu.b, cpu.c, cpu.a);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_DEm_A, cpu.d, cpu.e, cpu.a);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_B, cpu.h, cpu.l, cpu.b);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_C, cpu.h, cpu.l, cpu.c);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_D, cpu.h, cpu.l, cpu.d);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_E, cpu.h, cpu.l, cpu.e);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_H, cpu.h, cpu.l, cpu.h);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_L, cpu.h, cpu.l, cpu.l);
+    testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_A, cpu.h, cpu.l, cpu.a);
 }

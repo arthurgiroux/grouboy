@@ -19,6 +19,7 @@ add_executable(
         ../src/gpu.hpp
         ../src/tile.cpp
         ../src/tile.hpp
+        ../src/utils.hpp
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp

@@ -206,8 +206,18 @@ private:
 	// Load the byte pointed by pc into X
 	void LD_X_N(byte& X);
 
-	// Load the byte Z at the address pointed by the word XY
-	void LD_XYm_Z(byte X, byte Y, byte Z);
+	/**
+	 * Load the given value to the memory pointed by the given address.
+	 *
+	 * @param addrMsb   the MSB part of the address
+	 * @param addrLsb   the LSB part of the address
+	 * @param value     the value to load in memory
+     * @opcodes:
+     *     0x02 0x12 0x70 0x71 0x72 0x73 0x74 0x75 0x76
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+	 */
+	void loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value);
 
 	// Load the byte pointed by pc at the address pointed by the word XY
 	void LD_XYm_N(byte X, byte Y);
