@@ -88,14 +88,15 @@ protected:
 
     void testIncrement8BitsRegisters(byte instruction, const byte& msbRegister, const byte& lsbRegister) {
         cpu.pc = 0x00;
-        int expected_pc = 1;
-        for (int i = 1; i < UINT16_MAX + 1; ++i) {
+        uint16_t expected_pc = 1;
+        for (int i = 1; i <= UINT16_MAX + 1; ++i) {
+            uint16_t expected_value = i;
             mmu.write(cpu.pc, instruction);
             int ticks = cpu.fetchDecodeAndExecute();
             ASSERT_EQ(ticks, 2);
             ASSERT_EQ(cpu.getFlag(), 0x00);
             uint16_t regValue = (msbRegister << 8u) | lsbRegister;
-            ASSERT_EQ(regValue, i);
+            ASSERT_EQ(regValue, expected_value);
             ASSERT_EQ(cpu.pc, expected_pc);
             expected_pc++;
         }
@@ -103,13 +104,53 @@ protected:
 
     void testIncrement16BitsRegister(byte instruction, const uint16_t& reg) {
         cpu.pc = 0x00;
-        int expected_pc = 1;
-        for (int i = 1; i < UINT16_MAX + 1; ++i) {
+        uint16_t expected_pc = 1;
+        for (int i = 1; i <= UINT16_MAX + 1; ++i) {
+            uint16_t expected_value = i;
             mmu.write(cpu.pc, instruction);
             int ticks = cpu.fetchDecodeAndExecute();
             ASSERT_EQ(ticks, 2);
             ASSERT_EQ(cpu.getFlag(), 0x00);
-            ASSERT_EQ(reg, i);
+            ASSERT_EQ(reg, expected_value);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
+
+    void testIncrement8BitRegister(byte instruction, const byte& reg) {
+        cpu.pc = 0x00;
+        uint16_t expected_pc = 1;
+        for (int i = 1; i <= UINT8_MAX + 1; ++i) {
+            byte expected_value = i;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 1);
+            ASSERT_FALSE(cpu.isFlagSet( CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x10);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
+            ASSERT_EQ(reg, expected_value);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
+
+    void testIncrement8BitsMemoryValue(byte instruction, byte& msbRegister, byte& lsbRegister) {
+        cpu.pc = 0x00;
+        msbRegister = 0x0F;
+        lsbRegister = 0xFF;
+        mmu.write(createAddrFromHighAndLowBytes(msbRegister, lsbRegister), 0);
+        uint16_t expected_pc = 1;
+        for (int i = 1; i <= UINT8_MAX + 1; ++i) {
+            byte expected_value = i;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 3);
+            ASSERT_FALSE(cpu.isFlagSet( CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x10);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
+            ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
             ASSERT_EQ(cpu.pc, expected_pc);
             expected_pc++;
         }
@@ -202,4 +243,12 @@ TEST_F(CpuInstructionTest, InstructionIncrementRegister) {
     testIncrement8BitsRegisters(standardInstructions::INC_DE, cpu.d, cpu.e);
     testIncrement8BitsRegisters(standardInstructions::INC_HL, cpu.h, cpu.l);
     testIncrement16BitsRegister(standardInstructions::INC_SP, cpu.sp);
+    testIncrement8BitRegister(standardInstructions::INC_B, cpu.b);
+    testIncrement8BitRegister(standardInstructions::INC_C, cpu.c);
+    testIncrement8BitRegister(standardInstructions::INC_D, cpu.d);
+    testIncrement8BitRegister(standardInstructions::INC_E, cpu.e);
+    testIncrement8BitRegister(standardInstructions::INC_H, cpu.h);
+    testIncrement8BitRegister(standardInstructions::INC_L, cpu.l);
+    testIncrement8BitRegister(standardInstructions::INC_A, cpu.a);
+    testIncrement8BitsMemoryValue(standardInstructions::INC_HLm, cpu.h, cpu.l);
 }

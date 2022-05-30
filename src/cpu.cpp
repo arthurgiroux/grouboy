@@ -207,17 +207,18 @@ void CPU::incrementRegistersValue(byte& msbRegister, byte& lsbRegister) {
 }
 
 void CPU::incrementRegisterValue(uint16_t& reg) {
-	XY++;
+	reg++;
 	lastInstructionTicks = 2;
 }
 
-void CPU::INC_XYm(byte X, byte Y) {
+void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb) {
 	unsetFlag(CpuFlags::SUBSTRACTION);
-	byte oldvalue = mmu.read((X << 8) | Y);
+	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte oldvalue = mmu.read(addr);
 	byte value = oldvalue + 1;
-	mmu.write((X << 8) | Y, value);
+	mmu.write(addr, value);
 	changeZeroValueFlag(value);
-	setHalfCarryFlag((oldvalue & 0x10) == 0 && (value & 0x10) > 0);
+	setHalfCarryFlag(value == 0x10);
 
 	lastInstructionTicks = 3;
 }
@@ -232,12 +233,12 @@ void CPU::DEC_XYm(byte X, byte Y) {
 	lastInstructionTicks = 3;
 }
 
-void CPU::INC_X(byte& X) {
+void CPU::IncrementRegisterValue(byte& reg) {
 	unsetFlag(CpuFlags::SUBSTRACTION);
 
-	X++;
-	setHalfCarryFlag(X == 0);
-	changeZeroValueFlag(X);
+	reg++;
+	setHalfCarryFlag(reg == 0x10);
+	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
@@ -815,7 +816,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_B:
-		INC_X(b);
+        IncrementRegisterValue(b);
 		break;
 
 	case DEC_B:
@@ -847,7 +848,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_C:
-		INC_X(c);
+        IncrementRegisterValue(c);
 		break;
 
 	case DEC_C:
@@ -885,7 +886,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_D:
-		INC_X(d);
+        IncrementRegisterValue(d);
 		break;
 
 	case DEC_D:
@@ -917,7 +918,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_E:
-		INC_X(e);
+        IncrementRegisterValue(e);
 		break;
 
 	case DEC_E:
@@ -953,7 +954,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_H:
-		INC_X(h);
+        IncrementRegisterValue(h);
 		break;
 
 	case DEC_H:
@@ -985,7 +986,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_L:
-		INC_X(l);
+        IncrementRegisterValue(l);
 		break;
 
 	case DEC_L:
@@ -1021,7 +1022,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_HLm:
-		INC_XYm(h, l);
+        incrementValueInMemoryAtAddr(h, l);
 		break;
 
 	case DEC_HLm:
@@ -1053,7 +1054,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_A:
-		INC_X(a);
+        IncrementRegisterValue(a);
 		break;
 
 	case DEC_A:

@@ -270,14 +270,31 @@ private:
      */
 	void incrementRegisterValue(uint16_t& reg);
 
-	// Increment the value pointed by XY
-	void INC_XYm(byte X, byte Y);
+    /**
+     * Increment the value in memory pointed by the given address.
+     *
+     * @param addrMsb   the MSB part of the address
+     * @param addrLsb   the LSB part of the address
+     * @opcodes:
+     *     0x34
+     * @flags_affected: Zero, Half-carry, Substraction
+     * @number_of_ticks: 3
+     */
+	void incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb);
+
+    /**
+     * Increment the 8 bits value of the register.
+     *
+     * @param reg   the register
+     * @opcodes:
+     *     0x04 0x14 0x24 0x0C 0x1C 0x2C 0x3C
+     * @flags_affected: Zero, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+    void IncrementRegisterValue(byte& reg);
 
 	// Decrement the value pointed by XY
 	void DEC_XYm(byte X, byte Y);
-
-	// Increment the value of X
-	void INC_X(byte& X);
 
 	// Decrement the value of X
 	void DEC_X(byte& X);
