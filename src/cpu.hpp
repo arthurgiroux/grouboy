@@ -247,9 +247,28 @@ private:
 	// Load the byte Y into X
 	void LD_X_Y(byte& X, byte Y);
 
-	// Increment the value of XY
-	void INC_XY(byte& X, byte& Y);
-	void INC_XY(uint16_t& XY);
+    /**
+     * Increment the 16 bits value of the register made of two 8 bits registers.
+     *
+     * @param msbRegister   the MSB register
+     * @param lsbRegister   the LSB register
+     * @opcodes:
+     *     0x03 0x13 0x23
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void incrementRegistersValue(byte& msbRegister, byte& lsbRegister);
+
+    /**
+     * Increment the 16 bits value of the register.
+     *
+     * @param reg   the register to increment
+     * @opcodes:
+     *     0x33
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void incrementRegisterValue(uint16_t& reg);
 
 	// Increment the value pointed by XY
 	void INC_XYm(byte X, byte Y);

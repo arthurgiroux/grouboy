@@ -197,18 +197,16 @@ void CPU::LD_X_Y(byte& X, byte Y) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::INC_XY(byte& X, byte& Y) {
-	// We increment the LSB
-	Y++;
+void CPU::incrementRegistersValue(byte& msbRegister, byte& lsbRegister) {
+	lsbRegister++;
 	// If we overflowed the LSB then we increment the MSB
-	if (Y == 0) {
-		X++;
+	if (lsbRegister == 0) {
+		msbRegister++;
 	}
 	lastInstructionTicks = 2;
 }
 
-void CPU::INC_XY(uint16_t& XY) {
-	// We increment the value
+void CPU::incrementRegisterValue(uint16_t& reg) {
 	XY++;
 	lastInstructionTicks = 2;
 }
@@ -813,7 +811,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_BC:
-		INC_XY(b, c);
+        incrementRegistersValue(b, c);
 		break;
 
 	case INC_B:
@@ -883,7 +881,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_DE:
-		INC_XY(d, e);
+        incrementRegistersValue(d, e);
 		break;
 
 	case INC_D:
@@ -951,7 +949,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_HL:
-		INC_XY(h, l);
+        incrementRegistersValue(h, l);
 		break;
 
 	case INC_H:
@@ -1019,7 +1017,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_SP:
-		INC_XY(sp);
+        incrementRegisterValue(sp);
 		break;
 
 	case INC_HLm:

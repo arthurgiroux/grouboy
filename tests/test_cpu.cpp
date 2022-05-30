@@ -85,6 +85,35 @@ protected:
         ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
         ASSERT_EQ(cpu.pc, 0x01);
     }
+
+    void testIncrement8BitsRegisters(byte instruction, const byte& msbRegister, const byte& lsbRegister) {
+        cpu.pc = 0x00;
+        int expected_pc = 1;
+        for (int i = 1; i < UINT16_MAX + 1; ++i) {
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.getFlag(), 0x00);
+            uint16_t regValue = (msbRegister << 8u) | lsbRegister;
+            ASSERT_EQ(regValue, i);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
+
+    void testIncrement16BitsRegister(byte instruction, const uint16_t& reg) {
+        cpu.pc = 0x00;
+        int expected_pc = 1;
+        for (int i = 1; i < UINT16_MAX + 1; ++i) {
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.getFlag(), 0x00);
+            ASSERT_EQ(reg, i);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -165,4 +194,12 @@ TEST_F(CpuInstructionTest, InstructionLoad8BitsValueInMemoryAddr) {
     testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_H, cpu.h, cpu.l, cpu.h);
     testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_L, cpu.h, cpu.l, cpu.l);
     testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_A, cpu.h, cpu.l, cpu.a);
+}
+
+
+TEST_F(CpuInstructionTest, InstructionIncrementRegister) {
+    testIncrement8BitsRegisters(standardInstructions::INC_BC, cpu.b, cpu.c);
+    testIncrement8BitsRegisters(standardInstructions::INC_DE, cpu.d, cpu.e);
+    testIncrement8BitsRegisters(standardInstructions::INC_HL, cpu.h, cpu.l);
+    testIncrement16BitsRegister(standardInstructions::INC_SP, cpu.sp);
 }
