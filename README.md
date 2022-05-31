@@ -1,4 +1,4 @@
-# C++ Gameboy Emulator
+# C++ Gameboy Emulator [![Build Status](https://app.travis-ci.com/arthurgiroux/gbemulator.svg?branch=master)](https://app.travis-ci.com/arthurgiroux/gbemulator)
 
 This is an educative implementation of a Gameboy Emulator made in C++.
 

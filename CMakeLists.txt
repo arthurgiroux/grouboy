@@ -61,4 +61,5 @@ set(SOURCE_FILES
 add_executable(gbemulator ${SOURCE_FILES})
 target_link_libraries(gbemulator IMGUI)
 
+enable_testing()
 add_subdirectory(tests/)

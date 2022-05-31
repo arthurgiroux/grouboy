@@ -1,0 +1,15 @@
+os: windows
+
+language: cpp
+
+compiler:
+  - clang
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_RELEASE_TYPE="Release" ..
+
+script:
+  - cmake --build .
+  - ctest .
