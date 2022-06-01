@@ -56,7 +56,9 @@ set(SOURCE_FILES
 	src/gpu.hpp
 	src/tile.cpp
 	src/tile.hpp
-		src/utils.hpp)
+	src/utils.hpp
+	src/GUI.cpp
+	src/GUI.hpp)
 
 add_executable(gbemulator ${SOURCE_FILES})
 target_link_libraries(gbemulator IMGUI)
