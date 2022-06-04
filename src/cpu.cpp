@@ -223,17 +223,18 @@ void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb) {
 	lastInstructionTicks = 3;
 }
 
-void CPU::DEC_XYm(byte X, byte Y) {
+void CPU::decrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb) {
 	setFlag(CpuFlags::SUBSTRACTION);
-	byte oldvalue = mmu.read((X << 8) | Y);
+    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    byte oldvalue = mmu.read(addr);
 	byte value = oldvalue - 1;
-	mmu.write((X << 8) | Y, value);
+	mmu.write(addr, value);
 	changeZeroValueFlag(value);
-    setHalfCarryFlag((oldvalue & 0x10) > 0 && (value & 0x10) == 0);
+    setHalfCarryFlag(value == 0x08);
 	lastInstructionTicks = 3;
 }
 
-void CPU::IncrementRegisterValue(byte& reg) {
+void CPU::incrementRegisterValue(byte& reg) {
 	unsetFlag(CpuFlags::SUBSTRACTION);
 
 	reg++;
@@ -242,26 +243,25 @@ void CPU::IncrementRegisterValue(byte& reg) {
 	lastInstructionTicks = 1;
 }
 
-// TODO: check reset flags
-void CPU::DEC_X(byte& X) {
+void CPU::decrementRegisterValue(byte& reg) {
     setFlag(CpuFlags::SUBSTRACTION);
 
-    X--;
-    setHalfCarryFlag(X == 0xFF);
-	changeZeroValueFlag(X);
+    reg--;
+    setHalfCarryFlag(reg == 0x08);
+	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
-void CPU::DEC_XY(byte& X, byte& Y) {
-	uint16_t xy = (X << 8) | Y;
+void CPU::decrementRegistersValue(byte& msgRegister, byte& lsbRegister) {
+	uint16_t xy = (msgRegister << 8) | lsbRegister;
 	xy--;
-	X = (xy >> 8);
-	Y = (xy & 0x00FF);
+    msgRegister = (xy >> 8);
+    lsbRegister = (xy & 0x00FF);
 	lastInstructionTicks = 2;
 }
 
-void CPU::DEC_XY(uint16_t& XY) {
-	XY--;
+void CPU::decrementRegisterValue(uint16_t& reg) {
+	reg--;
 	lastInstructionTicks = 2;
 }
 
@@ -816,11 +816,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_B:
-        IncrementRegisterValue(b);
+        incrementRegisterValue(b);
 		break;
 
 	case DEC_B:
-		DEC_X(b);
+        decrementRegisterValue(b);
 		break;
 
 	case LD_B_n:
@@ -844,15 +844,15 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_BC:
-		DEC_XY(b, c);
+        decrementRegistersValue(b, c);
 		break;
 
 	case INC_C:
-        IncrementRegisterValue(c);
+        incrementRegisterValue(c);
 		break;
 
 	case DEC_C:
-		DEC_X(c);
+        decrementRegisterValue(c);
 		break;
 
 	case LD_C_n:
@@ -886,11 +886,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_D:
-        IncrementRegisterValue(d);
+        incrementRegisterValue(d);
 		break;
 
 	case DEC_D:
-		DEC_X(d);
+        decrementRegisterValue(d);
 		break;
 
 	case LD_D_n:
@@ -914,15 +914,15 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_DE:
-		DEC_XY(d, e);
+        decrementRegistersValue(d, e);
 		break;
 
 	case INC_E:
-        IncrementRegisterValue(e);
+        incrementRegisterValue(e);
 		break;
 
 	case DEC_E:
-		DEC_X(e);
+        decrementRegisterValue(e);
 		break;
 
 	case LD_E_n:
@@ -954,11 +954,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_H:
-        IncrementRegisterValue(h);
+        incrementRegisterValue(h);
 		break;
 
 	case DEC_H:
-		DEC_X(h);
+        decrementRegisterValue(h);
 		break;
 
 	case LD_H_n:
@@ -982,15 +982,15 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_HL:
-		DEC_XY(h, l);
+        decrementRegistersValue(h, l);
 		break;
 
 	case INC_L:
-        IncrementRegisterValue(l);
+        incrementRegisterValue(l);
 		break;
 
 	case DEC_L:
-		DEC_X(l);
+        decrementRegisterValue(l);
 		break;
 
 	case LD_L_n:
@@ -1026,7 +1026,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_HLm:
-		DEC_XYm(h, l);
+        decrementValueInMemoryAtAddr(h, l);
 		break;
 
 	case LD_HLm_n:
@@ -1050,15 +1050,15 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_SP:
-		DEC_XY(sp);
+        decrementRegisterValue(sp);
 		break;
 
 	case INC_A:
-        IncrementRegisterValue(a);
+        incrementRegisterValue(a);
 		break;
 
 	case DEC_A:
-		DEC_X(a);
+        decrementRegisterValue(a);
 		break;
 
 	case LD_A_n:

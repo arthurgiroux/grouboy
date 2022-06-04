@@ -155,6 +155,76 @@ protected:
             expected_pc++;
         }
     }
+
+    void testDecrement8BitsRegisters(byte instruction, const byte& msbRegister, const byte& lsbRegister) {
+        cpu.pc = 0x00;
+        uint16_t expected_pc = 1;
+        for (int i = UINT16_MAX; i >= 0; --i) {
+            uint16_t expected_value = i;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.getFlag(), 0x00);
+            uint16_t regValue = (msbRegister << 8u) | lsbRegister;
+            ASSERT_EQ(regValue, expected_value);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
+
+    void testDecrement16BitsRegister(byte instruction, const uint16_t& reg) {
+        cpu.pc = 0x00;
+        uint16_t expected_pc = 1;
+        for (int i = UINT16_MAX; i >= 0; --i) {
+            uint16_t expected_value = i;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.getFlag(), 0x00);
+            ASSERT_EQ(reg, expected_value);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
+
+    void testDecrement8BitRegister(byte instruction, const byte& reg) {
+        cpu.pc = 0x00;
+        uint16_t expected_pc = 1;
+        for (int i = UINT8_MAX; i >= 0; --i) {
+            byte expected_value = i;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 1);
+            ASSERT_TRUE(cpu.isFlagSet( CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x08);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
+            ASSERT_EQ(reg, expected_value);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
+
+    void testDecrement8BitsMemoryValue(byte instruction, byte& msbRegister, byte& lsbRegister) {
+        cpu.pc = 0x00;
+        msbRegister = 0x0F;
+        lsbRegister = 0xFF;
+        mmu.write(createAddrFromHighAndLowBytes(msbRegister, lsbRegister), 0);
+        uint16_t expected_pc = 1;
+        for (int i = UINT8_MAX; i >= 0; --i) {
+            byte expected_value = i;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 3);
+            ASSERT_TRUE(cpu.isFlagSet( CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x08);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
+            ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            expected_pc++;
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -237,7 +307,6 @@ TEST_F(CpuInstructionTest, InstructionLoad8BitsValueInMemoryAddr) {
     testLoad8BitsValueInMemoryAddr(standardInstructions::LD_HLm_A, cpu.h, cpu.l, cpu.a);
 }
 
-
 TEST_F(CpuInstructionTest, InstructionIncrementRegister) {
     testIncrement8BitsRegisters(standardInstructions::INC_BC, cpu.b, cpu.c);
     testIncrement8BitsRegisters(standardInstructions::INC_DE, cpu.d, cpu.e);
@@ -251,4 +320,19 @@ TEST_F(CpuInstructionTest, InstructionIncrementRegister) {
     testIncrement8BitRegister(standardInstructions::INC_L, cpu.l);
     testIncrement8BitRegister(standardInstructions::INC_A, cpu.a);
     testIncrement8BitsMemoryValue(standardInstructions::INC_HLm, cpu.h, cpu.l);
+}
+
+TEST_F(CpuInstructionTest, InstructionDecrementRegister) {
+    testDecrement8BitsRegisters(standardInstructions::DEC_BC, cpu.b, cpu.c);
+    testDecrement8BitsRegisters(standardInstructions::DEC_DE, cpu.d, cpu.e);
+    testDecrement8BitsRegisters(standardInstructions::DEC_HL, cpu.h, cpu.l);
+    testDecrement16BitsRegister(standardInstructions::DEC_SP, cpu.sp);
+    testDecrement8BitRegister(standardInstructions::DEC_B, cpu.b);
+    testDecrement8BitRegister(standardInstructions::DEC_C, cpu.c);
+    testDecrement8BitRegister(standardInstructions::DEC_D, cpu.d);
+    testDecrement8BitRegister(standardInstructions::DEC_E, cpu.e);
+    testDecrement8BitRegister(standardInstructions::DEC_H, cpu.h);
+    testDecrement8BitRegister(standardInstructions::DEC_L, cpu.l);
+    testDecrement8BitRegister(standardInstructions::DEC_A, cpu.a);
+    testDecrement8BitsMemoryValue(standardInstructions::DEC_HLm, cpu.h, cpu.l);
 }

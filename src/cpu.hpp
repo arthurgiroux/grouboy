@@ -291,17 +291,53 @@ private:
      * @flags_affected: Zero, Half-carry, Substraction
      * @number_of_ticks: 1
      */
-    void IncrementRegisterValue(byte& reg);
+    void incrementRegisterValue(byte& reg);
 
-	// Decrement the value pointed by XY
-	void DEC_XYm(byte X, byte Y);
+    /**
+     * Decrement the value in memory pointed by the given address.
+     *
+     * @param addrMsb   the MSB part of the address
+     * @param addrLsb   the LSB part of the address
+     * @opcodes:
+     *     0x35
+     * @flags_affected: Zero, Half-carry, Substraction
+     * @number_of_ticks: 3
+     */
+     void decrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb);
 
-	// Decrement the value of X
-	void DEC_X(byte& X);
+    /**
+     * Decrement the 8 bits value of the register.
+     *
+     * @param reg   the register
+     * @opcodes:
+     *     0x05 0x15 0x25 0x0D 0x1D 0x2D 0x3D
+     * @flags_affected: Zero, Half-carry, Substraction
+     * @number_of_ticks: 1
+    */
+    void decrementRegisterValue(byte& reg);
 
-	// Decrement the value of XY
-	void DEC_XY(byte& X, byte& Y);
-	void DEC_XY(uint16_t& XY);
+    /**
+     * Decrement the 16 bits value of the register made of two 8 bits registers.
+     *
+     * @param msbRegister   the MSB register
+     * @param lsbRegister   the LSB register
+     * @opcodes:
+     *     0x0B 0x1B 0x2B
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void decrementRegistersValue(byte& msgRegister, byte& lsbRegister);
+
+    /**
+     * Decrement the 16 bits value of the register.
+     *
+     * @param reg   the register to increment
+     * @opcodes:
+     *     0x3B
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void decrementRegisterValue(uint16_t& reg);
 
 	// Rotate the value of X to the left using the carry
 	void RLC_X(byte& X);
