@@ -225,6 +225,21 @@ protected:
             expected_pc++;
         }
     }
+
+    void testLoadImmediateValue(byte instruction, byte& reg) {
+        cpu.pc = 0x00;
+        uint16_t expected_pc = 0;
+        for (int i = 0; i < UINT8_MAX; ++i) {
+            mmu.write(cpu.pc, instruction);
+            mmu.write(cpu.pc + 1, i);
+            int ticks = cpu.fetchDecodeAndExecute();
+            expected_pc += 2;
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.getFlag(), 0x00);
+            ASSERT_EQ(cpu.pc, expected_pc);
+            ASSERT_EQ(reg, i);
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -335,4 +350,14 @@ TEST_F(CpuInstructionTest, InstructionDecrementRegister) {
     testDecrement8BitRegister(standardInstructions::DEC_L, cpu.l);
     testDecrement8BitRegister(standardInstructions::DEC_A, cpu.a);
     testDecrement8BitsMemoryValue(standardInstructions::DEC_HLm, cpu.h, cpu.l);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoadImmediateValue) {
+    testLoadImmediateValue(standardInstructions::LD_A_n, cpu.a);
+    testLoadImmediateValue(standardInstructions::LD_B_n, cpu.b);
+    testLoadImmediateValue(standardInstructions::LD_C_n, cpu.c);
+    testLoadImmediateValue(standardInstructions::LD_D_n, cpu.d);
+    testLoadImmediateValue(standardInstructions::LD_E_n, cpu.e);
+    testLoadImmediateValue(standardInstructions::LD_H_n, cpu.h);
+    testLoadImmediateValue(standardInstructions::LD_L_n, cpu.l);
 }

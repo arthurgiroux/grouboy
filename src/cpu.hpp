@@ -203,8 +203,16 @@ private:
 	// Load X in the address pointed by pc
 	void LD_NNm_X(byte X);
 
-	// Load the byte pointed by pc into X
-	void LD_X_N(byte& X);
+    /**
+     * Load the immediate value in the given register.
+     *
+     * @param reg   the register in which to load the value
+     * @opcodes:
+     *     0x06 0x16 0x26 0x0E 0x1E 0x2E 0x3E
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+     void loadImmediateValueInRegister(byte& reg);
 
 	/**
 	 * Load the given value to the memory pointed by the given address.

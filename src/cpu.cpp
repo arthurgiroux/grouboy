@@ -112,8 +112,8 @@ void CPU::LD_NNm_X(byte X) {
 	lastInstructionTicks = 4;
 }
 
-void CPU::LD_X_N(byte& X) {
-	X = mmu.read(pc);
+void CPU::loadImmediateValueInRegister(byte& reg) {
+    reg = mmu.read(pc);
 	pc++;
 	lastInstructionTicks = 2;
 }
@@ -824,7 +824,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_B_n:
-		LD_X_N(b);
+        loadImmediateValueInRegister(b);
 		break;
 
 	case RLC_A:
@@ -856,7 +856,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_C_n:
-		LD_X_N(c);
+        loadImmediateValueInRegister(c);
 		break;
 
 	case RRC_A:
@@ -894,7 +894,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_D_n:
-		LD_X_N(d);
+        loadImmediateValueInRegister(d);
 		break;
 
 	case RL_A:
@@ -926,7 +926,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_E_n:
-		LD_X_N(e);
+        loadImmediateValueInRegister(e);
 		break;
 
 	case RR_A:
@@ -962,7 +962,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_H_n:
-		LD_X_N(h);
+        loadImmediateValueInRegister(h);
 		break;
 
 	case DAA:
@@ -994,7 +994,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_L_n:
-		LD_X_N(l);
+        loadImmediateValueInRegister(l);
 		break;
 
 	case CPL:
@@ -1062,7 +1062,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_A_n:
-		LD_X_N(a);
+        loadImmediateValueInRegister(a);
 		break;
 
 	case CCF:
