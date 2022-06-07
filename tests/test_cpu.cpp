@@ -240,6 +240,26 @@ protected:
             ASSERT_EQ(reg, i);
         }
     }
+
+    void testRotateLeftCarry(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
+        reg = 0b00000001;
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = reg;
+            bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
+            byte expectedValue = (registerValue << 1) | isCarryFlagSet;
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
+            ASSERT_EQ(reg, expectedValue);
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -360,4 +380,15 @@ TEST_F(CpuInstructionTest, InstructionLoadImmediateValue) {
     testLoadImmediateValue(standardInstructions::LD_E_n, cpu.e);
     testLoadImmediateValue(standardInstructions::LD_H_n, cpu.h);
     testLoadImmediateValue(standardInstructions::LD_L_n, cpu.l);
+}
+
+TEST_F(CpuInstructionTest, InstructionRotateLeftCarry) {
+    testRotateLeftCarry({standardInstructions::RLC_A}, cpu.a, 1);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_A}, cpu.a, 2);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_B}, cpu.b, 2);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_C}, cpu.c, 2);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_D}, cpu.d, 2);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_E}, cpu.e, 2);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_H}, cpu.h, 2);
+    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_L}, cpu.l, 2);
 }

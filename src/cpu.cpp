@@ -265,24 +265,24 @@ void CPU::decrementRegisterValue(uint16_t& reg) {
 	lastInstructionTicks = 2;
 }
 
-
-void CPU::RLC_X(byte& X) {
+void CPU::rotateRegisterLeftUsingCarry(byte& reg) {
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	unsetFlag(CpuFlags::ZERO);
 	unsetFlag(CpuFlags::HALF_CARRY);
 
 	byte currentCarry = isFlagSet(CpuFlags::CARRY);
 	/* Set the carry flag to the highest bit of X */
-    setCarryFlag((X & 0x80) > 0);
+    setCarryFlag((reg & 0x80) > 0);
 	/* Rotate the accumulator and set the last bit to the original carry flag */
-	X = (X << 1) | currentCarry;
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
+	reg = (reg << 1) | currentCarry;
+    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
+	changeZeroValueFlag(reg);
+	lastInstructionTicks = 1;
 }
 
 void CPU::RLC_XYm(byte X, byte Y) {
 	byte value = mmu.read((X << 8) | Y);
-	RLC_X(value);
+    rotateRegisterLeftUsingCarry(value);
 	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
@@ -828,7 +828,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case RLC_A:
-		RLC_X(a);
+        rotateRegisterLeftUsingCarry(a);
 		break;
 
 	case LD_nnm_SP:
@@ -1865,31 +1865,35 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case RLC_B:
-		RLC_X(b);
+        rotateRegisterLeftUsingCarryExtended(b);
 		break;
 
 	case RLC_C:
-		RLC_X(c);
+        rotateRegisterLeftUsingCarryExtended(c);
 		break;
 
 	case RLC_D:
-		RLC_X(d);
+        rotateRegisterLeftUsingCarryExtended(d);
 		break;
 
 	case RLC_E:
-		RLC_X(e);
+        rotateRegisterLeftUsingCarryExtended(e);
 		break;
 
 	case RLC_H:
-		RLC_X(h);
+        rotateRegisterLeftUsingCarryExtended(h);
 		break;
+
+    case RLC_L:
+        rotateRegisterLeftUsingCarryExtended(l);
+        break;
 
 	case RLC_HLm:
 		RLC_XYm(h, l);
 		break;
 
 	case RLC_A:
-		RLC_X(a);
+        rotateRegisterLeftUsingCarryExtended(a);
 		break;
 
 	case RRC_B:
@@ -2849,4 +2853,9 @@ void CPU::NoOperation() {
 
 byte CPU::getFlag() const {
     return f;
+}
+
+void CPU::rotateRegisterLeftUsingCarryExtended(byte &reg) {
+    rotateRegisterLeftUsingCarry(reg);
+    lastInstructionTicks = 2;
 }

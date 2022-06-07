@@ -347,8 +347,38 @@ private:
      */
 	void decrementRegisterValue(uint16_t& reg);
 
-	// Rotate the value of X to the left using the carry
-	void RLC_X(byte& X);
+    /**
+     * Rotate the value inside the given register to the
+     * left by 1 bit.
+     * The carry flag is used as a buffer for the rotation.
+     *
+     * Here's some example of rotating the value 10000000
+     * several times.
+     *
+     * |Carry| | Value |
+     *  0      10000000
+     *  1      00000000
+     *  0      00000001
+     *
+     * @param reg   the register to rotate to the left by 1 bit.
+     * @opcodes:
+     *     0x07
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+	void rotateRegisterLeftUsingCarry(byte& reg);
+
+    /**
+     * Rotate left with carry operation for the extended instruction set.
+     * See {@link #rotateRegisterLeftUsingCarry(byte&)} for details.
+     *
+     * @param reg   the register to rotate to the left by 1 bit.
+     * @opcodes:
+     *     0x00 0x01 0x02 0x03 0x04 0x05 0x07 0x08
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void rotateRegisterLeftUsingCarryExtended(byte& reg);
 
 	// Rotate the value pointed by XY to the left using the carry
 	void RLC_XYm(byte X, byte Y);
