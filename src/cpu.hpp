@@ -200,8 +200,27 @@ private:
 	// Load the byte pointed by the address pointed by pc into X
 	void LD_X_NNm(byte& X);
 
-	// Load X in the address pointed by pc
-	void LD_NNm_X(byte X);
+    /**
+     * Load the 16 bits value of the given register to the immediate address.
+     *
+     * @param reg   the register from which to load the value
+     * @opcodes:
+     *     0x08
+     * @flags_affected: N/A
+     * @number_of_ticks: 5
+     */
+	void load16BitsRegisterAtImmediateAddress(uint16_t reg);
+
+    /**
+     * Load the 8 bits value of the given register to the immediate address.
+     *
+     * @param reg   the register from which to load the value
+     * @opcodes:
+     *     0xEA
+     * @flags_affected: N/A
+     * @number_of_ticks: 4
+     */
+    void load8BitsRegisterAtImmediateAddress(byte reg);
 
     /**
      * Load the immediate value in the given register.
@@ -248,9 +267,6 @@ private:
 
 	// Load the byte pointed by YZ into X
 	void LD_X_YZm(byte& X, byte Y, byte Z);
-
-	// Load the word pointed by the address contained in pc into X
-	void LD_NNm_X(uint16_t& X);
 
 	// Load the byte Y into X
 	void LD_X_Y(byte& X, byte Y);

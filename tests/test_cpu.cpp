@@ -392,3 +392,33 @@ TEST_F(CpuInstructionTest, InstructionRotateLeftCarry) {
     testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_H}, cpu.h, 2);
     testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_L}, cpu.l, 2);
 }
+
+TEST_F(CpuInstructionTest, InstructionLoad16BitsRegisterAtImmediateAddr) {
+    uint16_t expectedValue = 0x559A;
+    cpu.sp = expectedValue;
+    cpu.pc = 0x00;
+    uint16_t addr = 0x5C8;
+    mmu.write(cpu.pc, standardInstructions::LD_nnm_SP);
+    mmu.writeWord(cpu.pc + 1, addr);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 5);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    uint16_t value = mmu.readWord(addr);
+    ASSERT_EQ(value, expectedValue);
+    ASSERT_EQ(cpu.pc, 3);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoad8BitsRegisterAtImmediateAddr) {
+    byte expectedValue = 0x9A;
+    cpu.a = expectedValue;
+    cpu.pc = 0x00;
+    uint16_t addr = 0x5C8;
+    mmu.write(cpu.pc, standardInstructions::LD_nnm_A);
+    mmu.writeWord(cpu.pc + 1, addr);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 4);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    uint16_t value = mmu.readWord(addr);
+    ASSERT_EQ(value, expectedValue);
+    ASSERT_EQ(cpu.pc, 3);
+}

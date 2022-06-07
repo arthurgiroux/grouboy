@@ -106,10 +106,16 @@ void CPU::LD_X_NNm(byte& X) {
 	lastInstructionTicks = 4;
 }
 
-void CPU::LD_NNm_X(byte X) {
-	mmu.write(mmu.readWord(pc), X);
+void CPU::load16BitsRegisterAtImmediateAddress(uint16_t reg) {
+	mmu.writeWord(mmu.readWord(pc), reg);
 	pc += 2;
-	lastInstructionTicks = 4;
+	lastInstructionTicks = 5;
+}
+
+void CPU::load8BitsRegisterAtImmediateAddress(byte reg) {
+    mmu.write(mmu.readWord(pc), reg);
+    pc += 2;
+    lastInstructionTicks = 4;
 }
 
 void CPU::loadImmediateValueInRegister(byte& reg) {
@@ -184,12 +190,6 @@ void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z) {
 void CPU::LD_X_YZm(byte& X, byte Y, byte Z) {
 	X = mmu.read((Y << 8) | Z);
 	lastInstructionTicks = 2;
-}
-
-void CPU::LD_NNm_X(uint16_t& X) {
-	mmu.writeWord(mmu.readWord(pc), X);
-	pc += 2;
-	lastInstructionTicks = 5;
 }
 
 void CPU::LD_X_Y(byte& X, byte Y) {
@@ -832,7 +832,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_nnm_SP:
-		LD_NNm_X(sp);
+        load16BitsRegisterAtImmediateAddress(sp);
 		break;
 
 	case ADD_HL_BC:
@@ -1778,7 +1778,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_nnm_A:
-		LD_NNm_X(a);
+        load8BitsRegisterAtImmediateAddress(a);
 		break;
 
 	case XOR_n:
