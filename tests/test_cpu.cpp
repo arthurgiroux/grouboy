@@ -260,6 +260,47 @@ protected:
             ASSERT_EQ(reg, expectedValue);
         }
     }
+
+    void addTwo8BitsRegisterToTwo8BitsRegister(byte instruction, byte& resultRegMsb, byte& resultRegLsb,
+                                               byte& valueRegMsb, byte& valueRegLsb,
+                                               std::vector<uint16_t>& startValues, std::vector<uint16_t>& addValues) {
+        for (int i = 0; i < startValues.size(); ++i) {
+            uint16_t startValue = startValues[i];
+            uint16_t addValue = addValues[i];
+            resultRegLsb = startValue & 0xFF;
+            resultRegMsb = (startValue >> 8) & 0xFF;
+            valueRegLsb = addValue & 0xFF;
+            valueRegMsb = (addValue >> 8) & 0xFF;
+            uint32_t expectedValue = startValue + addValue;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (expectedValue > 0xFFFF));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (startValue <= 0xFFF && expectedValue > 0xFFF));
+        }
+    }
+
+    void add16BitsRegisterToTwo8BitsRegister(byte instruction, byte& resultRegMsb, byte& resultRegLsb,
+                                               uint16_t& valueReg,
+                                               std::vector<uint16_t>& startValues, std::vector<uint16_t>& addValues) {
+        for (int i = 0; i < startValues.size(); ++i) {
+            uint16_t startValue = startValues[i];
+            uint16_t addValue = addValues[i];
+            resultRegLsb = startValue & 0xFF;
+            resultRegMsb = (startValue >> 8) & 0xFF;
+            valueReg = addValue;
+            uint32_t expectedValue = startValue + addValue;
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (expectedValue > 0xFFFF));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (startValue <= 0xFFF && expectedValue > 0xFFF));
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -421,4 +462,27 @@ TEST_F(CpuInstructionTest, InstructionLoad8BitsRegisterAtImmediateAddr) {
     uint16_t value = mmu.readWord(addr);
     ASSERT_EQ(value, expectedValue);
     ASSERT_EQ(cpu.pc, 3);
+}
+
+TEST_F(CpuInstructionTest, InstructionAddTwo8BitsRegisterToTwo8BitsRegister) {
+    std::vector<uint16_t> startValues = { 0x0000, 0x00FF, 0xFFFF, 0x0FFF, 0x0FFF };
+    std::vector<uint16_t> addValues = { 0x0012, 0x0012, 0x0050, 0x0012, 0x0000 };
+    addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_BC, cpu.h, cpu.l,
+                                          cpu.b, cpu.c, startValues, addValues);
+    addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_DE, cpu.h, cpu.l,
+                                          cpu.d, cpu.e, startValues, addValues);
+}
+
+TEST_F(CpuInstructionTest, InstructionAdd16BitsRegisterToTwo8BitsRegister) {
+    std::vector<uint16_t> startValues = { 0x0000, 0x00FF, 0xFFFF, 0x0FFF, 0x0FFF };
+    std::vector<uint16_t> addValues = { 0x0012, 0x0012, 0x0050, 0x0012, 0x0000 };
+    add16BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_SP, cpu.h, cpu.l,
+                                        cpu.sp, startValues, addValues);
+}
+
+TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterToSameRegisters) {
+    std::vector<uint16_t> startValues = { 0x0012, 0x00FF, 0x0FFF };
+    std::vector<uint16_t> addValues = { 0x0012, 0x00FF, 0x0FFF };
+    addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_HL, cpu.h, cpu.l,
+                                          cpu.h, cpu.l, startValues, addValues);
 }

@@ -459,8 +459,21 @@ private:
 	// Set the value of the bit at position X in the value pointed by YZ
 	void SET_X_YZm(byte X, byte Y, byte Z);
 
-	// Add the value of YZ to the value of WX
-	void ADD_WX_YZ(byte& W, byte& X, byte Y, byte Z);
+    /**
+     * Arithmetic operation of adding the 16 bits value made from two
+     * 8 bits register (YZ) to another two 8 bits register (WX)
+     *
+     * @param resultRegMsb    the msb of the register where the value will be added
+     * @param resultRegLsb    the lsb of the register where the value will be added
+     * @param valueRegMsb     the msb of the register containing the value to add
+     * @param valueRegLsb     the lsb of the register containing the value to add
+     * @opcodes:
+     *     0x09 0x19 0x29 0x39
+     * @flags_affected: Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+	void addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resultRegLsb,
+                                                 byte valueRegMsb, byte valueRegLsb);
 
 	// Add the value of Z to the value of XY
 	void ADD_XY_Z(byte& X, byte& Y, byte Z);

@@ -458,20 +458,22 @@ void CPU::SET_X_YZm(byte X, byte Y, byte Z) {
 }
 
 
-void CPU::ADD_WX_YZ(byte& W, byte& X, byte Y, byte Z) {
+void CPU::addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resultRegLsb,
+                                                  byte valueRegMsb, byte valueRegLsb) {
 	unsetFlag(CpuFlags::SUBSTRACTION);
-	uint32_t comp = (W << 8) | X;
-	comp += (Y << 8) | Z;
-	setCarryFlag(comp > 0xFFFF);
-	setHalfCarryFlag(comp > X);
-	W = ((comp & 0xFF00) >> 8);
-	X = (comp & 0xFF);
+    uint16_t origValue = (resultRegMsb << 8) | resultRegLsb;
+    uint32_t result = origValue;
+    result += (valueRegMsb << 8) | valueRegLsb;
+	setCarryFlag(result > 0xFFFF);
+	setHalfCarryFlag(origValue <= 0xFFF && result > 0xFFF);
+    resultRegMsb = ((result & 0xFF00) >> 8);
+    resultRegLsb = (result & 0xFF);
 	lastInstructionTicks = 2;
 }
 
 void CPU::ADD_XY_Z(byte& X, byte& Y, byte Z) {
 	uint32_t comp = (X << 8) | Y;
-	ADD_WX_YZ(X, Y, 0, Z);
+    addTwo8BitsRegistersToTwo8BitsRegisters(X, Y, 0, Z);
 	lastInstructionTicks = 2;
 }
 
@@ -836,7 +838,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case ADD_HL_BC:
-		ADD_WX_YZ(h, l, b, c);
+        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, b, c);
 		break;
 
 	case LD_A_BCm:
@@ -906,7 +908,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case ADD_HL_DE:
-		ADD_WX_YZ(h, l, d, e);
+        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, d, e);
 		break;
 
 	case LD_A_DEm:
@@ -974,7 +976,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case ADD_HL_HL:
-		ADD_WX_YZ(h, l, h, l);
+        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, h, l);
 		break;
 
 	case LD_A_HLm_I:
@@ -1042,7 +1044,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case ADD_HL_SP:
-		ADD_WX_YZ(h, l, (sp << 8), (sp & 0x00FF));
+        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, (sp << 8), (sp & 0x00FF));
 		break;
 
 	case LD_A_HLm_D:
