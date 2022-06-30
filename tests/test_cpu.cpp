@@ -301,6 +301,22 @@ protected:
             ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (startValue <= 0xFFF && expectedValue > 0xFFF));
         }
     }
+
+    void testLoadValueFromMemoryInto8BitsRegister(byte instruction, byte& reg, byte& addrRegMsb, byte& addrRegLsb) {
+        cpu.pc = 0x00;
+        std::vector<uint16_t> addr = {0x0042, 0x0F00, 0x0F42};
+        for (int i = 0; i < addr.size(); ++i) {
+            addrRegMsb = addr[i] >> 8;
+            addrRegLsb = addr[i] & 0xFF;
+            mmu.write(addr[i], i + 1);
+            mmu.write(cpu.pc, instruction);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.getFlag(), 0x00);
+            ASSERT_EQ(reg, i + 1);
+            ASSERT_EQ(cpu.pc, i+1);
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -485,4 +501,16 @@ TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterToSameRegisters) {
     std::vector<uint16_t> addValues = { 0x0012, 0x00FF, 0x0FFF };
     addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_HL, cpu.h, cpu.l,
                                           cpu.h, cpu.l, startValues, addValues);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoadValueFromMemoryInto8BitsRegister) {
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_B_HLm, cpu.b, cpu.h, cpu.l);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_D_HLm, cpu.d, cpu.h, cpu.l);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_H_HLm, cpu.h, cpu.h, cpu.l);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_A_BCm, cpu.a, cpu.b, cpu.c);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_A_DEm, cpu.a, cpu.d, cpu.e);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_C_HLm, cpu.c, cpu.h, cpu.l);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_E_HLm, cpu.e, cpu.h, cpu.l);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_L_HLm, cpu.l, cpu.h, cpu.l);
+    testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_A_HLm, cpu.a, cpu.h, cpu.l);
 }

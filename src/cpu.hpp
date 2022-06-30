@@ -266,7 +266,18 @@ private:
 	void LD_XYm_D_Z(byte& X, byte& Y, byte& Z);
 
 	// Load the byte pointed by YZ into X
-	void LD_X_YZm(byte& X, byte Y, byte Z);
+    /**
+     * Load the value from memory at the given address into the given register.
+     *
+     * @param reg       The 8 bits register where the value will be loaded
+     * @param addrMsb   The msb of the address
+     * @param addrLsb   The lsb of the address
+     * @opcodes:
+     *     0x46 0x56 0x66 0x0A 0x1A 0x4E 0x5E 0x6E 0x7E
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
 	// Load the byte Y into X
 	void LD_X_Y(byte& X, byte Y);

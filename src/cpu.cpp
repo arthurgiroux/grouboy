@@ -187,8 +187,8 @@ void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_YZm(byte& X, byte Y, byte Z) {
-	X = mmu.read((Y << 8) | Z);
+void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb) {
+    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
 	lastInstructionTicks = 2;
 }
 
@@ -842,7 +842,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_A_BCm:
-		LD_X_YZm(a, b, c);
+        loadValueFromMemoryInto8BitsRegister(a, b, c);
 		break;
 
 	case DEC_BC:
@@ -912,7 +912,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_A_DEm:
-		LD_X_YZm(a, d, e);
+        loadValueFromMemoryInto8BitsRegister(a, d, e);
 		break;
 
 	case DEC_DE:
@@ -1100,7 +1100,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_B_HLm:
-		LD_X_YZm(b, h, l);
+        loadValueFromMemoryInto8BitsRegister(b, h, l);
 		break;
 
 	case LD_B_A:
@@ -1132,7 +1132,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_C_HLm:
-		LD_X_YZm(c, h, l);
+        loadValueFromMemoryInto8BitsRegister(c, h, l);
 		break;
 
 	case LD_C_A:
@@ -1169,7 +1169,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_D_HLm:
-		LD_X_YZm(d, h, l);
+        loadValueFromMemoryInto8BitsRegister(d, h, l);
 		break;
 
 	case LD_D_A:
@@ -1201,7 +1201,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_E_HLm:
-		LD_X_YZm(e, h, l);
+        loadValueFromMemoryInto8BitsRegister(e, h, l);
 		break;
 
 	case LD_E_A:
@@ -1237,7 +1237,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_H_HLm:
-		LD_X_YZm(h, h, l);
+        loadValueFromMemoryInto8BitsRegister(h, h, l);
 		break;
 
 	case LD_H_A:
@@ -1269,7 +1269,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_L_HLm:
-		LD_X_YZm(l, h, l);
+        loadValueFromMemoryInto8BitsRegister(l, h, l);
 		break;
 
 	case LD_L_A:
@@ -1338,7 +1338,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_A_HLm:
-		LD_X_YZm(a, h, l);
+        loadValueFromMemoryInto8BitsRegister(a, h, l);
 		break;
 
 	case LD_A_A:
