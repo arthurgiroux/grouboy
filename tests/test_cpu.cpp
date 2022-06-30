@@ -317,6 +317,26 @@ protected:
             ASSERT_EQ(cpu.pc, i+1);
         }
     }
+
+    void testRotateRightCarry(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
+        reg = 0b10000000;
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = reg;
+            bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
+            byte expectedValue = (isCarryFlagSet << 7) | (registerValue >> 1);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
+            ASSERT_EQ(reg, expectedValue);
+        }
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -514,3 +534,15 @@ TEST_F(CpuInstructionTest, InstructionLoadValueFromMemoryInto8BitsRegister) {
     testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_L_HLm, cpu.l, cpu.h, cpu.l);
     testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_A_HLm, cpu.a, cpu.h, cpu.l);
 }
+
+TEST_F(CpuInstructionTest, InstructionRotateRightCarry) {
+    testRotateRightCarry({standardInstructions::RRC_A}, cpu.a, 1);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_A}, cpu.a, 2);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_B}, cpu.b, 2);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_C}, cpu.c, 2);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_D}, cpu.d, 2);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_E}, cpu.e, 2);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_H}, cpu.h, 2);
+    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_L}, cpu.l, 2);
+}
+

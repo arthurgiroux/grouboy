@@ -287,25 +287,26 @@ void CPU::RLC_XYm(byte X, byte Y) {
 	lastInstructionTicks = 4;
 }
 
-void CPU::RRC_X(byte& X) {
+void CPU::rotateRegisterRightUsingCarry(byte &reg) {
     unsetFlag(CpuFlags::SUBSTRACTION);
     unsetFlag(CpuFlags::ZERO);
     unsetFlag(CpuFlags::HALF_CARRY);
 
     byte currentCarry = isFlagSet(CpuFlags::CARRY);
-	/* Set the carry flag to the lowest bit of X */
-    setCarryFlag((X & 0x01) > 0);
-	/* Rotate the accumulator and set the first bit to the original carry flag */
-	X = ((currentCarry << 7) | (X >> 1));
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
+    /* Set the carry flag to the lowest bit of X */
+    setCarryFlag((reg & 0x01) > 0);
+    /* Rotate the accumulator and set the highest bit to the original carry flag */
+    reg = (currentCarry << 7) | (reg >> 1);
+    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
+    changeZeroValueFlag(reg);
+    lastInstructionTicks = 1;
 }
 
-void CPU::RRC_XYm(byte X, byte Y) {
-	byte value = mmu.read((X << 8) | Y);
-	RRC_X(value);
-	// Write back the value to memory
-	mmu.write((X << 8) | Y, value);
+void CPU::rotateValueInMemoryRightUsingCarry(byte addrMsb, byte addrLsb) {
+    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte value = mmu.read(addr);
+	rotateRegisterRightUsingCarry(value);
+	mmu.write(addr, value);
 	lastInstructionTicks = 4;
 }
 
@@ -862,7 +863,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case RRC_A:
-		RRC_X(a);
+		rotateRegisterRightUsingCarry(a);
 		break;
 
 		/******************************************************/
@@ -1850,7 +1851,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	default:
-		std::cerr << "OPCODE :" << std::hex << static_cast<int>(opCode) << " not implemented" << std::endl;
+        throw new UnhandledInstructionException(opCode);
 		return;
 	}
 }
@@ -1899,31 +1900,35 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		break;
 
 	case RRC_B:
-		RRC_X(b);
+        rotateRegisterRightUsingCarryExtended(b);
 		break;
 
 	case RRC_C:
-		RRC_X(c);
+        rotateRegisterRightUsingCarryExtended(c);
 		break;
 
 	case RRC_D:
-		RRC_X(d);
+        rotateRegisterRightUsingCarryExtended(d);
 		break;
 
 	case RRC_E:
-		RRC_X(e);
+        rotateRegisterRightUsingCarryExtended(e);
 		break;
 
 	case RRC_H:
-		RRC_X(h);
+        rotateRegisterRightUsingCarryExtended(h);
 		break;
 
+    case RRC_L:
+        rotateRegisterRightUsingCarryExtended(l);
+        break;
+
 	case RRC_HLm:
-		RRC_XYm(h, l);
+        rotateValueInMemoryRightUsingCarry(h, l);
 		break;
 
 	case RRC_A:
-		RRC_X(a);
+        rotateRegisterRightUsingCarryExtended(a);
 		break;
 
 		/******************************************************/
@@ -2832,7 +2837,7 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		break;
 
 	default:
-		std::cerr << "OPCODE EXTENDED :" << std::hex << static_cast<int>(opCode) << " not implemented" << std::endl;
+        throw new UnhandledExtendedInstructionException(opCode);
 		return;
 	}
 }
@@ -2859,5 +2864,10 @@ byte CPU::getFlag() const {
 
 void CPU::rotateRegisterLeftUsingCarryExtended(byte &reg) {
     rotateRegisterLeftUsingCarry(reg);
+    lastInstructionTicks = 2;
+}
+
+void CPU::rotateRegisterRightUsingCarryExtended(byte &reg) {
+    rotateRegisterRightUsingCarry(reg);
     lastInstructionTicks = 2;
 }

@@ -4,6 +4,7 @@
 #include "types.hpp"
 #include "mmu.hpp"
 #include "instructions.hpp"
+#include "utils.hpp"
 
 /**
  * Implementation of the CPU for the classic GameBoy.
@@ -20,6 +21,9 @@ public:
 
 	/**
 	 * Fetch the next instruction from the memory, decode it and execute it.
+	 *
+	 * @throws UnhandledInstructionException if an instruction is not handled by the CPU
+	 * @throws UnhandledExtendedInstructionException if an extended instruction is not handled by the CPU
 	 *
 	 * @return the number of ticks taken by the instructions to be executed
 	 */
@@ -103,6 +107,29 @@ public:
 	    return sp;
 	}
 
+    /**
+     * Exception raised when an instruction parsed by the CPU is not handled.
+     */
+    class UnhandledInstructionException : public std::exception
+    {
+    public:
+        UnhandledInstructionException(byte opCode) : opCode(opCode) {}
+        const char* what() const noexcept override { return utils::string_format("Unknown instruction with opcode=%x", opCode).c_str(); }
+
+    protected:
+        byte opCode = 0;
+    };
+
+    /**
+     * Exception raised when an extended instruction parsed by the CPU is not handled.
+     */
+    class UnhandledExtendedInstructionException : public UnhandledInstructionException
+    {
+    public:
+        UnhandledExtendedInstructionException(byte opCode) : UnhandledInstructionException(opCode) {}
+        const char* what() const noexcept override { return utils::string_format("Unknown extended instruction with opcode=%x", opCode).c_str(); }
+    };
+
 #ifndef UNIT_TESTING
 private:
 #endif
@@ -120,6 +147,7 @@ private:
 	/**
 	 * Execute an instruction that is part of the standard instruction set.
 	 *
+	 * @throws UnhandledInstructionException if the given instruction is not handled by the CPU
 	 * @param opCode the opcode of the instruction to execute
 	 */
 	void executeInstruction(const byte& opCode);
@@ -127,6 +155,7 @@ private:
     /**
      * Execute an instruction that is part of the extended instruction set.
      *
+     * @throws UnhandledExtendedInstructionException if the given instruction is not handled by the CPU
      * @param opCode the opcode of the instruction to execute
      */
 	void executeExtendedInstruction(const byte& opCode);
@@ -410,11 +439,51 @@ private:
 	// Rotate the value pointed by XY to the left using the carry
 	void RLC_XYm(byte X, byte Y);
 
-	// Rotate the value of X to the right using the carry
-	void RRC_X(byte& X);
+    /**
+     * Rotate the value inside the given register to the
+     * right by 1 bit.
+     * The carry flag is used as a buffer for the rotation.
+     *
+     * Here's some example of rotating the value 00000001
+     * several times.
+     *
+     * |Carry| | Value |
+     *  0      00000001
+     *  1      00000000
+     *  0      10000000
+     *
+     * @param reg   the register to rotate to the right by 1 bit.
+     * @opcodes:
+     *     0x0F
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+    void rotateRegisterRightUsingCarry(byte& reg);
 
-	// Rotate the value pointed by XY to the right using the carry
-	void RRC_XYm(byte X, byte Y);
+    /**
+     * Rotate right with carry operation for the extended instruction set.
+     * See {@link #rotateRegisterRightUsingCarry(byte&)} for details.
+     *
+     * @param reg   the register to rotate to the right by 1 bit.
+     * @opcodes:
+     *     0x08 0x09 x0A 0x0B 0x0C 0x0D 0x0F
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void rotateRegisterRightUsingCarryExtended(byte& reg);
+
+    /**
+     * Rotate right with carry operation for a value in memory.
+     * See {@link #rotateRegisterRightUsingCarry(byte&)} for details.
+     *
+     * @param addrMsb   the msb part of the address where to perform the operation
+     * @param addrLsb   the Lsb part of the address where to perform the operation
+     * @opcodes:
+     *     0x0E
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 4
+     */
+     void rotateValueInMemoryRightUsingCarry(byte addrMsb, byte addrLsb);
 
 	// Rotate the value of X to the left
 	void RL_X(byte& X);
