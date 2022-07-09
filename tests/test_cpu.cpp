@@ -241,7 +241,48 @@ protected:
         }
     }
 
-    void testRotateLeftCarry(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
+    void testRotateLeftCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
+        reg = 0b00000001;
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = reg;
+            byte expectedValue = (registerValue << 1) | (registerValue >> 7);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
+            ASSERT_EQ(reg, expectedValue);
+        }
+    }
+
+    void testRotateLeftCircularFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb, int expectedTicks) {
+        regMsb = 0x42;
+        regLsb = 0x11;
+        uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
+        mmu.write(addr, 0b00000001);
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = mmu.read(addr);
+            byte expectedValue = (registerValue << 1) | (registerValue >> 7);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
+            ASSERT_EQ(mmu.read(addr), expectedValue);
+        }
+    }
+
+    void testRotateLeft(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
         reg = 0b00000001;
         cpu.pc = 0x00;
         for (int i = 0; i < 9; ++i) {
@@ -258,6 +299,29 @@ protected:
             ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
             ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
             ASSERT_EQ(reg, expectedValue);
+        }
+    }
+
+    void testRotateLeftFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb, int expectedTicks) {
+        regMsb = 0x42;
+        regLsb = 0x11;
+        uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
+        mmu.write(addr, 0b00000001);
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = mmu.read(addr);
+            bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
+            byte expectedValue = (registerValue << 1) | isCarryFlagSet;
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
+            ASSERT_EQ(mmu.read(addr), expectedValue);
         }
     }
 
@@ -318,7 +382,48 @@ protected:
         }
     }
 
-    void testRotateRightCarry(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
+    void testRotateRightCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
+        reg = 0b10000000;
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = reg;
+            byte expectedValue = (registerValue << 7) | (registerValue >> 1);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
+            ASSERT_EQ(reg, expectedValue);
+        }
+    }
+
+    void testRotateRightCircularFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb, int expectedTicks) {
+        regMsb = 0x42;
+        regLsb = 0x11;
+        uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
+        mmu.write(addr, 0b10000000);
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = mmu.read(addr);
+            byte expectedValue = (registerValue << 7) | (registerValue >> 1);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
+            ASSERT_EQ(mmu.read(addr), expectedValue);
+        }
+    }
+
+    void testRotateRight(const std::vector<byte>& instructions, byte& reg, int expectedTicks) {
         reg = 0b10000000;
         cpu.pc = 0x00;
         for (int i = 0; i < 9; ++i) {
@@ -335,6 +440,29 @@ protected:
             ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
             ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
             ASSERT_EQ(reg, expectedValue);
+        }
+    }
+
+    void testRotateRightFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb, int expectedTicks) {
+        regMsb = 0x42;
+        regLsb = 0x11;
+        uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
+        mmu.write(addr, 0b10000000);
+        cpu.pc = 0x00;
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < instructions.size(); ++j) {
+                mmu.write(cpu.pc + j, instructions[j]);
+            }
+            byte registerValue = mmu.read(addr);
+            bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
+            byte expectedValue = (isCarryFlagSet << 7) | (registerValue >> 1);
+            int ticks = cpu.fetchDecodeAndExecute();
+            ASSERT_EQ(ticks, expectedTicks);
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+            ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+            ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
+            ASSERT_EQ(mmu.read(addr), expectedValue);
         }
     }
 };
@@ -459,15 +587,33 @@ TEST_F(CpuInstructionTest, InstructionLoadImmediateValue) {
     testLoadImmediateValue(standardInstructions::LD_L_n, cpu.l);
 }
 
-TEST_F(CpuInstructionTest, InstructionRotateLeftCarry) {
-    testRotateLeftCarry({standardInstructions::RLC_A}, cpu.a, 1);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_A}, cpu.a, 2);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_B}, cpu.b, 2);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_C}, cpu.c, 2);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_D}, cpu.d, 2);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_E}, cpu.e, 2);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_H}, cpu.h, 2);
-    testRotateLeftCarry({standardInstructions::EXT_OPS, extendedInstructions::RLC_L}, cpu.l, 2);
+TEST_F(CpuInstructionTest, InstructionRotateLeftCircular) {
+    testRotateLeftCircular({standardInstructions::RLC_A}, cpu.a, 1);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_A}, cpu.a, 2);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_B}, cpu.b, 2);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_C}, cpu.c, 2);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_D}, cpu.d, 2);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_E}, cpu.e, 2);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_H}, cpu.h, 2);
+    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_L}, cpu.l, 2);
+}
+
+TEST_F(CpuInstructionTest, InstructionRotateLeftCircularFromMemory) {
+    testRotateLeftCircularFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RLC_HLm}, cpu.h, cpu.l, 4);
+}
+
+TEST_F(CpuInstructionTest, InstructionRotateLeft) {
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_A}, cpu.a, 2);
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_B}, cpu.b, 2);
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_C}, cpu.c, 2);
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_D}, cpu.d, 2);
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_E}, cpu.e, 2);
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_H}, cpu.h, 2);
+    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_L}, cpu.l, 2);
+}
+
+TEST_F(CpuInstructionTest, InstructionRotateLeftFromMemory) {
+    testRotateLeftFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RL_HLm}, cpu.h, cpu.l, 4);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoad16BitsRegisterAtImmediateAddr) {
@@ -535,14 +681,31 @@ TEST_F(CpuInstructionTest, InstructionLoadValueFromMemoryInto8BitsRegister) {
     testLoadValueFromMemoryInto8BitsRegister(standardInstructions::LD_A_HLm, cpu.a, cpu.h, cpu.l);
 }
 
-TEST_F(CpuInstructionTest, InstructionRotateRightCarry) {
-    testRotateRightCarry({standardInstructions::RRC_A}, cpu.a, 1);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_A}, cpu.a, 2);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_B}, cpu.b, 2);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_C}, cpu.c, 2);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_D}, cpu.d, 2);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_E}, cpu.e, 2);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_H}, cpu.h, 2);
-    testRotateRightCarry({standardInstructions::EXT_OPS, extendedInstructions::RRC_L}, cpu.l, 2);
+TEST_F(CpuInstructionTest, InstructionRotateRightCircular) {
+    testRotateRightCircular({standardInstructions::RRC_A}, cpu.a, 1);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_A}, cpu.a, 2);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_B}, cpu.b, 2);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_C}, cpu.c, 2);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_D}, cpu.d, 2);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_E}, cpu.e, 2);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_H}, cpu.h, 2);
+    testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_L}, cpu.l, 2);
 }
 
+TEST_F(CpuInstructionTest, InstructionRotateRightCircularFromMemory) {
+    testRotateRightCircularFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RRC_HLm}, cpu.h, cpu.l, 4);
+}
+
+TEST_F(CpuInstructionTest, InstructionRotateRight) {
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_A}, cpu.a, 2);
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_B}, cpu.b, 2);
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_C}, cpu.c, 2);
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_D}, cpu.d, 2);
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_E}, cpu.e, 2);
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_H}, cpu.h, 2);
+    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_L}, cpu.l, 2);
+}
+
+TEST_F(CpuInstructionTest, InstructionRotateRightFromMemory) {
+    testRotateRightFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RR_HLm}, cpu.h, cpu.l, 4);
+}

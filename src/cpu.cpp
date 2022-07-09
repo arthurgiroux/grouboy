@@ -265,29 +265,74 @@ void CPU::decrementRegisterValue(uint16_t& reg) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::rotateRegisterLeftUsingCarry(byte& reg) {
+void CPU::rotateRegisterLeftCircular(byte& reg) {
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	unsetFlag(CpuFlags::ZERO);
 	unsetFlag(CpuFlags::HALF_CARRY);
 
-	byte currentCarry = isFlagSet(CpuFlags::CARRY);
 	/* Set the carry flag to the highest bit of X */
     setCarryFlag((reg & 0x80) > 0);
-	/* Rotate the accumulator and set the last bit to the original carry flag */
-	reg = (reg << 1) | currentCarry;
+    /* Rotate the value circularly */
+	reg = (reg << 1) | (reg >> 7);
     // TODO: Confirm that the Zero flag should also be set in the standard instruction set
 	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
-void CPU::RLC_XYm(byte X, byte Y) {
-	byte value = mmu.read((X << 8) | Y);
-    rotateRegisterLeftUsingCarry(value);
-	mmu.write((X << 8) | Y, value);
+void CPU::rotateValueInMemoryLeftCircular(byte addrMsb, byte addrLsb) {
+    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    byte value = mmu.read(addr);
+    rotateRegisterLeftCircular(value);
+    mmu.write(addr, value);
+    lastInstructionTicks = 4;
+}
+
+void CPU::rotateRegisterRightCircular(byte &reg) {
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+
+    /* Set the carry flag to the lowest bit of X */
+    setCarryFlag((reg & 0x01) > 0);
+    /* Rotate the value circularly */
+    reg = (reg << 7) | (reg >> 1);
+    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
+    changeZeroValueFlag(reg);
+    lastInstructionTicks = 1;
+}
+
+void CPU::rotateValueInMemoryRightCircular(byte addrMsb, byte addrLsb) {
+    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte value = mmu.read(addr);
+    rotateRegisterRightCircular(value);
+	mmu.write(addr, value);
 	lastInstructionTicks = 4;
 }
 
-void CPU::rotateRegisterRightUsingCarry(byte &reg) {
+void CPU::rotateRegisterLeftExtended(byte& reg) {
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+
+    byte currentCarry = isFlagSet(CpuFlags::CARRY);
+    /* Set the carry flag to the highest bit of reg */
+    setCarryFlag((reg & 0x80) > 0);
+    /* Rotate the accumulator and set the last bit to the original carry flag */
+    reg = (reg << 1) | currentCarry;
+    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
+    changeZeroValueFlag(reg);
+    lastInstructionTicks = 2;
+}
+
+void CPU::rotateValueInMemoryLeft(byte addrMsb, byte addrLsb) {
+    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    byte value = mmu.read(addr);
+    rotateRegisterLeftExtended(value);
+    mmu.write(addr, value);
+    lastInstructionTicks = 4;
+}
+
+void CPU::rotateRegisterRightExtended(byte& reg) {
     unsetFlag(CpuFlags::SUBSTRACTION);
     unsetFlag(CpuFlags::ZERO);
     unsetFlag(CpuFlags::HALF_CARRY);
@@ -299,51 +344,15 @@ void CPU::rotateRegisterRightUsingCarry(byte &reg) {
     reg = (currentCarry << 7) | (reg >> 1);
     // TODO: Confirm that the Zero flag should also be set in the standard instruction set
     changeZeroValueFlag(reg);
-    lastInstructionTicks = 1;
+    lastInstructionTicks = 2;
 }
 
-void CPU::rotateValueInMemoryRightUsingCarry(byte addrMsb, byte addrLsb) {
+void CPU::rotateValueInMemoryRight(byte addrMsb, byte addrLsb) {
     uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
-	byte value = mmu.read(addr);
-	rotateRegisterRightUsingCarry(value);
-	mmu.write(addr, value);
-	lastInstructionTicks = 4;
-}
-
-void CPU::RL_X(byte& X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    setCarryFlag((X & 0x80) > 0);
-	X = ((X << 1) | (X >> 7));
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
-}
-
-void CPU::RL_XYm(byte X, byte Y) {
-	byte value = mmu.read((X << 8) | Y);
-	RL_X(value);
-	// Write back the value to memory
-	mmu.write((X << 8) | Y, value);
-	lastInstructionTicks = 4;
-}
-
-void CPU::RR_X(byte& X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    setCarryFlag((X & 0x01) > 0);
-	X = ((X << 7) | (X >> 1));
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
-}
-
-void CPU::RR_XYm(byte X, byte Y) {
-	byte value = mmu.read((X << 8) | Y);
-	RR_X(value);
-	// Write back the value to memory
-	mmu.write((X << 8) | Y, value);
-	lastInstructionTicks = 4;
+    byte value = mmu.read(addr);
+    rotateRegisterRightExtended(value);
+    mmu.write(addr, value);
+    lastInstructionTicks = 4;
 }
 
 void CPU::SLA_X(byte& X) {
@@ -831,7 +840,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case RLC_A:
-        rotateRegisterLeftUsingCarry(a);
+        rotateRegisterLeftCircular(a);
 		break;
 
 	case LD_nnm_SP:
@@ -863,7 +872,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case RRC_A:
-		rotateRegisterRightUsingCarry(a);
+        rotateRegisterRightCircular(a);
 		break;
 
 		/******************************************************/
@@ -901,7 +910,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case RL_A:
-		RL_X(a);
+        rotateRegisterLeftExtended(a);
 		break;
 
 	case JR_n:
@@ -933,7 +942,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case RR_A:
-		RR_X(a);
+        rotateRegisterRightExtended(a);
 		break;
 
 		/******************************************************/
@@ -1868,67 +1877,67 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case RLC_B:
-        rotateRegisterLeftUsingCarryExtended(b);
+        rotateRegisterLeftCircularExtended(b);
 		break;
 
 	case RLC_C:
-        rotateRegisterLeftUsingCarryExtended(c);
+        rotateRegisterLeftCircularExtended(c);
 		break;
 
 	case RLC_D:
-        rotateRegisterLeftUsingCarryExtended(d);
+        rotateRegisterLeftCircularExtended(d);
 		break;
 
 	case RLC_E:
-        rotateRegisterLeftUsingCarryExtended(e);
+        rotateRegisterLeftCircularExtended(e);
 		break;
 
 	case RLC_H:
-        rotateRegisterLeftUsingCarryExtended(h);
+        rotateRegisterLeftCircularExtended(h);
 		break;
 
     case RLC_L:
-        rotateRegisterLeftUsingCarryExtended(l);
+        rotateRegisterLeftCircularExtended(l);
         break;
 
 	case RLC_HLm:
-		RLC_XYm(h, l);
+        rotateValueInMemoryLeftCircular(h, l);
 		break;
 
 	case RLC_A:
-        rotateRegisterLeftUsingCarryExtended(a);
+        rotateRegisterLeftCircularExtended(a);
 		break;
 
 	case RRC_B:
-        rotateRegisterRightUsingCarryExtended(b);
+        rotateRegisterRightCircularExtended(b);
 		break;
 
 	case RRC_C:
-        rotateRegisterRightUsingCarryExtended(c);
+        rotateRegisterRightCircularExtended(c);
 		break;
 
 	case RRC_D:
-        rotateRegisterRightUsingCarryExtended(d);
+        rotateRegisterRightCircularExtended(d);
 		break;
 
 	case RRC_E:
-        rotateRegisterRightUsingCarryExtended(e);
+        rotateRegisterRightCircularExtended(e);
 		break;
 
 	case RRC_H:
-        rotateRegisterRightUsingCarryExtended(h);
+        rotateRegisterRightCircularExtended(h);
 		break;
 
     case RRC_L:
-        rotateRegisterRightUsingCarryExtended(l);
+        rotateRegisterRightCircularExtended(l);
         break;
 
 	case RRC_HLm:
-        rotateValueInMemoryRightUsingCarry(h, l);
+        rotateValueInMemoryRightCircular(h, l);
 		break;
 
 	case RRC_A:
-        rotateRegisterRightUsingCarryExtended(a);
+        rotateRegisterRightCircularExtended(a);
 		break;
 
 		/******************************************************/
@@ -1936,59 +1945,67 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case RL_B:
-		RL_X(b);
+        rotateRegisterLeftExtended(b);
 		break;
 
 	case RL_C:
-		RL_X(c);
+        rotateRegisterLeftExtended(c);
 		break;
 
 	case RL_D:
-		RL_X(d);
+        rotateRegisterLeftExtended(d);
 		break;
 
 	case RL_E:
-		RL_X(e);
+        rotateRegisterLeftExtended(e);
 		break;
 
 	case RL_H:
-		RL_X(h);
+        rotateRegisterLeftExtended(h);
 		break;
 
+    case RL_L:
+        rotateRegisterLeftExtended(l);
+        break;
+
 	case RL_HLm:
-		RL_XYm(h, l);
+        rotateValueInMemoryLeft(h, l);
 		break;
 
 	case RL_A:
-		RL_X(a);
+        rotateRegisterLeftExtended(a);
 		break;
 
 	case RR_B:
-		RR_X(b);
+        rotateRegisterRightExtended(b);
 		break;
 
 	case RR_C:
-		RR_X(c);
+        rotateRegisterRightExtended(c);
 		break;
 
 	case RR_D:
-		RR_X(d);
+        rotateRegisterRightExtended(d);
 		break;
 
 	case RR_E:
-		RR_X(e);
+        rotateRegisterRightExtended(e);
 		break;
 
 	case RR_H:
-		RR_X(h);
+        rotateRegisterRightExtended(h);
 		break;
 
+    case RR_L:
+        rotateRegisterRightExtended(l);
+        break;
+
 	case RR_HLm:
-		RR_XYm(h, l);
+        rotateValueInMemoryRight(h, l);
 		break;
 
 	case RR_A:
-		RR_X(a);
+        rotateRegisterRightExtended(a);
 		break;
 
 		/******************************************************/
@@ -2862,12 +2879,12 @@ byte CPU::getFlag() const {
     return f;
 }
 
-void CPU::rotateRegisterLeftUsingCarryExtended(byte &reg) {
-    rotateRegisterLeftUsingCarry(reg);
+void CPU::rotateRegisterLeftCircularExtended(byte &reg) {
+    rotateRegisterLeftCircular(reg);
     lastInstructionTicks = 2;
 }
 
-void CPU::rotateRegisterRightUsingCarryExtended(byte &reg) {
-    rotateRegisterRightUsingCarry(reg);
+void CPU::rotateRegisterRightCircularExtended(byte &reg) {
+    rotateRegisterRightCircular(reg);
     lastInstructionTicks = 2;
 }

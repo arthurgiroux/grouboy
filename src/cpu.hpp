@@ -404,9 +404,102 @@ private:
 	void decrementRegisterValue(uint16_t& reg);
 
     /**
+     * Rotate circularly the value inside the given register to the
+     * left by 1 bit.
+     * the 7th bit is copied into the carry flag.
+     *
+     * Here's some example of rotating the value 10000000
+     * several times.
+     *
+     * |Carry| | Value |
+     *  0      10000000
+     *  1      00000001
+     *  0      00000010
+     *
+     * @param reg   the register to rotate to the left by 1 bit.
+     * @opcodes:
+     *     0x07
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+	void rotateRegisterLeftCircular(byte& reg);
+
+    /**
+     * Rotate left circular for the extended instruction set.
+     * See {@link #rotateRegisterLeftCircular(byte&)} for details.
+     *
+     * @param reg   the register to rotate to the left by 1 bit.
+     * @opcodes:
+     *     0x00 0x01 0x02 0x03 0x04 0x05 0x07 0x08
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void rotateRegisterLeftCircularExtended(byte& reg);
+
+    /**
+     * Rotate left circularly for a value in memory.
+     * See {@link #rotateRegisterLeftCircular(byte&)} for details.
+     *
+     * @param addrMsb   the msb part of the address where to perform the operation
+     * @param addrLsb   the Lsb part of the address where to perform the operation
+     * @opcodes:
+     *     0x06
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 4
+     */
+	void rotateValueInMemoryLeftCircular(byte addrMsb, byte addrLsb);
+
+    /**
+     * Rotate circularly the value inside the given register to the
+     * right by 1 bit.
+     * the 0th bit is copied into the carry flag.
+     *
+     * Here's some example of rotating the value 00000001
+     * several times.
+     *
+     * |Carry| | Value |
+     *  0      00000001
+     *  1      10000000
+     *  0      01000000
+     *
+     * @param reg   the register to rotate to the right by 1 bit.
+     * @opcodes:
+     *     0x0F
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+    void rotateRegisterRightCircular(byte& reg);
+
+    /**
+     * Rotate right circularly for the extended instruction set.
+     * See {@link #rotateRegisterRightCircular(byte&)} for details.
+     *
+     * @param reg   the register to rotate to the right by 1 bit.
+     * @opcodes:
+     *     0x08 0x09 x0A 0x0B 0x0C 0x0D 0x0F
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void rotateRegisterRightCircularExtended(byte& reg);
+
+    /**
+     * Rotate right circularly for a value in memory.
+     * See {@link #rotateRegisterRightCircular(byte&)} for details.
+     *
+     * @param addrMsb   the msb part of the address where to perform the operation
+     * @param addrLsb   the Lsb part of the address where to perform the operation
+     * @opcodes:
+     *     0x0E
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 4
+     */
+     void rotateValueInMemoryRightCircular(byte addrMsb, byte addrLsb);
+
+    /**
      * Rotate the value inside the given register to the
      * left by 1 bit.
-     * The carry flag is used as a buffer for the rotation.
+     *
+     * The carry is used as a buffer for the rotation.
      *
      * Here's some example of rotating the value 10000000
      * several times.
@@ -418,31 +511,30 @@ private:
      *
      * @param reg   the register to rotate to the left by 1 bit.
      * @opcodes:
-     *     0x07
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 1
-     */
-	void rotateRegisterLeftUsingCarry(byte& reg);
-
-    /**
-     * Rotate left with carry operation for the extended instruction set.
-     * See {@link #rotateRegisterLeftUsingCarry(byte&)} for details.
-     *
-     * @param reg   the register to rotate to the left by 1 bit.
-     * @opcodes:
-     *     0x00 0x01 0x02 0x03 0x04 0x05 0x07 0x08
+     *     0x17
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 2
      */
-    void rotateRegisterLeftUsingCarryExtended(byte& reg);
+	void rotateRegisterLeftExtended(byte& reg);
 
-	// Rotate the value pointed by XY to the left using the carry
-	void RLC_XYm(byte X, byte Y);
+    /**
+     * Rotate left a value in memory.
+     * See {@link #rotateRegisterLeftExtended(byte&)} for details.
+     *
+     * @param addrMsb   the msb part of the address where to perform the operation
+     * @param addrLsb   the Lsb part of the address where to perform the operation
+     * @opcodes:
+     *     0x16
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 4
+     */
+     void rotateValueInMemoryLeft(byte addrMsb, byte addrLsb);
 
     /**
      * Rotate the value inside the given register to the
      * right by 1 bit.
-     * The carry flag is used as a buffer for the rotation.
+     *
+     * The carry is used as a buffer for the rotation.
      *
      * Here's some example of rotating the value 00000001
      * several times.
@@ -454,48 +546,24 @@ private:
      *
      * @param reg   the register to rotate to the right by 1 bit.
      * @opcodes:
-     *     0x0F
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 1
-     */
-    void rotateRegisterRightUsingCarry(byte& reg);
-
-    /**
-     * Rotate right with carry operation for the extended instruction set.
-     * See {@link #rotateRegisterRightUsingCarry(byte&)} for details.
-     *
-     * @param reg   the register to rotate to the right by 1 bit.
-     * @opcodes:
-     *     0x08 0x09 x0A 0x0B 0x0C 0x0D 0x0F
+     *     0x1F
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 2
      */
-    void rotateRegisterRightUsingCarryExtended(byte& reg);
+	void rotateRegisterRightExtended(byte& reg);
 
     /**
-     * Rotate right with carry operation for a value in memory.
-     * See {@link #rotateRegisterRightUsingCarry(byte&)} for details.
+     * Rotate right a value in memory.
+     * See {@link #rotateRegisterRightExtended(byte&)} for details.
      *
      * @param addrMsb   the msb part of the address where to perform the operation
      * @param addrLsb   the Lsb part of the address where to perform the operation
      * @opcodes:
-     *     0x0E
+     *     0x1E
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 4
      */
-     void rotateValueInMemoryRightUsingCarry(byte addrMsb, byte addrLsb);
-
-	// Rotate the value of X to the left
-	void RL_X(byte& X);
-
-	// Rotate the value pointed by XY to the left
-	void RL_XYm(byte X, byte Y);
-
-	// Rotate the value of X to the right
-	void RR_X(byte& X);
-
-	// Rotate the value pointed by XY to the right
-	void RR_XYm(byte X, byte Y);
+	void rotateValueInMemoryRight(byte addrMsb, byte addrLsb);
 
 	// Shift left arithmetic of X
 	void SLA_X(byte& X);
