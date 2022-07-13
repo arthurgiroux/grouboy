@@ -704,18 +704,70 @@ private:
 	// Pop the value pointed by sp in X and sp+1 in X
 	void RET_X(bool cond);
 
-	// If the condition is satisfied, jump to the address stored in memory
-	void JP_X_NN(bool cond);
-
-	// jump to the address stored at memory pointed by XY
-	void JP_XYm(byte X, byte Y);
-
 	// if the condition is satisfied, push the current address to the stack
 	// and jump to the label
 	void CALL_X_NN(bool cond);
-	
-	// If the condition is satisfied, jump to the relative address stored in memory
-	void JR_COND_N(bool condition);
+
+    /**
+     * If the condition is true,
+     * Jump to the address pointed by the program counter +
+     * a relative offset in the immediate value.
+     *
+     * @param condition     The condition that needs to be true for the jump to happen
+     *
+     * @opcodes:
+     *     0x20 0x28 0x30 0x38
+     * @flags_affected: N/A
+     * @number_of_ticks: 3 if condition true, 2 otherwise
+     */
+     void jumpRelativeConditional(bool condition);
+
+    /**
+     * Jump to the address pointed by the program counter +
+     * a relative offset in the immediate value.
+
+     * @opcodes:
+     *     0x18
+     * @flags_affected: N/A
+     * @number_of_ticks: 3
+     */
+    void jumpRelative();
+
+    /**
+     * If the condition is true,
+     * Jump to the address pointed by the program counter
+     *
+     * @param condition     The condition that needs to be true for the jump to happen
+     *
+     * @opcodes:
+     *     0xC2 0xCA 0xD2 0xDA
+     * @flags_affected: N/A
+     * @number_of_ticks: 4 if condition true, 3 otherwise
+     */
+     void jumpConditional(bool condition);
+
+    /**
+    * Jump to the address pointed by the program counter
+
+    * @opcodes:
+    *     0xC3
+    * @flags_affected: N/A
+    * @number_of_ticks: 4
+    */
+    void jump();
+
+    /**
+    * Jump to the address pointed by the program counter
+    *
+    * @param addrMsb   the msb part of the address
+    * @param addrLsb   the Lsb part of the address
+    *
+    * @opcodes:
+    *     0xE9
+    * @flags_affected: N/A
+    * @number_of_ticks: 1
+    */
+    void jumpToAddrIn16BitsRegister(byte addrMsb, byte addrLsb);
 
 	// BCD corrects the value of the "a" register
 	void DAA_();
@@ -775,6 +827,11 @@ private:
     void setHalfCarryFlag(bool state);
 
     void setCarryFlag(bool state);
+
+    /**
+     * Reset all CPU flags
+     */
+     void resetFlags();
 
 };
 

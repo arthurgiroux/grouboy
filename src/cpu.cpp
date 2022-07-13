@@ -668,10 +668,10 @@ void CPU::RET_X(bool cond) {
 	}
 }
 
-void CPU::JP_X_NN(bool cond) {
+void CPU::jumpConditional(bool condition) {
 	uint16_t addr = mmu.readWord(pc);
 	pc += 2;
-	if (cond) {
+	if (condition) {
 		pc = addr;
 		lastInstructionTicks = 4;
 	}
@@ -680,8 +680,14 @@ void CPU::JP_X_NN(bool cond) {
 	}
 }
 
-void CPU::JP_XYm(byte X, byte Y) {
-	pc = mmu.read((X << 8) | Y);
+void CPU::jump() {
+    uint16_t addr = mmu.readWord(pc);
+    pc = addr;
+    lastInstructionTicks = 4;
+}
+
+void CPU::jumpToAddrIn16BitsRegister(byte addrMsb, byte addrLsb) {
+	pc = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
 	lastInstructionTicks = 1;
 }
 
@@ -734,16 +740,23 @@ void CPU::LD_X_Ym(byte& X, byte Y) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::JR_COND_N(bool condition) {
-	int8_t addr = static_cast<int8_t>(mmu.read(pc));
+void CPU::jumpRelativeConditional(bool condition) {
+	auto offset = static_cast<int8_t>(mmu.read(pc));
 	pc++;
 	if (condition) {
-		pc += addr;
+        pc += offset;
 		lastInstructionTicks = 3;
 	}
 	else {
 		lastInstructionTicks = 2;
 	}
+}
+
+void CPU::jumpRelative() {
+    auto offset = static_cast<int8_t>(mmu.read(pc));
+    pc++;
+    pc += offset;
+    lastInstructionTicks = 3;
 }
 
 void CPU::DAA_() {
@@ -914,7 +927,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JR_n:
-		JR_COND_N(true);
+        jumpRelative();
 		break;
 
 	case ADD_HL_DE:
@@ -950,7 +963,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case JR_NZ_n:
-		JR_COND_N(!isFlagSet(CpuFlags::ZERO));
+        jumpRelativeConditional(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case LD_HL_nn:
@@ -982,7 +995,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JR_Z_n:
-		JR_COND_N(isFlagSet(CpuFlags::ZERO));
+        jumpRelativeConditional(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case ADD_HL_HL:
@@ -1018,7 +1031,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case JR_NC_n:
-		JR_COND_N(!isFlagSet(CpuFlags::CARRY));
+        jumpRelativeConditional(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case LD_SP_nn:
@@ -1050,7 +1063,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JR_C_n:
-		JR_COND_N(isFlagSet(CpuFlags::CARRY));
+        jumpRelativeConditional(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case ADD_HL_SP:
@@ -1641,11 +1654,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_NZ_nn:
-		JP_X_NN(!isFlagSet(CpuFlags::ZERO));
+        jumpConditional(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case JP_nn:
-		JP_X_NN(true);
+        jump();
 		break;
 
 	case CALL_NZ_nn:
@@ -1673,7 +1686,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_Z_nn:
-		JP_X_NN(isFlagSet(CpuFlags::ZERO));
+        jumpConditional(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case EXT_OPS:
@@ -1709,7 +1722,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_NC_nn:
-		JP_X_NN(!isFlagSet(CpuFlags::CARRY));
+        jumpConditional(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case CALL_NC_nn:
@@ -1738,7 +1751,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_C_nn:
-		JP_X_NN(isFlagSet(CpuFlags::CARRY));
+        jumpConditional(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case CALL_C_nn:
@@ -1786,7 +1799,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_HLm:
-		JP_XYm(h, l);
+        jumpToAddrIn16BitsRegister(h, l);
 		break;
 
 	case LD_nnm_A:
@@ -2887,4 +2900,8 @@ void CPU::rotateRegisterLeftCircularExtended(byte &reg) {
 void CPU::rotateRegisterRightCircularExtended(byte &reg) {
     rotateRegisterRightCircular(reg);
     lastInstructionTicks = 2;
+}
+
+void CPU::resetFlags() {
+    f = 0x00;
 }

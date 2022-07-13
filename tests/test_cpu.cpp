@@ -465,6 +465,53 @@ protected:
             ASSERT_EQ(mmu.read(addr), expectedValue);
         }
     }
+
+    void testJumpConditional(byte instruction, bool condition) {
+        auto flag = cpu.getFlag();
+        cpu.pc = 0x00;
+        uint16_t addr = 0x1234;
+        mmu.write(cpu.pc, instruction);
+        mmu.writeWord(cpu.pc + 1, addr);
+        int ticks = cpu.fetchDecodeAndExecute();
+        if (condition) {
+            ASSERT_EQ(ticks, 4);
+            ASSERT_EQ(cpu.pc, addr);
+        }
+        else {
+            ASSERT_EQ(ticks, 3);
+            ASSERT_EQ(cpu.pc, 3);
+        }
+        ASSERT_EQ(cpu.getFlag(), flag);
+    }
+
+    void testJumpRelative(int8_t offset) {
+        uint16_t startAddr = 0x1234;
+        cpu.pc = startAddr;
+        mmu.write(cpu.pc, standardInstructions::JR_n);
+        mmu.write(cpu.pc + 1, offset);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 3);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(cpu.pc, startAddr + 2 + offset);
+    }
+
+    void testJumpRelativeConditional(byte instruction, int8_t offset, bool condition) {
+        auto flag = cpu.getFlag();
+        uint16_t startAddr = 0x1234;
+        cpu.pc = startAddr;
+        mmu.write(cpu.pc, instruction);
+        mmu.writeWord(cpu.pc + 1, offset);
+        int ticks = cpu.fetchDecodeAndExecute();
+        if (condition) {
+            ASSERT_EQ(ticks, 3);
+            ASSERT_EQ(cpu.pc, startAddr + 2 + offset);
+        }
+        else {
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.pc, startAddr + 2);
+        }
+        ASSERT_EQ(cpu.getFlag(), flag);
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect) {
@@ -708,4 +755,111 @@ TEST_F(CpuInstructionTest, InstructionRotateRight) {
 
 TEST_F(CpuInstructionTest, InstructionRotateRightFromMemory) {
     testRotateRightFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RR_HLm}, cpu.h, cpu.l, 4);
+}
+
+TEST_F(CpuInstructionTest, InstructionJump) {
+    cpu.pc = 0x00;
+    uint16_t addr = 0x1234;
+    mmu.write(cpu.pc, standardInstructions::JP_nn);
+    mmu.writeWord(cpu.pc + 1, addr);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 4);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    ASSERT_EQ(cpu.pc, addr);
+}
+
+TEST_F(CpuInstructionTest, InstructionJumpConditional) {
+    cpu.resetFlags();
+    testJumpConditional(standardInstructions::JP_C_nn, false);
+    cpu.setFlag(CPU::CARRY);
+    testJumpConditional(standardInstructions::JP_C_nn, true);
+
+    cpu.resetFlags();
+    testJumpConditional(standardInstructions::JP_NC_nn, true);
+    cpu.setFlag(CPU::CARRY);
+    testJumpConditional(standardInstructions::JP_NC_nn, false);
+
+    cpu.resetFlags();
+    testJumpConditional(standardInstructions::JP_Z_nn, false);
+    cpu.setFlag(CPU::ZERO);
+    testJumpConditional(standardInstructions::JP_Z_nn, true);
+
+    cpu.resetFlags();
+    testJumpConditional(standardInstructions::JP_NZ_nn, true);
+    cpu.setFlag(CPU::ZERO);
+    testJumpConditional(standardInstructions::JP_NZ_nn, false);
+}
+
+TEST_F(CpuInstructionTest, InstructionJumpRegister) {
+    cpu.pc = 0x00;
+    cpu.h = 0x12;
+    cpu.l = 0x34;
+    uint16_t addr = 0x1234;
+    mmu.write(cpu.pc, standardInstructions::JP_HLm);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 1);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    ASSERT_EQ(cpu.pc, addr);
+}
+
+TEST_F(CpuInstructionTest, InstructionJumpRelative) {
+    testJumpRelative(0);
+    testJumpRelative(5);
+    testJumpRelative(-5);
+    testJumpRelative(127);
+    testJumpRelative(-127);
+}
+
+TEST_F(CpuInstructionTest, InstructionJumpRelativeConditional) {
+    cpu.resetFlags();
+    testJumpRelativeConditional(standardInstructions::JR_C_n, 0, false);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, 5, false);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, -5, false);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, 127, false);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, -127, false);
+    cpu.setFlag(CPU::CARRY);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, 0, true);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, 5, true);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, -5, true);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, 127, true);
+    testJumpRelativeConditional(standardInstructions::JR_C_n, -127, true);
+    cpu.resetFlags();
+
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, 0, true);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, 5, true);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, -5, true);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, 127, true);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, -127, true);
+    cpu.setFlag(CPU::CARRY);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, 0, false);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, 5, false);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, -5, false);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, 127, false);
+    testJumpRelativeConditional(standardInstructions::JR_NC_n, -127, false);
+
+    cpu.resetFlags();
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, 0, false);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, 5, false);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, -5, false);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, 127, false);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, -127, false);
+    cpu.setFlag(CPU::ZERO);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, 0, true);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, 5, true);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, -5, true);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, 127, true);
+    testJumpRelativeConditional(standardInstructions::JR_Z_n, -127, true);
+
+    cpu.resetFlags();
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, 0, true);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, 5, true);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, -5, true);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, 127, true);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, -127, true);
+    cpu.setFlag(CPU::ZERO);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, 0, false);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, 5, false);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, -5, false);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, 127, false);
+    testJumpRelativeConditional(standardInstructions::JR_NZ_n, -127, false);
 }
