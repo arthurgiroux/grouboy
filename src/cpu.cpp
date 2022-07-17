@@ -1,13 +1,14 @@
-#include <iostream>
-#include <cassert>
 #include "cpu.hpp"
 #include "instructions.hpp"
 #include "mmu.hpp"
 #include "utils.hpp"
+#include <cassert>
+#include <iostream>
 
 using namespace utils;
 
-CPU::CPU(MMU& mmu_) : mmu(mmu_) {
+CPU::CPU(MMU& mmu_) : mmu(mmu_)
+{
 	tick = 0;
 	lastInstructionTicks = 0;
 	pc = 0;
@@ -26,62 +27,74 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_) {
 	f = 0;
 }
 
-int CPU::fetchDecodeAndExecute() {
+int CPU::fetchDecodeAndExecute()
+{
 
-	if (ticksBeforeEnablingInterrupts > 0) {
+	if (ticksBeforeEnablingInterrupts > 0)
+	{
 		ticksBeforeEnablingInterrupts--;
 	}
-	else if (ticksBeforeDisablingInterrupts > 0) {
+	else if (ticksBeforeDisablingInterrupts > 0)
+	{
 		ticksBeforeDisablingInterrupts--;
 	}
 
-    executeInstruction(mmu.read(pc++));
+	executeInstruction(mmu.read(pc++));
 	tick += lastInstructionTicks;
 
-	if (ticksBeforeEnablingInterrupts == 1) {
+	if (ticksBeforeEnablingInterrupts == 1)
+	{
 		interrupts = true;
 		ticksBeforeEnablingInterrupts = 0;
 	}
-	else if (ticksBeforeDisablingInterrupts == 1) {
+	else if (ticksBeforeDisablingInterrupts == 1)
+	{
 		interrupts = false;
 		ticksBeforeDisablingInterrupts = 0;
 	}
 
 	return lastInstructionTicks;
-
 }
 
-void CPU::setFlag(CpuFlags flag) {
+void CPU::setFlag(CpuFlags flag)
+{
 	f |= flag;
 }
 
-void CPU::unsetFlag(CpuFlags flag) {
+void CPU::unsetFlag(CpuFlags flag)
+{
 	f &= static_cast<byte>(~flag);
 }
 
-void CPU::setFlagIfTrue(bool condition, CpuFlags flag) {
-	if (condition) {
+void CPU::setFlagIfTrue(bool condition, CpuFlags flag)
+{
+	if (condition)
+	{
 		setFlag(flag);
 	}
-	else {
+	else
+	{
 		unsetFlag(flag);
 	}
 }
 
-void CPU::changeZeroValueFlag(byte value) {
+void CPU::changeZeroValueFlag(byte value)
+{
 	setFlagIfTrue(value == 0, CpuFlags::ZERO);
 }
 
 CPU::~CPU() = default;
 
-void CPU::load16BitsValueInRegisters(byte& msbRegister, byte& lsbRegister) {
-    lsbRegister = mmu.read(pc);
-    msbRegister = mmu.read(pc + 1);
+void CPU::load16BitsValueInRegisters(byte& msbRegister, byte& lsbRegister)
+{
+	lsbRegister = mmu.read(pc);
+	msbRegister = mmu.read(pc + 1);
 	pc += 2;
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z) {
+void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z)
+{
 	unsetFlag(CpuFlags::ZERO);
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	uint16_t value = (X << 8) | Y;
@@ -94,124 +107,145 @@ void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z) {
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_X_NN(uint16_t& X) {
+void CPU::LD_X_NN(uint16_t& X)
+{
 	X = mmu.readWord(pc);
 	pc += 2;
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_X_NNm(byte& X) {
+void CPU::LD_X_NNm(byte& X)
+{
 	X = mmu.read(mmu.readWord(pc));
 	pc += 2;
 	lastInstructionTicks = 4;
 }
 
-void CPU::load16BitsRegisterAtImmediateAddress(uint16_t reg) {
+void CPU::load16BitsRegisterAtImmediateAddress(uint16_t reg)
+{
 	mmu.writeWord(mmu.readWord(pc), reg);
 	pc += 2;
 	lastInstructionTicks = 5;
 }
 
-void CPU::load8BitsRegisterAtImmediateAddress(byte reg) {
-    mmu.write(mmu.readWord(pc), reg);
-    pc += 2;
-    lastInstructionTicks = 4;
+void CPU::load8BitsRegisterAtImmediateAddress(byte reg)
+{
+	mmu.write(mmu.readWord(pc), reg);
+	pc += 2;
+	lastInstructionTicks = 4;
 }
 
-void CPU::loadImmediateValueInRegister(byte& reg) {
-    reg = mmu.read(pc);
+void CPU::loadImmediateValueInRegister(byte& reg)
+{
+	reg = mmu.read(pc);
 	pc++;
 	lastInstructionTicks = 2;
 }
 
-void CPU::loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value) {
+void CPU::loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value)
+{
 	mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_XYm_N(byte X, byte Y) {
+void CPU::LD_XYm_N(byte X, byte Y)
+{
 	mmu.write((X << 8) | Y, mmu.read(pc));
 	pc++;
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_XYm_I_Z(byte& X, byte& Y, byte Z) {
+void CPU::LD_XYm_I_Z(byte& X, byte& Y, byte Z)
+{
 	mmu.write((X << 8) | Y, Z);
 	// Increment the LSB part of the address
 	Y++;
 	// If we overflowed then we increment the MSB part
-	if (Y == 0) {
+	if (Y == 0)
+	{
 		X++;
 	}
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_YZm_I(byte& X, byte& Y, byte& Z) {
+void CPU::LD_X_YZm_I(byte& X, byte& Y, byte& Z)
+{
 	X = mmu.read((Y << 8) | Z);
 	// Increment the LSB part of the address
 	Z++;
 	// If we overflowed then we increment the MSB part
-	if (Z == 0) {
+	if (Z == 0)
+	{
 		Y++;
 	}
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z) {
+void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z)
+{
 	X = mmu.read((Y << 8) | Z);
 	// Decrement the MSB part of the address if it's set
-	if (Y > 0) {
+	if (Y > 0)
+	{
 		Y--;
 	}
 	// Decrement the LSB part otherwise
-	else {
+	else
+	{
 		Z--;
 	}
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z) {
+void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z)
+{
 	uint16_t XY = (X << 8) | Y;
 	mmu.write(XY, Z);
 	XY--;
 	X = XY >> 8;
 	Y = XY & 0xFF;
 	//// Decrement the MSB part of the address if it's set
-	//if (Y > 0) {
+	// if (Y > 0) {
 	//	Y--;
 	//}
 	//// Decrement the LSB part otherwise
-	//else {
+	// else {
 	//	X--;
 	//}
 	lastInstructionTicks = 2;
 }
 
-void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb) {
-    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
+{
+	reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_Y(byte& X, byte Y) {
+void CPU::LD_X_Y(byte& X, byte Y)
+{
 	X = Y;
 	lastInstructionTicks = 1;
 }
 
-void CPU::incrementRegistersValue(byte& msbRegister, byte& lsbRegister) {
+void CPU::incrementRegistersValue(byte& msbRegister, byte& lsbRegister)
+{
 	lsbRegister++;
 	// If we overflowed the LSB then we increment the MSB
-	if (lsbRegister == 0) {
+	if (lsbRegister == 0)
+	{
 		msbRegister++;
 	}
 	lastInstructionTicks = 2;
 }
 
-void CPU::incrementRegisterValue(uint16_t& reg) {
+void CPU::incrementRegisterValue(uint16_t& reg)
+{
 	reg++;
 	lastInstructionTicks = 2;
 }
 
-void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb) {
+void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
 	byte oldvalue = mmu.read(addr);
@@ -223,18 +257,20 @@ void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb) {
 	lastInstructionTicks = 3;
 }
 
-void CPU::decrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb) {
+void CPU::decrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
+{
 	setFlag(CpuFlags::SUBSTRACTION);
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
-    byte oldvalue = mmu.read(addr);
+	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte oldvalue = mmu.read(addr);
 	byte value = oldvalue - 1;
 	mmu.write(addr, value);
 	changeZeroValueFlag(value);
-    setHalfCarryFlag(value == 0x08);
+	setHalfCarryFlag(value == 0x08);
 	lastInstructionTicks = 3;
 }
 
-void CPU::incrementRegisterValue(byte& reg) {
+void CPU::incrementRegisterValue(byte& reg)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 
 	reg++;
@@ -243,158 +279,173 @@ void CPU::incrementRegisterValue(byte& reg) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::decrementRegisterValue(byte& reg) {
-    setFlag(CpuFlags::SUBSTRACTION);
+void CPU::decrementRegisterValue(byte& reg)
+{
+	setFlag(CpuFlags::SUBSTRACTION);
 
-    reg--;
-    setHalfCarryFlag(reg == 0x08);
+	reg--;
+	setHalfCarryFlag(reg == 0x08);
 	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
-void CPU::decrementRegistersValue(byte& msgRegister, byte& lsbRegister) {
+void CPU::decrementRegistersValue(byte& msgRegister, byte& lsbRegister)
+{
 	uint16_t xy = (msgRegister << 8) | lsbRegister;
 	xy--;
-    msgRegister = (xy >> 8);
-    lsbRegister = (xy & 0x00FF);
+	msgRegister = (xy >> 8);
+	lsbRegister = (xy & 0x00FF);
 	lastInstructionTicks = 2;
 }
 
-void CPU::decrementRegisterValue(uint16_t& reg) {
+void CPU::decrementRegisterValue(uint16_t& reg)
+{
 	reg--;
 	lastInstructionTicks = 2;
 }
 
-void CPU::rotateRegisterLeftCircular(byte& reg) {
+void CPU::rotateRegisterLeftCircular(byte& reg)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	unsetFlag(CpuFlags::ZERO);
 	unsetFlag(CpuFlags::HALF_CARRY);
 
 	/* Set the carry flag to the highest bit of X */
-    setCarryFlag((reg & 0x80) > 0);
-    /* Rotate the value circularly */
+	setCarryFlag((reg & 0x80) > 0);
+	/* Rotate the value circularly */
 	reg = (reg << 1) | (reg >> 7);
-    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
+	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
 	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
-void CPU::rotateValueInMemoryLeftCircular(byte addrMsb, byte addrLsb) {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
-    byte value = mmu.read(addr);
-    rotateRegisterLeftCircular(value);
-    mmu.write(addr, value);
-    lastInstructionTicks = 4;
-}
-
-void CPU::rotateRegisterRightCircular(byte &reg) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-
-    /* Set the carry flag to the lowest bit of X */
-    setCarryFlag((reg & 0x01) > 0);
-    /* Rotate the value circularly */
-    reg = (reg << 7) | (reg >> 1);
-    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
-    changeZeroValueFlag(reg);
-    lastInstructionTicks = 1;
-}
-
-void CPU::rotateValueInMemoryRightCircular(byte addrMsb, byte addrLsb) {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+void CPU::rotateValueInMemoryLeftCircular(byte addrMsb, byte addrLsb)
+{
+	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
 	byte value = mmu.read(addr);
-    rotateRegisterRightCircular(value);
+	rotateRegisterLeftCircular(value);
 	mmu.write(addr, value);
 	lastInstructionTicks = 4;
 }
 
-void CPU::rotateRegisterLeftExtended(byte& reg) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
+void CPU::rotateRegisterRightCircular(byte& reg)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
 
-    byte currentCarry = isFlagSet(CpuFlags::CARRY);
-    /* Set the carry flag to the highest bit of reg */
-    setCarryFlag((reg & 0x80) > 0);
-    /* Rotate the accumulator and set the last bit to the original carry flag */
-    reg = (reg << 1) | currentCarry;
-    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
-    changeZeroValueFlag(reg);
-    lastInstructionTicks = 2;
+	/* Set the carry flag to the lowest bit of X */
+	setCarryFlag((reg & 0x01) > 0);
+	/* Rotate the value circularly */
+	reg = (reg << 7) | (reg >> 1);
+	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
+	changeZeroValueFlag(reg);
+	lastInstructionTicks = 1;
 }
 
-void CPU::rotateValueInMemoryLeft(byte addrMsb, byte addrLsb) {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
-    byte value = mmu.read(addr);
-    rotateRegisterLeftExtended(value);
-    mmu.write(addr, value);
-    lastInstructionTicks = 4;
+void CPU::rotateValueInMemoryRightCircular(byte addrMsb, byte addrLsb)
+{
+	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte value = mmu.read(addr);
+	rotateRegisterRightCircular(value);
+	mmu.write(addr, value);
+	lastInstructionTicks = 4;
 }
 
-void CPU::rotateRegisterRightExtended(byte& reg) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
+void CPU::rotateRegisterLeftExtended(byte& reg)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
 
-    byte currentCarry = isFlagSet(CpuFlags::CARRY);
-    /* Set the carry flag to the lowest bit of X */
-    setCarryFlag((reg & 0x01) > 0);
-    /* Rotate the accumulator and set the highest bit to the original carry flag */
-    reg = (currentCarry << 7) | (reg >> 1);
-    // TODO: Confirm that the Zero flag should also be set in the standard instruction set
-    changeZeroValueFlag(reg);
-    lastInstructionTicks = 2;
+	byte currentCarry = isFlagSet(CpuFlags::CARRY);
+	/* Set the carry flag to the highest bit of reg */
+	setCarryFlag((reg & 0x80) > 0);
+	/* Rotate the accumulator and set the last bit to the original carry flag */
+	reg = (reg << 1) | currentCarry;
+	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
+	changeZeroValueFlag(reg);
+	lastInstructionTicks = 2;
 }
 
-void CPU::rotateValueInMemoryRight(byte addrMsb, byte addrLsb) {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
-    byte value = mmu.read(addr);
-    rotateRegisterRightExtended(value);
-    mmu.write(addr, value);
-    lastInstructionTicks = 4;
+void CPU::rotateValueInMemoryLeft(byte addrMsb, byte addrLsb)
+{
+	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte value = mmu.read(addr);
+	rotateRegisterLeftExtended(value);
+	mmu.write(addr, value);
+	lastInstructionTicks = 4;
 }
 
-void CPU::SLA_X(byte& X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    setCarryFlag((X & 0x80) > 0);
+void CPU::rotateRegisterRightExtended(byte& reg)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
+
+	byte currentCarry = isFlagSet(CpuFlags::CARRY);
+	/* Set the carry flag to the lowest bit of X */
+	setCarryFlag((reg & 0x01) > 0);
+	/* Rotate the accumulator and set the highest bit to the original carry flag */
+	reg = (currentCarry << 7) | (reg >> 1);
+	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
+	changeZeroValueFlag(reg);
+	lastInstructionTicks = 2;
+}
+
+void CPU::rotateValueInMemoryRight(byte addrMsb, byte addrLsb)
+{
+	uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+	byte value = mmu.read(addr);
+	rotateRegisterRightExtended(value);
+	mmu.write(addr, value);
+	lastInstructionTicks = 4;
+}
+
+void CPU::SLA_X(byte& X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	setCarryFlag((X & 0x80) > 0);
 	X = (X << 1);
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
 }
 
-void CPU::SLA_XYm(byte X, byte Y) {
+void CPU::SLA_XYm(byte X, byte Y)
+{
 	byte value = mmu.read((X << 8) | Y);
 	SLA_X(value);
 	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
-void CPU::SRA_X(byte X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
+void CPU::SRA_X(byte X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
 
 	X = ((X & 0x80) | (X >> 1));
 	changeZeroValueFlag(X);
 	lastInstructionTicks = 2;
 }
 
-void CPU::SRA_XYm(byte X, byte Y) {
+void CPU::SRA_XYm(byte X, byte Y)
+{
 	byte value = mmu.read((X << 8) | Y);
 	SRA_X(value);
 	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
-
-void CPU::SRL_X(byte& X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
+void CPU::SRL_X(byte& X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
 
 	setCarryFlag((X & 0x01) > 0);
 	X = (X >> 1);
@@ -402,19 +453,20 @@ void CPU::SRL_X(byte& X) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::SRL_XYm(byte X, byte Y) {
+void CPU::SRL_XYm(byte X, byte Y)
+{
 	byte value = mmu.read((X << 8) | Y);
 	SRL_X(value);
 	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
-
-void CPU::SWAP_X(byte& X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
+void CPU::SWAP_X(byte& X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::ZERO);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
 
 	// swap the two nibbles
 	X = ((X >> 4) | (X << 4));
@@ -422,72 +474,81 @@ void CPU::SWAP_X(byte& X) {
 	lastInstructionTicks = 2;
 }
 
-void CPU::SWAP_XYm(byte X, byte Y) {
+void CPU::SWAP_XYm(byte X, byte Y)
+{
 	byte value = mmu.read((X << 8) | Y);
 	SWAP_X(value);
 	mmu.write((X << 8) | Y, value);
 	lastInstructionTicks = 4;
 }
 
-void CPU::BIT_X_Y(byte X, byte Y) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    setFlag(CpuFlags::HALF_CARRY);
+void CPU::BIT_X_Y(byte X, byte Y)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	setFlag(CpuFlags::HALF_CARRY);
 	// If the value of the bit is set then we set the flag zero
 	changeZeroValueFlag((Y >> X) & 0x01);
 	lastInstructionTicks = 2;
 }
 
-void CPU::BIT_X_YZm(byte X, byte Y, byte Z) {
+void CPU::BIT_X_YZm(byte X, byte Y, byte Z)
+{
 	byte value = mmu.read((Y << 8) | Z);
 	BIT_X_Y(X, value);
 	lastInstructionTicks = 4;
 }
 
-void CPU::RES_X_Y(byte X, byte& Y) {
+void CPU::RES_X_Y(byte X, byte& Y)
+{
 	Y = (Y & ~(0x01 << X));
 	lastInstructionTicks = 2;
 }
 
-void CPU::RES_X_YZm(byte X, byte Y, byte Z) {
+void CPU::RES_X_YZm(byte X, byte Y, byte Z)
+{
 	byte value = mmu.read((Y << 8) | Z);
 	RES_X_Y(X, value);
 	mmu.write((Y << 8) | Z, value);
 	lastInstructionTicks = 4;
 }
 
-void CPU::SET_X_Y(byte X, byte& Y) {
+void CPU::SET_X_Y(byte X, byte& Y)
+{
 	Y = (Y | (0x01 << X));
 	lastInstructionTicks = 2;
 }
 
-void CPU::SET_X_YZm(byte X, byte Y, byte Z) {
+void CPU::SET_X_YZm(byte X, byte Y, byte Z)
+{
 	byte value = mmu.read((Y << 8) | Z);
 	SET_X_Y(X, value);
 	mmu.write((Y << 8) | Z, value);
 	lastInstructionTicks = 4;
 }
 
-
-void CPU::addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resultRegLsb,
-                                                  byte valueRegMsb, byte valueRegLsb) {
+void CPU::addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resultRegLsb, byte valueRegMsb,
+                                                  byte valueRegLsb)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
-    uint16_t origValue = (resultRegMsb << 8) | resultRegLsb;
-    uint32_t result = origValue;
-    result += (valueRegMsb << 8) | valueRegLsb;
+	uint16_t origValue = (resultRegMsb << 8) | resultRegLsb;
+	uint32_t result = origValue;
+	result += (valueRegMsb << 8) | valueRegLsb;
 	setCarryFlag(result > 0xFFFF);
 	setHalfCarryFlag(origValue <= 0xFFF && result > 0xFFF);
-    resultRegMsb = ((result & 0xFF00) >> 8);
-    resultRegLsb = (result & 0xFF);
+	resultRegMsb = ((result & 0xFF00) >> 8);
+	resultRegLsb = (result & 0xFF);
 	lastInstructionTicks = 2;
 }
 
-void CPU::ADD_XY_Z(byte& X, byte& Y, byte Z) {
+void CPU::ADD_XY_Z(byte& X, byte& Y, byte Z)
+{
 	uint32_t comp = (X << 8) | Y;
-    addTwo8BitsRegistersToTwo8BitsRegisters(X, Y, 0, Z);
+	addTwo8BitsRegistersToTwo8BitsRegisters(X, Y, 0, Z);
 	lastInstructionTicks = 2;
 }
 
-void CPU::ADD_X_Y(byte& X, byte Y) {
+void CPU::ADD_X_Y(byte& X, byte Y)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X += Y;
@@ -497,7 +558,8 @@ void CPU::ADD_X_Y(byte& X, byte Y) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::ADD_SP_X(sbyte X) {
+void CPU::ADD_SP_X(sbyte X)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	unsetFlag(CpuFlags::ZERO);
 	uint16_t value = sp;
@@ -507,16 +569,19 @@ void CPU::ADD_SP_X(sbyte X) {
 	lastInstructionTicks = 4;
 }
 
-void CPU::ADD_X_N(byte& X) {
+void CPU::ADD_X_N(byte& X)
+{
 	ADD_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
-void CPU::ADC_X_Y(byte& X, byte Y) {
+void CPU::ADC_X_Y(byte& X, byte Y)
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X += Y;
-	if (isFlagSet(CpuFlags::CARRY)) {
+	if (isFlagSet(CpuFlags::CARRY))
+	{
 		X++;
 	}
 	setCarryFlag(value > X);
@@ -525,23 +590,26 @@ void CPU::ADC_X_Y(byte& X, byte Y) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::ADC_X_N(byte X) {
+void CPU::ADC_X_N(byte X)
+{
 	ADC_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
-void CPU::ADD_X_YZm(byte& X, byte Y, byte Z) {
+void CPU::ADD_X_YZm(byte& X, byte Y, byte Z)
+{
 	ADD_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
-void CPU::ADC_X_YZm(byte& X, byte Y, byte Z) {
+void CPU::ADC_X_YZm(byte& X, byte Y, byte Z)
+{
 	ADC_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
-
-void CPU::SUB_X_Y(byte& X, byte Y) {
+void CPU::SUB_X_Y(byte& X, byte Y)
+{
 	setFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X -= Y;
@@ -551,16 +619,19 @@ void CPU::SUB_X_Y(byte& X, byte Y) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::SUB_X_N(byte& X) {
+void CPU::SUB_X_N(byte& X)
+{
 	SUB_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
-void CPU::SBC_X_Y(byte& X, byte Y) {
+void CPU::SBC_X_Y(byte& X, byte Y)
+{
 	setFlag(CpuFlags::SUBSTRACTION);
 	byte value = X;
 	X -= Y;
-	if (isFlagSet(CpuFlags::CARRY)) {
+	if (isFlagSet(CpuFlags::CARRY))
+	{
 		X--;
 	}
 	setCarryFlag(value < X);
@@ -569,74 +640,86 @@ void CPU::SBC_X_Y(byte& X, byte Y) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::SBC_X_N(byte& X) {
+void CPU::SBC_X_N(byte& X)
+{
 	SBC_X_Y(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
-void CPU::SUB_X_YZm(byte& X, byte Y, byte Z) {
+void CPU::SUB_X_YZm(byte& X, byte Y, byte Z)
+{
 	SUB_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
-void CPU::SBC_X_YZm(byte& X, byte Y, byte Z) {
+void CPU::SBC_X_YZm(byte& X, byte Y, byte Z)
+{
 	SBC_X_Y(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
-void CPU::AND_X(byte X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
+void CPU::AND_X(byte X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
 	a &= X;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
 }
 
-void CPU::AND_XYm(byte X, byte Y) {
+void CPU::AND_XYm(byte X, byte Y)
+{
 	AND_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
-void CPU::XOR_X(byte X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
+void CPU::XOR_X(byte X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
 	a ^= X;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
 }
 
-void CPU::XOR_XYm(byte X, byte Y) {
+void CPU::XOR_XYm(byte X, byte Y)
+{
 	XOR_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
-void CPU::OR_X(byte X) {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
+void CPU::OR_X(byte X)
+{
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
 	a |= X;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
 }
 
-void CPU::OR_XYm(byte X, byte Y) {
+void CPU::OR_XYm(byte X, byte Y)
+{
 	OR_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
-void CPU::OR_N() {
+void CPU::OR_N()
+{
 	OR_X(mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
-void CPU::AND_N() {
+void CPU::AND_N()
+{
 	AND_X(mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
-void CPU::CP_X(byte X) {
+void CPU::CP_X(byte X)
+{
 	setFlag(CpuFlags::SUBSTRACTION);
 	setFlagIfTrue(a == X, CpuFlags::ZERO);
 	setHalfCarryFlag(a > X);
@@ -644,143 +727,171 @@ void CPU::CP_X(byte X) {
 	lastInstructionTicks = 1;
 }
 
-void CPU::CP_XYm(byte X, byte Y) {
+void CPU::CP_XYm(byte X, byte Y)
+{
 	CP_X(mmu.read((X << 8) | Y));
 	lastInstructionTicks = 2;
 }
 
-void CPU::POP_XY(byte X, byte Y) {
+void CPU::POP_XY(byte X, byte Y)
+{
 	Y = mmu.read(sp);
 	X = mmu.read(sp + 1);
 	sp += 2;
 	lastInstructionTicks = 3;
 }
 
-void CPU::RET_X(bool cond) {
+void CPU::RET_X(bool cond)
+{
 	uint16_t addr = mmu.readWord(sp);
 	sp += 2;
-	if (cond) {
+	if (cond)
+	{
 		pc = addr;
 		lastInstructionTicks = 5;
 	}
-	else {
+	else
+	{
 		lastInstructionTicks = 2;
 	}
 }
 
-void CPU::jumpConditional(bool condition) {
+void CPU::jumpConditional(bool condition)
+{
 	uint16_t addr = mmu.readWord(pc);
 	pc += 2;
-	if (condition) {
+	if (condition)
+	{
 		pc = addr;
 		lastInstructionTicks = 4;
 	}
-	else {
+	else
+	{
 		lastInstructionTicks = 3;
 	}
 }
 
-void CPU::jump() {
-    uint16_t addr = mmu.readWord(pc);
-    pc = addr;
-    lastInstructionTicks = 4;
+void CPU::jump()
+{
+	uint16_t addr = mmu.readWord(pc);
+	pc = addr;
+	lastInstructionTicks = 4;
 }
 
-void CPU::jumpToAddrIn16BitsRegister(byte addrMsb, byte addrLsb) {
+void CPU::jumpToAddrIn16BitsRegister(byte addrMsb, byte addrLsb)
+{
 	pc = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
 	lastInstructionTicks = 1;
 }
 
-void CPU::CALL_X_NN(bool cond) {
-	if (cond) {
-	    sp -= 2;
-	    mmu.writeWord(sp, pc+2);
+void CPU::CALL_X_NN(bool cond)
+{
+	if (cond)
+	{
+		sp -= 2;
+		mmu.writeWord(sp, pc + 2);
 		pc = mmu.read(pc);
 		lastInstructionTicks = 6;
 	}
-	else {
+	else
+	{
 		lastInstructionTicks = 3;
 	}
 }
 
-void CPU::PUSH_XY(byte X, byte Y) {
+void CPU::PUSH_XY(byte X, byte Y)
+{
 	sp -= 2;
 	mmu.write(sp, X);
 	mmu.write(sp + 1, Y);
 	lastInstructionTicks = 4;
 }
 
-
-void CPU::RST_X(byte X) {
+void CPU::RST_X(byte X)
+{
 	sp -= 2;
 	mmu.writeWord(sp, pc);
 	pc = X;
 	lastInstructionTicks = 4;
 }
 
-void CPU::LDH_Nm_X(byte X) {
+void CPU::LDH_Nm_X(byte X)
+{
 	mmu.write(0xFF00 | mmu.read(pc), X);
 	pc++;
 	lastInstructionTicks = 3;
 }
 
-void CPU::LDH_X_Nm(byte& X) {
+void CPU::LDH_X_Nm(byte& X)
+{
 	X = mmu.read(0xFF00 + mmu.read(pc));
 	pc++;
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_Xm_Y(byte X, byte Y) {
+void CPU::LD_Xm_Y(byte X, byte Y)
+{
 	mmu.write(0xFF00 | X, Y);
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_Ym(byte& X, byte Y) {
+void CPU::LD_X_Ym(byte& X, byte Y)
+{
 	X = mmu.read(0xFF00 | Y);
 	lastInstructionTicks = 2;
 }
 
-void CPU::jumpRelativeConditional(bool condition) {
+void CPU::jumpRelativeConditional(bool condition)
+{
 	auto offset = static_cast<int8_t>(mmu.read(pc));
 	pc++;
-	if (condition) {
-        pc += offset;
+	if (condition)
+	{
+		pc += offset;
 		lastInstructionTicks = 3;
 	}
-	else {
+	else
+	{
 		lastInstructionTicks = 2;
 	}
 }
 
-void CPU::jumpRelative() {
-    auto offset = static_cast<int8_t>(mmu.read(pc));
-    pc++;
-    pc += offset;
-    lastInstructionTicks = 3;
+void CPU::jumpRelative()
+{
+	auto offset = static_cast<int8_t>(mmu.read(pc));
+	pc++;
+	pc += offset;
+	lastInstructionTicks = 3;
 }
 
-void CPU::DAA_() {
+void CPU::DAA_()
+{
 	unsetFlag(CpuFlags::SUBSTRACTION);
 
-	if (((a & 0x0F) > 9) || isFlagSet(CpuFlags::HALF_CARRY)) {
+	if (((a & 0x0F) > 9) || isFlagSet(CpuFlags::HALF_CARRY))
+	{
 		a += 0x06;
 		setFlag(CpuFlags::HALF_CARRY);
 	}
-	else {
+	else
+	{
 		unsetFlag(CpuFlags::HALF_CARRY);
 	}
 
-	if (((a >> 4) > 9) || isFlagSet(CpuFlags::CARRY)) {
+	if (((a >> 4) > 9) || isFlagSet(CpuFlags::CARRY))
+	{
 		a += 0x60;
 		setFlag(CpuFlags::CARRY);
 	}
-	else {
+	else
+	{
 		unsetFlag(CpuFlags::CARRY);
 	}
 	lastInstructionTicks = 1;
 }
 
-void CPU::CPL_() {
+void CPU::CPL_()
+{
 	// a = ~a
 	a ^= 0xFF;
 	setFlag(CpuFlags::SUBSTRACTION);
@@ -788,14 +899,16 @@ void CPU::CPL_() {
 	lastInstructionTicks = 1;
 }
 
-void CPU::SCF_() {
+void CPU::SCF_()
+{
 	unsetFlag(CpuFlags::HALF_CARRY);
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	setFlag(CpuFlags::CARRY);
 	lastInstructionTicks = 1;
 }
 
-void CPU::CCF_() {
+void CPU::CCF_()
+{
 	unsetFlag(CpuFlags::HALF_CARRY);
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	setCarryFlag(!isFlagSet(CpuFlags::CARRY));
@@ -804,88 +917,90 @@ void CPU::CCF_() {
 
 /*
 void CPU::LDH_Xm_Y(byte X, byte Y) {
-	mmu.write(mmu.read(0xFF00 + mmu.read(pc)), X);
-	mmu.write(0xFF00 + mmu.read(X), Y);
-	lastInstructionTicks = 3;
+    mmu.write(mmu.read(0xFF00 + mmu.read(pc)), X);
+    mmu.write(0xFF00 + mmu.read(X), Y);
+    lastInstructionTicks = 3;
 }
 
 void CPU::LDH_X_Nm(byte& X) {
-	(X = mmu.read(0xFF00 + mmu.read(pc));
-	pc++;
-	lastInstructionTicks = 3;
+    (X = mmu.read(0xFF00 + mmu.read(pc));
+    pc++;
+    lastInstructionTicks = 3;
 }*/
 
-void CPU::executeInstruction(const byte& opCode) {
-    using namespace standardInstructions;
+void CPU::executeInstruction(const byte& opCode)
+{
+	using namespace standardInstructions;
 
-    switch (opCode) {
+	switch (opCode)
+	{
 
 		/******************************************************/
 		/************************ 0x00 ************************/
 		/******************************************************/
 
 	case NOP:
-        NoOperation();
+		NoOperation();
 		break;
 
 	case LD_BC_nn:
-        load16BitsValueInRegisters(b, c);
+		load16BitsValueInRegisters(b, c);
 		break;
 
 	case LD_BCm_A:
-        loadValueToMemoryAtAddr(b, c, a);
+		loadValueToMemoryAtAddr(b, c, a);
 		break;
 
 	case INC_BC:
-        incrementRegistersValue(b, c);
+		incrementRegistersValue(b, c);
 		break;
 
 	case INC_B:
-        incrementRegisterValue(b);
+		incrementRegisterValue(b);
 		break;
 
 	case DEC_B:
-        decrementRegisterValue(b);
+		decrementRegisterValue(b);
 		break;
 
 	case LD_B_n:
-        loadImmediateValueInRegister(b);
+		loadImmediateValueInRegister(b);
 		break;
 
 	case RLC_A:
-        rotateRegisterLeftCircular(a);
+		rotateRegisterLeftCircular(a);
 		break;
 
 	case LD_nnm_SP:
-        load16BitsRegisterAtImmediateAddress(sp);
+		load16BitsRegisterAtImmediateAddress(sp);
 		break;
 
 	case ADD_HL_BC:
-        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, b, c);
+		addTwo8BitsRegistersToTwo8BitsRegisters(h, l, b, c);
 		break;
 
 	case LD_A_BCm:
-        loadValueFromMemoryInto8BitsRegister(a, b, c);
+		loadValueFromMemoryInto8BitsRegister(a, b, c);
 		break;
 
 	case DEC_BC:
-        decrementRegistersValue(b, c);
+		decrementRegistersValue(b, c);
 		break;
 
 	case INC_C:
-        incrementRegisterValue(c);
+		incrementRegisterValue(c);
 		break;
 
 	case DEC_C:
-        decrementRegisterValue(c);
+		decrementRegisterValue(c);
 		break;
 
 	case LD_C_n:
-        loadImmediateValueInRegister(c);
+		loadImmediateValueInRegister(c);
 		break;
 
 	case RRC_A:
-        rotateRegisterRightCircular(a);
+		rotateRegisterRightCircular(a);
 		break;
 
 		/******************************************************/
@@ -893,69 +1008,69 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case STOP:
-		//TODO:
+		// TODO:
 		// Stop cpu and gpu and wait for button to be pressed
 		lastInstructionTicks = 2;
 		break;
 
 	case LD_DE_nn:
-        load16BitsValueInRegisters(d, e);
+		load16BitsValueInRegisters(d, e);
 		break;
 
 	case LD_DEm_A:
-        loadValueToMemoryAtAddr(d, e, a);
+		loadValueToMemoryAtAddr(d, e, a);
 		break;
 
 	case INC_DE:
-        incrementRegistersValue(d, e);
+		incrementRegistersValue(d, e);
 		break;
 
 	case INC_D:
-        incrementRegisterValue(d);
+		incrementRegisterValue(d);
 		break;
 
 	case DEC_D:
-        decrementRegisterValue(d);
+		decrementRegisterValue(d);
 		break;
 
 	case LD_D_n:
-        loadImmediateValueInRegister(d);
+		loadImmediateValueInRegister(d);
 		break;
 
 	case RL_A:
-        rotateRegisterLeftExtended(a);
+		rotateRegisterLeftExtended(a);
 		break;
 
 	case JR_n:
-        jumpRelative();
+		jumpRelative();
 		break;
 
 	case ADD_HL_DE:
-        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, d, e);
+		addTwo8BitsRegistersToTwo8BitsRegisters(h, l, d, e);
 		break;
 
 	case LD_A_DEm:
-        loadValueFromMemoryInto8BitsRegister(a, d, e);
+		loadValueFromMemoryInto8BitsRegister(a, d, e);
 		break;
 
 	case DEC_DE:
-        decrementRegistersValue(d, e);
+		decrementRegistersValue(d, e);
 		break;
 
 	case INC_E:
-        incrementRegisterValue(e);
+		incrementRegisterValue(e);
 		break;
 
 	case DEC_E:
-        decrementRegisterValue(e);
+		decrementRegisterValue(e);
 		break;
 
 	case LD_E_n:
-        loadImmediateValueInRegister(e);
+		loadImmediateValueInRegister(e);
 		break;
 
 	case RR_A:
-        rotateRegisterRightExtended(a);
+		rotateRegisterRightExtended(a);
 		break;
 
 		/******************************************************/
@@ -963,11 +1078,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case JR_NZ_n:
-        jumpRelativeConditional(!isFlagSet(CpuFlags::ZERO));
+		jumpRelativeConditional(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case LD_HL_nn:
-        load16BitsValueInRegisters(h, l);
+		load16BitsValueInRegisters(h, l);
 		break;
 
 	case LD_HLm_I_A:
@@ -975,19 +1090,19 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_HL:
-        incrementRegistersValue(h, l);
+		incrementRegistersValue(h, l);
 		break;
 
 	case INC_H:
-        incrementRegisterValue(h);
+		incrementRegisterValue(h);
 		break;
 
 	case DEC_H:
-        decrementRegisterValue(h);
+		decrementRegisterValue(h);
 		break;
 
 	case LD_H_n:
-        loadImmediateValueInRegister(h);
+		loadImmediateValueInRegister(h);
 		break;
 
 	case DAA:
@@ -995,11 +1110,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JR_Z_n:
-        jumpRelativeConditional(isFlagSet(CpuFlags::ZERO));
+		jumpRelativeConditional(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case ADD_HL_HL:
-        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, h, l);
+		addTwo8BitsRegistersToTwo8BitsRegisters(h, l, h, l);
 		break;
 
 	case LD_A_HLm_I:
@@ -1007,19 +1122,19 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_HL:
-        decrementRegistersValue(h, l);
+		decrementRegistersValue(h, l);
 		break;
 
 	case INC_L:
-        incrementRegisterValue(l);
+		incrementRegisterValue(l);
 		break;
 
 	case DEC_L:
-        decrementRegisterValue(l);
+		decrementRegisterValue(l);
 		break;
 
 	case LD_L_n:
-        loadImmediateValueInRegister(l);
+		loadImmediateValueInRegister(l);
 		break;
 
 	case CPL:
@@ -1031,7 +1146,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case JR_NC_n:
-        jumpRelativeConditional(!isFlagSet(CpuFlags::CARRY));
+		jumpRelativeConditional(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case LD_SP_nn:
@@ -1043,15 +1158,15 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case INC_SP:
-        incrementRegisterValue(sp);
+		incrementRegisterValue(sp);
 		break;
 
 	case INC_HLm:
-        incrementValueInMemoryAtAddr(h, l);
+		incrementValueInMemoryAtAddr(h, l);
 		break;
 
 	case DEC_HLm:
-        decrementValueInMemoryAtAddr(h, l);
+		decrementValueInMemoryAtAddr(h, l);
 		break;
 
 	case LD_HLm_n:
@@ -1063,11 +1178,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JR_C_n:
-        jumpRelativeConditional(isFlagSet(CpuFlags::CARRY));
+		jumpRelativeConditional(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case ADD_HL_SP:
-        addTwo8BitsRegistersToTwo8BitsRegisters(h, l, (sp << 8), (sp & 0x00FF));
+		addTwo8BitsRegistersToTwo8BitsRegisters(h, l, (sp << 8), (sp & 0x00FF));
 		break;
 
 	case LD_A_HLm_D:
@@ -1075,19 +1190,19 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case DEC_SP:
-        decrementRegisterValue(sp);
+		decrementRegisterValue(sp);
 		break;
 
 	case INC_A:
-        incrementRegisterValue(a);
+		incrementRegisterValue(a);
 		break;
 
 	case DEC_A:
-        decrementRegisterValue(a);
+		decrementRegisterValue(a);
 		break;
 
 	case LD_A_n:
-        loadImmediateValueInRegister(a);
+		loadImmediateValueInRegister(a);
 		break;
 
 	case CCF:
@@ -1123,7 +1238,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_B_HLm:
-        loadValueFromMemoryInto8BitsRegister(b, h, l);
+		loadValueFromMemoryInto8BitsRegister(b, h, l);
 		break;
 
 	case LD_B_A:
@@ -1155,13 +1270,12 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_C_HLm:
-        loadValueFromMemoryInto8BitsRegister(c, h, l);
+		loadValueFromMemoryInto8BitsRegister(c, h, l);
 		break;
 
 	case LD_C_A:
 		LD_X_Y(c, a);
 		break;
-
 
 		/******************************************************/
 		/************************ 0x50 ************************/
@@ -1192,7 +1306,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_D_HLm:
-        loadValueFromMemoryInto8BitsRegister(d, h, l);
+		loadValueFromMemoryInto8BitsRegister(d, h, l);
 		break;
 
 	case LD_D_A:
@@ -1224,7 +1338,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_E_HLm:
-        loadValueFromMemoryInto8BitsRegister(e, h, l);
+		loadValueFromMemoryInto8BitsRegister(e, h, l);
 		break;
 
 	case LD_E_A:
@@ -1260,7 +1374,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_H_HLm:
-        loadValueFromMemoryInto8BitsRegister(h, h, l);
+		loadValueFromMemoryInto8BitsRegister(h, h, l);
 		break;
 
 	case LD_H_A:
@@ -1292,7 +1406,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_L_HLm:
-        loadValueFromMemoryInto8BitsRegister(l, h, l);
+		loadValueFromMemoryInto8BitsRegister(l, h, l);
 		break;
 
 	case LD_L_A:
@@ -1304,27 +1418,27 @@ void CPU::executeInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case LD_HLm_B:
-        loadValueToMemoryAtAddr(h, l, b);
+		loadValueToMemoryAtAddr(h, l, b);
 		break;
 
 	case LD_HLm_C:
-        loadValueToMemoryAtAddr(h, l, c);
+		loadValueToMemoryAtAddr(h, l, c);
 		break;
 
 	case LD_HLm_D:
-        loadValueToMemoryAtAddr(h, l, d);
+		loadValueToMemoryAtAddr(h, l, d);
 		break;
 
 	case LD_HLm_E:
-        loadValueToMemoryAtAddr(h, l, e);
+		loadValueToMemoryAtAddr(h, l, e);
 		break;
 
 	case LD_HLm_H:
-        loadValueToMemoryAtAddr(h, l, h);
+		loadValueToMemoryAtAddr(h, l, h);
 		break;
 
 	case LD_HLm_L:
-        loadValueToMemoryAtAddr(h, l, l);
+		loadValueToMemoryAtAddr(h, l, l);
 		break;
 
 	case HALT:
@@ -1333,7 +1447,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_HLm_A:
-        loadValueToMemoryAtAddr(h, l, a);
+		loadValueToMemoryAtAddr(h, l, a);
 		break;
 
 	case LD_A_B:
@@ -1361,7 +1475,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case LD_A_HLm:
-        loadValueFromMemoryInto8BitsRegister(a, h, l);
+		loadValueFromMemoryInto8BitsRegister(a, h, l);
 		break;
 
 	case LD_A_A:
@@ -1640,7 +1754,6 @@ void CPU::executeInstruction(const byte& opCode) {
 		CP_X(a);
 		break;
 
-
 		/******************************************************/
 		/************************ 0xC0 ************************/
 		/******************************************************/
@@ -1654,11 +1767,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_NZ_nn:
-        jumpConditional(!isFlagSet(CpuFlags::ZERO));
+		jumpConditional(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case JP_nn:
-        jump();
+		jump();
 		break;
 
 	case CALL_NZ_nn:
@@ -1686,11 +1799,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_Z_nn:
-        jumpConditional(isFlagSet(CpuFlags::ZERO));
+		jumpConditional(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case EXT_OPS:
-        executeExtendedInstruction(mmu.read(pc++));
+		executeExtendedInstruction(mmu.read(pc++));
 		break;
 
 	case CALL_Z_nn:
@@ -1722,7 +1835,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_NC_nn:
-        jumpConditional(!isFlagSet(CpuFlags::CARRY));
+		jumpConditional(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case CALL_NC_nn:
@@ -1751,7 +1864,7 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_C_nn:
-        jumpConditional(isFlagSet(CpuFlags::CARRY));
+		jumpConditional(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case CALL_C_nn:
@@ -1799,11 +1912,11 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	case JP_HLm:
-        jumpToAddrIn16BitsRegister(h, l);
+		jumpToAddrIn16BitsRegister(h, l);
 		break;
 
 	case LD_nnm_A:
-        load8BitsRegisterAtImmediateAddress(a);
+		load8BitsRegisterAtImmediateAddress(a);
 		break;
 
 	case XOR_n:
@@ -1873,84 +1986,84 @@ void CPU::executeInstruction(const byte& opCode) {
 		break;
 
 	default:
-        throw new UnhandledInstructionException(opCode);
+		throw new UnhandledInstructionException(opCode);
 		return;
 	}
 }
 
+void CPU::executeExtendedInstruction(const byte& opCode)
+{
+	using namespace extendedInstructions;
 
-
-void CPU::executeExtendedInstruction(const byte& opCode) {
-    using namespace extendedInstructions;
-
-	switch (opCode) {
+	switch (opCode)
+	{
 
 		/******************************************************/
 		/************************ 0x00 ************************/
 		/******************************************************/
 
 	case RLC_B:
-        rotateRegisterLeftCircularExtended(b);
+		rotateRegisterLeftCircularExtended(b);
 		break;
 
 	case RLC_C:
-        rotateRegisterLeftCircularExtended(c);
+		rotateRegisterLeftCircularExtended(c);
 		break;
 
 	case RLC_D:
-        rotateRegisterLeftCircularExtended(d);
+		rotateRegisterLeftCircularExtended(d);
 		break;
 
 	case RLC_E:
-        rotateRegisterLeftCircularExtended(e);
+		rotateRegisterLeftCircularExtended(e);
 		break;
 
 	case RLC_H:
-        rotateRegisterLeftCircularExtended(h);
+		rotateRegisterLeftCircularExtended(h);
 		break;
 
-    case RLC_L:
-        rotateRegisterLeftCircularExtended(l);
-        break;
+	case RLC_L:
+		rotateRegisterLeftCircularExtended(l);
+		break;
 
 	case RLC_HLm:
-        rotateValueInMemoryLeftCircular(h, l);
+		rotateValueInMemoryLeftCircular(h, l);
 		break;
 
 	case RLC_A:
-        rotateRegisterLeftCircularExtended(a);
+		rotateRegisterLeftCircularExtended(a);
 		break;
 
 	case RRC_B:
-        rotateRegisterRightCircularExtended(b);
+		rotateRegisterRightCircularExtended(b);
 		break;
 
 	case RRC_C:
-        rotateRegisterRightCircularExtended(c);
+		rotateRegisterRightCircularExtended(c);
 		break;
 
 	case RRC_D:
-        rotateRegisterRightCircularExtended(d);
+		rotateRegisterRightCircularExtended(d);
 		break;
 
 	case RRC_E:
-        rotateRegisterRightCircularExtended(e);
+		rotateRegisterRightCircularExtended(e);
 		break;
 
 	case RRC_H:
-        rotateRegisterRightCircularExtended(h);
+		rotateRegisterRightCircularExtended(h);
 		break;
 
-    case RRC_L:
-        rotateRegisterRightCircularExtended(l);
-        break;
+	case RRC_L:
+		rotateRegisterRightCircularExtended(l);
+		break;
 
 	case RRC_HLm:
-        rotateValueInMemoryRightCircular(h, l);
+		rotateValueInMemoryRightCircular(h, l);
 		break;
 
 	case RRC_A:
-        rotateRegisterRightCircularExtended(a);
+		rotateRegisterRightCircularExtended(a);
 		break;
 
 		/******************************************************/
@@ -1958,67 +2071,67 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		/******************************************************/
 
 	case RL_B:
-        rotateRegisterLeftExtended(b);
+		rotateRegisterLeftExtended(b);
 		break;
 
 	case RL_C:
-        rotateRegisterLeftExtended(c);
+		rotateRegisterLeftExtended(c);
 		break;
 
 	case RL_D:
-        rotateRegisterLeftExtended(d);
+		rotateRegisterLeftExtended(d);
 		break;
 
 	case RL_E:
-        rotateRegisterLeftExtended(e);
+		rotateRegisterLeftExtended(e);
 		break;
 
 	case RL_H:
-        rotateRegisterLeftExtended(h);
+		rotateRegisterLeftExtended(h);
 		break;
 
-    case RL_L:
-        rotateRegisterLeftExtended(l);
-        break;
+	case RL_L:
+		rotateRegisterLeftExtended(l);
+		break;
 
 	case RL_HLm:
-        rotateValueInMemoryLeft(h, l);
+		rotateValueInMemoryLeft(h, l);
 		break;
 
 	case RL_A:
-        rotateRegisterLeftExtended(a);
+		rotateRegisterLeftExtended(a);
 		break;
 
 	case RR_B:
-        rotateRegisterRightExtended(b);
+		rotateRegisterRightExtended(b);
 		break;
 
 	case RR_C:
-        rotateRegisterRightExtended(c);
+		rotateRegisterRightExtended(c);
 		break;
 
 	case RR_D:
-        rotateRegisterRightExtended(d);
+		rotateRegisterRightExtended(d);
 		break;
 
 	case RR_E:
-        rotateRegisterRightExtended(e);
+		rotateRegisterRightExtended(e);
 		break;
 
 	case RR_H:
-        rotateRegisterRightExtended(h);
+		rotateRegisterRightExtended(h);
 		break;
 
-    case RR_L:
-        rotateRegisterRightExtended(l);
-        break;
+	case RR_L:
+		rotateRegisterRightExtended(l);
+		break;
 
 	case RR_HLm:
-        rotateValueInMemoryRight(h, l);
+		rotateValueInMemoryRight(h, l);
 		break;
 
 	case RR_A:
-        rotateRegisterRightExtended(a);
+		rotateRegisterRightExtended(a);
 		break;
 
 		/******************************************************/
@@ -2321,7 +2434,6 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		BIT_X_Y(5, a);
 		break;
 
-
 		/******************************************************/
 		/************************ 0x70 ************************/
 		/******************************************************/
@@ -2381,7 +2493,6 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 	case BIT_7_A:
 		BIT_X_Y(7, a);
 		break;
-
 
 		/******************************************************/
 		/************************ 0x80 ************************/
@@ -2563,7 +2674,6 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		RES_X_Y(5, a);
 		break;
 
-
 		/******************************************************/
 		/************************ 0xB0 ************************/
 		/******************************************************/
@@ -2623,7 +2733,6 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 	case RES_7_A:
 		RES_X_Y(7, a);
 		break;
-
 
 		/******************************************************/
 		/************************ 0xC0 ************************/
@@ -2805,7 +2914,6 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		SET_X_Y(5, a);
 		break;
 
-
 		/******************************************************/
 		/************************ 0xF0 ************************/
 		/******************************************************/
@@ -2867,41 +2975,49 @@ void CPU::executeExtendedInstruction(const byte& opCode) {
 		break;
 
 	default:
-        throw new UnhandledExtendedInstructionException(opCode);
+		throw new UnhandledExtendedInstructionException(opCode);
 		return;
 	}
 }
 
-bool CPU::isFlagSet(CPU::CpuFlags flag) const {
-    return (f & flag) > 0;
+bool CPU::isFlagSet(CPU::CpuFlags flag) const
+{
+	return (f & flag) > 0;
 }
 
-void CPU::setHalfCarryFlag(bool state) {
-    setFlagIfTrue(state, CpuFlags::HALF_CARRY);
+void CPU::setHalfCarryFlag(bool state)
+{
+	setFlagIfTrue(state, CpuFlags::HALF_CARRY);
 }
 
-void CPU::setCarryFlag(bool state) {
-    setFlagIfTrue(state, CpuFlags::CARRY);
+void CPU::setCarryFlag(bool state)
+{
+	setFlagIfTrue(state, CpuFlags::CARRY);
 }
 
-void CPU::NoOperation() {
-    lastInstructionTicks = 1;
+void CPU::NoOperation()
+{
+	lastInstructionTicks = 1;
 }
 
-byte CPU::getFlag() const {
-    return f;
+byte CPU::getFlag() const
+{
+	return f;
 }
 
-void CPU::rotateRegisterLeftCircularExtended(byte &reg) {
-    rotateRegisterLeftCircular(reg);
-    lastInstructionTicks = 2;
+void CPU::rotateRegisterLeftCircularExtended(byte& reg)
+{
+	rotateRegisterLeftCircular(reg);
+	lastInstructionTicks = 2;
 }
 
-void CPU::rotateRegisterRightCircularExtended(byte &reg) {
-    rotateRegisterRightCircular(reg);
-    lastInstructionTicks = 2;
+void CPU::rotateRegisterRightCircularExtended(byte& reg)
+{
+	rotateRegisterRightCircular(reg);
+	lastInstructionTicks = 2;
 }
 
-void CPU::resetFlags() {
-    f = 0x00;
+void CPU::resetFlags()
+{
+	f = 0x00;
 }

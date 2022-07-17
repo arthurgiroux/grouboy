@@ -1,0 +1,18 @@
+﻿---
+BasedOnStyle: LLVM
+AlignTrailingComments: 'true'
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakTemplateDeclarations: 'Yes'
+BreakBeforeBraces: Allman
+ColumnLimit: '120'
+IndentWidth: '4'
+NamespaceIndentation: Inner
+PointerAlignment: Left
+TabWidth: '4'
+UseTab: ForIndentation
+
+...

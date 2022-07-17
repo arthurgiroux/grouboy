@@ -2,33 +2,38 @@
 #define EMULATOR_H
 
 #include "cpu.hpp"
-#include "mmu.hpp"
 #include "gpu.hpp"
+#include "mmu.hpp"
 
-class Emulator {
-public:
+class Emulator
+{
+  public:
 	Emulator();
 	~Emulator();
 	void exec();
 
-	GPU& getGPU() {
-	    return gpu;
+	GPU& getGPU()
+	{
+		return gpu;
 	}
 
-    MMU& getMMU() {
-        return mmu;
-    }
-
-    CPU& getCPU() {
-	    return cpu;
+	MMU& getMMU()
+	{
+		return mmu;
 	}
 
-	int getCurrentTicks() const {
-	    return currentTicks;
+	CPU& getCPU()
+	{
+		return cpu;
 	}
 
-private:
-    MMU mmu;
+	int getCurrentTicks() const
+	{
+		return currentTicks;
+	}
+
+  private:
+	MMU mmu;
 	CPU cpu;
 	GPU gpu;
 	int currentTicks = 0;
