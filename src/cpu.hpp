@@ -124,17 +124,19 @@ class CPU
 	class UnhandledInstructionException : public std::exception
 	{
 	  public:
-		UnhandledInstructionException(byte opCode) : opCode(opCode)
+        explicit UnhandledInstructionException(byte opCode) : opCode(opCode)
 		{
+			str = utils::string_format("Unknown instruction with opcode=%x", opCode);
 		}
 
 		const char* what() const noexcept override
 		{
-			return utils::string_format("Unknown instruction with opcode=%x", opCode).c_str();
+			return str.c_str();
 		}
 
 	  protected:
 		byte opCode = 0;
+		std::string str;
 	};
 
 	/**
@@ -143,13 +145,14 @@ class CPU
 	class UnhandledExtendedInstructionException : public UnhandledInstructionException
 	{
 	  public:
-		UnhandledExtendedInstructionException(byte opCode) : UnhandledInstructionException(opCode)
+		explicit UnhandledExtendedInstructionException(byte opCode) : UnhandledInstructionException(opCode)
 		{
+			str = utils::string_format("Unknown extended instruction with opcode=%x", opCode);
 		}
 
 		const char* what() const noexcept override
 		{
-			return utils::string_format("Unknown extended instruction with opcode=%x", opCode).c_str();
+			return str.c_str();
 		}
 	};
 
