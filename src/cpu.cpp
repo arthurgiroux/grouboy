@@ -155,16 +155,10 @@ void CPU::LD_XYm_N(byte X, byte Y)
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_XYm_I_Z(byte& X, byte& Y, byte Z)
+void CPU::loadValueToMemoryAndIncreaseAddr(byte& addrMsb, byte& addrLsb, byte value)
 {
-	mmu.write((X << 8) | Y, Z);
-	// Increment the LSB part of the address
-	Y++;
-	// If we overflowed then we increment the MSB part
-	if (Y == 0)
-	{
-		X++;
-	}
+	mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+	increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
 	lastInstructionTicks = 2;
 }
 
@@ -197,22 +191,11 @@ void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z)
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_XYm_D_Z(byte& X, byte& Y, byte& Z)
+void CPU::loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value)
 {
-	uint16_t XY = (X << 8) | Y;
-	mmu.write(XY, Z);
-	XY--;
-	X = XY >> 8;
-	Y = XY & 0xFF;
-	//// Decrement the MSB part of the address if it's set
-	// if (Y > 0) {
-	//	Y--;
-	//}
-	//// Decrement the LSB part otherwise
-	// else {
-	//	X--;
-	//}
-	lastInstructionTicks = 2;
+    mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+    decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
+    lastInstructionTicks = 2;
 }
 
 void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
@@ -1086,7 +1069,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_HLm_I_A:
-		LD_XYm_I_Z(h, l, a);
+		loadValueToMemoryAndIncreaseAddr(h, l, a);
 		break;
 
 	case INC_HL:
@@ -1154,7 +1137,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_HLm_D_A:
-		LD_XYm_D_Z(h, l, a);
+		loadValueToMemoryAndDecreaseAddr(h, l, a);
 		break;
 
 	case INC_SP:

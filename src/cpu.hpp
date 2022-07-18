@@ -124,7 +124,7 @@ class CPU
 	class UnhandledInstructionException : public std::exception
 	{
 	  public:
-        explicit UnhandledInstructionException(byte opCode) : opCode(opCode)
+		explicit UnhandledInstructionException(byte opCode) : opCode(opCode)
 		{
 			str = utils::string_format("Unknown instruction with opcode=%x", opCode);
 		}
@@ -307,9 +307,19 @@ class CPU
 	// Load the byte pointed by pc at the address pointed by the word XY
 	void LD_XYm_N(byte X, byte Y);
 
-	// Load the byte Z at the address pointed by the word XY and
-	// increment the address XY
-	void LD_XYm_I_Z(byte& X, byte& Y, byte Z);
+	/**
+	 * Load the given value to the memory pointed by the given address and
+	 * increment the address.
+	 *
+	 * @param addrMsb   the MSB part of the address
+	 * @param addrLsb   the LSB part of the address
+	 * @param value     the value to load in memory
+	 * @opcodes:
+	 *     0x22
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
+	void loadValueToMemoryAndIncreaseAddr(byte& addrMsb, byte& addrLsb, byte value);
 
 	// Load the byte pointed by the word YZ into X and
 	// increment the address YZ
@@ -319,9 +329,19 @@ class CPU
 	// decrement the address YZ
 	void LD_X_YZm_D(byte& X, byte& Y, byte& Z);
 
-	// Load the byte Z at the address pointed by the word XY and
-	// decrement the address XY
-	void LD_XYm_D_Z(byte& X, byte& Y, byte& Z);
+    /**
+     * Load the given value to the memory pointed by the given address and
+     * decrement the address.
+     *
+     * @param addrMsb   the MSB part of the address
+     * @param addrLsb   the LSB part of the address
+     * @param value     the value to load in memory
+     * @opcodes:
+     *     0x32
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value);
 
 	// Load the byte pointed by YZ into X
 	/**

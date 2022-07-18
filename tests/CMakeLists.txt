@@ -21,7 +21,8 @@ add_executable(
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp
-        test_tile.cpp)
+        test_tile.cpp
+        test_utils.cpp)
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
 

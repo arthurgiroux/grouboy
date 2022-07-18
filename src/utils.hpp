@@ -1,6 +1,7 @@
 #ifndef GBEMULATOR_UTILS_HPP
 #define GBEMULATOR_UTILS_HPP
 
+#include <string>
 #include "types.hpp"
 
 namespace utils
@@ -33,6 +34,34 @@ static std::string string_format(const char* fmt, Args... args)
 	buf.resize(size);
 	snprintf(&buf[0], size + 1, fmt, args...);
 	return buf;
+}
+
+/**
+ * Increment a 16 bits value that is stored in two 8 bits value
+ *
+ * @param msb   the most significant byte of the 16 bits value
+ * @param lsb   the least significant byte of the 16 bits value
+ */
+static void increment16BitsValueStoredIn8BitsValues(byte& msb, byte& lsb)
+{
+	uint16_t value = (msb << 8) | lsb;
+	value++;
+	msb = (value >> 8);
+	lsb = value & 0xFF;
+}
+
+/**
+ * Decrement a 16 bits value that is stored in two 8 bits value
+ *
+ * @param msb   the most significant byte of the 16 bits value
+ * @param lsb   the least significant byte of the 16 bits value
+ */
+static void decrement16BitsValueStoredIn8BitsValues(byte& msb, byte& lsb)
+{
+	uint16_t value = (msb << 8) | lsb;
+	value--;
+	msb = (value >> 8);
+	lsb = value & 0xFF;
 }
 } // namespace utils
 

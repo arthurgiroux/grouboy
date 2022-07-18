@@ -576,6 +576,34 @@ class CpuInstructionTest : public ::testing::Test
 		}
 		ASSERT_EQ(cpu.getFlag(), flag);
 	}
+
+	void testLoadValueToMemoryAndIncreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg) {
+        cpu.pc = 0x00;
+        uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
+        uint16_t expected_inc_addr = addr + 1;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 2);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(cpu.pc,  1);
+        ASSERT_EQ(mmu.read(addr), valueReg);
+        ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
+        ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
+	}
+
+    void testLoadValueToMemoryAndDecreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg) {
+        cpu.pc = 0x00;
+        uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
+        uint16_t expected_inc_addr = addr - 1;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 2);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(cpu.pc,  1);
+        ASSERT_EQ(mmu.read(addr), valueReg);
+        ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
+        ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -958,4 +986,36 @@ TEST_F(CpuInstructionTest, InstructionJumpRelativeConditional)
 	testJumpRelativeConditional(standardInstructions::JR_NZ_n, -5, false);
 	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 127, false);
 	testJumpRelativeConditional(standardInstructions::JR_NZ_n, -127, false);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoadValueToMemoryAndIncreaseAddr)
+{
+	cpu.a = 42;
+	cpu.h = 0x00;
+	cpu.l = 0x01;
+    testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
+    cpu.a = 200;
+    cpu.h = 0xFF;
+    cpu.l = 0x00;
+    testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
+    cpu.a = 250;
+    cpu.h = 0x00;
+    cpu.l = 0xFF;
+    testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoadValueToMemoryAndDecreaseAddr)
+{
+    cpu.a = 42;
+    cpu.h = 0x00;
+    cpu.l = 0x01;
+    testLoadValueToMemoryAndDecreaseAddr(standardInstructions::LD_HLm_D_A, cpu.h, cpu.l, cpu.a);
+    cpu.a = 200;
+    cpu.h = 0xFF;
+    cpu.l = 0x00;
+    testLoadValueToMemoryAndDecreaseAddr(standardInstructions::LD_HLm_D_A, cpu.h, cpu.l, cpu.a);
+    cpu.a = 250;
+    cpu.h = 0x00;
+    cpu.l = 0xFF;
+    testLoadValueToMemoryAndDecreaseAddr(standardInstructions::LD_HLm_D_A, cpu.h, cpu.l, cpu.a);
 }

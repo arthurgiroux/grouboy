@@ -1,6 +1,8 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
+#include "types.hpp"
+
 namespace standardInstructions
 {
 enum OpCode : byte
