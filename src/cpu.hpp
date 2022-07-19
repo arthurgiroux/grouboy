@@ -797,7 +797,7 @@ class CPU
 
 	/**
 	* Jump to the address pointed by the program counter
-
+    *
 	* @opcodes:
 	*     0xC3
 	* @flags_affected: N/A
@@ -818,8 +818,16 @@ class CPU
 	 */
 	void jumpToAddrIn16BitsRegister(byte addrMsb, byte addrLsb);
 
-	// BCD corrects the value of the "a" register
-	void DAA_();
+	/**
+	 * Adjusts the sum of two packed BCD values to create a packed BCD result.
+	 * The a register is the implied source and destination operand.
+	 *
+	 * @opcodes:
+	 *     0x27
+	 * @flags_affected: Zero, Carry, Half-carry
+	 * @number_of_ticks: 1
+	 */
+	void decimalAdjustAccumulator();
 
 	// Inverts all bits of a
 	void CPL_();

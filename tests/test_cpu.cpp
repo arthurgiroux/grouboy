@@ -604,6 +604,23 @@ class CpuInstructionTest : public ::testing::Test
         ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
         ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
     }
+
+	void testDecimalAdjustAccumulator(byte instruction, bool carryStateBeforeExecution, byte registerValue, bool halfCarryStateBeforeExecution,
+	                       byte expectedRegisterValue, bool carryStateAfterExecution) {
+        cpu.pc = 0x00;
+		cpu.a = registerValue;
+		cpu.setCarryFlag(carryStateBeforeExecution);
+		cpu.setHalfCarryFlag(halfCarryStateBeforeExecution);
+
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 1);
+        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), cpu.a == 0);
+        ASSERT_EQ(cpu.pc,  1);
+        ASSERT_EQ(cpu.a, expectedRegisterValue);
+        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), carryStateAfterExecution);
+        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), false);
+	}
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1004,18 +1021,51 @@ TEST_F(CpuInstructionTest, InstructionLoadValueToMemoryAndIncreaseAddr)
     testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
 }
 
-TEST_F(CpuInstructionTest, InstructionLoadValueToMemoryAndDecreaseAddr)
+TEST_F(CpuInstructionTest, InstructionDecimalAdjustAccumulator)
 {
-    cpu.a = 42;
-    cpu.h = 0x00;
-    cpu.l = 0x01;
-    testLoadValueToMemoryAndDecreaseAddr(standardInstructions::LD_HLm_D_A, cpu.h, cpu.l, cpu.a);
-    cpu.a = 200;
-    cpu.h = 0xFF;
-    cpu.l = 0x00;
-    testLoadValueToMemoryAndDecreaseAddr(standardInstructions::LD_HLm_D_A, cpu.h, cpu.l, cpu.a);
-    cpu.a = 250;
-    cpu.h = 0x00;
-    cpu.l = 0xFF;
-    testLoadValueToMemoryAndDecreaseAddr(standardInstructions::LD_HLm_D_A, cpu.h, cpu.l, cpu.a);
+	// Taken from GameBoy programmer manual
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, false, 0x00, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x09, false, 0x09, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, false, 0x90, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x99, false, 0x99, false);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0A, false, 0x0A + 0x06, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0F, false, 0x0F + 0x06, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9A, false, 0x9A + 0x06, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, true, 0x00 + 0x06, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, true, 0x90 + 0x06, false);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x93, true, 0x93 + 0x06, false);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, false, static_cast<byte>(0xA0 + 0x60), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA9, false, static_cast<byte>(0xA9 + 0x60), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, false, static_cast<byte>(0xF0 + 0x60), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF9, false, static_cast<byte>(0xF9 + 0x60), true);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAA, false, static_cast<byte>(0xAA + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAF, false, static_cast<byte>(0xAF + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFA, false, static_cast<byte>(0xFA + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFF, false, static_cast<byte>(0xFF + 0x66), true);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, true, static_cast<byte>(0xA0 + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA3, true, static_cast<byte>(0xA3 + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, true, static_cast<byte>(0xF0 + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF3, true, static_cast<byte>(0xF3 + 0x66), true);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, false, static_cast<byte>(0x00 + 0x60), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x02, false, static_cast<byte>(0x02 + 0x60), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, false, static_cast<byte>(0x30 + 0x60), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x39, false, static_cast<byte>(0x39 + 0x60), true);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0A, false, static_cast<byte>(0x0A + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0F, false, static_cast<byte>(0x0F + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2A, false, static_cast<byte>(0x2A + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2F, false, static_cast<byte>(0x2F + 0x66), true);
+
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, true, static_cast<byte>(0x00 + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x03, true, static_cast<byte>(0x03 + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, true, static_cast<byte>(0x30 + 0x66), true);
+    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x33, true, static_cast<byte>(0x33 + 0x66), true);
 }

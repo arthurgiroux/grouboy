@@ -847,30 +847,29 @@ void CPU::jumpRelative()
 	lastInstructionTicks = 3;
 }
 
-void CPU::DAA_()
+void CPU::decimalAdjustAccumulator()
 {
-	unsetFlag(CpuFlags::SUBSTRACTION);
-
+	byte valueToAdd = 0;
 	if (((a & 0x0F) > 9) || isFlagSet(CpuFlags::HALF_CARRY))
 	{
-		a += 0x06;
-		setFlag(CpuFlags::HALF_CARRY);
-	}
-	else
-	{
-		unsetFlag(CpuFlags::HALF_CARRY);
+        valueToAdd += 0x06;
 	}
 
 	if (((a >> 4) > 9) || isFlagSet(CpuFlags::CARRY))
 	{
-		a += 0x60;
+        valueToAdd += 0x60;
 		setFlag(CpuFlags::CARRY);
 	}
 	else
 	{
 		unsetFlag(CpuFlags::CARRY);
 	}
-	lastInstructionTicks = 1;
+
+	a += valueToAdd;
+
+	setFlagIfTrue(a == 0, CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    lastInstructionTicks = 1;
 }
 
 void CPU::CPL_()
@@ -1089,7 +1088,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case DAA:
-		DAA_();
+		decimalAdjustAccumulator();
 		break;
 
 	case JR_Z_n:
