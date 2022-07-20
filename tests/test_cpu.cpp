@@ -605,6 +605,21 @@ class CpuInstructionTest : public ::testing::Test
         ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
     }
 
+    void testLoadValueFromMemoryAndIncreaseAddr(byte instruction, byte& valueReg, byte& regAddrMsb, byte& regAddrLsb, byte value) {
+        cpu.pc = 0x00;
+        uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
+        uint16_t expected_inc_addr = addr + 1;
+		mmu.write(addr, value);
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 2);
+        ASSERT_EQ(cpu.getFlag(), 0x00);
+        ASSERT_EQ(cpu.pc,  1);
+        ASSERT_EQ(valueReg, value);
+        ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
+        ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
+    }
+
 	void testDecimalAdjustAccumulator(byte instruction, bool carryStateBeforeExecution, byte registerValue, bool halfCarryStateBeforeExecution,
 	                       byte expectedRegisterValue, bool carryStateAfterExecution) {
         cpu.pc = 0x00;
@@ -1068,4 +1083,19 @@ TEST_F(CpuInstructionTest, InstructionDecimalAdjustAccumulator)
     testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x03, true, static_cast<byte>(0x03 + 0x66), true);
     testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, true, static_cast<byte>(0x30 + 0x66), true);
     testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x33, true, static_cast<byte>(0x33 + 0x66), true);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoadValueFromMemoryAndIncreaseAddr)
+{
+    cpu.h = 0x00;
+    cpu.l = 0x01;
+    testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a, cpu.h, cpu.l, 42);
+    cpu.a = 200;
+    cpu.h = 0xFF;
+    cpu.l = 0x00;
+    testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I,  cpu.a,cpu.h, cpu.l, 200);
+    cpu.a = 250;
+    cpu.h = 0x00;
+    cpu.l = 0xFF;
+    testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a,cpu.h, cpu.l, 250);
 }

@@ -321,9 +321,19 @@ class CPU
 	 */
 	void loadValueToMemoryAndIncreaseAddr(byte& addrMsb, byte& addrLsb, byte value);
 
-	// Load the byte pointed by the word YZ into X and
-	// increment the address YZ
-	void LD_X_YZm_I(byte& X, byte& Y, byte& Z);
+    /**
+     * Load value from memory into the given register and
+     * increment the address.
+     *
+     * @param reg       the register where to load the value
+     * @param addrMsb   the MSB part of the address
+     * @param addrLsb   the LSB part of the address
+     * @opcodes:
+     *     0x2A
+     * @flags_affected: N/A
+     * @number_of_ticks: 2
+     */
+	void loadValueFromMemoryAndIncreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb);
 
 	// Load the byte pointed by the word YZ into X and
 	// decrement the address YZ

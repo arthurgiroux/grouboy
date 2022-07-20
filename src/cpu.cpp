@@ -162,16 +162,10 @@ void CPU::loadValueToMemoryAndIncreaseAddr(byte& addrMsb, byte& addrLsb, byte va
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_YZm_I(byte& X, byte& Y, byte& Z)
+void CPU::loadValueFromMemoryAndIncreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
-	X = mmu.read((Y << 8) | Z);
-	// Increment the LSB part of the address
-	Z++;
-	// If we overflowed then we increment the MSB part
-	if (Z == 0)
-	{
-		Y++;
-	}
+    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+    increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
 	lastInstructionTicks = 2;
 }
 
@@ -1100,7 +1094,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_HLm_I:
-		LD_X_YZm_I(a, h, l);
+		loadValueFromMemoryAndIncreaseAddr(a, h, l);
 		break;
 
 	case DEC_HL:
