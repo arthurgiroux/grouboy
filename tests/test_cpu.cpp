@@ -636,6 +636,18 @@ class CpuInstructionTest : public ::testing::Test
         ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), carryStateAfterExecution);
         ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), false);
 	}
+
+	void testComplementRegister(byte instruction, byte& reg, byte value, byte expectedValue) {
+        cpu.pc = 0x00;
+        reg = value;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 1);
+        ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
+        ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_EQ(reg, expectedValue);
+        ASSERT_EQ(cpu.pc, 1);
+	}
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1098,4 +1110,14 @@ TEST_F(CpuInstructionTest, InstructionLoadValueFromMemoryAndIncreaseAddr)
     cpu.h = 0x00;
     cpu.l = 0xFF;
     testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a,cpu.h, cpu.l, 250);
+}
+
+TEST_F(CpuInstructionTest, InstructionComplementRegister)
+{
+    testComplementRegister(standardInstructions::CPL, cpu.a, 0x00, 0xFF);
+    testComplementRegister(standardInstructions::CPL, cpu.a, 0xFF, 0x00);
+    testComplementRegister(standardInstructions::CPL, cpu.a, 0x01, 0xFE);
+    testComplementRegister(standardInstructions::CPL, cpu.a, 0x10, 0xEF);
+    testComplementRegister(standardInstructions::CPL, cpu.a, 0x55, 0xAA);
+    testComplementRegister(standardInstructions::CPL, cpu.a, 0xAA, 0x55);
 }

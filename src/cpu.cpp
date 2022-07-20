@@ -866,10 +866,9 @@ void CPU::decimalAdjustAccumulator()
     lastInstructionTicks = 1;
 }
 
-void CPU::CPL_()
+void CPU::complementRegister(byte& reg)
 {
-	// a = ~a
-	a ^= 0xFF;
+	reg = ~reg;
 	setFlag(CpuFlags::SUBSTRACTION);
 	setFlag(CpuFlags::HALF_CARRY);
 	lastInstructionTicks = 1;
@@ -1114,7 +1113,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CPL:
-		CPL_();
+		complementRegister(a);
 		break;
 
 		/******************************************************/

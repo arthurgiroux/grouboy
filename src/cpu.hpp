@@ -839,8 +839,15 @@ class CPU
 	 */
 	void decimalAdjustAccumulator();
 
-	// Inverts all bits of a
-	void CPL_();
+    /**
+     * Logical complement (XOR) of the given register
+     *
+     * @opcodes:
+     *     0x2F
+     * @flags_affected: Substraction, Half-carry
+     * @number_of_ticks: 1
+     */
+	void complementRegister(byte& reg);
 
 	// Set the carry flag
 	void SCF_();
