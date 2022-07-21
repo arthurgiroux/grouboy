@@ -252,8 +252,16 @@ class CPU
 	// Load the
 	void LD_XY_Z_N(byte& X, byte& Y, uint16_t Z);
 
-	// Load the word pointed by pc into X
-	void LD_X_NN(uint16_t& X);
+    /**
+     * Load the 16 bits immediate value into the given register.
+     *
+     * @param reg   the register in which to load the value
+     * @opcodes:
+     *     0x31
+     * @flags_affected: N/A
+     * @number_of_ticks: 3
+     */
+	void load16BitsImmediateValueIntoRegister(uint16_t& reg);
 
 	// Load the byte pointed by the address pointed by pc into X
 	void LD_X_NNm(byte& X);
@@ -304,8 +312,17 @@ class CPU
 	 */
 	void loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value);
 
-	// Load the byte pointed by pc at the address pointed by the word XY
-	void LD_XYm_N(byte X, byte Y);
+    /**
+     * Load the 8 bits immediate value into memory at the given address.
+     *
+     * @param addrMsb   the MSB part of the address
+     * @param addrLsb   the LSB part of the address
+     * @opcodes:
+     *     0x36
+     * @flags_affected: N/A
+     * @number_of_ticks: 3
+     */
+     void load8BitsImmediateValueAtMemoryAddress(byte addrMsb, byte addrLsb);
 
 	/**
 	 * Load the given value to the memory pointed by the given address and
@@ -319,7 +336,7 @@ class CPU
 	 * @flags_affected: N/A
 	 * @number_of_ticks: 2
 	 */
-	void loadValueToMemoryAndIncreaseAddr(byte& addrMsb, byte& addrLsb, byte value);
+	void loadValueToMemoryAndIncrementAddr(byte& addrMsb, byte& addrLsb, byte value);
 
     /**
      * Load value from memory into the given register and
@@ -333,11 +350,21 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 2
      */
-	void loadValueFromMemoryAndIncreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb);
+	void loadValueFromMemoryAndIncrementAddr(byte& reg, byte& addrMsb, byte& addrLsb);
 
-	// Load the byte pointed by the word YZ into X and
-	// decrement the address YZ
-	void LD_X_YZm_D(byte& X, byte& Y, byte& Z);
+    /**
+      * Load value from memory into the given register and
+      * decrement the address.
+      *
+      * @param reg       the register where to load the value
+      * @param addrMsb   the MSB part of the address
+      * @param addrLsb   the LSB part of the address
+      * @opcodes:
+      *     0x3A
+      * @flags_affected: N/A
+      * @number_of_ticks: 2
+      */
+	void loadValueFromMemoryAndDecreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb);
 
     /**
      * Load the given value to the memory pointed by the given address and
@@ -353,7 +380,6 @@ class CPU
      */
 	void loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value);
 
-	// Load the byte pointed by YZ into X
 	/**
 	 * Load the value from memory at the given address into the given register.
 	 *
@@ -367,8 +393,20 @@ class CPU
 	 */
 	void loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-	// Load the byte Y into X
-	void LD_X_Y(byte& X, byte Y);
+    /**
+     * Load an 8 value into into an 8 bit register.
+     *
+     * @param reg          the register where to load the value
+     * @param value        the value to load
+     * @opcodes:
+     *     0x40 0x41 0x42 0x43 0x44 0x45 0x47 0x48 0x49 0x4A 0x4B 0x4C 0x4D 0x4F
+     *     0x50 0x51 0x52 0x53 0x54 0x55 0x57 0x58 0x59 0x5A 0x5B 0x5C 0x5D 0x5F
+     *     0x60 0x61 0x62 0x63 0x64 0x65 0x67 0x68 0x69 0x6A 0x6B 0x6C 0x6D 0x6F
+     *     0x78 0x79 0x7A 0x7B 0x7C 0x7D 0x7F
+     * @flags_affected: N/A
+     * @number_of_ticks: 1
+     */
+	void load8BitsValueInRegister(byte& reg, byte value);
 
 	/**
 	 * Increment the 16 bits value of the register made of two 8 bits registers.

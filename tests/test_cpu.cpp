@@ -648,6 +648,17 @@ class CpuInstructionTest : public ::testing::Test
 		ASSERT_EQ(reg, expectedValue);
         ASSERT_EQ(cpu.pc, 1);
 	}
+
+    void testLoadValueIntoRegister(byte instruction, byte& regDst, byte& regSrc, byte value) {
+        cpu.pc = 0x00;
+        regSrc = value;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 1);
+        ASSERT_EQ(cpu.getFlag(), 0);
+        ASSERT_EQ(regDst, value);
+        ASSERT_EQ(cpu.pc, 1);
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1120,4 +1131,89 @@ TEST_F(CpuInstructionTest, InstructionComplementRegister)
     testComplementRegister(standardInstructions::CPL, cpu.a, 0x10, 0xEF);
     testComplementRegister(standardInstructions::CPL, cpu.a, 0x55, 0xAA);
     testComplementRegister(standardInstructions::CPL, cpu.a, 0xAA, 0x55);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoad16BitsImmediateValueInRegister)
+{
+    cpu.pc = 0x00;
+    uint16_t value = 0x1234;
+    mmu.write(cpu.pc, standardInstructions::LD_SP_nn);
+	mmu.writeWord(cpu.pc + 1, value);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 3);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    ASSERT_EQ(cpu.pc,  3);
+    ASSERT_EQ(cpu.sp, value);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoad8BitsImmediateValueInMemory)
+{
+    cpu.pc = 0x00;
+    byte value = 0x12;
+	uint16_t addr = 0x3456;
+	cpu.h = (addr >> 8);
+	cpu.l = (addr & 0xFF);
+    mmu.write(cpu.pc, standardInstructions::LD_HLm_n);
+    mmu.writeWord(cpu.pc + 1, value);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 3);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    ASSERT_EQ(cpu.pc,  2);
+    ASSERT_EQ(mmu.read(addr), value);
+}
+
+TEST_F(CpuInstructionTest, InstructionLoadValueIntoRegister)
+{
+    testLoadValueIntoRegister(standardInstructions::LD_B_B, cpu.b, cpu.b, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_B_C, cpu.b, cpu.c, 0x34);
+    testLoadValueIntoRegister(standardInstructions::LD_B_D, cpu.b, cpu.d, 0x56);
+    testLoadValueIntoRegister(standardInstructions::LD_B_E, cpu.b, cpu.e, 0x78);
+    testLoadValueIntoRegister(standardInstructions::LD_B_H, cpu.b, cpu.h, 0x9A);
+    testLoadValueIntoRegister(standardInstructions::LD_B_L, cpu.b, cpu.l, 0xBC);
+    testLoadValueIntoRegister(standardInstructions::LD_B_A, cpu.b, cpu.a, 0xDE);
+    testLoadValueIntoRegister(standardInstructions::LD_C_B, cpu.c, cpu.b, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_C_C, cpu.c, cpu.c, 0x23);
+    testLoadValueIntoRegister(standardInstructions::LD_C_D, cpu.c, cpu.d, 0x45);
+    testLoadValueIntoRegister(standardInstructions::LD_C_E, cpu.c, cpu.e, 0x67);
+    testLoadValueIntoRegister(standardInstructions::LD_C_H, cpu.c, cpu.h, 0x89);
+    testLoadValueIntoRegister(standardInstructions::LD_C_L, cpu.c, cpu.l, 0xAB);
+    testLoadValueIntoRegister(standardInstructions::LD_C_A, cpu.c, cpu.a, 0x12);
+
+    testLoadValueIntoRegister(standardInstructions::LD_D_B, cpu.d, cpu.b, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_D_C, cpu.d, cpu.c, 0x23);
+    testLoadValueIntoRegister(standardInstructions::LD_D_D, cpu.d, cpu.d, 0x45);
+    testLoadValueIntoRegister(standardInstructions::LD_D_E, cpu.d, cpu.e, 0x67);
+    testLoadValueIntoRegister(standardInstructions::LD_D_H, cpu.d, cpu.h, 0x89);
+    testLoadValueIntoRegister(standardInstructions::LD_D_L, cpu.d, cpu.l, 0xAB);
+    testLoadValueIntoRegister(standardInstructions::LD_D_A, cpu.d, cpu.a, 0xCD);
+    testLoadValueIntoRegister(standardInstructions::LD_E_B, cpu.e, cpu.b, 0xEF);
+    testLoadValueIntoRegister(standardInstructions::LD_E_C, cpu.e, cpu.c, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_E_D, cpu.e, cpu.d, 0x34);
+    testLoadValueIntoRegister(standardInstructions::LD_E_E, cpu.e, cpu.e, 0x56);
+    testLoadValueIntoRegister(standardInstructions::LD_E_H, cpu.e, cpu.h, 0x78);
+    testLoadValueIntoRegister(standardInstructions::LD_E_L, cpu.e, cpu.l, 0x9A);
+    testLoadValueIntoRegister(standardInstructions::LD_E_A, cpu.e, cpu.a, 0xBC);
+
+    testLoadValueIntoRegister(standardInstructions::LD_H_B, cpu.h, cpu.b, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_H_C, cpu.h, cpu.c, 0x23);
+    testLoadValueIntoRegister(standardInstructions::LD_H_D, cpu.h, cpu.d, 0x34);
+    testLoadValueIntoRegister(standardInstructions::LD_H_E, cpu.h, cpu.e, 0x56);
+    testLoadValueIntoRegister(standardInstructions::LD_H_H, cpu.h, cpu.h, 0x78);
+    testLoadValueIntoRegister(standardInstructions::LD_H_L, cpu.h, cpu.l, 0x9A);
+    testLoadValueIntoRegister(standardInstructions::LD_H_A, cpu.h, cpu.a, 0xBC);
+    testLoadValueIntoRegister(standardInstructions::LD_L_B, cpu.l, cpu.b, 0xDE);
+    testLoadValueIntoRegister(standardInstructions::LD_L_C, cpu.l, cpu.c, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_L_D, cpu.l, cpu.d, 0x23);
+    testLoadValueIntoRegister(standardInstructions::LD_L_E, cpu.l, cpu.e, 0x45);
+    testLoadValueIntoRegister(standardInstructions::LD_L_H, cpu.l, cpu.h, 0x67);
+    testLoadValueIntoRegister(standardInstructions::LD_L_L, cpu.l, cpu.l, 0x89);
+    testLoadValueIntoRegister(standardInstructions::LD_L_A, cpu.l, cpu.a, 0xAB);
+
+    testLoadValueIntoRegister(standardInstructions::LD_A_B, cpu.a, cpu.b, 0x12);
+    testLoadValueIntoRegister(standardInstructions::LD_A_C, cpu.a, cpu.c, 0x34);
+    testLoadValueIntoRegister(standardInstructions::LD_A_D, cpu.a, cpu.d, 0x56);
+    testLoadValueIntoRegister(standardInstructions::LD_A_E, cpu.a, cpu.e, 0x78);
+    testLoadValueIntoRegister(standardInstructions::LD_A_H, cpu.a, cpu.h, 0x9A);
+    testLoadValueIntoRegister(standardInstructions::LD_A_L, cpu.a, cpu.l, 0xBC);
+    testLoadValueIntoRegister(standardInstructions::LD_A_A, cpu.a, cpu.a, 0xDE);
 }

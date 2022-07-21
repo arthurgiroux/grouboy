@@ -107,9 +107,9 @@ void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z)
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_X_NN(uint16_t& X)
+void CPU::load16BitsImmediateValueIntoRegister(uint16_t& reg)
 {
-	X = mmu.readWord(pc);
+	reg = mmu.readWord(pc);
 	pc += 2;
 	lastInstructionTicks = 3;
 }
@@ -148,41 +148,33 @@ void CPU::loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value)
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_XYm_N(byte X, byte Y)
+void CPU::load8BitsImmediateValueAtMemoryAddress(byte addrMsb, byte addrLsb)
 {
-	mmu.write((X << 8) | Y, mmu.read(pc));
+	byte value = mmu.read(pc);
 	pc++;
+	mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
 	lastInstructionTicks = 3;
 }
 
-void CPU::loadValueToMemoryAndIncreaseAddr(byte& addrMsb, byte& addrLsb, byte value)
+void CPU::loadValueToMemoryAndIncrementAddr(byte& addrMsb, byte& addrLsb, byte value)
 {
 	mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
 	increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
 	lastInstructionTicks = 2;
 }
 
-void CPU::loadValueFromMemoryAndIncreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb)
+void CPU::loadValueFromMemoryAndIncrementAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
     reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
     increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_YZm_D(byte& X, byte& Y, byte& Z)
+void CPU::loadValueFromMemoryAndDecreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
-	X = mmu.read((Y << 8) | Z);
-	// Decrement the MSB part of the address if it's set
-	if (Y > 0)
-	{
-		Y--;
-	}
-	// Decrement the LSB part otherwise
-	else
-	{
-		Z--;
-	}
-	lastInstructionTicks = 2;
+    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+    decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
+    lastInstructionTicks = 2;
 }
 
 void CPU::loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value)
@@ -198,9 +190,9 @@ void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte add
 	lastInstructionTicks = 2;
 }
 
-void CPU::LD_X_Y(byte& X, byte Y)
+void CPU::load8BitsValueInRegister(byte& reg, byte value)
 {
-	X = Y;
+	reg = value;
 	lastInstructionTicks = 1;
 }
 
@@ -1061,7 +1053,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_HLm_I_A:
-		loadValueToMemoryAndIncreaseAddr(h, l, a);
+		loadValueToMemoryAndIncrementAddr(h, l, a);
 		break;
 
 	case INC_HL:
@@ -1093,7 +1085,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_HLm_I:
-		loadValueFromMemoryAndIncreaseAddr(a, h, l);
+		loadValueFromMemoryAndIncrementAddr(a, h, l);
 		break;
 
 	case DEC_HL:
@@ -1125,7 +1117,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_SP_nn:
-		LD_X_NN(sp);
+		load16BitsImmediateValueIntoRegister(sp);
 		break;
 
 	case LD_HLm_D_A:
@@ -1145,7 +1137,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_HLm_n:
-		LD_XYm_N(h, l);
+		load8BitsImmediateValueAtMemoryAddress(h, l);
 		break;
 
 	case SCF:
@@ -1161,7 +1153,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_HLm_D:
-		LD_X_YZm_D(a, h, l);
+		loadValueFromMemoryAndDecreaseAddr(a, h, l);
 		break;
 
 	case DEC_SP:
@@ -1189,27 +1181,27 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LD_B_B:
-		LD_X_Y(b, b);
+		load8BitsValueInRegister(b, b);
 		break;
 
 	case LD_B_C:
-		LD_X_Y(b, c);
+		load8BitsValueInRegister(b, c);
 		break;
 
 	case LD_B_D:
-		LD_X_Y(b, d);
+		load8BitsValueInRegister(b, d);
 		break;
 
 	case LD_B_E:
-		LD_X_Y(b, e);
+		load8BitsValueInRegister(b, e);
 		break;
 
 	case LD_B_H:
-		LD_X_Y(b, h);
+		load8BitsValueInRegister(b, h);
 		break;
 
 	case LD_B_L:
-		LD_X_Y(b, l);
+		load8BitsValueInRegister(b, l);
 		break;
 
 	case LD_B_HLm:
@@ -1217,31 +1209,31 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_B_A:
-		LD_X_Y(b, a);
+		load8BitsValueInRegister(b, a);
 		break;
 
 	case LD_C_B:
-		LD_X_Y(c, b);
+		load8BitsValueInRegister(c, b);
 		break;
 
 	case LD_C_C:
-		LD_X_Y(c, c);
+		load8BitsValueInRegister(c, c);
 		break;
 
 	case LD_C_D:
-		LD_X_Y(c, d);
+		load8BitsValueInRegister(c, d);
 		break;
 
 	case LD_C_E:
-		LD_X_Y(c, e);
+		load8BitsValueInRegister(c, e);
 		break;
 
 	case LD_C_H:
-		LD_X_Y(c, h);
+		load8BitsValueInRegister(c, h);
 		break;
 
 	case LD_C_L:
-		LD_X_Y(c, l);
+		load8BitsValueInRegister(c, l);
 		break;
 
 	case LD_C_HLm:
@@ -1249,7 +1241,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_C_A:
-		LD_X_Y(c, a);
+		load8BitsValueInRegister(c, a);
 		break;
 
 		/******************************************************/
@@ -1257,27 +1249,27 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LD_D_B:
-		LD_X_Y(d, b);
+		load8BitsValueInRegister(d, b);
 		break;
 
 	case LD_D_C:
-		LD_X_Y(d, c);
+		load8BitsValueInRegister(d, c);
 		break;
 
 	case LD_D_D:
-		LD_X_Y(d, d);
+		load8BitsValueInRegister(d, d);
 		break;
 
 	case LD_D_E:
-		LD_X_Y(d, e);
+		load8BitsValueInRegister(d, e);
 		break;
 
 	case LD_D_H:
-		LD_X_Y(d, h);
+		load8BitsValueInRegister(d, h);
 		break;
 
 	case LD_D_L:
-		LD_X_Y(d, l);
+		load8BitsValueInRegister(d, l);
 		break;
 
 	case LD_D_HLm:
@@ -1285,31 +1277,31 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_D_A:
-		LD_X_Y(d, a);
+		load8BitsValueInRegister(d, a);
 		break;
 
 	case LD_E_B:
-		LD_X_Y(e, b);
+		load8BitsValueInRegister(e, b);
 		break;
 
 	case LD_E_C:
-		LD_X_Y(e, c);
+		load8BitsValueInRegister(e, c);
 		break;
 
 	case LD_E_D:
-		LD_X_Y(e, d);
+		load8BitsValueInRegister(e, d);
 		break;
 
 	case LD_E_E:
-		LD_X_Y(e, e);
+		load8BitsValueInRegister(e, e);
 		break;
 
 	case LD_E_H:
-		LD_X_Y(e, h);
+		load8BitsValueInRegister(e, h);
 		break;
 
 	case LD_E_L:
-		LD_X_Y(e, l);
+		load8BitsValueInRegister(e, l);
 		break;
 
 	case LD_E_HLm:
@@ -1317,7 +1309,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_E_A:
-		LD_X_Y(e, a);
+		load8BitsValueInRegister(e, a);
 		break;
 
 		/******************************************************/
@@ -1325,27 +1317,27 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LD_H_B:
-		LD_X_Y(h, b);
+		load8BitsValueInRegister(h, b);
 		break;
 
 	case LD_H_C:
-		LD_X_Y(h, c);
+		load8BitsValueInRegister(h, c);
 		break;
 
 	case LD_H_D:
-		LD_X_Y(h, d);
+		load8BitsValueInRegister(h, d);
 		break;
 
 	case LD_H_E:
-		LD_X_Y(h, e);
+		load8BitsValueInRegister(h, e);
 		break;
 
 	case LD_H_H:
-		LD_X_Y(h, h);
+		load8BitsValueInRegister(h, h);
 		break;
 
 	case LD_H_L:
-		LD_X_Y(h, l);
+		load8BitsValueInRegister(h, l);
 		break;
 
 	case LD_H_HLm:
@@ -1353,31 +1345,31 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_H_A:
-		LD_X_Y(h, a);
+		load8BitsValueInRegister(h, a);
 		break;
 
 	case LD_L_B:
-		LD_X_Y(l, b);
+		load8BitsValueInRegister(l, b);
 		break;
 
 	case LD_L_C:
-		LD_X_Y(l, c);
+		load8BitsValueInRegister(l, c);
 		break;
 
 	case LD_L_D:
-		LD_X_Y(l, d);
+		load8BitsValueInRegister(l, d);
 		break;
 
 	case LD_L_E:
-		LD_X_Y(l, e);
+		load8BitsValueInRegister(l, e);
 		break;
 
 	case LD_L_H:
-		LD_X_Y(l, h);
+		load8BitsValueInRegister(l, h);
 		break;
 
 	case LD_L_L:
-		LD_X_Y(l, l);
+		load8BitsValueInRegister(l, l);
 		break;
 
 	case LD_L_HLm:
@@ -1385,7 +1377,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_L_A:
-		LD_X_Y(l, a);
+		load8BitsValueInRegister(l, a);
 		break;
 
 		/******************************************************/
@@ -1426,27 +1418,27 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_B:
-		LD_X_Y(a, b);
+		load8BitsValueInRegister(a, b);
 		break;
 
 	case LD_A_C:
-		LD_X_Y(a, c);
+		load8BitsValueInRegister(a, c);
 		break;
 
 	case LD_A_D:
-		LD_X_Y(a, d);
+		load8BitsValueInRegister(a, d);
 		break;
 
 	case LD_A_E:
-		LD_X_Y(a, e);
+		load8BitsValueInRegister(a, e);
 		break;
 
 	case LD_A_H:
-		LD_X_Y(a, h);
+		load8BitsValueInRegister(a, h);
 		break;
 
 	case LD_A_L:
-		LD_X_Y(a, l);
+		load8BitsValueInRegister(a, l);
 		break;
 
 	case LD_A_HLm:
@@ -1454,7 +1446,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_A:
-		LD_X_Y(a, a);
+		load8BitsValueInRegister(a, a);
 		break;
 
 		/******************************************************/
