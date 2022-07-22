@@ -887,11 +887,25 @@ class CPU
      */
 	void complementRegister(byte& reg);
 
-	// Set the carry flag
-	void SCF_();
+	/**
+	 * Set the carry flag
+	 *
+	 * @opcodes:
+	 *     0x37
+	 * @flags_affected: Substraction, Half-carry, Carry
+	 * @number_of_ticks: 1
+	 */
+	void setCarryFlagInstruction();
 
-	// Inverts the carry flag
-	void CCF_();
+	/**
+	 * Inverts the carry flag
+	 *
+	 * @opcodes:
+	 *     0x3F
+	 * @flags_affected: Substraction, Half-carry, Carry
+	 * @number_of_ticks: 1
+	 */
+	void invertsCarryFlag();
 
 	// Push the value XY on the stack pointer
 	void PUSH_XY(byte X, byte Y);

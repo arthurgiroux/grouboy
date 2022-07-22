@@ -1217,3 +1217,32 @@ TEST_F(CpuInstructionTest, InstructionLoadValueIntoRegister)
     testLoadValueIntoRegister(standardInstructions::LD_A_L, cpu.a, cpu.l, 0xBC);
     testLoadValueIntoRegister(standardInstructions::LD_A_A, cpu.a, cpu.a, 0xDE);
 }
+
+TEST_F(CpuInstructionTest, InstructionSetCarryFlag)
+{
+    cpu.pc = 0x00;
+	cpu.resetFlags();
+    cpu.setFlag(CPU::HALF_CARRY);
+	cpu.setFlag(CPU::SUBSTRACTION);
+    mmu.write(cpu.pc, standardInstructions::SCF);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 1);
+    ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
+    ASSERT_EQ(cpu.pc,  1);
+}
+
+TEST_F(CpuInstructionTest, InstructionInvertsCarryFlag)
+{
+    cpu.pc = 0x00;
+    cpu.resetFlags();
+    cpu.setFlag(CPU::HALF_CARRY);
+    cpu.setFlag(CPU::SUBSTRACTION);
+    mmu.write(cpu.pc, standardInstructions::CCF);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 1);
+    ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
+    ASSERT_EQ(cpu.pc,  1);
+    mmu.write(cpu.pc, standardInstructions::CCF);
+    ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+}

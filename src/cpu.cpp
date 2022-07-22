@@ -866,7 +866,7 @@ void CPU::complementRegister(byte& reg)
 	lastInstructionTicks = 1;
 }
 
-void CPU::SCF_()
+void CPU::setCarryFlagInstruction()
 {
 	unsetFlag(CpuFlags::HALF_CARRY);
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -874,7 +874,7 @@ void CPU::SCF_()
 	lastInstructionTicks = 1;
 }
 
-void CPU::CCF_()
+void CPU::invertsCarryFlag()
 {
 	unsetFlag(CpuFlags::HALF_CARRY);
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -1141,7 +1141,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case SCF:
-		SCF_();
+		setCarryFlagInstruction();
 		break;
 
 	case JR_C_n:
@@ -1173,7 +1173,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CCF:
-		CCF_();
+		invertsCarryFlag();
 		break;
 
 		/******************************************************/
