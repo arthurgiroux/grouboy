@@ -252,15 +252,15 @@ class CPU
 	// Load the
 	void LD_XY_Z_N(byte& X, byte& Y, uint16_t Z);
 
-    /**
-     * Load the 16 bits immediate value into the given register.
-     *
-     * @param reg   the register in which to load the value
-     * @opcodes:
-     *     0x31
-     * @flags_affected: N/A
-     * @number_of_ticks: 3
-     */
+	/**
+	 * Load the 16 bits immediate value into the given register.
+	 *
+	 * @param reg   the register in which to load the value
+	 * @opcodes:
+	 *     0x31
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 3
+	 */
 	void load16BitsImmediateValueIntoRegister(uint16_t& reg);
 
 	// Load the byte pointed by the address pointed by pc into X
@@ -312,17 +312,17 @@ class CPU
 	 */
 	void loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value);
 
-    /**
-     * Load the 8 bits immediate value into memory at the given address.
-     *
-     * @param addrMsb   the MSB part of the address
-     * @param addrLsb   the LSB part of the address
-     * @opcodes:
-     *     0x36
-     * @flags_affected: N/A
-     * @number_of_ticks: 3
-     */
-     void load8BitsImmediateValueAtMemoryAddress(byte addrMsb, byte addrLsb);
+	/**
+	 * Load the 8 bits immediate value into memory at the given address.
+	 *
+	 * @param addrMsb   the MSB part of the address
+	 * @param addrLsb   the LSB part of the address
+	 * @opcodes:
+	 *     0x36
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 3
+	 */
+	void load8BitsImmediateValueAtMemoryAddress(byte addrMsb, byte addrLsb);
 
 	/**
 	 * Load the given value to the memory pointed by the given address and
@@ -338,46 +338,46 @@ class CPU
 	 */
 	void loadValueToMemoryAndIncrementAddr(byte& addrMsb, byte& addrLsb, byte value);
 
-    /**
-     * Load value from memory into the given register and
-     * increment the address.
-     *
-     * @param reg       the register where to load the value
-     * @param addrMsb   the MSB part of the address
-     * @param addrLsb   the LSB part of the address
-     * @opcodes:
-     *     0x2A
-     * @flags_affected: N/A
-     * @number_of_ticks: 2
-     */
+	/**
+	 * Load value from memory into the given register and
+	 * increment the address.
+	 *
+	 * @param reg       the register where to load the value
+	 * @param addrMsb   the MSB part of the address
+	 * @param addrLsb   the LSB part of the address
+	 * @opcodes:
+	 *     0x2A
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
 	void loadValueFromMemoryAndIncrementAddr(byte& reg, byte& addrMsb, byte& addrLsb);
 
-    /**
-      * Load value from memory into the given register and
-      * decrement the address.
-      *
-      * @param reg       the register where to load the value
-      * @param addrMsb   the MSB part of the address
-      * @param addrLsb   the LSB part of the address
-      * @opcodes:
-      *     0x3A
-      * @flags_affected: N/A
-      * @number_of_ticks: 2
-      */
+	/**
+	 * Load value from memory into the given register and
+	 * decrement the address.
+	 *
+	 * @param reg       the register where to load the value
+	 * @param addrMsb   the MSB part of the address
+	 * @param addrLsb   the LSB part of the address
+	 * @opcodes:
+	 *     0x3A
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
 	void loadValueFromMemoryAndDecreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb);
 
-    /**
-     * Load the given value to the memory pointed by the given address and
-     * decrement the address.
-     *
-     * @param addrMsb   the MSB part of the address
-     * @param addrLsb   the LSB part of the address
-     * @param value     the value to load in memory
-     * @opcodes:
-     *     0x32
-     * @flags_affected: N/A
-     * @number_of_ticks: 2
-     */
+	/**
+	 * Load the given value to the memory pointed by the given address and
+	 * decrement the address.
+	 *
+	 * @param addrMsb   the MSB part of the address
+	 * @param addrLsb   the LSB part of the address
+	 * @param value     the value to load in memory
+	 * @opcodes:
+	 *     0x32
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
 	void loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value);
 
 	/**
@@ -393,19 +393,19 @@ class CPU
 	 */
 	void loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-    /**
-     * Load an 8 value into into an 8 bit register.
-     *
-     * @param reg          the register where to load the value
-     * @param value        the value to load
-     * @opcodes:
-     *     0x40 0x41 0x42 0x43 0x44 0x45 0x47 0x48 0x49 0x4A 0x4B 0x4C 0x4D 0x4F
-     *     0x50 0x51 0x52 0x53 0x54 0x55 0x57 0x58 0x59 0x5A 0x5B 0x5C 0x5D 0x5F
-     *     0x60 0x61 0x62 0x63 0x64 0x65 0x67 0x68 0x69 0x6A 0x6B 0x6C 0x6D 0x6F
-     *     0x78 0x79 0x7A 0x7B 0x7C 0x7D 0x7F
-     * @flags_affected: N/A
-     * @number_of_ticks: 1
-     */
+	/**
+	 * Load an 8 value into into an 8 bit register.
+	 *
+	 * @param reg          the register where to load the value
+	 * @param value        the value to load
+	 * @opcodes:
+	 *     0x40 0x41 0x42 0x43 0x44 0x45 0x47 0x48 0x49 0x4A 0x4B 0x4C 0x4D 0x4F
+	 *     0x50 0x51 0x52 0x53 0x54 0x55 0x57 0x58 0x59 0x5A 0x5B 0x5C 0x5D 0x5F
+	 *     0x60 0x61 0x62 0x63 0x64 0x65 0x67 0x68 0x69 0x6A 0x6B 0x6C 0x6D 0x6F
+	 *     0x78 0x79 0x7A 0x7B 0x7C 0x7D 0x7F
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
 	void load8BitsValueInRegister(byte& reg, byte value);
 
 	/**
@@ -844,13 +844,13 @@ class CPU
 	void jumpConditional(bool condition);
 
 	/**
-	* Jump to the address pointed by the program counter
-    *
-	* @opcodes:
-	*     0xC3
-	* @flags_affected: N/A
-	* @number_of_ticks: 4
-	*/
+	 * Jump to the address pointed by the program counter
+	 *
+	 * @opcodes:
+	 *     0xC3
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
+	 */
 	void jump();
 
 	/**
@@ -877,14 +877,14 @@ class CPU
 	 */
 	void decimalAdjustAccumulator();
 
-    /**
-     * Logical complement (XOR) of the given register
-     *
-     * @opcodes:
-     *     0x2F
-     * @flags_affected: Substraction, Half-carry
-     * @number_of_ticks: 1
-     */
+	/**
+	 * Logical complement (XOR) of the given register
+	 *
+	 * @opcodes:
+	 *     0x2F
+	 * @flags_affected: Substraction, Half-carry
+	 * @number_of_ticks: 1
+	 */
 	void complementRegister(byte& reg);
 
 	/**
