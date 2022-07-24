@@ -720,35 +720,77 @@ class CPU
 	void addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resultRegLsb, byte valueRegMsb,
 	                                             byte valueRegLsb);
 
-	// Add the value of Z to the value of XY
-	void ADD_XY_Z(byte& X, byte& Y, byte Z);
-
-    /**
-     * Arithmetic add an 8 bits value to an 8 bits register
-     *
-     * @param reg      the register to add the value to
-     * @param value    the value to add
+	/**
+	 * Arithmetic add an 8 bits value to an 8 bits register
+	 *
+	 * @param reg      the register to add the value to
+	 * @param value    the value to add
 	 * @opcodes:
 	 *     0x80 0x81 0x82 0x83 0x84 0x85 0x87
-     * @flags_affected: Carry, Half-carry, Substraction
-     * @number_of_ticks: 1
-     */
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
 	void add8BitsValueTo8BitsRegister(byte& reg, byte value);
 
-	// Add the value pointed by pc to the value of X
-	void ADD_X_N(byte& X);
+	/**
+	 * Arithmetic add immediate value to an 8 bits register
+	 *
+	 * @param reg      the register to add the value to
+	 * @opcodes:
+	 *     0xC6
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void addImmediateValueTo8BitsRegister(byte& reg);
 
-	// Add the value pointed by YZ to the value of X
-	void ADD_X_YZm(byte& X, byte Y, byte Z);
+	/**
+	 * Arithmetic add value from memory to an 8 bits register
+	 *
+	 * @param reg      the register to add the value to
+	 * @param addrMsb   the msb part of the address where the value is stored
+	 * @param addrLsb   the Lsb part of the address where the value is stored
+	 * @opcodes:
+	 *     0x86
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void addValueFromMemoryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-	// Add the value of Y and the value of the carry to the value of X
-	void ADC_X_Y(byte& X, byte Y);
+	/**
+	 * Arithmetic add an 8 bits value and the carry to an 8 bits register
+	 *
+	 * @param reg      the register to add the value to
+	 * @param value    the value to add
+	 * @opcodes:
+	 *     0x88 0x89 0x8A 0x8B 0x8C 0x8D 0x8F
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void add8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value);
 
-	// Add the value pointed by pc and the value of the carry to the value of X
-	void ADC_X_N(byte X);
+	/**
+	 * Arithmetic add immediate value and carry to an 8 bits register
+	 *
+	 * @param reg      the register to add the value to
+	 * @opcodes:
+	 *     0xCE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void addImmediateValueAndCarryTo8BitsRegister(byte& reg);
 
-	// Add the value pointed by YZ and the value of the carry to the value of X
-	void ADC_X_YZm(byte& X, byte Y, byte Z);
+	/**
+	 * Arithmetic add value from memory and carry to an 8 bits register
+	 *
+	 * @param reg      the register to add the value to
+	 * @param addrMsb   the msb part of the address where the value is stored
+	 * @param addrLsb   the Lsb part of the address where the value is stored
+	 * @opcodes:
+	 *     0x8E
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void addValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
 	// Substract the value of Y from the value of X
 	void SUB_X_Y(byte& X, byte Y);
