@@ -723,8 +723,17 @@ class CPU
 	// Add the value of Z to the value of XY
 	void ADD_XY_Z(byte& X, byte& Y, byte Z);
 
-	// Add the value of Y to the value of X
-	void ADD_X_Y(byte& X, byte Y);
+    /**
+     * Arithmetic add an 8 bits value to an 8 bits register
+     *
+     * @param reg      the register to add the value to
+     * @param value    the value to add
+	 * @opcodes:
+	 *     0x80 0x81 0x82 0x83 0x84 0x85 0x87
+     * @flags_affected: Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+	void add8BitsValueTo8BitsRegister(byte& reg, byte value);
 
 	// Add the value pointed by pc to the value of X
 	void ADD_X_N(byte& X);

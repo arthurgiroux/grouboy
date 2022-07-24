@@ -659,6 +659,30 @@ class CpuInstructionTest : public ::testing::Test
         ASSERT_EQ(regDst, value);
         ASSERT_EQ(cpu.pc, 1);
     }
+
+	void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue,
+	                                         byte& regAdd, byte addValue, byte expectedResult,
+	                                         bool expectedHalfCarryFlag, bool expectedCarryFlag) {
+        cpu.pc = 0x00;
+		reg = startValue;
+        regAdd = addValue;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+		uint8_t expectedValue = startValue + addValue;
+        ASSERT_EQ(ticks, 1);
+        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
+        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
+        ASSERT_EQ(reg, expectedValue);
+        ASSERT_EQ(cpu.pc, 1);
+	}
+
+    void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte& regAdd) {
+        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x00, 0x00, false, false);
+        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x05, 0x05, false, false);
+        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, regAdd, 0x05, 0x15, true, false);
+        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, regAdd, 0x05, 0x05, false, true);
+    }
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1245,4 +1269,18 @@ TEST_F(CpuInstructionTest, InstructionInvertsCarryFlag)
     mmu.write(cpu.pc, standardInstructions::CCF);
     ticks = cpu.fetchDecodeAndExecute();
     ASSERT_EQ(cpu.getFlag(), 0x00);
+}
+
+TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterTogether)
+{
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_B, cpu.a, cpu.b);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_C, cpu.a, cpu.c);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_D, cpu.a, cpu.d);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_E, cpu.a, cpu.e);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_H, cpu.a, cpu.h);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_L, cpu.a, cpu.l);
+
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, true, false);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, true);
 }

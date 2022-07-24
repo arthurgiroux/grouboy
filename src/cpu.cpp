@@ -516,14 +516,14 @@ void CPU::ADD_XY_Z(byte& X, byte& Y, byte Z)
 	lastInstructionTicks = 2;
 }
 
-void CPU::ADD_X_Y(byte& X, byte Y)
+void CPU::add8BitsValueTo8BitsRegister(byte& reg, byte value)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
-	byte value = X;
-	X += Y;
-	setCarryFlag(value > X);
-	setHalfCarryFlag((value <= 0x0F) && (X > 0x0F));
-	changeZeroValueFlag(X);
+	uint16_t result = reg + value;
+	setCarryFlag(result > 0xFF);
+	setHalfCarryFlag(reg <= 0x0F && result > 0x0F);
+	reg = static_cast<byte>(result);
+	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
@@ -540,7 +540,7 @@ void CPU::ADD_SP_X(sbyte X)
 
 void CPU::ADD_X_N(byte& X)
 {
-	ADD_X_Y(X, mmu.read(pc));
+	add8BitsValueTo8BitsRegister(X, mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
@@ -567,7 +567,7 @@ void CPU::ADC_X_N(byte X)
 
 void CPU::ADD_X_YZm(byte& X, byte Y, byte Z)
 {
-	ADD_X_Y(X, mmu.read((Y << 8) | Z));
+	add8BitsValueTo8BitsRegister(X, mmu.read((Y << 8) | Z));
 	lastInstructionTicks = 2;
 }
 
@@ -1454,27 +1454,27 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case ADD_A_B:
-		ADD_X_Y(a, b);
+		add8BitsValueTo8BitsRegister(a, b);
 		break;
 
 	case ADD_A_C:
-		ADD_X_Y(a, c);
+		add8BitsValueTo8BitsRegister(a, c);
 		break;
 
 	case ADD_A_D:
-		ADD_X_Y(a, d);
+		add8BitsValueTo8BitsRegister(a, d);
 		break;
 
 	case ADD_A_E:
-		ADD_X_Y(a, e);
+		add8BitsValueTo8BitsRegister(a, e);
 		break;
 
 	case ADD_A_H:
-		ADD_X_Y(a, h);
+		add8BitsValueTo8BitsRegister(a, h);
 		break;
 
 	case ADD_A_L:
-		ADD_X_Y(a, l);
+		add8BitsValueTo8BitsRegister(a, l);
 		break;
 
 	case ADD_A_HLm:
@@ -1482,7 +1482,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case ADD_A_A:
-		ADD_X_Y(a, a);
+		add8BitsValueTo8BitsRegister(a, a);
 		break;
 
 	case ADC_A_B:
