@@ -620,21 +620,28 @@ void CPU::subValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byt
 	lastInstructionTicks = 2;
 }
 
-void CPU::AND_X(byte X)
+void CPU::logicalAndBetweenAccumulatorAnd8BitsRegister(byte value)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::HALF_CARRY);
+	setFlag(CpuFlags::HALF_CARRY);
 	unsetFlag(CpuFlags::CARRY);
-	a &= X;
+	a &= value;
 	changeZeroValueFlag(a);
 	lastInstructionTicks = 1;
 }
 
-void CPU::AND_XYm(byte X, byte Y)
+void CPU::logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-	AND_X(mmu.read((X << 8) | Y));
+    logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
 	lastInstructionTicks = 2;
 }
+
+void CPU::logicalAndBetweenAccumulatorAndImmediateValue()
+{
+    logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
+    lastInstructionTicks = 2;
+}
+
 
 void CPU::XOR_X(byte X)
 {
@@ -671,12 +678,6 @@ void CPU::OR_XYm(byte X, byte Y)
 void CPU::OR_N()
 {
 	OR_X(mmu.read(pc));
-	lastInstructionTicks = 2;
-}
-
-void CPU::AND_N()
-{
-	AND_X(mmu.read(pc));
 	lastInstructionTicks = 2;
 }
 
@@ -1583,35 +1584,35 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case AND_B:
-		AND_X(b);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(b);
 		break;
 
 	case AND_C:
-		AND_X(c);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(c);
 		break;
 
 	case AND_D:
-		AND_X(d);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(d);
 		break;
 
 	case AND_E:
-		AND_X(e);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(e);
 		break;
 
 	case AND_H:
-		AND_X(h);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(h);
 		break;
 
 	case AND_L:
-		AND_X(l);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(l);
 		break;
 
 	case AND_HLm:
-		AND_XYm(h, l);
+        logicalAndBetweenAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case AND_A:
-		AND_X(a);
+		logicalAndBetweenAccumulatorAnd8BitsRegister(a);
 		break;
 
 	case XOR_B:
@@ -1860,7 +1861,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case AND_n:
-		AND_N();
+        logicalAndBetweenAccumulatorAndImmediateValue();
 		break;
 
 	case RST_20:

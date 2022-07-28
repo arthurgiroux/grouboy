@@ -864,11 +864,40 @@ class CPU
 	 */
 	void subValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-	// Perform the logical AND between the "a" register and X
-	void AND_X(byte X);
+    /**
+     * Logical "AND" between the accumulator and an 8 bits register.
+     * The result will be stored in the accumulator.
+     *
+     * @param reg      the register to use for the second operand
+     * @opcodes:
+     *     0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA7
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+    void logicalAndBetweenAccumulatorAnd8BitsRegister(byte value);
 
-	// Perform the logical AND between the "a" register and value pointed by XY
-	void AND_XYm(byte X, byte Y);
+    /**
+     * Logical "AND" between the accumulator and an immediate value.
+     * The result will be stored in the accumulator.
+     *
+     * @opcodes:
+     *     0xEE
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void logicalAndBetweenAccumulatorAndImmediateValue();
+
+    /**
+     * Logical "AND" between the accumulator and a value in memory.
+     *
+     * @param addrMsb   the msb part of the address where the second operand is stored
+     * @param addrLsb   the Lsb part of the address where the second operand is stored
+     * @opcodes:
+     *     0xA6
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
 	// Perform the logical XOR between the "a" register and X
 	void XOR_X(byte X);
@@ -884,9 +913,6 @@ class CPU
 
 	// Perform the logical OR between the "a" register and value pointed by pc
 	void OR_N();
-
-	// Perform the logical AND between the "a" register and value pointed by pc
-	void AND_N();
 
 	// Compare the value of the register "a" and the value X
 	// If a == X then flag zero is set
