@@ -1513,20 +1513,20 @@ TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterAndCarryToAnother)
 	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_H, cpu.a, cpu.h);
 	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_L, cpu.a, cpu.l);
 
-	//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
-	//	                                    false);
-	//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x01, true, false,
-	//	                                    false);
-	//
-	//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true,
-	//	                                    false);
-	//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x10, true, true,
-	//	                                    false);
-	//
-	//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false,
-	//	                                    true);
-	//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFF, true, false,
-	//	                                    true);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
+                                        false);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x01, true, false,
+                                        false);
+
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true,
+                                        false);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1F, true, true,
+                                        false);
+
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false,
+                                        true);
+    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFF, true, false,
+                                        true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAddValueFromMemoryAndCarryToRegister)
