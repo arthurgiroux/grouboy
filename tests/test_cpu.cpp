@@ -577,224 +577,244 @@ class CpuInstructionTest : public ::testing::Test
 		ASSERT_EQ(cpu.getFlag(), flag);
 	}
 
-	void testLoadValueToMemoryAndIncreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg) {
-        cpu.pc = 0x00;
-        uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
-        uint16_t expected_inc_addr = addr + 1;
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.getFlag(), 0x00);
-        ASSERT_EQ(cpu.pc,  1);
-        ASSERT_EQ(mmu.read(addr), valueReg);
-        ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
-        ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
+	void testLoadValueToMemoryAndIncreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg)
+	{
+		cpu.pc = 0x00;
+		uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
+		uint16_t expected_inc_addr = addr + 1;
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.getFlag(), 0x00);
+		ASSERT_EQ(cpu.pc, 1);
+		ASSERT_EQ(mmu.read(addr), valueReg);
+		ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
+		ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
 	}
 
-    void testLoadValueToMemoryAndDecreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg) {
-        cpu.pc = 0x00;
-        uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
-        uint16_t expected_inc_addr = addr - 1;
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.getFlag(), 0x00);
-        ASSERT_EQ(cpu.pc,  1);
-        ASSERT_EQ(mmu.read(addr), valueReg);
-        ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
-        ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
-    }
+	void testLoadValueToMemoryAndDecreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg)
+	{
+		cpu.pc = 0x00;
+		uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
+		uint16_t expected_inc_addr = addr - 1;
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.getFlag(), 0x00);
+		ASSERT_EQ(cpu.pc, 1);
+		ASSERT_EQ(mmu.read(addr), valueReg);
+		ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
+		ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
+	}
 
-    void testLoadValueFromMemoryAndIncreaseAddr(byte instruction, byte& valueReg, byte& regAddrMsb, byte& regAddrLsb, byte value) {
-        cpu.pc = 0x00;
-        uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
-        uint16_t expected_inc_addr = addr + 1;
+	void testLoadValueFromMemoryAndIncreaseAddr(byte instruction, byte& valueReg, byte& regAddrMsb, byte& regAddrLsb,
+	                                            byte value)
+	{
+		cpu.pc = 0x00;
+		uint16_t addr = (regAddrMsb << 8) | regAddrLsb;
+		uint16_t expected_inc_addr = addr + 1;
 		mmu.write(addr, value);
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.getFlag(), 0x00);
-        ASSERT_EQ(cpu.pc,  1);
-        ASSERT_EQ(valueReg, value);
-        ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
-        ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
-    }
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.getFlag(), 0x00);
+		ASSERT_EQ(cpu.pc, 1);
+		ASSERT_EQ(valueReg, value);
+		ASSERT_EQ(expected_inc_addr >> 8, regAddrMsb);
+		ASSERT_EQ(expected_inc_addr & 0xFF, regAddrLsb);
+	}
 
-	void testDecimalAdjustAccumulator(byte instruction, bool carryStateBeforeExecution, byte registerValue, bool halfCarryStateBeforeExecution,
-	                       byte expectedRegisterValue, bool carryStateAfterExecution) {
-        cpu.pc = 0x00;
+	void testDecimalAdjustAccumulator(byte instruction, bool carryStateBeforeExecution, byte registerValue,
+	                                  bool halfCarryStateBeforeExecution, byte expectedRegisterValue,
+	                                  bool carryStateAfterExecution)
+	{
+		cpu.pc = 0x00;
 		cpu.a = registerValue;
 		cpu.setCarryFlag(carryStateBeforeExecution);
 		cpu.setHalfCarryFlag(halfCarryStateBeforeExecution);
 
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 1);
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), cpu.a == 0);
-        ASSERT_EQ(cpu.pc,  1);
-        ASSERT_EQ(cpu.a, expectedRegisterValue);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), carryStateAfterExecution);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), false);
-	}
-
-	void testComplementRegister(byte instruction, byte& reg, byte value, byte expectedValue) {
-        cpu.pc = 0x00;
-        reg = value;
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 1);
-        ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
-        ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
-		ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 1);
-	}
-
-    void testLoadValueIntoRegister(byte instruction, byte& regDst, byte& regSrc, byte value) {
-        cpu.pc = 0x00;
-        regSrc = value;
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 1);
-        ASSERT_EQ(cpu.getFlag(), 0);
-        ASSERT_EQ(regDst, value);
-        ASSERT_EQ(cpu.pc, 1);
-    }
-
-	void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue,
-	                                         byte& regAdd, byte addValue, byte expectedResult,
-	                                         bool expectedHalfCarryFlag, bool expectedCarryFlag, bool expectedZeroFlag) {
-        cpu.pc = 0x00;
-		reg = startValue;
-        regAdd = addValue;
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-		uint8_t expectedValue = startValue + addValue;
-        ASSERT_EQ(ticks, 1);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
-        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedValue == 0);
-        ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 1);
-	}
-
-    void testAddValueFromMemoryToRegister(byte instruction, byte& reg, byte startValue,
-                                             byte regAddrMsb, byte regAddrLsb, byte addValue, byte expectedResult,
-                                             bool expectedHalfCarryFlag, bool expectedCarryFlag, bool expectedZeroFlag) {
-        cpu.pc = 0x00;
-        reg = startValue;
-		mmu.write(createAddrFromHighAndLowBytes(regAddrMsb, regAddrLsb), addValue);
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        uint8_t expectedValue = startValue + addValue;
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
-        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedValue == 0);
-        ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 1);
-    }
-
-    void testAddImmediateValueToRegister(byte instruction, byte& reg, byte startValue, byte addValue, byte expectedResult,
-                                          bool expectedHalfCarryFlag, bool expectedCarryFlag, bool expectedZeroFlag) {
-        cpu.pc = 0x00;
-        reg = startValue;
 		mmu.write(cpu.pc, instruction);
-		mmu.write(cpu.pc + 1, addValue);
-        int ticks = cpu.fetchDecodeAndExecute();
-        uint8_t expectedValue = startValue + addValue;
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
-        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedValue == 0);
-        ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 2);
-    }
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 1);
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), cpu.a == 0);
+		ASSERT_EQ(cpu.pc, 1);
+		ASSERT_EQ(cpu.a, expectedRegisterValue);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), carryStateAfterExecution);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), false);
+	}
 
-    void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte& regAdd) {
-        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x00, 0x00, false, false, true);
-        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x05, 0x05, false, false, false);
-        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, regAdd, 0x05, 0x15, true, false, false);
-        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, regAdd, 0x05, 0x05, false, true, false);
-        testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, regAdd, 0x01, 0x00, false, true, true);
-    }
+	void testComplementRegister(byte instruction, byte& reg, byte value, byte expectedValue)
+	{
+		cpu.pc = 0x00;
+		reg = value;
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 1);
+		ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
+		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_EQ(reg, expectedValue);
+		ASSERT_EQ(cpu.pc, 1);
+	}
 
-    void testAdd8BitsRegisterAndCarryTo8BitsRegister(byte instruction, byte& reg, byte startValue,
-                                             byte& regAdd, byte addValue, byte expectedResult, bool carryFlag,
-                                             bool expectedHalfCarryFlag, bool expectedCarryFlag, bool expectedZeroFlag) {
-        cpu.pc = 0x00;
-        reg = startValue;
-        regAdd = addValue;
+	void testLoadValueIntoRegister(byte instruction, byte& regDst, byte& regSrc, byte value)
+	{
+		cpu.pc = 0x00;
+		regSrc = value;
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 1);
+		ASSERT_EQ(cpu.getFlag(), 0);
+		ASSERT_EQ(regDst, value);
+		ASSERT_EQ(cpu.pc, 1);
+	}
+
+	void testArithmeticOp8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue, byte& regOther,
+	                                                  byte otherValue, byte expectedResult, bool carryFlag,
+	                                                  bool expectedHalfCarryFlag, bool expectedCarryFlag,
+	                                                  bool expectedSubstractionFlag)
+	{
+		cpu.pc = 0x00;
+		reg = startValue;
+		regOther = otherValue;
 		cpu.setCarryFlag(carryFlag);
-        mmu.write(cpu.pc, instruction);
-        int ticks = cpu.fetchDecodeAndExecute();
-        uint8_t expectedValue = startValue + addValue;
-		if (carryFlag) {
-			expectedValue++;
-		}
-        ASSERT_EQ(ticks, 1);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
-        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedValue == 0);
-        ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 1);
-    }
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 1);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::SUBSTRACTION), expectedSubstractionFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedResult == 0);
+		ASSERT_EQ(reg, expectedResult);
+		ASSERT_EQ(cpu.pc, 1);
+	}
 
-    void testAddValueFromMemoryAndCarryToRegister(byte instruction, byte& reg, byte startValue,
-                                          byte regAddrMsb, byte regAddrLsb, byte addValue, byte expectedResult, bool carryFlag,
-                                          bool expectedHalfCarryFlag, bool expectedCarryFlag, bool expectedZeroFlag) {
-        cpu.pc = 0x00;
-        reg = startValue;
+	void testArithmeticOpFromMemoryToRegister(byte instruction, byte& reg, byte startValue, byte regAddrMsb,
+	                                          byte regAddrLsb, byte value, byte expectedResult, bool carryFlag,
+	                                          bool expectedHalfCarryFlag, bool expectedCarryFlag,
+	                                          bool expectedSubstractionFlag)
+	{
+		cpu.pc = 0x00;
+		reg = startValue;
+		mmu.write(createAddrFromHighAndLowBytes(regAddrMsb, regAddrLsb), value);
+		mmu.write(cpu.pc, instruction);
         cpu.setCarryFlag(carryFlag);
-        mmu.write(createAddrFromHighAndLowBytes(regAddrMsb, regAddrLsb), addValue);
-        mmu.write(cpu.pc, instruction);
         int ticks = cpu.fetchDecodeAndExecute();
-        uint8_t expectedValue = startValue + addValue;
-        if (carryFlag) {
-            expectedValue++;
-        }
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
-        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedValue == 0);
-        ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 1);
-    }
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::SUBSTRACTION), expectedSubstractionFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedResult == 0);
+		ASSERT_EQ(reg, expectedResult);
+		ASSERT_EQ(cpu.pc, 1);
+	}
 
-    void testAddImmediateValueAndCarryToRegister(byte instruction, byte& reg, byte startValue, byte addValue, byte expectedResult,
-	                                                 bool carryFlag, bool expectedHalfCarryFlag, bool expectedCarryFlag, bool expectedZeroFlag) {
-        cpu.pc = 0x00;
-        reg = startValue;
+	void testArithmeticOpImmediateValueToRegister(byte instruction, byte& reg, byte startValue, byte value,
+	                                              byte expectedResult, bool carryFlag, bool expectedHalfCarryFlag,
+	                                              bool expectedCarryFlag, bool expectedSubstractionFlag)
+	{
+		cpu.pc = 0x00;
+		reg = startValue;
+		mmu.write(cpu.pc, instruction);
+		mmu.write(cpu.pc + 1, value);
         cpu.setCarryFlag(carryFlag);
-        mmu.write(cpu.pc, instruction);
-        mmu.write(cpu.pc + 1, addValue);
         int ticks = cpu.fetchDecodeAndExecute();
-        uint8_t expectedValue = startValue + addValue;
-        if (carryFlag) {
-            expectedValue++;
-        }
-        ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
-        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedValue == 0);
-        ASSERT_EQ(reg, expectedValue);
-        ASSERT_EQ(cpu.pc, 2);
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::SUBSTRACTION), expectedSubstractionFlag);
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedResult == 0);
+		ASSERT_EQ(reg, expectedResult);
+		ASSERT_EQ(cpu.pc, 2);
+	}
+
+	void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue, byte& otherReg, byte value,
+	                                         byte expectedResult, bool carryFlag, bool expectedHalfCarryFlag,
+	                                         bool expectedCarryFlag)
+	{
+		testArithmeticOp8BitsRegisterTo8BitsRegister(instruction, reg, startValue, otherReg, value, expectedResult,
+		                                             carryFlag, expectedHalfCarryFlag, expectedCarryFlag, false);
+	}
+
+	void testAddValueFromMemoryToRegister(byte instruction, byte& reg, byte startValue, byte regAddrMsb,
+	                                      byte regAddrLsb, byte value, byte expectedResult, bool carryFlag,
+	                                      bool expectedHalfCarryFlag, bool expectedCarryFlag)
+	{
+		testArithmeticOpFromMemoryToRegister(instruction, reg, startValue, regAddrMsb, regAddrLsb, value,
+		                                     expectedResult, carryFlag, expectedHalfCarryFlag, expectedCarryFlag, false);
+	}
+
+	void testAddImmediateValueToRegister(byte instruction, byte& reg, byte startValue, byte value,
+	                                     byte expectedResult, bool carryFlag, bool expectedHalfCarryFlag,
+	                                     bool expectedCarryFlag)
+	{
+		testArithmeticOpImmediateValueToRegister(instruction, reg, startValue, value, expectedResult, carryFlag,
+		                                         expectedHalfCarryFlag, expectedCarryFlag, false);
+	}
+
+	void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
+	{
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x05, false, false, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x05, 0x14, false, true, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0x04, false, false, true);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x01, 0x00, false, false, true);
+	}
+
+	void testAdd8BitsRegisterAndCarryTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
+	{
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x01, true, false, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x05, false, false, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x06, true, false, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x00, 0x10, true, true, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x05, 0x14, false, true, false);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0x04, false, false, true);
+		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0x00, true, false, true);
+	}
+
+    void testSub8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue, byte& otherReg, byte value,
+                                             byte expectedResult, bool carryFlag, bool expectedHalfCarryFlag,
+                                             bool expectedCarryFlag)
+    {
+        testArithmeticOp8BitsRegisterTo8BitsRegister(instruction, reg, startValue, otherReg, value, expectedResult,
+                                                     carryFlag, expectedHalfCarryFlag, expectedCarryFlag, true);
     }
 
-    void testAdd8BitsRegisterAndCarryTo8BitsRegister(byte instruction, byte& reg, byte& regAdd) {
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x00, 0x00, false, false, false, true);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x00, 0x01, true, false, false, false);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x05, 0x05, false, false, false, false);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0x00, regAdd, 0x05, 0x06, true, false, false, false);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0x0F, regAdd, 0x00, 0x10, true, true, false, false);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0x0F, regAdd, 0x05, 0x15, false, true, false, false);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0xFF, regAdd, 0x05, 0x05, false, false, true, false);
-        testAdd8BitsRegisterAndCarryTo8BitsRegister(instruction, reg, 0xFF, regAdd, 0x00, 0x00, true, false, true, true);
+    void testSubValueFromMemoryToRegister(byte instruction, byte& reg, byte startValue, byte regAddrMsb,
+                                          byte regAddrLsb, byte value, byte expectedResult, bool carryFlag,
+                                          bool expectedHalfCarryFlag, bool expectedCarryFlag)
+    {
+        testArithmeticOpFromMemoryToRegister(instruction, reg, startValue, regAddrMsb, regAddrLsb, value,
+                                             expectedResult, carryFlag, expectedHalfCarryFlag, expectedCarryFlag, true);
+    }
+
+    void testSubImmediateValueToRegister(byte instruction, byte& reg, byte startValue, byte value,
+                                         byte expectedResult, bool carryFlag, bool expectedHalfCarryFlag,
+                                         bool expectedCarryFlag)
+    {
+        testArithmeticOpImmediateValueToRegister(instruction, reg, startValue, value, expectedResult, carryFlag,
+                                                 expectedHalfCarryFlag, expectedCarryFlag, true);
+    }
+
+    void testSub8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
+    {
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFB, false, false, true);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x05, 0x0B, false, true, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x01, 0xFF, false, false, true);
+    }
+
+    void testSub8BitsRegisterAndCarryTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
+    {
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0xFF, true, false, true);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFB, false, false, true);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFA, true, false, true);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x00, 0x0F, true, true, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x05, 0x0B, false, true, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
+        testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0xFE, true, false, false);
     }
 };
 
@@ -1185,291 +1205,376 @@ TEST_F(CpuInstructionTest, InstructionLoadValueToMemoryAndIncreaseAddr)
 	cpu.a = 42;
 	cpu.h = 0x00;
 	cpu.l = 0x01;
-    testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
-    cpu.a = 200;
-    cpu.h = 0xFF;
-    cpu.l = 0x00;
-    testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
-    cpu.a = 250;
-    cpu.h = 0x00;
-    cpu.l = 0xFF;
-    testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
+	testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
+	cpu.a = 200;
+	cpu.h = 0xFF;
+	cpu.l = 0x00;
+	testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
+	cpu.a = 250;
+	cpu.h = 0x00;
+	cpu.l = 0xFF;
+	testLoadValueToMemoryAndIncreaseAddr(standardInstructions::LD_HLm_I_A, cpu.h, cpu.l, cpu.a);
 }
 
 TEST_F(CpuInstructionTest, InstructionDecimalAdjustAccumulator)
 {
 	// Taken from GameBoy programmer manual
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, false, 0x00, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x09, false, 0x09, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, false, 0x90, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x99, false, 0x99, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, false, 0x00, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x09, false, 0x09, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, false, 0x90, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x99, false, 0x99, false);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0A, false, 0x0A + 0x06, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0F, false, 0x0F + 0x06, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9A, false, 0x9A + 0x06, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0A, false, 0x0A + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0F, false, 0x0F + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9A, false, 0x9A + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, true, 0x00 + 0x06, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, true, 0x90 + 0x06, false);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x93, true, 0x93 + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, true, 0x00 + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, true, 0x90 + 0x06, false);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x93, true, 0x93 + 0x06, false);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, false, static_cast<byte>(0xA0 + 0x60), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA9, false, static_cast<byte>(0xA9 + 0x60), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, false, static_cast<byte>(0xF0 + 0x60), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF9, false, static_cast<byte>(0xF9 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, false, static_cast<byte>(0xA0 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA9, false, static_cast<byte>(0xA9 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, false, static_cast<byte>(0xF0 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF9, false, static_cast<byte>(0xF9 + 0x60), true);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAA, false, static_cast<byte>(0xAA + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAF, false, static_cast<byte>(0xAF + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFA, false, static_cast<byte>(0xFA + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFF, false, static_cast<byte>(0xFF + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAA, false, static_cast<byte>(0xAA + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAF, false, static_cast<byte>(0xAF + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFA, false, static_cast<byte>(0xFA + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFF, false, static_cast<byte>(0xFF + 0x66), true);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, true, static_cast<byte>(0xA0 + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA3, true, static_cast<byte>(0xA3 + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, true, static_cast<byte>(0xF0 + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF3, true, static_cast<byte>(0xF3 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, true, static_cast<byte>(0xA0 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA3, true, static_cast<byte>(0xA3 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, true, static_cast<byte>(0xF0 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF3, true, static_cast<byte>(0xF3 + 0x66), true);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, false, static_cast<byte>(0x00 + 0x60), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x02, false, static_cast<byte>(0x02 + 0x60), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, false, static_cast<byte>(0x30 + 0x60), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x39, false, static_cast<byte>(0x39 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, false, static_cast<byte>(0x00 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x02, false, static_cast<byte>(0x02 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, false, static_cast<byte>(0x30 + 0x60), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x39, false, static_cast<byte>(0x39 + 0x60), true);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0A, false, static_cast<byte>(0x0A + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0F, false, static_cast<byte>(0x0F + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2A, false, static_cast<byte>(0x2A + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2F, false, static_cast<byte>(0x2F + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0A, false, static_cast<byte>(0x0A + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0F, false, static_cast<byte>(0x0F + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2A, false, static_cast<byte>(0x2A + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2F, false, static_cast<byte>(0x2F + 0x66), true);
 
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, true, static_cast<byte>(0x00 + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x03, true, static_cast<byte>(0x03 + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, true, static_cast<byte>(0x30 + 0x66), true);
-    testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x33, true, static_cast<byte>(0x33 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, true, static_cast<byte>(0x00 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x03, true, static_cast<byte>(0x03 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, true, static_cast<byte>(0x30 + 0x66), true);
+	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x33, true, static_cast<byte>(0x33 + 0x66), true);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoadValueFromMemoryAndIncreaseAddr)
 {
-    cpu.h = 0x00;
-    cpu.l = 0x01;
-    testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a, cpu.h, cpu.l, 42);
-    cpu.a = 200;
-    cpu.h = 0xFF;
-    cpu.l = 0x00;
-    testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I,  cpu.a,cpu.h, cpu.l, 200);
-    cpu.a = 250;
-    cpu.h = 0x00;
-    cpu.l = 0xFF;
-    testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a,cpu.h, cpu.l, 250);
+	cpu.h = 0x00;
+	cpu.l = 0x01;
+	testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a, cpu.h, cpu.l, 42);
+	cpu.a = 200;
+	cpu.h = 0xFF;
+	cpu.l = 0x00;
+	testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a, cpu.h, cpu.l, 200);
+	cpu.a = 250;
+	cpu.h = 0x00;
+	cpu.l = 0xFF;
+	testLoadValueFromMemoryAndIncreaseAddr(standardInstructions::LD_A_HLm_I, cpu.a, cpu.h, cpu.l, 250);
 }
 
 TEST_F(CpuInstructionTest, InstructionComplementRegister)
 {
-    testComplementRegister(standardInstructions::CPL, cpu.a, 0x00, 0xFF);
-    testComplementRegister(standardInstructions::CPL, cpu.a, 0xFF, 0x00);
-    testComplementRegister(standardInstructions::CPL, cpu.a, 0x01, 0xFE);
-    testComplementRegister(standardInstructions::CPL, cpu.a, 0x10, 0xEF);
-    testComplementRegister(standardInstructions::CPL, cpu.a, 0x55, 0xAA);
-    testComplementRegister(standardInstructions::CPL, cpu.a, 0xAA, 0x55);
+	testComplementRegister(standardInstructions::CPL, cpu.a, 0x00, 0xFF);
+	testComplementRegister(standardInstructions::CPL, cpu.a, 0xFF, 0x00);
+	testComplementRegister(standardInstructions::CPL, cpu.a, 0x01, 0xFE);
+	testComplementRegister(standardInstructions::CPL, cpu.a, 0x10, 0xEF);
+	testComplementRegister(standardInstructions::CPL, cpu.a, 0x55, 0xAA);
+	testComplementRegister(standardInstructions::CPL, cpu.a, 0xAA, 0x55);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoad16BitsImmediateValueInRegister)
 {
-    cpu.pc = 0x00;
-    uint16_t value = 0x1234;
-    mmu.write(cpu.pc, standardInstructions::LD_SP_nn);
+	cpu.pc = 0x00;
+	uint16_t value = 0x1234;
+	mmu.write(cpu.pc, standardInstructions::LD_SP_nn);
 	mmu.writeWord(cpu.pc + 1, value);
-    int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 3);
-    ASSERT_EQ(cpu.getFlag(), 0x00);
-    ASSERT_EQ(cpu.pc,  3);
-    ASSERT_EQ(cpu.sp, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.pc, 3);
+	ASSERT_EQ(cpu.sp, value);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoad8BitsImmediateValueInMemory)
 {
-    cpu.pc = 0x00;
-    byte value = 0x12;
+	cpu.pc = 0x00;
+	byte value = 0x12;
 	uint16_t addr = 0x3456;
 	cpu.h = (addr >> 8);
 	cpu.l = (addr & 0xFF);
-    mmu.write(cpu.pc, standardInstructions::LD_HLm_n);
-    mmu.writeWord(cpu.pc + 1, value);
-    int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 3);
-    ASSERT_EQ(cpu.getFlag(), 0x00);
-    ASSERT_EQ(cpu.pc,  2);
-    ASSERT_EQ(mmu.read(addr), value);
+	mmu.write(cpu.pc, standardInstructions::LD_HLm_n);
+	mmu.writeWord(cpu.pc + 1, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.pc, 2);
+	ASSERT_EQ(mmu.read(addr), value);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoadValueIntoRegister)
 {
-    testLoadValueIntoRegister(standardInstructions::LD_B_B, cpu.b, cpu.b, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_B_C, cpu.b, cpu.c, 0x34);
-    testLoadValueIntoRegister(standardInstructions::LD_B_D, cpu.b, cpu.d, 0x56);
-    testLoadValueIntoRegister(standardInstructions::LD_B_E, cpu.b, cpu.e, 0x78);
-    testLoadValueIntoRegister(standardInstructions::LD_B_H, cpu.b, cpu.h, 0x9A);
-    testLoadValueIntoRegister(standardInstructions::LD_B_L, cpu.b, cpu.l, 0xBC);
-    testLoadValueIntoRegister(standardInstructions::LD_B_A, cpu.b, cpu.a, 0xDE);
-    testLoadValueIntoRegister(standardInstructions::LD_C_B, cpu.c, cpu.b, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_C_C, cpu.c, cpu.c, 0x23);
-    testLoadValueIntoRegister(standardInstructions::LD_C_D, cpu.c, cpu.d, 0x45);
-    testLoadValueIntoRegister(standardInstructions::LD_C_E, cpu.c, cpu.e, 0x67);
-    testLoadValueIntoRegister(standardInstructions::LD_C_H, cpu.c, cpu.h, 0x89);
-    testLoadValueIntoRegister(standardInstructions::LD_C_L, cpu.c, cpu.l, 0xAB);
-    testLoadValueIntoRegister(standardInstructions::LD_C_A, cpu.c, cpu.a, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_B_B, cpu.b, cpu.b, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_B_C, cpu.b, cpu.c, 0x34);
+	testLoadValueIntoRegister(standardInstructions::LD_B_D, cpu.b, cpu.d, 0x56);
+	testLoadValueIntoRegister(standardInstructions::LD_B_E, cpu.b, cpu.e, 0x78);
+	testLoadValueIntoRegister(standardInstructions::LD_B_H, cpu.b, cpu.h, 0x9A);
+	testLoadValueIntoRegister(standardInstructions::LD_B_L, cpu.b, cpu.l, 0xBC);
+	testLoadValueIntoRegister(standardInstructions::LD_B_A, cpu.b, cpu.a, 0xDE);
+	testLoadValueIntoRegister(standardInstructions::LD_C_B, cpu.c, cpu.b, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_C_C, cpu.c, cpu.c, 0x23);
+	testLoadValueIntoRegister(standardInstructions::LD_C_D, cpu.c, cpu.d, 0x45);
+	testLoadValueIntoRegister(standardInstructions::LD_C_E, cpu.c, cpu.e, 0x67);
+	testLoadValueIntoRegister(standardInstructions::LD_C_H, cpu.c, cpu.h, 0x89);
+	testLoadValueIntoRegister(standardInstructions::LD_C_L, cpu.c, cpu.l, 0xAB);
+	testLoadValueIntoRegister(standardInstructions::LD_C_A, cpu.c, cpu.a, 0x12);
 
-    testLoadValueIntoRegister(standardInstructions::LD_D_B, cpu.d, cpu.b, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_D_C, cpu.d, cpu.c, 0x23);
-    testLoadValueIntoRegister(standardInstructions::LD_D_D, cpu.d, cpu.d, 0x45);
-    testLoadValueIntoRegister(standardInstructions::LD_D_E, cpu.d, cpu.e, 0x67);
-    testLoadValueIntoRegister(standardInstructions::LD_D_H, cpu.d, cpu.h, 0x89);
-    testLoadValueIntoRegister(standardInstructions::LD_D_L, cpu.d, cpu.l, 0xAB);
-    testLoadValueIntoRegister(standardInstructions::LD_D_A, cpu.d, cpu.a, 0xCD);
-    testLoadValueIntoRegister(standardInstructions::LD_E_B, cpu.e, cpu.b, 0xEF);
-    testLoadValueIntoRegister(standardInstructions::LD_E_C, cpu.e, cpu.c, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_E_D, cpu.e, cpu.d, 0x34);
-    testLoadValueIntoRegister(standardInstructions::LD_E_E, cpu.e, cpu.e, 0x56);
-    testLoadValueIntoRegister(standardInstructions::LD_E_H, cpu.e, cpu.h, 0x78);
-    testLoadValueIntoRegister(standardInstructions::LD_E_L, cpu.e, cpu.l, 0x9A);
-    testLoadValueIntoRegister(standardInstructions::LD_E_A, cpu.e, cpu.a, 0xBC);
+	testLoadValueIntoRegister(standardInstructions::LD_D_B, cpu.d, cpu.b, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_D_C, cpu.d, cpu.c, 0x23);
+	testLoadValueIntoRegister(standardInstructions::LD_D_D, cpu.d, cpu.d, 0x45);
+	testLoadValueIntoRegister(standardInstructions::LD_D_E, cpu.d, cpu.e, 0x67);
+	testLoadValueIntoRegister(standardInstructions::LD_D_H, cpu.d, cpu.h, 0x89);
+	testLoadValueIntoRegister(standardInstructions::LD_D_L, cpu.d, cpu.l, 0xAB);
+	testLoadValueIntoRegister(standardInstructions::LD_D_A, cpu.d, cpu.a, 0xCD);
+	testLoadValueIntoRegister(standardInstructions::LD_E_B, cpu.e, cpu.b, 0xEF);
+	testLoadValueIntoRegister(standardInstructions::LD_E_C, cpu.e, cpu.c, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_E_D, cpu.e, cpu.d, 0x34);
+	testLoadValueIntoRegister(standardInstructions::LD_E_E, cpu.e, cpu.e, 0x56);
+	testLoadValueIntoRegister(standardInstructions::LD_E_H, cpu.e, cpu.h, 0x78);
+	testLoadValueIntoRegister(standardInstructions::LD_E_L, cpu.e, cpu.l, 0x9A);
+	testLoadValueIntoRegister(standardInstructions::LD_E_A, cpu.e, cpu.a, 0xBC);
 
-    testLoadValueIntoRegister(standardInstructions::LD_H_B, cpu.h, cpu.b, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_H_C, cpu.h, cpu.c, 0x23);
-    testLoadValueIntoRegister(standardInstructions::LD_H_D, cpu.h, cpu.d, 0x34);
-    testLoadValueIntoRegister(standardInstructions::LD_H_E, cpu.h, cpu.e, 0x56);
-    testLoadValueIntoRegister(standardInstructions::LD_H_H, cpu.h, cpu.h, 0x78);
-    testLoadValueIntoRegister(standardInstructions::LD_H_L, cpu.h, cpu.l, 0x9A);
-    testLoadValueIntoRegister(standardInstructions::LD_H_A, cpu.h, cpu.a, 0xBC);
-    testLoadValueIntoRegister(standardInstructions::LD_L_B, cpu.l, cpu.b, 0xDE);
-    testLoadValueIntoRegister(standardInstructions::LD_L_C, cpu.l, cpu.c, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_L_D, cpu.l, cpu.d, 0x23);
-    testLoadValueIntoRegister(standardInstructions::LD_L_E, cpu.l, cpu.e, 0x45);
-    testLoadValueIntoRegister(standardInstructions::LD_L_H, cpu.l, cpu.h, 0x67);
-    testLoadValueIntoRegister(standardInstructions::LD_L_L, cpu.l, cpu.l, 0x89);
-    testLoadValueIntoRegister(standardInstructions::LD_L_A, cpu.l, cpu.a, 0xAB);
+	testLoadValueIntoRegister(standardInstructions::LD_H_B, cpu.h, cpu.b, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_H_C, cpu.h, cpu.c, 0x23);
+	testLoadValueIntoRegister(standardInstructions::LD_H_D, cpu.h, cpu.d, 0x34);
+	testLoadValueIntoRegister(standardInstructions::LD_H_E, cpu.h, cpu.e, 0x56);
+	testLoadValueIntoRegister(standardInstructions::LD_H_H, cpu.h, cpu.h, 0x78);
+	testLoadValueIntoRegister(standardInstructions::LD_H_L, cpu.h, cpu.l, 0x9A);
+	testLoadValueIntoRegister(standardInstructions::LD_H_A, cpu.h, cpu.a, 0xBC);
+	testLoadValueIntoRegister(standardInstructions::LD_L_B, cpu.l, cpu.b, 0xDE);
+	testLoadValueIntoRegister(standardInstructions::LD_L_C, cpu.l, cpu.c, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_L_D, cpu.l, cpu.d, 0x23);
+	testLoadValueIntoRegister(standardInstructions::LD_L_E, cpu.l, cpu.e, 0x45);
+	testLoadValueIntoRegister(standardInstructions::LD_L_H, cpu.l, cpu.h, 0x67);
+	testLoadValueIntoRegister(standardInstructions::LD_L_L, cpu.l, cpu.l, 0x89);
+	testLoadValueIntoRegister(standardInstructions::LD_L_A, cpu.l, cpu.a, 0xAB);
 
-    testLoadValueIntoRegister(standardInstructions::LD_A_B, cpu.a, cpu.b, 0x12);
-    testLoadValueIntoRegister(standardInstructions::LD_A_C, cpu.a, cpu.c, 0x34);
-    testLoadValueIntoRegister(standardInstructions::LD_A_D, cpu.a, cpu.d, 0x56);
-    testLoadValueIntoRegister(standardInstructions::LD_A_E, cpu.a, cpu.e, 0x78);
-    testLoadValueIntoRegister(standardInstructions::LD_A_H, cpu.a, cpu.h, 0x9A);
-    testLoadValueIntoRegister(standardInstructions::LD_A_L, cpu.a, cpu.l, 0xBC);
-    testLoadValueIntoRegister(standardInstructions::LD_A_A, cpu.a, cpu.a, 0xDE);
+	testLoadValueIntoRegister(standardInstructions::LD_A_B, cpu.a, cpu.b, 0x12);
+	testLoadValueIntoRegister(standardInstructions::LD_A_C, cpu.a, cpu.c, 0x34);
+	testLoadValueIntoRegister(standardInstructions::LD_A_D, cpu.a, cpu.d, 0x56);
+	testLoadValueIntoRegister(standardInstructions::LD_A_E, cpu.a, cpu.e, 0x78);
+	testLoadValueIntoRegister(standardInstructions::LD_A_H, cpu.a, cpu.h, 0x9A);
+	testLoadValueIntoRegister(standardInstructions::LD_A_L, cpu.a, cpu.l, 0xBC);
+	testLoadValueIntoRegister(standardInstructions::LD_A_A, cpu.a, cpu.a, 0xDE);
 }
 
 TEST_F(CpuInstructionTest, InstructionSetCarryFlag)
 {
-    cpu.pc = 0x00;
+	cpu.pc = 0x00;
 	cpu.resetFlags();
-    cpu.setFlag(CPU::HALF_CARRY);
+	cpu.setFlag(CPU::HALF_CARRY);
 	cpu.setFlag(CPU::SUBSTRACTION);
-    mmu.write(cpu.pc, standardInstructions::SCF);
-    int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 1);
-    ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
-    ASSERT_EQ(cpu.pc,  1);
+	mmu.write(cpu.pc, standardInstructions::SCF);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 1);
+	ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
+	ASSERT_EQ(cpu.pc, 1);
 }
 
 TEST_F(CpuInstructionTest, InstructionInvertsCarryFlag)
 {
-    cpu.pc = 0x00;
-    cpu.resetFlags();
-    cpu.setFlag(CPU::HALF_CARRY);
-    cpu.setFlag(CPU::SUBSTRACTION);
-    mmu.write(cpu.pc, standardInstructions::CCF);
-    int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 1);
-    ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
-    ASSERT_EQ(cpu.pc,  1);
-    mmu.write(cpu.pc, standardInstructions::CCF);
-    ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(cpu.getFlag(), 0x00);
+	cpu.pc = 0x00;
+	cpu.resetFlags();
+	cpu.setFlag(CPU::HALF_CARRY);
+	cpu.setFlag(CPU::SUBSTRACTION);
+	mmu.write(cpu.pc, standardInstructions::CCF);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 1);
+	ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
+	ASSERT_EQ(cpu.pc, 1);
+	mmu.write(cpu.pc, standardInstructions::CCF);
+	ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(cpu.getFlag(), 0x00);
 }
 
 TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterTogether)
 {
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_B, cpu.a, cpu.b);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_C, cpu.a, cpu.c);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_D, cpu.a, cpu.d);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_E, cpu.a, cpu.e);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_H, cpu.a, cpu.h);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_L, cpu.a, cpu.l);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_B, cpu.a, cpu.b);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_C, cpu.a, cpu.c);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_D, cpu.a, cpu.d);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_E, cpu.a, cpu.e);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_H, cpu.a, cpu.h);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_L, cpu.a, cpu.l);
 
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false, true);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, true, false, false);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, true, false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
+	                                    false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true,
+	                                    false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false,
+	                                    true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAddValueFromMemoryToRegister)
 {
 	cpu.h = 0x12;
 	cpu.l = 0x23;
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x00, false, false, true);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x05, 0x05, false, false, false);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0x0F, cpu.h, cpu.l, 0x05, 0x15, true, false, false);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x05, 0x05, false, true, false);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x01, 0x00, false, true, true);
+	testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x00, false,
+	                                 false, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x05, 0x05, false,
+	                                 false, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0x0F, cpu.h, cpu.l, 0x05, 0x14, false,
+	                                 true, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x05, 0x04, false,
+	                                 false, true);
+	testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x01, 0x00, false,
+	                                 false, true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAddImmediateValueToRegister)
 {
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0x00, 0x00, 0x00, false, false, true);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0x00, 0x05, 0x05, false, false, false);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0x0F, 0x05, 0x15, true, false, false);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0xFF, 0x05, 0x05, false, true, false);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0xFF, 0x01, 0x00, false, true, true);
+	testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0x00, 0x00, 0x00, false, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0x00, 0x05, 0x05, false, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0x0F, 0x05, 0x14, false, true, false);
+	testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0xFF, 0x05, 0x04, false, false, true);
+	testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.a, 0xFF, 0x01, 0x00, false, false, true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterAndCarryToAnother)
 {
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_B, cpu.a, cpu.b);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_C, cpu.a, cpu.c);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_D, cpu.a, cpu.d);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_E, cpu.a, cpu.e);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_H, cpu.a, cpu.h);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_L, cpu.a, cpu.l);
+	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_B, cpu.a, cpu.b);
+	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_C, cpu.a, cpu.c);
+	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_D, cpu.a, cpu.d);
+	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_E, cpu.a, cpu.e);
+	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_H, cpu.a, cpu.h);
+	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_L, cpu.a, cpu.l);
 
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false, false, true);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x01, true, false, false, true);
-
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true, false, false);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x10, true, true, false, false);
-
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false, true, false);
-    testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFF, true, false, true, false);
-
+//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
+//	                                    false);
+//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x01, true, false,
+//	                                    false);
+//
+//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true,
+//	                                    false);
+//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x10, true, true,
+//	                                    false);
+//
+//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false,
+//	                                    true);
+//	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFF, true, false,
+//	                                    true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAddValueFromMemoryAndCarryToRegister)
 {
-    cpu.h = 0x12;
-    cpu.l = 0x23;
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x00, false, false, false, true);
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x01, true, false, false, true);
+	cpu.h = 0x12;
+	cpu.l = 0x23;
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x00,
+	                                         false, false, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x01, true,
+	                                 false, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x05, 0x05,
+	                                         false, false, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x0F, cpu.h, cpu.l, 0x05, 0x14,
+	                                         false, true, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x0F, cpu.h, cpu.l, 0x05, 0x15,
+	                                         true, true, false);
 
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x05, 0x05, false, false, false, false);
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x0F, cpu.h, cpu.l, 0x05, 0x15, false, true, false, false);
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0x0F, cpu.h, cpu.l, 0x05, 0x16, true, true, false, false);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x05, 0x04,
+	                                         false, false, true);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x05, 0x05,
+	                                         true, false, true);
 
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x05, 0x05, false, false, true, false);
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x06, 0x06, true, false, true, false);
-
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x01, 0x00, false, false, true, true);
-    testAddValueFromMemoryAndCarryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x00, 0x01, true, false, true, true);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x01, 0x00,
+	                                         false, false, true);
+	testAddValueFromMemoryToRegister(standardInstructions::ADC_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x00, 0x00,
+	                                         true, false, true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAddImmediateValueAndCarryToRegister)
 {
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x00, 0x00, false, false, false, true);
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x00, 0x01, true, false, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x00, 0x00, false, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x00, 0x01, true, false, false);
 
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x05, 0x05, false, false, false, false);
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x05, 0x06, true, false, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x05, 0x05, false, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0x00, 0x05, 0x06, true, false, false);
 
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0x0F, 0x05, 0x15, false, true, false, false);
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0x0F, 0x05, 0x16, true, true, false, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0x0F, 0x05, 0x14, false, true, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0x0F, 0x05, 0x15, true, true, false);
 
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x05, 0x05, false, false, true, false);
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x05, 0x06, true, false, true, false);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x05, 0x04, false, false, true);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x05, 0x05, true, false, true);
 
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x01, 0x00, false, false, true, true);
-    testAddImmediateValueAndCarryToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x00, 0x00, true, false, true, true);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x01, 0x00, false, false, true);
+	testAddImmediateValueToRegister(standardInstructions::ADC_A_n, cpu.a, 0xFF, 0x00, 0x00, true, false, true);
+}
+
+TEST_F(CpuInstructionTest, InstructionSub8BitsRegisterTogether)
+{
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_B, cpu.a, cpu.b);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_C, cpu.a, cpu.c);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_D, cpu.a, cpu.d);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_E, cpu.a, cpu.e);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_H, cpu.a, cpu.h);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_L, cpu.a, cpu.l);
+
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
+                                        false);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0x00, false, true,
+                                        false);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SUB_A_A, cpu.a, 0x10, cpu.a, 0x10, 0x00, false, true,
+                                        false);
+}
+
+
+TEST_F(CpuInstructionTest, InstructionSubValueFromMemoryToRegister)
+{
+    cpu.h = 0x12;
+    cpu.l = 0x23;
+    testSubValueFromMemoryToRegister(standardInstructions::SUB_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x00, 0x00, false,
+                                     false, false);
+    testSubValueFromMemoryToRegister(standardInstructions::SUB_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x05, 0xFB, false,
+                                     false, true);
+    testSubValueFromMemoryToRegister(standardInstructions::SUB_A_HLm, cpu.a, 0x10, cpu.h, cpu.l, 0x05, 0x0B, false,
+                                     true, false);
+    testSubValueFromMemoryToRegister(standardInstructions::SUB_A_HLm, cpu.a, 0xFF, cpu.h, cpu.l, 0x05, 0xFA, false,
+                                     false, false);
+    testSubValueFromMemoryToRegister(standardInstructions::SUB_A_HLm, cpu.a, 0x00, cpu.h, cpu.l, 0x01, 0xFF, false,
+                                     false, true);
+}
+
+TEST_F(CpuInstructionTest, InstructionSubImmediateValueToRegister)
+{
+    testSubImmediateValueToRegister(standardInstructions::SUB_A_n, cpu.a, 0x00, 0x00, 0x00, false, false, false);
+    testSubImmediateValueToRegister(standardInstructions::SUB_A_n, cpu.a, 0x00, 0x05, 0xFB, false, false, true);
+    testSubImmediateValueToRegister(standardInstructions::SUB_A_n, cpu.a, 0x10, 0x05, 0x0B, false, true, false);
+    testSubImmediateValueToRegister(standardInstructions::SUB_A_n, cpu.a, 0xFF, 0x05, 0xFA, false, false, false);
+    testSubImmediateValueToRegister(standardInstructions::SUB_A_n, cpu.a, 0x00, 0x01, 0xFF, false, false, true);
+}
+
+TEST_F(CpuInstructionTest, InstructionSub8BitsRegisterAndCarryToAnother)
+{
+    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_B, cpu.a, cpu.b);
+    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_C, cpu.a, cpu.c);
+    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_D, cpu.a, cpu.d);
+    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_E, cpu.a, cpu.e);
+    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_H, cpu.a, cpu.h);
+    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_L, cpu.a, cpu.l);
+
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
+                                        false);
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0xFF, true, false,
+                                        true);
+
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.a, 0x10, cpu.a, 0x10, 0x00, false, true,
+                                        false);
+	// TODO: Check if half carry flag should be set in this situation
+    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.a, 0x10, cpu.a, 0x10, 0xFF, true, false,
+                                        true);
 }

@@ -792,23 +792,77 @@ class CPU
 	 */
 	void addValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-	// Substract the value of Y from the value of X
-	void SUB_X_Y(byte& X, byte Y);
+	/**
+	 * Arithmetic subtract an 8 bits value from an 8 bits register
+	 *
+	 * @param reg      the register to substract the value from
+	 * @param value    the value to substract
+	 * @opcodes:
+	 *     0x90 0x91 0x92 0x93 0x94 0x95 0x97
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void substract8BitsValueFrom8BitsRegister(byte& reg, byte value);
 
-	// Substract the value pointed by pc from the value of X
-	void SUB_X_N(byte& X);
+	/**
+	 * Arithmetic substract immediate value from an 8 bits register
+	 *
+	 * @param reg      the register to substract the value from
+	 * @opcodes:
+	 *     0xCE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void substractImmediateValueFrom8BitsRegister(byte& reg);
 
-	// Substract the value of Y and the value of the carry from the value of X
-	void SBC_X_Y(byte& X, byte Y);
+	/**
+	 * Arithmetic substract value in memory from an 8 bits register
+	 *
+	 * @param reg      the register to substract the value from
+	 * @param addrMsb   the msb part of the address where the value is stored
+	 * @param addrLsb   the Lsb part of the address where the value is stored
+	 * @opcodes:
+	 *     0x96
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void substractValueInMemoryFrom8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-	// Substract the value pointed by pc and the value of the carry from the value of X
-	void SBC_X_N(byte& X);
+	/**
+	 * Arithmetic substract an 8 bits value and the carry from an 8 bits register
+	 *
+	 * @param reg      the register to substract the value from
+	 * @param value    the value to substract
+	 * @opcodes:
+	 *     0x98 0x99 0x9A 0x9B 0x9C 0x9D 0x9F
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void sub8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value);
 
-	// Substract the value pointed by YZ from the value of X
-	void SUB_X_YZm(byte& X, byte Y, byte Z);
+	/**
+	 * Arithmetic substract an immediate value and the carry from an 8 bits register
+	 *
+	 * @param reg      the register to substract the value from
+	 * @opcodes:
+	 *     0xDE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void subImmediateValueAndCarryTo8BitsRegister(byte& reg);
 
-	// Substract the value pointed by YZ and the value of the carry from the value of X
-	void SBC_X_YZm(byte& X, byte Y, byte Z);
+	/**
+	 * Arithmetic subtract a value from memory and the carry from an 8 bits register
+	 *
+	 * @param reg      the register to substract the value from
+	 * @param addrMsb   the msb part of the address where the value is stored
+	 * @param addrLsb   the Lsb part of the address where the value is stored
+	 * @opcodes:
+	 *     0x9E
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void subValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
 	// Perform the logical AND between the "a" register and X
 	void AND_X(byte X);

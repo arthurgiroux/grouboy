@@ -165,23 +165,23 @@ void CPU::loadValueToMemoryAndIncrementAddr(byte& addrMsb, byte& addrLsb, byte v
 
 void CPU::loadValueFromMemoryAndIncrementAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
-    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
-    increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
+	reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+	increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
 	lastInstructionTicks = 2;
 }
 
 void CPU::loadValueFromMemoryAndDecreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
-    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
-    decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
-    lastInstructionTicks = 2;
+	reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+	decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
+	lastInstructionTicks = 2;
 }
 
 void CPU::loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value)
 {
-    mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
-    decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
-    lastInstructionTicks = 2;
+	mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+	decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
+	lastInstructionTicks = 2;
 }
 
 void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
@@ -539,16 +539,17 @@ void CPU::addImmediateValueTo8BitsRegister(byte& reg)
 
 void CPU::add8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    uint16_t result = reg + value;
-	if (isFlagSet(CpuFlags::CARRY)) {
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	uint16_t result = reg + value;
+	if (isFlagSet(CpuFlags::CARRY))
+	{
 		result++;
 	}
-    setCarryFlag(result > 0xFF);
-    setHalfCarryFlag(reg <= 0x0F && result > 0x0F);
-    reg = static_cast<byte>(result);
-    changeZeroValueFlag(reg);
-    lastInstructionTicks = 1;
+	setCarryFlag(result > 0xFF);
+	setHalfCarryFlag(reg <= 0x0F && result > 0x0F);
+	reg = static_cast<byte>(result);
+	changeZeroValueFlag(reg);
+	lastInstructionTicks = 1;
 }
 
 void CPU::addImmediateValueAndCarryTo8BitsRegister(byte& reg)
@@ -569,53 +570,53 @@ void CPU::addValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byt
 	lastInstructionTicks = 2;
 }
 
-void CPU::SUB_X_Y(byte& X, byte Y)
+void CPU::substract8BitsValueFrom8BitsRegister(byte& reg, byte value)
 {
 	setFlag(CpuFlags::SUBSTRACTION);
-	byte value = X;
-	X -= Y;
-	setCarryFlag(value < X);
-	setHalfCarryFlag((value > 0x0F) && (X <= 0x0F));
-	changeZeroValueFlag(X);
+	uint16_t result = reg - value;
+	setCarryFlag(result > 0xFF);
+	setHalfCarryFlag(reg > 0x0F && result <= 0x0F);
+	reg = static_cast<byte>(result);
+	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
-void CPU::SUB_X_N(byte& X)
+void CPU::substractImmediateValueFrom8BitsRegister(byte& reg)
 {
-	SUB_X_Y(X, mmu.read(pc));
+	substract8BitsValueFrom8BitsRegister(reg, mmu.read(pc++));
 	lastInstructionTicks = 2;
 }
 
-void CPU::SBC_X_Y(byte& X, byte Y)
+void CPU::substractValueInMemoryFrom8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
+{
+	substract8BitsValueFrom8BitsRegister(reg, mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+	lastInstructionTicks = 2;
+}
+
+void CPU::sub8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
 	setFlag(CpuFlags::SUBSTRACTION);
-	byte value = X;
-	X -= Y;
+	uint16_t result = reg - value;
 	if (isFlagSet(CpuFlags::CARRY))
 	{
-		X--;
+		result--;
 	}
-	setCarryFlag(value < X);
-	setHalfCarryFlag((value > 0x0F) && (X <= 0x0F));
-	changeZeroValueFlag(X);
+	setCarryFlag(result > 0xFF);
+	setHalfCarryFlag(reg > 0x0F && result <= 0x0F);
+	reg = static_cast<byte>(result);
+	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
-void CPU::SBC_X_N(byte& X)
+void CPU::subImmediateValueAndCarryTo8BitsRegister(byte& reg)
 {
-	SBC_X_Y(X, mmu.read(pc));
+	sub8BitsValueAndCarryTo8BitsRegister(reg, mmu.read(pc++));
 	lastInstructionTicks = 2;
 }
 
-void CPU::SUB_X_YZm(byte& X, byte Y, byte Z)
+void CPU::subValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
 {
-	SUB_X_Y(X, mmu.read((Y << 8) | Z));
-	lastInstructionTicks = 2;
-}
-
-void CPU::SBC_X_YZm(byte& X, byte Y, byte Z)
-{
-	SBC_X_Y(X, mmu.read((Y << 8) | Z));
+	sub8BitsValueAndCarryTo8BitsRegister(reg, mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
 	lastInstructionTicks = 2;
 }
 
@@ -830,12 +831,12 @@ void CPU::decimalAdjustAccumulator()
 	byte valueToAdd = 0;
 	if (((a & 0x0F) > 9) || isFlagSet(CpuFlags::HALF_CARRY))
 	{
-        valueToAdd += 0x06;
+		valueToAdd += 0x06;
 	}
 
 	if (((a >> 4) > 9) || isFlagSet(CpuFlags::CARRY))
 	{
-        valueToAdd += 0x60;
+		valueToAdd += 0x60;
 		setFlag(CpuFlags::CARRY);
 	}
 	else
@@ -846,8 +847,8 @@ void CPU::decimalAdjustAccumulator()
 	a += valueToAdd;
 
 	setFlagIfTrue(a == 0, CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    lastInstructionTicks = 1;
+	unsetFlag(CpuFlags::HALF_CARRY);
+	lastInstructionTicks = 1;
 }
 
 void CPU::complementRegister(byte& reg)
@@ -1514,67 +1515,67 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case SUB_A_B:
-		SUB_X_Y(a, b);
+		substract8BitsValueFrom8BitsRegister(a, b);
 		break;
 
 	case SUB_A_C:
-		SUB_X_Y(a, c);
+		substract8BitsValueFrom8BitsRegister(a, c);
 		break;
 
 	case SUB_A_D:
-		SUB_X_Y(a, d);
+		substract8BitsValueFrom8BitsRegister(a, d);
 		break;
 
 	case SUB_A_E:
-		SUB_X_Y(a, e);
+		substract8BitsValueFrom8BitsRegister(a, e);
 		break;
 
 	case SUB_A_H:
-		SUB_X_Y(a, h);
+		substract8BitsValueFrom8BitsRegister(a, h);
 		break;
 
 	case SUB_A_L:
-		SUB_X_Y(a, l);
+		substract8BitsValueFrom8BitsRegister(a, l);
 		break;
 
 	case SUB_A_HLm:
-		SUB_X_YZm(a, h, l);
+		substractValueInMemoryFrom8BitsRegister(a, h, l);
 		break;
 
 	case SUB_A_A:
-		SUB_X_Y(a, a);
+		substract8BitsValueFrom8BitsRegister(a, a);
 		break;
 
 	case SBC_A_B:
-		SBC_X_Y(a, b);
+		sub8BitsValueAndCarryTo8BitsRegister(a, b);
 		break;
 
 	case SBC_A_C:
-		SBC_X_Y(a, c);
+		sub8BitsValueAndCarryTo8BitsRegister(a, c);
 		break;
 
 	case SBC_A_D:
-		SBC_X_Y(a, d);
+		sub8BitsValueAndCarryTo8BitsRegister(a, d);
 		break;
 
 	case SBC_A_E:
-		SBC_X_Y(a, e);
+		sub8BitsValueAndCarryTo8BitsRegister(a, e);
 		break;
 
 	case SBC_A_H:
-		SBC_X_Y(a, h);
+		sub8BitsValueAndCarryTo8BitsRegister(a, h);
 		break;
 
 	case SBC_A_L:
-		SBC_X_Y(a, l);
+		sub8BitsValueAndCarryTo8BitsRegister(a, l);
 		break;
 
 	case SBC_A_HLm:
-		SBC_X_YZm(a, h, l);
+		subValueFromMemoryAndCarryTo8BitsRegister(a, h, l);
 		break;
 
 	case SBC_A_A:
-		add8BitsValueAndCarryTo8BitsRegister(a, a);
+		sub8BitsValueAndCarryTo8BitsRegister(a, a);
 		break;
 
 		/******************************************************/
@@ -1806,7 +1807,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case SUB_A_n:
-		SUB_X_N(a);
+		substractImmediateValueFrom8BitsRegister(a);
 		break;
 
 	case RST_10:
@@ -1831,7 +1832,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case SBC_A_n:
-		SBC_X_N(a);
+		subImmediateValueAndCarryTo8BitsRegister(a);
 		break;
 
 	case RST_18:
