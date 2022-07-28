@@ -881,7 +881,7 @@ class CPU
      * The result will be stored in the accumulator.
      *
      * @opcodes:
-     *     0xEE
+     *     0xE6
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 2
      */
@@ -899,11 +899,40 @@ class CPU
      */
     void logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
-	// Perform the logical XOR between the "a" register and X
-	void XOR_X(byte X);
+    /**
+     * Logical "XOR" between the accumulator and an 8 bits register.
+     * The result will be stored in the accumulator.
+     *
+     * @param reg      the register to use for the second operand
+     * @opcodes:
+     *     0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAF
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+    void logicalXorBetweenAccumulatorAnd8BitsRegister(byte value);
 
-	// Perform the logical XOR between the "a" register and value pointed by XY
-	void XOR_XYm(byte X, byte Y);
+    /**
+     * Logical "XOR" between the accumulator and an immediate value.
+     * The result will be stored in the accumulator.
+     *
+     * @opcodes:
+     *     0xEE
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void logicalXorBetweenAccumulatorAndImmediateValue();
+
+    /**
+     * Logical "XOR" between the accumulator and a value in memory.
+     *
+     * @param addrMsb   the msb part of the address where the second operand is stored
+     * @param addrLsb   the Lsb part of the address where the second operand is stored
+     * @opcodes:
+     *     0xAE
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
 	// Perform the logical OR between the "a" register and X
 	void OR_X(byte X);

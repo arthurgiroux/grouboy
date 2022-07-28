@@ -643,20 +643,26 @@ void CPU::logicalAndBetweenAccumulatorAndImmediateValue()
 }
 
 
-void CPU::XOR_X(byte X)
+void CPU::logicalXorBetweenAccumulatorAnd8BitsRegister(byte value)
 {
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::HALF_CARRY);
-	unsetFlag(CpuFlags::CARRY);
-	a ^= X;
-	changeZeroValueFlag(a);
-	lastInstructionTicks = 1;
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
+    a ^= value;
+    changeZeroValueFlag(a);
+    lastInstructionTicks = 1;
 }
 
-void CPU::XOR_XYm(byte X, byte Y)
+void CPU::logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-	XOR_X(mmu.read((X << 8) | Y));
-	lastInstructionTicks = 2;
+    logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    lastInstructionTicks = 2;
+}
+
+void CPU::logicalXorBetweenAccumulatorAndImmediateValue()
+{
+    logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
+    lastInstructionTicks = 2;
 }
 
 void CPU::OR_X(byte X)
@@ -1616,35 +1622,35 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case XOR_B:
-		XOR_X(b);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(b);
 		break;
 
 	case XOR_C:
-		XOR_X(c);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(c);
 		break;
 
 	case XOR_D:
-		XOR_X(d);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(d);
 		break;
 
 	case XOR_E:
-		XOR_X(e);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(e);
 		break;
 
 	case XOR_H:
-		XOR_X(h);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(h);
 		break;
 
 	case XOR_L:
-		XOR_X(l);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(l);
 		break;
 
 	case XOR_HLm:
-		XOR_XYm(h, l);
+        logicalXorBetweenAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case XOR_A:
-		XOR_X(a);
+        logicalXorBetweenAccumulatorAnd8BitsRegister(a);
 		break;
 
 		/******************************************************/
@@ -1881,7 +1887,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case XOR_n:
-		XOR_X(mmu.read(pc++));
+        logicalXorBetweenAccumulatorAndImmediateValue();
 		break;
 
 	case RST_28:
