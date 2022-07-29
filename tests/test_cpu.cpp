@@ -964,6 +964,22 @@ class CpuInstructionTest : public ::testing::Test
 		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
 		ASSERT_EQ(cpu.pc, 1);
 	}
+
+	void testReturnConditional(int instruction, bool expectReturn) {
+        uint16_t callerAddr = 0x1234;
+        mmu.writeWord(cpu.pc, callerAddr);
+        cpu.pc += 2;
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+		if (expectReturn) {
+            ASSERT_EQ(ticks, 5);
+            ASSERT_EQ(cpu.pc, callerAddr);
+        }
+		else {
+            ASSERT_EQ(ticks, 2);
+            ASSERT_EQ(cpu.pc, 0x03);
+		}
+	}
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1896,4 +1912,82 @@ TEST_F(CpuInstructionTest, InstructionCompareWithMemory)
     testCompareOperationWithMemory(standardInstructions::CP_HLm, 0xFF, cpu.h, cpu.l, 0xFF, CPU::ZERO);
     testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x09, cpu.h, cpu.l, 0x08, CPU::HALF_CARRY);
     testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x08, cpu.h, cpu.l, 0x09, CPU::CARRY);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturn)
+{
+	uint16_t callerAddr = 0x1234;
+    mmu.writeWord(cpu.pc, callerAddr);
+	cpu.pc += 2;
+	mmu.write(cpu.pc, standardInstructions::RET);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 4);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.pc, callerAddr);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalCarryTrue)
+{
+	cpu.setFlag(CPU::CARRY);
+    testReturnConditional(standardInstructions::RET_C, true);
+	ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalCarryFalse)
+{
+    testReturnConditional(standardInstructions::RET_C, false);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalZeroTrue)
+{
+    cpu.setFlag(CPU::ZERO);
+    testReturnConditional(standardInstructions::RET_Z, true);
+    ASSERT_EQ(cpu.getFlag(), CPU::ZERO);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalZeroFalse)
+{
+    testReturnConditional(standardInstructions::RET_Z, false);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalNotCarryTrue)
+{
+    testReturnConditional(standardInstructions::RET_NC, true);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalNotCarryFalse)
+{
+	cpu.setFlag(CPU::CARRY);
+    testReturnConditional(standardInstructions::RET_NC, false);
+    ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalNotZeroTrue)
+{
+    testReturnConditional(standardInstructions::RET_NZ, true);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnConditionalNotZeroFalse)
+{
+    cpu.setFlag(CPU::ZERO);
+    testReturnConditional(standardInstructions::RET_NZ, false);
+    ASSERT_EQ(cpu.getFlag(), CPU::ZERO);
+}
+
+TEST_F(CpuInstructionTest, InstructionReturnAfterInterrupt)
+{
+	cpu.interrupts = true;
+    uint16_t callerAddr = 0x1234;
+    mmu.writeWord(cpu.pc, callerAddr);
+    cpu.pc += 2;
+    mmu.write(cpu.pc, standardInstructions::RETI);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 4);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    ASSERT_EQ(cpu.pc, callerAddr);
+	ASSERT_FALSE(cpu.interrupts);
 }
