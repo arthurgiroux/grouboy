@@ -632,58 +632,58 @@ void CPU::logicalAndBetweenAccumulatorAnd8BitsRegister(byte value)
 
 void CPU::logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+	logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
 	lastInstructionTicks = 2;
 }
 
 void CPU::logicalAndBetweenAccumulatorAndImmediateValue()
 {
-    logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
-    lastInstructionTicks = 2;
+	logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
+	lastInstructionTicks = 2;
 }
 
 void CPU::logicalXorBetweenAccumulatorAnd8BitsRegister(byte value)
 {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
-    a ^= value;
-    changeZeroValueFlag(a);
-    lastInstructionTicks = 1;
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
+	a ^= value;
+	changeZeroValueFlag(a);
+	lastInstructionTicks = 1;
 }
 
 void CPU::logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
-    lastInstructionTicks = 2;
+	logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+	lastInstructionTicks = 2;
 }
 
 void CPU::logicalXorBetweenAccumulatorAndImmediateValue()
 {
-    logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
-    lastInstructionTicks = 2;
+	logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
+	lastInstructionTicks = 2;
 }
 
 void CPU::logicalOrBetweenAccumulatorAnd8BitsRegister(byte value)
 {
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    unsetFlag(CpuFlags::CARRY);
-    a |= value;
-    changeZeroValueFlag(a);
-    lastInstructionTicks = 1;
+	unsetFlag(CpuFlags::SUBSTRACTION);
+	unsetFlag(CpuFlags::HALF_CARRY);
+	unsetFlag(CpuFlags::CARRY);
+	a |= value;
+	changeZeroValueFlag(a);
+	lastInstructionTicks = 1;
 }
 
 void CPU::logicalOrBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
-    lastInstructionTicks = 2;
+	logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+	lastInstructionTicks = 2;
 }
 
 void CPU::logicalOrBetweenAccumulatorAndImmediateValue()
 {
-    logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
-    lastInstructionTicks = 2;
+	logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
+	lastInstructionTicks = 2;
 }
 
 void CPU::compareAccumulatorAndRegister(byte value)
@@ -697,14 +697,14 @@ void CPU::compareAccumulatorAndRegister(byte value)
 
 void CPU::compareAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    compareAccumulatorAndRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+	compareAccumulatorAndRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
 	lastInstructionTicks = 2;
 }
 
 void CPU::compareAccumulatorAndImmediateValue()
 {
-    compareAccumulatorAndRegister(mmu.read(pc++));
-    lastInstructionTicks = 2;
+	compareAccumulatorAndRegister(mmu.read(pc++));
+	lastInstructionTicks = 2;
 }
 
 void CPU::POP_XY(byte X, byte Y)
@@ -715,19 +715,35 @@ void CPU::POP_XY(byte X, byte Y)
 	lastInstructionTicks = 3;
 }
 
-void CPU::RET_X(bool cond)
+void CPU::returnInstruction()
 {
+	// We unpop the address of the caller
+	// From the stack and set the pc to the value
 	uint16_t addr = mmu.readWord(sp);
 	sp += 2;
+	pc = addr;
+	lastInstructionTicks = 4;
+}
+
+void CPU::returnInstructionConditional(bool cond)
+{
 	if (cond)
 	{
-		pc = addr;
+		returnInstruction();
 		lastInstructionTicks = 5;
 	}
 	else
 	{
 		lastInstructionTicks = 2;
 	}
+}
+
+void CPU::returnInstructionAfterInterrupt()
+{
+	returnInstruction();
+	// TODO:
+	// Revisit what to do after implementing interrups
+	interrupts = false;
 }
 
 void CPU::jumpConditional(bool condition)
@@ -1619,7 +1635,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case AND_HLm:
-        logicalAndBetweenAccumulatorAndValueInMemory(h, l);
+		logicalAndBetweenAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case AND_A:
@@ -1651,11 +1667,11 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case XOR_HLm:
-        logicalXorBetweenAccumulatorAndValueInMemory(h, l);
+		logicalXorBetweenAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case XOR_A:
-        logicalXorBetweenAccumulatorAnd8BitsRegister(a);
+		logicalXorBetweenAccumulatorAnd8BitsRegister(a);
 		break;
 
 		/******************************************************/
@@ -1719,7 +1735,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CP_HLm:
-        compareAccumulatorAndValueInMemory(h, l);
+		compareAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case CP_A:
@@ -1731,7 +1747,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case RET_NZ:
-		RET_X(!isFlagSet(CpuFlags::ZERO));
+		returnInstructionConditional(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case POP_BC:
@@ -1763,11 +1779,11 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RET_Z:
-		RET_X(isFlagSet(CpuFlags::ZERO));
+		returnInstructionConditional(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case RET:
-		RET_X(true);
+		returnInstruction();
 		break;
 
 	case JP_Z_nn:
@@ -1799,7 +1815,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case RET_NC:
-		RET_X(!isFlagSet(CpuFlags::CARRY));
+		returnInstructionConditional(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case POP_DE:
@@ -1827,12 +1843,11 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RET_C:
-		RET_X(isFlagSet(CpuFlags::CARRY));
+		returnInstructionConditional(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case RETI:
-		RET_X(true);
-		interrupts = true;
+		returnInstructionAfterInterrupt();
 		break;
 
 	case JP_C_nn:
@@ -1872,7 +1887,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case AND_n:
-        logicalAndBetweenAccumulatorAndImmediateValue();
+		logicalAndBetweenAccumulatorAndImmediateValue();
 		break;
 
 	case RST_20:
@@ -1892,7 +1907,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case XOR_n:
-        logicalXorBetweenAccumulatorAndImmediateValue();
+		logicalXorBetweenAccumulatorAndImmediateValue();
 		break;
 
 	case RST_28:
@@ -1950,7 +1965,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CP_n:
-        compareAccumulatorAndImmediateValue();
+		compareAccumulatorAndImmediateValue();
 		break;
 
 	case RST_38:

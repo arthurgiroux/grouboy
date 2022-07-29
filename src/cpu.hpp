@@ -1014,8 +1014,34 @@ class CPU
 	// Pop the value pointed by sp in X and sp+1 in X
 	void POP_XY(byte X, byte Y);
 
-	// Pop the value pointed by sp in X and sp+1 in X
-	void RET_X(bool cond);
+	/**
+	 * Return control to the caller of the subroutine.
+	 *
+	 * @opcodes:
+	 *     0xC9
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
+	 */
+	void returnInstruction();
+	/**
+	 * Return control to the caller of the subroutine if the condition is satisfied.
+	 *
+	 * @opcodes:
+	 *     0xCA 0xDA 0xC8 0xD8
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 5 if condition satisfied, 2 otherwise
+	 */
+	void returnInstructionConditional(bool cond);
+
+	/**
+	 * Return control to the caller of the subroutine after an interrupt.
+	 *
+	 * @opcodes:
+	 *     0xD9
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
+	 */
+	void returnInstructionAfterInterrupt();
 
 	// if the condition is satisfied, push the current address to the stack
 	// and jump to the label
