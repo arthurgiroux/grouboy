@@ -864,122 +864,152 @@ class CPU
 	 */
 	void subValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb);
 
-    /**
-     * Logical "AND" between the accumulator and an 8 bits register.
-     * The result will be stored in the accumulator.
-     *
-     * @param reg      the register to use for the second operand
-     * @opcodes:
-     *     0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA7
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 1
-     */
-    void logicalAndBetweenAccumulatorAnd8BitsRegister(byte value);
+	/**
+	 * Logical "AND" between the accumulator and an 8 bits register.
+	 * The result will be stored in the accumulator.
+	 *
+	 * @param reg      the register to use for the second operand
+	 * @opcodes:
+	 *     0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA7
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void logicalAndBetweenAccumulatorAnd8BitsRegister(byte value);
 
-    /**
-     * Logical "AND" between the accumulator and an immediate value.
-     * The result will be stored in the accumulator.
-     *
-     * @opcodes:
-     *     0xE6
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void logicalAndBetweenAccumulatorAndImmediateValue();
+	/**
+	 * Logical "AND" between the accumulator and an immediate value.
+	 * The result will be stored in the accumulator.
+	 *
+	 * @opcodes:
+	 *     0xE6
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void logicalAndBetweenAccumulatorAndImmediateValue();
 
-    /**
-     * Logical "AND" between the accumulator and a value in memory.
-     *
-     * @param addrMsb   the msb part of the address where the second operand is stored
-     * @param addrLsb   the Lsb part of the address where the second operand is stored
-     * @opcodes:
-     *     0xA6
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
+	/**
+	 * Logical "AND" between the accumulator and a value in memory.
+	 *
+	 * @param addrMsb   the msb part of the address where the second operand is stored
+	 * @param addrLsb   the Lsb part of the address where the second operand is stored
+	 * @opcodes:
+	 *     0xA6
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
-    /**
-     * Logical "XOR" between the accumulator and an 8 bits register.
-     * The result will be stored in the accumulator.
-     *
-     * @param reg      the register to use for the second operand
-     * @opcodes:
-     *     0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAF
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 1
-     */
-    void logicalXorBetweenAccumulatorAnd8BitsRegister(byte value);
+	/**
+	 * Logical "XOR" between the accumulator and an 8 bits register.
+	 * The result will be stored in the accumulator.
+	 *
+	 * @param reg      the register to use for the second operand
+	 * @opcodes:
+	 *     0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAF
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void logicalXorBetweenAccumulatorAnd8BitsRegister(byte value);
 
-    /**
-     * Logical "XOR" between the accumulator and an immediate value.
-     * The result will be stored in the accumulator.
-     *
-     * @opcodes:
-     *     0xEE
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void logicalXorBetweenAccumulatorAndImmediateValue();
+	/**
+	 * Logical "XOR" between the accumulator and an immediate value.
+	 * The result will be stored in the accumulator.
+	 *
+	 * @opcodes:
+	 *     0xEE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void logicalXorBetweenAccumulatorAndImmediateValue();
 
-    /**
-     * Logical "XOR" between the accumulator and a value in memory.
-     *
-     * @param addrMsb   the msb part of the address where the second operand is stored
-     * @param addrLsb   the Lsb part of the address where the second operand is stored
-     * @opcodes:
-     *     0xAE
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
+	/**
+	 * Logical "XOR" between the accumulator and a value in memory.
+	 *
+	 * @param addrMsb   the msb part of the address where the second operand is stored
+	 * @param addrLsb   the Lsb part of the address where the second operand is stored
+	 * @opcodes:
+	 *     0xAE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
-    /**
-     * Logical "OR" between the accumulator and an 8 bits register.
-     * The result will be stored in the accumulator.
-     *
-     * @param reg      the register to use for the second operand
-     * @opcodes:
-     *     0xB0 0xB1 0xB2 0xB3 0xB4 0xB5 0xB7
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 1
-     */
-    void logicalOrBetweenAccumulatorAnd8BitsRegister(byte value);
+	/**
+	 * Logical "OR" between the accumulator and an 8 bits register.
+	 * The result will be stored in the accumulator.
+	 *
+	 * @param reg      the register to use for the second operand
+	 * @opcodes:
+	 *     0xB0 0xB1 0xB2 0xB3 0xB4 0xB5 0xB7
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void logicalOrBetweenAccumulatorAnd8BitsRegister(byte value);
 
-    /**
-     * Logical "OR" between the accumulator and an immediate value.
-     * The result will be stored in the accumulator.
-     *
-     * @opcodes:
-     *     0xFE
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void logicalOrBetweenAccumulatorAndImmediateValue();
+	/**
+	 * Logical "OR" between the accumulator and an immediate value.
+	 * The result will be stored in the accumulator.
+	 *
+	 * @opcodes:
+	 *     0xFE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void logicalOrBetweenAccumulatorAndImmediateValue();
 
-    /**
-     * Logical "OR" between the accumulator and a value in memory.
-     *
-     * @param addrMsb   the msb part of the address where the second operand is stored
-     * @param addrLsb   the Lsb part of the address where the second operand is stored
-     * @opcodes:
-     *     0xB6
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void logicalOrBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
+	/**
+	 * Logical "OR" between the accumulator and a value in memory.
+	 *
+	 * @param addrMsb   the msb part of the address where the second operand is stored
+	 * @param addrLsb   the Lsb part of the address where the second operand is stored
+	 * @opcodes:
+	 *     0xB6
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void logicalOrBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
-	// Compare the value of the register "a" and the value X
-	// If a == X then flag zero is set
-	// If a > X then flag half carry is set
-	// Otherwise flag carry is set
-	void CP_X(byte X);
+	/**
+	 * Compare the accumulator with the value of a register.
+	 * If the accumulator and the value are equal, "Zero" flag is set
+	 * If the accumulator is greater than the value, "Half carry" flag is set
+	 * If the accumulator is smaller than the value, "Carry" flag is set
+	 *
+	 * @param value      the value to compare to
+	 * @opcodes:
+	 *     0xB8 0xB9 0xBA 0xBB 0xBC 0xBD 0xBF
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void compareAccumulatorAndRegister(byte value);
 
-	// Compare the value of the register "a" and the value pointed by XY
-	// If a == XY then flag zero is set
-	// If a > XY then flag half carry is set
-	// Otherwise flag carry is set
-	void CP_XYm(byte X, byte Y);
+	/**
+	 * Compare the accumulator with a value in memory.
+	 * If the accumulator and the value are equal, "Zero" flag is set
+	 * If the accumulator is greater than the value, "Half carry" flag is set
+	 * If the accumulator is smaller than the value, "Carry" flag is set
+	 *
+	 * @param addrMsb   the msb part of the address where the value is stored
+	 * @param addrLsb   the Lsb part of the address where the value is stored
+	 * @opcodes:
+	 *     0xBE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void compareAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
+
+	/**
+	 * Compare the accumulator with an immediate value.
+	 * If the accumulator and the value are equal, "Zero" flag is set
+	 * If the accumulator is greater than the value, "Half carry" flag is set
+	 * If the accumulator is smaller than the value, "Carry" flag is set
+	 *
+	 * @opcodes:
+	 *     0xFE
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void compareAccumulatorAndImmediateValue();
 
 	// Pop the value pointed by sp in X and sp+1 in X
 	void POP_XY(byte X, byte Y);

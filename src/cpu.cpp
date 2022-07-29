@@ -686,19 +686,25 @@ void CPU::logicalOrBetweenAccumulatorAndImmediateValue()
     lastInstructionTicks = 2;
 }
 
-void CPU::CP_X(byte X)
+void CPU::compareAccumulatorAndRegister(byte value)
 {
 	setFlag(CpuFlags::SUBSTRACTION);
-	setFlagIfTrue(a == X, CpuFlags::ZERO);
-	setHalfCarryFlag(a > X);
-	setCarryFlag(a < X);
+	setFlagIfTrue(a == value, CpuFlags::ZERO);
+	setHalfCarryFlag(a > value);
+	setCarryFlag(a < value);
 	lastInstructionTicks = 1;
 }
 
-void CPU::CP_XYm(byte X, byte Y)
+void CPU::compareAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-	CP_X(mmu.read((X << 8) | Y));
+    compareAccumulatorAndRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
 	lastInstructionTicks = 2;
+}
+
+void CPU::compareAccumulatorAndImmediateValue()
+{
+    compareAccumulatorAndRegister(mmu.read(pc++));
+    lastInstructionTicks = 2;
 }
 
 void CPU::POP_XY(byte X, byte Y)
@@ -1689,35 +1695,35 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CP_B:
-		CP_X(b);
+		compareAccumulatorAndRegister(b);
 		break;
 
 	case CP_C:
-		CP_X(c);
+		compareAccumulatorAndRegister(c);
 		break;
 
 	case CP_D:
-		CP_X(d);
+		compareAccumulatorAndRegister(d);
 		break;
 
 	case CP_E:
-		CP_X(e);
+		compareAccumulatorAndRegister(e);
 		break;
 
 	case CP_H:
-		CP_X(h);
+		compareAccumulatorAndRegister(h);
 		break;
 
 	case CP_L:
-		CP_X(l);
+		compareAccumulatorAndRegister(l);
 		break;
 
 	case CP_HLm:
-		CP_XYm(h, l);
+        compareAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case CP_A:
-		CP_X(a);
+		compareAccumulatorAndRegister(a);
 		break;
 
 		/******************************************************/
@@ -1944,7 +1950,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CP_n:
-		CP_X(mmu.read(pc++));
+        compareAccumulatorAndImmediateValue();
 		break;
 
 	case RST_38:
