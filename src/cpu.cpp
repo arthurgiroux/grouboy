@@ -1952,7 +1952,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	default:
-		throw new UnhandledInstructionException(opCode);
+		throw UnhandledInstructionException(opCode);
 		return;
 	}
 }
@@ -2941,7 +2941,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		break;
 
 	default:
-		throw new UnhandledExtendedInstructionException(opCode);
+		throw UnhandledExtendedInstructionException(opCode);
 		return;
 	}
 }
