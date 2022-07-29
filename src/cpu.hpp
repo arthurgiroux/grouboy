@@ -934,14 +934,40 @@ class CPU
      */
     void logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
-	// Perform the logical OR between the "a" register and X
-	void OR_X(byte X);
+    /**
+     * Logical "OR" between the accumulator and an 8 bits register.
+     * The result will be stored in the accumulator.
+     *
+     * @param reg      the register to use for the second operand
+     * @opcodes:
+     *     0xB0 0xB1 0xB2 0xB3 0xB4 0xB5 0xB7
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 1
+     */
+    void logicalOrBetweenAccumulatorAnd8BitsRegister(byte value);
 
-	// Perform the logical OR between the "a" register and value pointed by XY
-	void OR_XYm(byte X, byte Y);
+    /**
+     * Logical "OR" between the accumulator and an immediate value.
+     * The result will be stored in the accumulator.
+     *
+     * @opcodes:
+     *     0xFE
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void logicalOrBetweenAccumulatorAndImmediateValue();
 
-	// Perform the logical OR between the "a" register and value pointed by pc
-	void OR_N();
+    /**
+     * Logical "OR" between the accumulator and a value in memory.
+     *
+     * @param addrMsb   the msb part of the address where the second operand is stored
+     * @param addrLsb   the Lsb part of the address where the second operand is stored
+     * @opcodes:
+     *     0xB6
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void logicalOrBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb);
 
 	// Compare the value of the register "a" and the value X
 	// If a == X then flag zero is set

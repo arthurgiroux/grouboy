@@ -642,7 +642,6 @@ void CPU::logicalAndBetweenAccumulatorAndImmediateValue()
     lastInstructionTicks = 2;
 }
 
-
 void CPU::logicalXorBetweenAccumulatorAnd8BitsRegister(byte value)
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
@@ -665,26 +664,26 @@ void CPU::logicalXorBetweenAccumulatorAndImmediateValue()
     lastInstructionTicks = 2;
 }
 
-void CPU::OR_X(byte X)
+void CPU::logicalOrBetweenAccumulatorAnd8BitsRegister(byte value)
 {
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::HALF_CARRY);
-	unsetFlag(CpuFlags::CARRY);
-	a |= X;
-	changeZeroValueFlag(a);
-	lastInstructionTicks = 1;
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
+    a |= value;
+    changeZeroValueFlag(a);
+    lastInstructionTicks = 1;
 }
 
-void CPU::OR_XYm(byte X, byte Y)
+void CPU::logicalOrBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-	OR_X(mmu.read((X << 8) | Y));
-	lastInstructionTicks = 2;
+    logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    lastInstructionTicks = 2;
 }
 
-void CPU::OR_N()
+void CPU::logicalOrBetweenAccumulatorAndImmediateValue()
 {
-	OR_X(mmu.read(pc));
-	lastInstructionTicks = 2;
+    logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(pc++));
+    lastInstructionTicks = 2;
 }
 
 void CPU::CP_X(byte X)
@@ -1658,35 +1657,35 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case OR_B:
-		OR_X(b);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(b);
 		break;
 
 	case OR_C:
-		OR_X(c);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(c);
 		break;
 
 	case OR_D:
-		OR_X(d);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(d);
 		break;
 
 	case OR_E:
-		OR_X(e);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(e);
 		break;
 
 	case OR_H:
-		OR_X(h);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(h);
 		break;
 
 	case OR_L:
-		OR_X(l);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(l);
 		break;
 
 	case OR_HLm:
-		OR_XYm(h, l);
+		logicalOrBetweenAccumulatorAndValueInMemory(h, l);
 		break;
 
 	case OR_A:
-		OR_X(a);
+		logicalOrBetweenAccumulatorAnd8BitsRegister(a);
 		break;
 
 	case CP_B:
@@ -1919,7 +1918,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case OR_n:
-		OR_N();
+		logicalOrBetweenAccumulatorAndImmediateValue();
 		break;
 
 	case RST_30:
