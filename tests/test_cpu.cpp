@@ -908,6 +908,62 @@ class CpuInstructionTest : public ::testing::Test
 		testOpFromMemoryToRegister(instruction, cpu.a, startValue, regAddrMsb, regAddrLsb, value, expectedResult, true,
 		                           false, false, false);
 	}
+
+	void testCompareOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, int expectedFlags)
+	{
+		cpu.pc = 0x00;
+		cpu.a = startValue;
+		reg = value;
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 1);
+		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
+		ASSERT_EQ(cpu.pc, 1);
+	}
+
+	void testCompareOperationWithRegister(byte instruction, byte& reg)
+	{
+		testCompareOperationWithRegister(instruction, 0x00, reg, 0x00, CPU::ZERO);
+		testCompareOperationWithRegister(instruction, 0x0F, reg, 0x00, CPU::HALF_CARRY);
+		testCompareOperationWithRegister(instruction, 0x00, reg, 0x0F, CPU::CARRY);
+		testCompareOperationWithRegister(instruction, 0xFF, reg, 0xFF, CPU::ZERO);
+		testCompareOperationWithRegister(instruction, 0x09, reg, 0x08, CPU::HALF_CARRY);
+		testCompareOperationWithRegister(instruction, 0x08, reg, 0x09, CPU::CARRY);
+	}
+
+	void testCompareOperationWithImmediateValue(byte instruction, byte startValue, byte value, int expectedFlags)
+	{
+		cpu.pc = 0x00;
+		cpu.a = startValue;
+		mmu.write(cpu.pc, instruction);
+		mmu.write(cpu.pc + 1, value);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
+		ASSERT_EQ(cpu.pc, 2);
+	}
+
+	void testCompareOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
+	                                    int expectedFlags)
+	{
+		cpu.pc = 0x00;
+		cpu.a = startValue;
+		mmu.write(createAddrFromHighAndLowBytes(regAddrMsb, regAddrLsb), value);
+		mmu.write(cpu.pc, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
+		ASSERT_EQ(cpu.pc, 1);
+	}
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1774,7 +1830,7 @@ TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndAccumulator)
 	testOrOperationWithRegister(standardInstructions::OR_A, 0xFF, cpu.a, 0xFF, 0xFF);
 }
 
- TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndImmediateValue)
+TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndImmediateValue)
 {
 	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x00, 0x00, 0x00);
 	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x0F, 0x00, 0x0F);
@@ -1788,7 +1844,7 @@ TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndAccumulator)
 	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0xFF, 0xFF, 0xFF);
 }
 
- TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndMemory)
+TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndMemory)
 {
 	cpu.h = 0x12;
 	cpu.l = 0x23;
@@ -1802,4 +1858,42 @@ TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndAccumulator)
 	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x01, cpu.h, cpu.l, 0x00, 0x01);
 	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x00, cpu.h, cpu.l, 0x01, 0x01);
 	testOrOperationWithMemory(standardInstructions::OR_HLm, 0xFF, cpu.h, cpu.l, 0xFF, 0xFF);
+}
+
+TEST_F(CpuInstructionTest, InstructionCompareAccumulatorAndRegister)
+{
+	testCompareOperationWithRegister(standardInstructions::CP_B, cpu.b);
+	testCompareOperationWithRegister(standardInstructions::CP_C, cpu.c);
+	testCompareOperationWithRegister(standardInstructions::CP_D, cpu.d);
+	testCompareOperationWithRegister(standardInstructions::CP_E, cpu.e);
+	testCompareOperationWithRegister(standardInstructions::CP_H, cpu.h);
+	testCompareOperationWithRegister(standardInstructions::CP_L, cpu.l);
+
+	testCompareOperationWithRegister(standardInstructions::CP_A, 0x00, cpu.a, 0x00, CPU::ZERO);
+	testCompareOperationWithRegister(standardInstructions::CP_A, 0xF0, cpu.a, 0xF0, CPU::ZERO);
+	testCompareOperationWithRegister(standardInstructions::CP_A, 0x0F, cpu.a, 0x0F, CPU::ZERO);
+	testCompareOperationWithRegister(standardInstructions::CP_A, 0xFF, cpu.a, 0xFF, CPU::ZERO);
+}
+
+TEST_F(CpuInstructionTest, InstructionCompareWithImmediateValue)
+{
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x00, 0x00, CPU::ZERO);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x0F, 0x00, CPU::HALF_CARRY);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x00, 0x0F, CPU::CARRY);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0xFF, 0xFF, CPU::ZERO);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x09, 0x08, CPU::HALF_CARRY);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x08, 0x09, CPU::CARRY);
+
+}
+
+TEST_F(CpuInstructionTest, InstructionCompareWithMemory)
+{
+    cpu.h = 0x12;
+    cpu.l = 0x23;
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x00, cpu.h, cpu.l, 0x00, CPU::ZERO);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x0F, cpu.h, cpu.l, 0x00, CPU::HALF_CARRY);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x00, cpu.h, cpu.l, 0x0F, CPU::CARRY);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0xFF, cpu.h, cpu.l, 0xFF, CPU::ZERO);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x09, cpu.h, cpu.l, 0x08, CPU::HALF_CARRY);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x08, cpu.h, cpu.l, 0x09, CPU::CARRY);
 }
