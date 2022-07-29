@@ -680,8 +680,8 @@ class CpuInstructionTest : public ::testing::Test
 		mmu.write(cpu.pc, instruction);
 		int ticks = cpu.fetchDecodeAndExecute();
 		ASSERT_EQ(ticks, 1);
-        ASSERT_EQ(reg, expectedResult);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+		ASSERT_EQ(reg, expectedResult);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::SUBSTRACTION), expectedSubstractionFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedResult == 0);
@@ -699,8 +699,8 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.setCarryFlag(carryFlag);
 		int ticks = cpu.fetchDecodeAndExecute();
 		ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(reg, expectedResult);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+		ASSERT_EQ(reg, expectedResult);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::SUBSTRACTION), expectedSubstractionFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedResult == 0);
@@ -718,8 +718,8 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.setCarryFlag(carryFlag);
 		int ticks = cpu.fetchDecodeAndExecute();
 		ASSERT_EQ(ticks, 2);
-        ASSERT_EQ(reg, expectedResult);
-        ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
+		ASSERT_EQ(reg, expectedResult);
+		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), expectedHalfCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::SUBSTRACTION), expectedSubstractionFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), expectedResult == 0);
@@ -843,37 +843,71 @@ class CpuInstructionTest : public ::testing::Test
 		                           true, false, false);
 	}
 
-    void testXorOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, byte expectedResult)
-    {
-        testOp8BitsRegisterTo8BitsRegister(instruction, cpu.a, startValue, reg, value, expectedResult, true, false,
-                                           false, false);
-    }
+	void testXorOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, byte expectedResult)
+	{
+		testOp8BitsRegisterTo8BitsRegister(instruction, cpu.a, startValue, reg, value, expectedResult, true, false,
+		                                   false, false);
+	}
 
-    void testXorOperationWithRegister(byte instruction, byte& reg)
-    {
-        testXorOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
-        testXorOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x0F);
-        testXorOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x0F);
-        testXorOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x00);
-        testXorOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0x00);
-        testXorOperationWithRegister(instruction, 0x01, reg, 0x01, 0x00);
-        testXorOperationWithRegister(instruction, 0x10, reg, 0x10, 0x00);
-        testXorOperationWithRegister(instruction, 0x01, reg, 0x00, 0x01);
-        testXorOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
-        testXorOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0x00);
-    }
+	void testXorOperationWithRegister(byte instruction, byte& reg)
+	{
+		testXorOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
+		testXorOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x0F);
+		testXorOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x0F);
+		testXorOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x00);
+		testXorOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0x00);
+		testXorOperationWithRegister(instruction, 0x01, reg, 0x01, 0x00);
+		testXorOperationWithRegister(instruction, 0x10, reg, 0x10, 0x00);
+		testXorOperationWithRegister(instruction, 0x01, reg, 0x00, 0x01);
+		testXorOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
+		testXorOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0x00);
+	}
 
-    void testXorOperationWithImmediateValue(byte instruction, byte startValue, byte value, byte expectedResult)
-    {
-        testOpImmediateValueToRegister(instruction, cpu.a, startValue, value, expectedResult, true, false, false, false);
-    }
+	void testXorOperationWithImmediateValue(byte instruction, byte startValue, byte value, byte expectedResult)
+	{
+		testOpImmediateValueToRegister(instruction, cpu.a, startValue, value, expectedResult, true, false, false,
+		                               false);
+	}
 
-    void testXorOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
-                                    byte expectedResult)
-    {
-        testOpFromMemoryToRegister(instruction, cpu.a, startValue, regAddrMsb, regAddrLsb, value, expectedResult, true,
-                                   false, false, false);
-    }
+	void testXorOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
+	                                byte expectedResult)
+	{
+		testOpFromMemoryToRegister(instruction, cpu.a, startValue, regAddrMsb, regAddrLsb, value, expectedResult, true,
+		                           false, false, false);
+	}
+
+	void testOrOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, byte expectedResult)
+	{
+		testOp8BitsRegisterTo8BitsRegister(instruction, cpu.a, startValue, reg, value, expectedResult, true, false,
+		                                   false, false);
+	}
+
+	void testOrOperationWithRegister(byte instruction, byte& reg)
+	{
+		testOrOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
+		testOrOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x0F);
+		testOrOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x0F);
+		testOrOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x0F);
+		testOrOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0xF0);
+		testOrOperationWithRegister(instruction, 0x01, reg, 0x01, 0x01);
+		testOrOperationWithRegister(instruction, 0x10, reg, 0x10, 0x10);
+		testOrOperationWithRegister(instruction, 0x01, reg, 0x00, 0x01);
+		testOrOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
+		testOrOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0xFF);
+	}
+
+	void testOrOperationWithImmediateValue(byte instruction, byte startValue, byte value, byte expectedResult)
+	{
+		testOpImmediateValueToRegister(instruction, cpu.a, startValue, value, expectedResult, true, false, false,
+		                               false);
+	}
+
+	void testOrOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
+	                               byte expectedResult)
+	{
+		testOpFromMemoryToRegister(instruction, cpu.a, startValue, regAddrMsb, regAddrLsb, value, expectedResult, true,
+		                           false, false, false);
+	}
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1513,20 +1547,20 @@ TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterAndCarryToAnother)
 	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_H, cpu.a, cpu.h);
 	testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_L, cpu.a, cpu.l);
 
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
-                                        false);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x01, true, false,
-                                        false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x00, false, false,
+	                                    false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x00, cpu.a, 0x00, 0x01, true, false,
+	                                    false);
 
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true,
-                                        false);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1F, true, true,
-                                        false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1E, false, true,
+	                                    false);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0x0F, cpu.a, 0x0F, 0x1F, true, true,
+	                                    false);
 
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false,
-                                        true);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFF, true, false,
-                                        true);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFE, false, false,
+	                                    true);
+	testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADC_A_A, cpu.a, 0xFF, cpu.a, 0xFF, 0xFF, true, false,
+	                                    true);
 }
 
 TEST_F(CpuInstructionTest, InstructionAddValueFromMemoryAndCarryToRegister)
@@ -1678,48 +1712,94 @@ TEST_F(CpuInstructionTest, InstructionAndBetweenRegisterAndMemory)
 
 TEST_F(CpuInstructionTest, InstructionXorBetweenRegisterAndAccumulator)
 {
-    testXorOperationWithRegister(standardInstructions::XOR_B, cpu.b);
-    testXorOperationWithRegister(standardInstructions::XOR_C, cpu.c);
-    testXorOperationWithRegister(standardInstructions::XOR_D, cpu.d);
-    testXorOperationWithRegister(standardInstructions::XOR_E, cpu.e);
-    testXorOperationWithRegister(standardInstructions::XOR_H, cpu.h);
-    testXorOperationWithRegister(standardInstructions::XOR_L, cpu.l);
+	testXorOperationWithRegister(standardInstructions::XOR_B, cpu.b);
+	testXorOperationWithRegister(standardInstructions::XOR_C, cpu.c);
+	testXorOperationWithRegister(standardInstructions::XOR_D, cpu.d);
+	testXorOperationWithRegister(standardInstructions::XOR_E, cpu.e);
+	testXorOperationWithRegister(standardInstructions::XOR_H, cpu.h);
+	testXorOperationWithRegister(standardInstructions::XOR_L, cpu.l);
 
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x00, cpu.a, 0x00, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x0F, cpu.a, 0x0F, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0xF0, cpu.a, 0xF0, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x01, cpu.a, 0x01, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x10, cpu.a, 0x10, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0xFF, cpu.a, 0xFF, 0x00);
+	testXorOperationWithRegister(standardInstructions::XOR_A, 0x00, cpu.a, 0x00, 0x00);
+	testXorOperationWithRegister(standardInstructions::XOR_A, 0x0F, cpu.a, 0x0F, 0x00);
+	testXorOperationWithRegister(standardInstructions::XOR_A, 0xF0, cpu.a, 0xF0, 0x00);
+	testXorOperationWithRegister(standardInstructions::XOR_A, 0x01, cpu.a, 0x01, 0x00);
+	testXorOperationWithRegister(standardInstructions::XOR_A, 0x10, cpu.a, 0x10, 0x00);
+	testXorOperationWithRegister(standardInstructions::XOR_A, 0xFF, cpu.a, 0xFF, 0x00);
 }
 
 TEST_F(CpuInstructionTest, InstructionXorBetweenRegisterAndImmediateValue)
 {
 	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x00, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x0F, 0x00, 0x0F);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x0F, 0x0F);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x0F, 0x0F, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0xF0, 0xF0, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x01, 0x01, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x10, 0x10, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x01, 0x00, 0x01);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x01, 0x01);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0xFF, 0xFF, 0x00);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x0F, 0x00, 0x0F);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x0F, 0x0F);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x0F, 0x0F, 0x00);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0xF0, 0xF0, 0x00);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x01, 0x01, 0x00);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x10, 0x10, 0x00);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x01, 0x00, 0x01);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x01, 0x01);
+	testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0xFF, 0xFF, 0x00);
 }
 
 TEST_F(CpuInstructionTest, InstructionXorBetweenRegisterAndMemory)
 {
-    cpu.h = 0x12;
-    cpu.l = 0x23;
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x00, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x0F, cpu.h, cpu.l, 0x00, 0x0F);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x0F, 0x0F);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x0F, cpu.h, cpu.l, 0x0F, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0xF0, cpu.h, cpu.l, 0xF0, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x01, cpu.h, cpu.l, 0x01, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x10, cpu.h, cpu.l, 0x10, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x01, cpu.h, cpu.l, 0x00, 0x01);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x01, 0x01);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0xFF, cpu.h, cpu.l, 0xFF, 0x00);
+	cpu.h = 0x12;
+	cpu.l = 0x23;
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x00, 0x00);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x0F, cpu.h, cpu.l, 0x00, 0x0F);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x0F, 0x0F);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x0F, cpu.h, cpu.l, 0x0F, 0x00);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0xF0, cpu.h, cpu.l, 0xF0, 0x00);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x01, cpu.h, cpu.l, 0x01, 0x00);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x10, cpu.h, cpu.l, 0x10, 0x00);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x01, cpu.h, cpu.l, 0x00, 0x01);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x01, 0x01);
+	testXorOperationWithMemory(standardInstructions::XOR_HLm, 0xFF, cpu.h, cpu.l, 0xFF, 0x00);
+}
 
+TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndAccumulator)
+{
+	testOrOperationWithRegister(standardInstructions::OR_B, cpu.b);
+	testOrOperationWithRegister(standardInstructions::OR_C, cpu.c);
+	testOrOperationWithRegister(standardInstructions::OR_D, cpu.d);
+	testOrOperationWithRegister(standardInstructions::OR_E, cpu.e);
+	testOrOperationWithRegister(standardInstructions::OR_H, cpu.h);
+	testOrOperationWithRegister(standardInstructions::OR_L, cpu.l);
+
+	testOrOperationWithRegister(standardInstructions::OR_A, 0x00, cpu.a, 0x00, 0x00);
+	testOrOperationWithRegister(standardInstructions::OR_A, 0x0F, cpu.a, 0x0F, 0x0F);
+	testOrOperationWithRegister(standardInstructions::OR_A, 0xF0, cpu.a, 0xF0, 0xF0);
+	testOrOperationWithRegister(standardInstructions::OR_A, 0x01, cpu.a, 0x01, 0x01);
+	testOrOperationWithRegister(standardInstructions::OR_A, 0x10, cpu.a, 0x10, 0x10);
+	testOrOperationWithRegister(standardInstructions::OR_A, 0xFF, cpu.a, 0xFF, 0xFF);
+}
+
+ TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndImmediateValue)
+{
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x00, 0x00, 0x00);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x0F, 0x00, 0x0F);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x00, 0x0F, 0x0F);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x0F, 0x0F, 0x0F);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0xF0, 0xF0, 0xF0);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x01, 0x01, 0x01);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x10, 0x10, 0x10);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x01, 0x00, 0x01);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0x00, 0x01, 0x01);
+	testOrOperationWithImmediateValue(standardInstructions::OR_n, 0xFF, 0xFF, 0xFF);
+}
+
+ TEST_F(CpuInstructionTest, InstructionOrBetweenRegisterAndMemory)
+{
+	cpu.h = 0x12;
+	cpu.l = 0x23;
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x00, cpu.h, cpu.l, 0x00, 0x00);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x0F, cpu.h, cpu.l, 0x00, 0x0F);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x00, cpu.h, cpu.l, 0x0F, 0x0F);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x0F, cpu.h, cpu.l, 0x0F, 0x0F);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0xF0, cpu.h, cpu.l, 0xF0, 0xF0);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x01, cpu.h, cpu.l, 0x01, 0x01);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x10, cpu.h, cpu.l, 0x10, 0x10);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x01, cpu.h, cpu.l, 0x00, 0x01);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0x00, cpu.h, cpu.l, 0x01, 0x01);
+	testOrOperationWithMemory(standardInstructions::OR_HLm, 0xFF, cpu.h, cpu.l, 0xFF, 0xFF);
 }
