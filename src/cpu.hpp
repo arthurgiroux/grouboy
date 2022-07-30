@@ -1011,8 +1011,18 @@ class CPU
 	 */
 	void compareAccumulatorAndImmediateValue();
 
-	// Pop the value pointed by sp in X and sp+1 in X
-	void POP_XY(byte X, byte Y);
+    /**
+     * Pop contents from the memory stack into register pairs.
+     *
+	 * @param regMsb   the register where the msb will be stored
+	 * @param regLsb   the register where the lsb will be stored
+     *
+     * @opcodes:
+     *     0xC1 0xD1 0xE1 0xF1
+     * @flags_affected: N/A
+     * @number_of_ticks: 3
+     */
+	void popMemoryIntoRegisterPair(byte& regMsb, byte& regLsb);
 
 	/**
 	 * Return control to the caller of the subroutine.

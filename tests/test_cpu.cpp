@@ -980,6 +980,22 @@ class CpuInstructionTest : public ::testing::Test
             ASSERT_EQ(cpu.pc, 0x03);
 		}
 	}
+
+	void testPopMemoryIntoRegisterPair(int instruction, byte& regMsb, byte& regLsb) {
+        uint16_t startSp = 0xFFFC;
+        cpu.sp = startSp;
+		int msbValue = 0x3C;
+		int lsbValue = 0x5F;
+        mmu.write(cpu.sp, lsbValue);
+        mmu.write(cpu.sp + 1, msbValue);
+        mmu.write(cpu.pc, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 3);
+        ASSERT_EQ(cpu.pc, 1);
+        ASSERT_EQ(cpu.sp, startSp + 2);
+        ASSERT_EQ(regMsb, msbValue);
+        ASSERT_EQ(regLsb, lsbValue);
+	}
 };
 
 TEST_F(CpuTest, RegistersValueAtInitAreCorrect)
@@ -1990,4 +2006,24 @@ TEST_F(CpuInstructionTest, InstructionReturnAfterInterrupt)
     ASSERT_EQ(cpu.getFlag(), 0x00);
     ASSERT_EQ(cpu.pc, callerAddr);
 	ASSERT_FALSE(cpu.interrupts);
+}
+
+TEST_F(CpuInstructionTest, InstructionPopMemoryContentBC)
+{
+    testPopMemoryIntoRegisterPair(standardInstructions::POP_BC, cpu.b, cpu.c);
+}
+
+TEST_F(CpuInstructionTest, InstructionPopMemoryContentDE)
+{
+    testPopMemoryIntoRegisterPair(standardInstructions::POP_DE, cpu.d, cpu.e);
+}
+
+TEST_F(CpuInstructionTest, InstructionPopMemoryContentHL)
+{
+    testPopMemoryIntoRegisterPair(standardInstructions::POP_HL, cpu.h, cpu.l);
+}
+
+TEST_F(CpuInstructionTest, InstructionPopMemoryContentAF)
+{
+    testPopMemoryIntoRegisterPair(standardInstructions::POP_AF, cpu.a, cpu.f);
 }
