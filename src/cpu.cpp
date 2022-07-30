@@ -707,10 +707,10 @@ void CPU::compareAccumulatorAndImmediateValue()
 	lastInstructionTicks = 2;
 }
 
-void CPU::POP_XY(byte X, byte Y)
+void CPU::popMemoryIntoRegisterPair(byte& regMsb, byte& regLsb)
 {
-	Y = mmu.read(sp);
-	X = mmu.read(sp + 1);
+    regLsb = mmu.read(sp);
+    regMsb = mmu.read(sp + 1);
 	sp += 2;
 	lastInstructionTicks = 3;
 }
@@ -1751,7 +1751,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case POP_BC:
-		POP_XY(b, c);
+		popMemoryIntoRegisterPair(b, c);
 		break;
 
 	case JP_NZ_nn:
@@ -1819,7 +1819,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case POP_DE:
-		POP_XY(d, e);
+		popMemoryIntoRegisterPair(d, e);
 		break;
 
 	case JP_NC_nn:
@@ -1875,7 +1875,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case POP_HL:
-		POP_XY(h, l);
+		popMemoryIntoRegisterPair(h, l);
 		break;
 
 	case LD_Cm_A:
@@ -1922,7 +1922,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case POP_AF:
-		POP_XY(a, f);
+		popMemoryIntoRegisterPair(a, f);
 		break;
 
 	case LD_A_Cm:
