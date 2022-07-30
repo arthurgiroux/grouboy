@@ -22,6 +22,30 @@ class CPU
 	~CPU();
 
 	/**
+	 * Possible values for the CPU flag.
+	 */
+	enum CpuFlags : byte
+	{
+		/**
+		 * Set when the result of a math operation is zero or two values match when using the CP instruction.
+		 */
+		ZERO = 0x80,
+		/**
+		 * Set if a subtraction was performed in the last math instruction.
+		 */
+		SUBSTRACTION = 0x40,
+		/**
+		 * Set if a carry occurred from the lower nibble in the last math operation.
+		 */
+		HALF_CARRY = 0x20,
+		/**
+		 * Set if a carry occurred from the last math operation or if register A is the smaller value when executing the
+		 * CP instruction.
+		 */
+		CARRY = 0x10
+	};
+
+	/**
 	 * Fetch the next instruction from the memory, decode it and execute it.
 	 *
 	 * @throws UnhandledInstructionException if an instruction is not handled by the CPU
@@ -41,12 +65,32 @@ class CPU
 	}
 
 	/**
+	 * Set the value of register A.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterA(byte value)
+	{
+		a = value;
+	}
+
+	/**
 	 * Get the current value of the 8 bits register B.
 	 * @return the value of the register
 	 */
 	byte getRegisterB() const
 	{
 		return b;
+	}
+
+	/**
+	 * Set the value of register B.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterB(byte value)
+	{
+		b = value;
 	}
 
 	/**
@@ -59,12 +103,32 @@ class CPU
 	}
 
 	/**
+	 * Set the value of register C.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterC(byte value)
+	{
+		c = value;
+	}
+
+	/**
 	 * Get the current value of the 8 bits register D.
 	 * @return the value of the register
 	 */
 	byte getRegisterD() const
 	{
 		return d;
+	}
+
+	/**
+	 * Set the value of register D.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterD(byte value)
+	{
+		d = value;
 	}
 
 	/**
@@ -77,6 +141,16 @@ class CPU
 	}
 
 	/**
+	 * Set the value of register E.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterE(byte value)
+	{
+		e = value;
+	}
+
+	/**
 	 * Get the current value of the 8 bits register H.
 	 * @return the value of the register
 	 */
@@ -86,12 +160,32 @@ class CPU
 	}
 
 	/**
+	 * Set the value of register H.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterH(byte value)
+	{
+		h = value;
+	}
+
+	/**
 	 * Get the current value of the 8 bits register L.
 	 * @return the value of the register
 	 */
 	byte getRegisterL() const
 	{
 		return l;
+	}
+
+	/**
+	 * Set the value of register L.
+	 *
+	 * @param value     The value to set.
+	 */
+	void setRegisterL(byte value)
+	{
+		l = value;
 	}
 
 	/**
@@ -106,16 +200,35 @@ class CPU
 	}
 
 	/**
+	 * Set the value of the program counter.
+	 *
+	 * @param value The value to set.
+	 */
+	void setProgramCounter(uint16_t value)
+	{
+		pc = value;
+	}
+
+	/**
 	 * Retrieve the current address of the stack pointer.
 	 * The stack pointer is the address in memory of the stack,
 	 * a reserved area used for internal operations.
 	 *
 	 * @return the 16 bits value of the stack pointer.
 	 */
-
 	uint16_t getStackPointer() const
 	{
 		return sp;
+	}
+
+	/**
+	 * Set the value of the stack pointer.
+	 *
+	 * @param value The value to set.
+	 */
+	void setStackPointer(uint16_t value)
+	{
+		sp = value;
 	}
 
 	/**
@@ -159,20 +272,6 @@ class CPU
 #ifndef UNIT_TESTING
   private:
 #endif
-
-	/**
-	 * Possible values for the CPU flag.
-	 */
-	enum CpuFlags : byte
-	{
-		ZERO =
-		    0x80, /// Set when the result of a math operation is zero or two values match when using the CP instruction.
-		SUBSTRACTION = 0x40, /// Set if a subtraction was performed in the last math instruction.
-		HALF_CARRY = 0x20,   /// Set if a carry occurred from the lower nibble in the last math operation.
-		CARRY = 0x10 /// Set if a carry occurred from the last math operation or if register A is the smaller value when
-		             /// executing the CP instruction.
-	};
-
 	/**
 	 * Execute an instruction that is part of the standard instruction set.
 	 *
@@ -973,17 +1072,17 @@ class CPU
 	 */
 	void compareAccumulatorAndImmediateValue();
 
-    /**
-     * Pop contents from the memory stack into register pairs.
-     *
+	/**
+	 * Pop contents from the memory stack into register pairs.
+	 *
 	 * @param regMsb   the register where the msb will be stored
 	 * @param regLsb   the register where the lsb will be stored
-     *
-     * @opcodes:
-     *     0xC1 0xD1 0xE1 0xF1
-     * @flags_affected: N/A
-     * @number_of_ticks: 3
-     */
+	 *
+	 * @opcodes:
+	 *     0xC1 0xD1 0xE1 0xF1
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 3
+	 */
 	void popMemoryIntoRegisterPair(byte& regMsb, byte& regLsb);
 
 	/**
@@ -1173,43 +1272,43 @@ class CPU
 	 */
 	void resetFlags();
 
-    // internal registers
-    byte a{};
-    byte b{};
-    byte c{};
-    byte d{};
-    byte e{};
-    byte h{};
-    byte l{};
+	// internal registers
+	byte a{};
+	byte b{};
+	byte c{};
+	byte d{};
+	byte e{};
+	byte h{};
+	byte l{};
 
-    // flag register
-    byte f{};
+	// flag register
+	byte f{};
 
-    // current CPU tick
-    int tick;
+	// current CPU tick
+	int tick;
 
-    // How many ticks the latest instruction took
-    int lastInstructionTicks;
+	// How many ticks the latest instruction took
+	int lastInstructionTicks;
 
-    // program counter
-    uint16_t pc;
+	// program counter
+	uint16_t pc;
 
-    // stack pointer
-    uint16_t sp;
+	// stack pointer
+	uint16_t sp;
 
-    // Memory management unit
-    MMU& mmu;
+	// Memory management unit
+	MMU& mmu;
 
-    // Whether of not the CPU is halted
-    bool halted;
+	// Whether of not the CPU is halted
+	bool halted;
 
-    bool interrupts;
+	bool interrupts;
 
-    // How many ticks left before enabling the interrupts
-    byte ticksBeforeEnablingInterrupts;
+	// How many ticks left before enabling the interrupts
+	byte ticksBeforeEnablingInterrupts;
 
-    // How many ticks left before disabling the interrupts
-    byte ticksBeforeDisablingInterrupts;
+	// How many ticks left before disabling the interrupts
+	byte ticksBeforeDisablingInterrupts;
 };
 
 #endif
