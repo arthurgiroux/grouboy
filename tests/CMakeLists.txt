@@ -12,6 +12,13 @@ add_executable(
         ../src/mmu.cpp
         ../src/mmu.hpp
         ../src/cpu.cpp
+        ../src/cpu_instructions_misc_control.cpp
+        ../src/cpu_instructions_jumps_calls.cpp
+        ../src/cpu_instructions_8bits_load_store_move.cpp
+        ../src/cpu_instructions_16bits_load_store_move.cpp
+        ../src/cpu_instructions_8bits_arithmetic_logical.cpp
+        ../src/cpu_instructions_16bits_arithmetic_logical.cpp
+        ../src/cpu_instructions_8bits_rotation_shifts_bit.cpp
         ../src/cpu.hpp
         ../src/gpu.cpp
         ../src/gpu.hpp
