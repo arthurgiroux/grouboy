@@ -189,44 +189,6 @@ class CPU
 	 */
 	void executeExtendedInstruction(const byte& opCode);
 
-	// internal registers
-	byte a{};
-	byte b{};
-	byte c{};
-	byte d{};
-	byte e{};
-	byte h{};
-	byte l{};
-
-	// flag register
-	byte f{};
-
-	// current CPU tick
-	int tick;
-
-	// How many ticks the latest instruction took
-	int lastInstructionTicks;
-
-	// program counter
-	uint16_t pc;
-
-	// stack pointer
-	uint16_t sp;
-
-	// Memory management unit
-	MMU& mmu;
-
-	// Whether of not the CPU is halted
-	bool halted;
-
-	bool interrupts;
-
-	// How many ticks left before enabling the interrupts
-	byte ticksBeforeEnablingInterrupts;
-
-	// How many ticks left before disabling the interrupts
-	byte ticksBeforeDisablingInterrupts;
-
 	/**
 	 * Perform no operation.
 	 *
@@ -1210,6 +1172,44 @@ class CPU
 	 * Reset all CPU flags
 	 */
 	void resetFlags();
+
+    // internal registers
+    byte a{};
+    byte b{};
+    byte c{};
+    byte d{};
+    byte e{};
+    byte h{};
+    byte l{};
+
+    // flag register
+    byte f{};
+
+    // current CPU tick
+    int tick;
+
+    // How many ticks the latest instruction took
+    int lastInstructionTicks;
+
+    // program counter
+    uint16_t pc;
+
+    // stack pointer
+    uint16_t sp;
+
+    // Memory management unit
+    MMU& mmu;
+
+    // Whether of not the CPU is halted
+    bool halted;
+
+    bool interrupts;
+
+    // How many ticks left before enabling the interrupts
+    byte ticksBeforeEnablingInterrupts;
+
+    // How many ticks left before disabling the interrupts
+    byte ticksBeforeDisablingInterrupts;
 };
 
 #endif
