@@ -523,60 +523,6 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testJumpConditional(byte instruction, bool condition)
-	{
-		auto flag = cpu.getFlag();
-		cpu.pc = 0x00;
-		uint16_t addr = 0x1234;
-		mmu.write(cpu.pc, instruction);
-		mmu.writeWord(cpu.pc + 1, addr);
-		int ticks = cpu.fetchDecodeAndExecute();
-		if (condition)
-		{
-			ASSERT_EQ(ticks, 4);
-			ASSERT_EQ(cpu.pc, addr);
-		}
-		else
-		{
-			ASSERT_EQ(ticks, 3);
-			ASSERT_EQ(cpu.pc, 3);
-		}
-		ASSERT_EQ(cpu.getFlag(), flag);
-	}
-
-	void testJumpRelative(int8_t offset)
-	{
-		uint16_t startAddr = 0x1234;
-		cpu.pc = startAddr;
-		mmu.write(cpu.pc, standardInstructions::JR_n);
-		mmu.write(cpu.pc + 1, offset);
-		int ticks = cpu.fetchDecodeAndExecute();
-		ASSERT_EQ(ticks, 3);
-		ASSERT_EQ(cpu.getFlag(), 0x00);
-		ASSERT_EQ(cpu.pc, startAddr + 2 + offset);
-	}
-
-	void testJumpRelativeConditional(byte instruction, int8_t offset, bool condition)
-	{
-		auto flag = cpu.getFlag();
-		uint16_t startAddr = 0x1234;
-		cpu.pc = startAddr;
-		mmu.write(cpu.pc, instruction);
-		mmu.writeWord(cpu.pc + 1, offset);
-		int ticks = cpu.fetchDecodeAndExecute();
-		if (condition)
-		{
-			ASSERT_EQ(ticks, 3);
-			ASSERT_EQ(cpu.pc, startAddr + 2 + offset);
-		}
-		else
-		{
-			ASSERT_EQ(ticks, 2);
-			ASSERT_EQ(cpu.pc, startAddr + 2);
-		}
-		ASSERT_EQ(cpu.getFlag(), flag);
-	}
-
 	void testLoadValueToMemoryAndIncreaseAddr(byte instruction, byte& regAddrMsb, byte& regAddrLsb, byte& valueReg)
 	{
 		cpu.pc = 0x00;
@@ -1268,118 +1214,6 @@ TEST_F(CpuInstructionTest, InstructionRotateRightFromMemory)
 	testRotateRightFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RR_HLm}, cpu.h, cpu.l, 4);
 }
 
-TEST_F(CpuInstructionTest, InstructionJump)
-{
-	cpu.pc = 0x00;
-	uint16_t addr = 0x1234;
-	mmu.write(cpu.pc, standardInstructions::JP_nn);
-	mmu.writeWord(cpu.pc + 1, addr);
-	int ticks = cpu.fetchDecodeAndExecute();
-	ASSERT_EQ(ticks, 4);
-	ASSERT_EQ(cpu.getFlag(), 0x00);
-	ASSERT_EQ(cpu.pc, addr);
-}
-
-TEST_F(CpuInstructionTest, InstructionJumpConditional)
-{
-	cpu.resetFlags();
-	testJumpConditional(standardInstructions::JP_C_nn, false);
-	cpu.setFlag(CPU::CARRY);
-	testJumpConditional(standardInstructions::JP_C_nn, true);
-
-	cpu.resetFlags();
-	testJumpConditional(standardInstructions::JP_NC_nn, true);
-	cpu.setFlag(CPU::CARRY);
-	testJumpConditional(standardInstructions::JP_NC_nn, false);
-
-	cpu.resetFlags();
-	testJumpConditional(standardInstructions::JP_Z_nn, false);
-	cpu.setFlag(CPU::ZERO);
-	testJumpConditional(standardInstructions::JP_Z_nn, true);
-
-	cpu.resetFlags();
-	testJumpConditional(standardInstructions::JP_NZ_nn, true);
-	cpu.setFlag(CPU::ZERO);
-	testJumpConditional(standardInstructions::JP_NZ_nn, false);
-}
-
-TEST_F(CpuInstructionTest, InstructionJumpRegister)
-{
-	cpu.pc = 0x00;
-	cpu.h = 0x12;
-	cpu.l = 0x34;
-	uint16_t addr = 0x1234;
-	mmu.write(cpu.pc, standardInstructions::JP_HLm);
-	int ticks = cpu.fetchDecodeAndExecute();
-	ASSERT_EQ(ticks, 1);
-	ASSERT_EQ(cpu.getFlag(), 0x00);
-	ASSERT_EQ(cpu.pc, addr);
-}
-
-TEST_F(CpuInstructionTest, InstructionJumpRelative)
-{
-	testJumpRelative(0);
-	testJumpRelative(5);
-	testJumpRelative(-5);
-	testJumpRelative(127);
-	testJumpRelative(-127);
-}
-
-TEST_F(CpuInstructionTest, InstructionJumpRelativeConditional)
-{
-	cpu.resetFlags();
-	testJumpRelativeConditional(standardInstructions::JR_C_n, 0, false);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, 5, false);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, -5, false);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, 127, false);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, -127, false);
-	cpu.setFlag(CPU::CARRY);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, 0, true);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, 5, true);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, -5, true);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, 127, true);
-	testJumpRelativeConditional(standardInstructions::JR_C_n, -127, true);
-	cpu.resetFlags();
-
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, 0, true);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, 5, true);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, -5, true);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, 127, true);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, -127, true);
-	cpu.setFlag(CPU::CARRY);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, 0, false);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, 5, false);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, -5, false);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, 127, false);
-	testJumpRelativeConditional(standardInstructions::JR_NC_n, -127, false);
-
-	cpu.resetFlags();
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, 0, false);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, 5, false);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, -5, false);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, 127, false);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, -127, false);
-	cpu.setFlag(CPU::ZERO);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, 0, true);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, 5, true);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, -5, true);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, 127, true);
-	testJumpRelativeConditional(standardInstructions::JR_Z_n, -127, true);
-
-	cpu.resetFlags();
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 0, true);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 5, true);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, -5, true);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 127, true);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, -127, true);
-	cpu.setFlag(CPU::ZERO);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 0, false);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 5, false);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, -5, false);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, 127, false);
-	testJumpRelativeConditional(standardInstructions::JR_NZ_n, -127, false);
-}
-
 TEST_F(CpuInstructionTest, InstructionLoadValueToMemoryAndIncreaseAddr)
 {
 	cpu.a = 42;
@@ -2026,4 +1860,76 @@ TEST_F(CpuInstructionTest, InstructionPopMemoryContentHL)
 TEST_F(CpuInstructionTest, InstructionPopMemoryContentAF)
 {
     testPopMemoryIntoRegisterPair(standardInstructions::POP_AF, cpu.a, cpu.f);
+}
+
+TEST_F(CpuTest, GetSetStackPointerShouldChangeValue)
+{
+	uint16_t value = 0xCAFE;
+	ASSERT_EQ(cpu.getStackPointer(), 0x00);
+	cpu.setStackPointer(value);
+	ASSERT_EQ(cpu.getStackPointer(), value);
+}
+
+TEST_F(CpuTest, GetSetProgramCounterShouldChangeValue)
+{
+    uint16_t value = 0xCAFE;
+    ASSERT_EQ(cpu.getProgramCounter(), 0x00);
+    cpu.setProgramCounter(value);
+    ASSERT_EQ(cpu.getProgramCounter(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterAShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterA(), 0x00);
+    cpu.setRegisterA(value);
+    ASSERT_EQ(cpu.getRegisterA(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterBShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterB(), 0x00);
+    cpu.setRegisterB(value);
+    ASSERT_EQ(cpu.getRegisterB(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterCShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterC(), 0x00);
+    cpu.setRegisterC(value);
+    ASSERT_EQ(cpu.getRegisterC(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterDShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterD(), 0x00);
+    cpu.setRegisterD(value);
+    ASSERT_EQ(cpu.getRegisterD(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterEShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterE(), 0x00);
+    cpu.setRegisterE(value);
+    ASSERT_EQ(cpu.getRegisterE(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterHShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterH(), 0x00);
+    cpu.setRegisterH(value);
+    ASSERT_EQ(cpu.getRegisterH(), value);
+}
+
+TEST_F(CpuTest, GetSetRegisterLShouldChangeValue)
+{
+    uint16_t value = 0x12;
+    ASSERT_EQ(cpu.getRegisterL(), 0x00);
+    cpu.setRegisterL(value);
+    ASSERT_EQ(cpu.getRegisterL(), value);
 }
