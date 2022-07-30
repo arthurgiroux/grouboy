@@ -20,6 +20,28 @@ static uint16_t createAddrFromHighAndLowBytes(byte msb, byte lsb)
 }
 
 /**
+ * Get the Most significant Bit of a word (16 bits value).
+ *
+ * @param value     The word to split
+ * @return      The msb of the word
+ */
+static byte getMsbFromWord(uint16_t value)
+{
+    return value >> 8;
+}
+
+/**
+ * Get the Least significant Bit of a word (16 bits value).
+ *
+ * @param value     The word to split
+ * @return      The lsb of the word
+ */
+static byte getLsbFromWord(uint16_t value)
+{
+    return value;
+}
+
+/**
  * Format a string using a "printf"-style format.
  * @param fmt   The string to format
  * @param args  The value used for formatting
