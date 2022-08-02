@@ -114,26 +114,6 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testIncrement8BitRegister(byte instruction, const byte& reg)
-	{
-		cpu.pc = 0x00;
-		uint16_t expected_pc = 1;
-		for (int i = 1; i <= UINT8_MAX + 1; ++i)
-		{
-			byte expected_value = i;
-			mmu.write(cpu.pc, instruction);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, 1);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x10);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
-			ASSERT_EQ(reg, expected_value);
-			ASSERT_EQ(cpu.pc, expected_pc);
-			expected_pc++;
-		}
-	}
-
 	void testIncrement8BitsMemoryValue(byte instruction, byte& msbRegister, byte& lsbRegister)
 	{
 		cpu.pc = 0x00;
@@ -192,26 +172,6 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testDecrement8BitRegister(byte instruction, const byte& reg)
-	{
-		cpu.pc = 0x00;
-		uint16_t expected_pc = 1;
-		for (int i = UINT8_MAX; i >= 0; --i)
-		{
-			byte expected_value = i;
-			mmu.write(cpu.pc, instruction);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, 1);
-			ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x08);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
-			ASSERT_EQ(reg, expected_value);
-			ASSERT_EQ(cpu.pc, expected_pc);
-			expected_pc++;
-		}
-	}
-
 	void testDecrement8BitsMemoryValue(byte instruction, byte& msbRegister, byte& lsbRegister)
 	{
 		cpu.pc = 0x00;
@@ -226,7 +186,7 @@ class CpuInstructionTest : public ::testing::Test
 			int ticks = cpu.fetchDecodeAndExecute();
 			ASSERT_EQ(ticks, 3);
 			ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x08);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x0F);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 			ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
@@ -472,38 +432,6 @@ class CpuInstructionTest : public ::testing::Test
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
 			ASSERT_EQ(mmu.read(addr), expectedValue);
 		}
-	}
-
-	void testDecimalAdjustAccumulator(byte instruction, bool carryStateBeforeExecution, byte registerValue,
-	                                  bool halfCarryStateBeforeExecution, byte expectedRegisterValue,
-	                                  bool carryStateAfterExecution)
-	{
-		cpu.pc = 0x00;
-		cpu.a = registerValue;
-		cpu.setCarryFlag(carryStateBeforeExecution);
-		cpu.setHalfCarryFlag(halfCarryStateBeforeExecution);
-
-		mmu.write(cpu.pc, instruction);
-		int ticks = cpu.fetchDecodeAndExecute();
-		ASSERT_EQ(ticks, 1);
-		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), cpu.a == 0);
-		ASSERT_EQ(cpu.pc, 1);
-		ASSERT_EQ(cpu.a, expectedRegisterValue);
-		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), carryStateAfterExecution);
-		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), false);
-	}
-
-	void testComplementRegister(byte instruction, byte& reg, byte value, byte expectedValue)
-	{
-		cpu.pc = 0x00;
-		reg = value;
-		mmu.write(cpu.pc, instruction);
-		int ticks = cpu.fetchDecodeAndExecute();
-		ASSERT_EQ(ticks, 1);
-		ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
-		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
-		ASSERT_EQ(reg, expectedValue);
-		ASSERT_EQ(cpu.pc, 1);
 	}
 
 	void testOp8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue, byte& regOther,
@@ -920,13 +848,6 @@ TEST_F(CpuInstructionTest, InstructionIncrementRegister)
 	testIncrement8BitsRegisters(standardInstructions::INC_DE, cpu.d, cpu.e);
 	testIncrement8BitsRegisters(standardInstructions::INC_HL, cpu.h, cpu.l);
 	testIncrement16BitsRegister(standardInstructions::INC_SP, cpu.sp);
-	testIncrement8BitRegister(standardInstructions::INC_B, cpu.b);
-	testIncrement8BitRegister(standardInstructions::INC_C, cpu.c);
-	testIncrement8BitRegister(standardInstructions::INC_D, cpu.d);
-	testIncrement8BitRegister(standardInstructions::INC_E, cpu.e);
-	testIncrement8BitRegister(standardInstructions::INC_H, cpu.h);
-	testIncrement8BitRegister(standardInstructions::INC_L, cpu.l);
-	testIncrement8BitRegister(standardInstructions::INC_A, cpu.a);
 	testIncrement8BitsMemoryValue(standardInstructions::INC_HLm, cpu.h, cpu.l);
 }
 
@@ -936,13 +857,6 @@ TEST_F(CpuInstructionTest, InstructionDecrementRegister)
 	testDecrement8BitsRegisters(standardInstructions::DEC_DE, cpu.d, cpu.e);
 	testDecrement8BitsRegisters(standardInstructions::DEC_HL, cpu.h, cpu.l);
 	testDecrement16BitsRegister(standardInstructions::DEC_SP, cpu.sp);
-	testDecrement8BitRegister(standardInstructions::DEC_B, cpu.b);
-	testDecrement8BitRegister(standardInstructions::DEC_C, cpu.c);
-	testDecrement8BitRegister(standardInstructions::DEC_D, cpu.d);
-	testDecrement8BitRegister(standardInstructions::DEC_E, cpu.e);
-	testDecrement8BitRegister(standardInstructions::DEC_H, cpu.h);
-	testDecrement8BitRegister(standardInstructions::DEC_L, cpu.l);
-	testDecrement8BitRegister(standardInstructions::DEC_A, cpu.a);
 	testDecrement8BitsMemoryValue(standardInstructions::DEC_HLm, cpu.h, cpu.l);
 }
 
@@ -1053,65 +967,6 @@ TEST_F(CpuInstructionTest, InstructionRotateRightFromMemory)
 	testRotateRightFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RR_HLm}, cpu.h, cpu.l, 4);
 }
 
-TEST_F(CpuInstructionTest, InstructionDecimalAdjustAccumulator)
-{
-	// Taken from GameBoy programmer manual
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, false, 0x00, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x09, false, 0x09, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, false, 0x90, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x99, false, 0x99, false);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0A, false, 0x0A + 0x06, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x0F, false, 0x0F + 0x06, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9A, false, 0x9A + 0x06, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x9F, false, 0x9F + 0x06, false);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x00, true, 0x00 + 0x06, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x90, true, 0x90 + 0x06, false);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0x93, true, 0x93 + 0x06, false);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, false, static_cast<byte>(0xA0 + 0x60), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA9, false, static_cast<byte>(0xA9 + 0x60), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, false, static_cast<byte>(0xF0 + 0x60), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF9, false, static_cast<byte>(0xF9 + 0x60), true);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAA, false, static_cast<byte>(0xAA + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xAF, false, static_cast<byte>(0xAF + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFA, false, static_cast<byte>(0xFA + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xFF, false, static_cast<byte>(0xFF + 0x66), true);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA0, true, static_cast<byte>(0xA0 + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xA3, true, static_cast<byte>(0xA3 + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF0, true, static_cast<byte>(0xF0 + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, false, 0xF3, true, static_cast<byte>(0xF3 + 0x66), true);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, false, static_cast<byte>(0x00 + 0x60), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x02, false, static_cast<byte>(0x02 + 0x60), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, false, static_cast<byte>(0x30 + 0x60), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x39, false, static_cast<byte>(0x39 + 0x60), true);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0A, false, static_cast<byte>(0x0A + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x0F, false, static_cast<byte>(0x0F + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2A, false, static_cast<byte>(0x2A + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x2F, false, static_cast<byte>(0x2F + 0x66), true);
-
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x00, true, static_cast<byte>(0x00 + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x03, true, static_cast<byte>(0x03 + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x30, true, static_cast<byte>(0x30 + 0x66), true);
-	testDecimalAdjustAccumulator(standardInstructions::DAA, true, 0x33, true, static_cast<byte>(0x33 + 0x66), true);
-}
-
-TEST_F(CpuInstructionTest, InstructionComplementRegister)
-{
-	testComplementRegister(standardInstructions::CPL, cpu.a, 0x00, 0xFF);
-	testComplementRegister(standardInstructions::CPL, cpu.a, 0xFF, 0x00);
-	testComplementRegister(standardInstructions::CPL, cpu.a, 0x01, 0xFE);
-	testComplementRegister(standardInstructions::CPL, cpu.a, 0x10, 0xEF);
-	testComplementRegister(standardInstructions::CPL, cpu.a, 0x55, 0xAA);
-	testComplementRegister(standardInstructions::CPL, cpu.a, 0xAA, 0x55);
-}
-
 TEST_F(CpuInstructionTest, InstructionLoad16BitsImmediateValueInRegister)
 {
 	cpu.pc = 0x00;
@@ -1123,35 +978,6 @@ TEST_F(CpuInstructionTest, InstructionLoad16BitsImmediateValueInRegister)
 	ASSERT_EQ(cpu.getFlag(), 0x00);
 	ASSERT_EQ(cpu.pc, 3);
 	ASSERT_EQ(cpu.sp, value);
-}
-
-TEST_F(CpuInstructionTest, InstructionSetCarryFlag)
-{
-	cpu.pc = 0x00;
-	cpu.resetFlags();
-	cpu.setFlag(CPU::HALF_CARRY);
-	cpu.setFlag(CPU::SUBSTRACTION);
-	mmu.write(cpu.pc, standardInstructions::SCF);
-	int ticks = cpu.fetchDecodeAndExecute();
-	ASSERT_EQ(ticks, 1);
-	ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
-	ASSERT_EQ(cpu.pc, 1);
-}
-
-TEST_F(CpuInstructionTest, InstructionInvertsCarryFlag)
-{
-	cpu.pc = 0x00;
-	cpu.resetFlags();
-	cpu.setFlag(CPU::HALF_CARRY);
-	cpu.setFlag(CPU::SUBSTRACTION);
-	mmu.write(cpu.pc, standardInstructions::CCF);
-	int ticks = cpu.fetchDecodeAndExecute();
-	ASSERT_EQ(ticks, 1);
-	ASSERT_EQ(cpu.getFlag(), CPU::CARRY);
-	ASSERT_EQ(cpu.pc, 1);
-	mmu.write(cpu.pc, standardInstructions::CCF);
-	ticks = cpu.fetchDecodeAndExecute();
-	ASSERT_EQ(cpu.getFlag(), 0x00);
 }
 
 TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterTogether)

@@ -31,7 +31,8 @@ add_executable(
         test_tile.cpp
         test_utils.cpp
         test_cpu_instructions_jumps_calls.cpp
-        test_cpu_instructions_8bits_load_store_move.cpp)
+        test_cpu_instructions_8bits_load_store_move.cpp
+        test_cpu_instructions_8bits_arithmetic_logical.cpp)
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
 
