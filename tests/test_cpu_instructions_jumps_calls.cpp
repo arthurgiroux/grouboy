@@ -63,6 +63,43 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
 		ASSERT_EQ(cpu.getFlag(), flag);
 	}
 
+	void assertWeCanCallASubroutineAndReturnFromIt(int instruction) {
+		/**
+		 *  We are creating the following code execution in memory:
+		 *
+		 *  0x1234:    call fct;
+		 *  .....
+		 *  .....
+		 *  0x4321:    fct:
+		 *                return
+		 *
+		 */
+	    uint16_t startPc = 0x1234;
+		uint16_t routineAddr = 0x4321;
+		cpu.setProgramCounter(startPc);
+		mmu.write(cpu.getProgramCounter(), instruction);
+		mmu.writeWord(cpu.getProgramCounter() + 1, routineAddr);
+		mmu.write(routineAddr, standardInstructions::RET);
+
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 6);
+        ASSERT_EQ(cpu.getProgramCounter(), routineAddr);
+		cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(cpu.getProgramCounter(), startPc + 3);
+	}
+
+    void assertSubroutineIsNotCalled(int instruction) {
+        uint16_t startPc = 0x1234;
+        uint16_t routineAddr = 0x4321;
+        cpu.setProgramCounter(startPc);
+        mmu.write(cpu.getProgramCounter(), instruction);
+        mmu.writeWord(cpu.getProgramCounter() + 1, routineAddr);
+
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 3);
+        ASSERT_EQ(cpu.getProgramCounter(), startPc + 3);
+    }
+
 	MMU mmu;
 	CPU cpu = CPU(mmu);
 };
@@ -291,4 +328,44 @@ TEST_F(CpuInstructionsJumpsCallsTest, JumpRelativeConditionalNotZeroWithOffset12
 TEST_F(CpuInstructionsJumpsCallsTest, JumpRelativeConditionalNotZeroWithOffsetMinus127ShouldGoBackwardBy127WhenFlagIsUnset)
 {
     assertInstructionPerformedJumpAtOffset(standardInstructions::JR_NZ_n, -127, true);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineShouldExecuteSubroutine) {
+    assertWeCanCallASubroutineAndReturnFromIt(standardInstructions::CALL_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalCarryWhenCarryIsSetShouldExecuteSubroutine) {
+	cpu.setFlag(CPU::CARRY);
+    assertWeCanCallASubroutineAndReturnFromIt(standardInstructions::CALL_C_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalNotCarryWhenCarryIsUnsetShouldExecuteSubroutine) {
+    assertWeCanCallASubroutineAndReturnFromIt(standardInstructions::CALL_NC_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalZeroWhenZeroIsSetShouldExecuteSubroutine) {
+    cpu.setFlag(CPU::ZERO);
+    assertWeCanCallASubroutineAndReturnFromIt(standardInstructions::CALL_Z_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalNotZeroWhenZeroIsUnsetShouldExecuteSubroutine) {
+    assertWeCanCallASubroutineAndReturnFromIt(standardInstructions::CALL_NZ_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalCarryWhenCarryIsUnsetShouldNotExecuteSubroutine) {
+    assertSubroutineIsNotCalled(standardInstructions::CALL_C_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalNotCarryWhenCarryIsSetShouldNotExecuteSubroutine) {
+    cpu.setFlag(CPU::CARRY);
+	assertSubroutineIsNotCalled(standardInstructions::CALL_NC_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalZeroWhenZeroIsUnsetShouldNotExecuteSubroutine) {
+    assertSubroutineIsNotCalled(standardInstructions::CALL_Z_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalNotZeroWhenZeroIsSetShouldNotExecuteSubroutine) {
+    cpu.setFlag(CPU::ZERO);
+    assertSubroutineIsNotCalled(standardInstructions::CALL_NZ_nn);
 }

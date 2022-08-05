@@ -84,3 +84,25 @@ void CPU::returnInstructionAfterInterrupt()
     // Revisit what to do after implementing interrups
     interrupts = false;
 }
+
+void CPU::callImmediateSubroutineIfConditionSatisfied(bool condition)
+{
+    if (condition)
+    {
+        callImmediateSubroutine();
+    }
+    else
+    {
+		pc += 2;
+        lastInstructionTicks = 3;
+    }
+}
+
+
+void CPU::callImmediateSubroutine()
+{
+    sp -= 2;
+    mmu.writeWord(sp, pc + 2);
+    pc = mmu.readWord(pc);
+    lastInstructionTicks = 6;
+}

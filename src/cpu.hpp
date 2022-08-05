@@ -1094,6 +1094,7 @@ class CPU
 	 * @number_of_ticks: 4
 	 */
 	void returnInstruction();
+
 	/**
 	 * Return control to the caller of the subroutine if the condition is satisfied.
 	 *
@@ -1114,9 +1115,27 @@ class CPU
 	 */
 	void returnInstructionAfterInterrupt();
 
-	// if the condition is satisfied, push the current address to the stack
-	// and jump to the label
-	void CALL_X_NN(bool cond);
+	/**
+	 * Push the current program counter on the stack pointer
+	 * and load the immediate value in the program counter.
+	 *
+	 * @opcodes:
+	 *     0xCD
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 6
+	 */
+	void callImmediateSubroutine();
+
+    /**
+     * Push the current program counter on the stack pointer
+     * and load the immediate value in the program counter.
+     *
+     * @opcodes:
+     *     0xC4 0xD4 0xCC 0xDC
+     * @flags_affected: N/A
+     * @number_of_ticks: 6 if condition satisfied, 3 otherwise
+     */
+	void callImmediateSubroutineIfConditionSatisfied(bool cond);
 
 	/**
 	 * If the condition is true,

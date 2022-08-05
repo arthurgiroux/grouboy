@@ -237,21 +237,6 @@ void CPU::ADD_SP_X(sbyte X)
 	lastInstructionTicks = 4;
 }
 
-void CPU::CALL_X_NN(bool cond)
-{
-	if (cond)
-	{
-		sp -= 2;
-		mmu.writeWord(sp, pc + 2);
-		pc = mmu.read(pc);
-		lastInstructionTicks = 6;
-	}
-	else
-	{
-		lastInstructionTicks = 3;
-	}
-}
-
 void CPU::PUSH_XY(byte X, byte Y)
 {
 	sp -= 2;
@@ -1154,7 +1139,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CALL_NZ_nn:
-		CALL_X_NN(!isFlagSet(CpuFlags::ZERO));
+		callImmediateSubroutineIfConditionSatisfied(!isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case PUSH_BC:
@@ -1186,11 +1171,11 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CALL_Z_nn:
-		CALL_X_NN(isFlagSet(CpuFlags::ZERO));
+		callImmediateSubroutineIfConditionSatisfied(isFlagSet(CpuFlags::ZERO));
 		break;
 
 	case CALL_nn:
-		CALL_X_NN(true);
+		callImmediateSubroutine();
 		break;
 
 	case ADC_A_n:
@@ -1218,7 +1203,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CALL_NC_nn:
-		CALL_X_NN(!isFlagSet(CpuFlags::CARRY));
+		callImmediateSubroutineIfConditionSatisfied(!isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case PUSH_DE:
@@ -1246,7 +1231,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case CALL_C_nn:
-		CALL_X_NN(isFlagSet(CpuFlags::CARRY));
+		callImmediateSubroutineIfConditionSatisfied(isFlagSet(CpuFlags::CARRY));
 		break;
 
 	case SBC_A_n:
