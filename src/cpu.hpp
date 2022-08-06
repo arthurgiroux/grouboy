@@ -1239,8 +1239,18 @@ class CPU
 	 */
 	void invertsCarryFlag();
 
-	// Push the value XY on the stack pointer
-	void PUSH_XY(byte X, byte Y);
+    /**
+     * Push the content of a register pair onto the stack pointer.
+     *
+     * @param regMsb   the register containing the msb that will be pushed on the sp
+     * @param regLsb   the register containing the lsb that will be pushed on the sp
+     *
+     * @opcodes:
+     *     0xC5 0xD5 0xE5 0xF5
+     * @flags_affected: N/A
+     * @number_of_ticks: 4
+     */
+    void push16BitsOntoStackPointer(byte regMsb, byte regLsb);
 
 	// Save the value of the program counter on the stack pointer and
 	// set the value of pc to X
