@@ -237,14 +237,6 @@ void CPU::ADD_SP_X(sbyte X)
 	lastInstructionTicks = 4;
 }
 
-void CPU::PUSH_XY(byte X, byte Y)
-{
-	sp -= 2;
-	mmu.write(sp, X);
-	mmu.write(sp + 1, Y);
-	lastInstructionTicks = 4;
-}
-
 void CPU::RST_X(byte X)
 {
 	sp -= 2;
@@ -1143,7 +1135,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case PUSH_BC:
-		PUSH_XY(b, c);
+		push16BitsOntoStackPointer(b, c);
 		break;
 
 	case ADD_A_n:
@@ -1207,7 +1199,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case PUSH_DE:
-		PUSH_XY(d, e);
+		push16BitsOntoStackPointer(d, e);
 		break;
 
 	case SUB_A_n:
@@ -1259,7 +1251,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case PUSH_HL:
-		PUSH_XY(h, l);
+		push16BitsOntoStackPointer(h, l);
 		break;
 
 	case AND_n:
@@ -1311,7 +1303,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case PUSH_AF:
-		PUSH_XY(a, f);
+		push16BitsOntoStackPointer(a, f);
 		break;
 
 	case OR_n:
