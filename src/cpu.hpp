@@ -1252,9 +1252,18 @@ class CPU
      */
     void push16BitsOntoStackPointer(byte regMsb, byte regLsb);
 
-	// Save the value of the program counter on the stack pointer and
-	// set the value of pc to X
-	void RST_X(byte X);
+	/**
+	 * Call one of the predefined restart routine.
+	 * The program counter will jump to the routine at the given address.
+	 *
+	 * @param memoryAddr       the address of the routine
+	 *
+     * @opcodes:
+     *     0xC7 0xD7 0xE7 0xF7 0xCF 0xDF 0xEF 0xFF
+     * @flags_affected: N/A
+     * @number_of_ticks: 4
+	 */
+    void callRestartRoutine(byte memoryAddr);
 
 	// Load the value of X in the value pointed by 0xFF00 + pc
 	void LDH_Nm_X(byte X);

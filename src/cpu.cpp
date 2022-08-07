@@ -237,14 +237,6 @@ void CPU::ADD_SP_X(sbyte X)
 	lastInstructionTicks = 4;
 }
 
-void CPU::RST_X(byte X)
-{
-	sp -= 2;
-	mmu.writeWord(sp, pc);
-	pc = X;
-	lastInstructionTicks = 4;
-}
-
 void CPU::LDH_Nm_X(byte X)
 {
 	mmu.write(0xFF00 | mmu.read(pc), X);
@@ -1143,7 +1135,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_0:
-		RST_X(0x00);
+		callRestartRoutine(0x00);
 		break;
 
 	case RET_Z:
@@ -1175,7 +1167,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_8:
-		RST_X(0x08);
+		callRestartRoutine(0x08);
 		break;
 
 		/******************************************************/
@@ -1207,7 +1199,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_10:
-		RST_X(0x10);
+		callRestartRoutine(0x10);
 		break;
 
 	case RET_C:
@@ -1231,7 +1223,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_18:
-		RST_X(0x18);
+		callRestartRoutine(0x18);
 		break;
 
 		/******************************************************/
@@ -1259,7 +1251,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_20:
-		RST_X(0x20);
+		callRestartRoutine(0x20);
 		break;
 
 	case ADD_SP_d:
@@ -1279,7 +1271,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_28:
-		RST_X(0x28);
+		callRestartRoutine(0x28);
 		break;
 		/******************************************************/
 		/************************ 0xF0 ************************/
@@ -1311,7 +1303,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_30:
-		RST_X(0x30);
+		callRestartRoutine(0x30);
 		break;
 
 	case LDHL_SP_d:
@@ -1337,7 +1329,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RST_38:
-		RST_X(0x38);
+		callRestartRoutine(0x38);
 		break;
 
 	default:

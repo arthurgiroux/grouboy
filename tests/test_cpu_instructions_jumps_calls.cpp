@@ -100,6 +100,19 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
         ASSERT_EQ(cpu.getProgramCounter(), startPc + 3);
     }
 
+	void assertRestartRoutineIsCalled(int instruction, uint16_t expectedAddr) {
+        uint16_t startPc = 0x1234;
+		uint16_t startSp = 0x4321;
+		cpu.setProgramCounter(startPc);
+		cpu.setStackPointer(startSp);
+        mmu.write(cpu.getProgramCounter(), instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 4);
+		ASSERT_EQ(cpu.getStackPointer(), startSp - 2);
+		ASSERT_EQ(mmu.readWord(cpu.getStackPointer()), startPc + 1);
+		ASSERT_EQ(cpu.getProgramCounter(), expectedAddr);
+	}
+
 	MMU mmu;
 	CPU cpu = CPU(mmu);
 };
@@ -368,4 +381,36 @@ TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalZeroWhenZeroIsUns
 TEST_F(CpuInstructionsJumpsCallsTest, CallSubroutineConditionalNotZeroWhenZeroIsSetShouldNotExecuteSubroutine) {
     cpu.setFlag(CPU::ZERO);
     assertSubroutineIsNotCalled(standardInstructions::CALL_NZ_nn);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x00ShouldGoToAddr0x00) {
+	assertRestartRoutineIsCalled(standardInstructions::RST_0, 0x00);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x10ShouldGoToAddr0x10) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_10, 0x10);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x20ShouldGoToAddr0x20) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_20, 0x20);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x30ShouldGoToAddr0x30) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_30, 0x30);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x08ShouldGoToAddr0x08) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_8, 0x08);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x18ShouldGoToAddr0x18) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_18, 0x18);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x28ShouldGoToAddr0x28) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_28, 0x28);
+}
+
+TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x38ShouldGoToAddr0x38) {
+    assertRestartRoutineIsCalled(standardInstructions::RST_38, 0x38);
 }
