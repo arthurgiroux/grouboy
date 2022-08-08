@@ -1265,11 +1265,27 @@ class CPU
 	 */
     void callRestartRoutine(byte memoryAddr);
 
-	// Load the value of X in the value pointed by 0xFF00 + pc
-	void LDH_Nm_X(byte X);
+	/**
+	 * Load the content of the accumulator to the memory address
+	 * ($FF00 + immediate byte)
+	 *
+	 * @opcodes:
+	 *     0xE0
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 3
+	 */
+	void loadAccumulatorInHighMemoryValue();
 
-	// Load the value pointed by 0xFF00 + pc in X
-	void LDH_X_Nm(byte& X);
+	/**
+	 * Load the content of memory address ($FF00 + immediate byte)
+	 * into accumulator
+	 *
+	 * @opcodes:
+	 *     0xF0
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 3
+	 */
+	void loadHighMemoryValueInAccumulator();
 
 	void LD_Xm_Y(byte X, byte Y);
 

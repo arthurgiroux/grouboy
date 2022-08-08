@@ -833,3 +833,33 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load8BitsImmediateValueInMemorySho
     ASSERT_EQ(cpu.getProgramCounter(), 2);
     ASSERT_EQ(mmu.read(addr), value);
 }
+
+TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadAccummulatorInHighMemoryShouldLoadCorrectly)
+{
+    byte addrOffset = 0x12;
+	byte value = 0x42;
+	uint16_t expectedAddr = 0xFF12;
+	cpu.setRegisterA(value);
+    mmu.write(cpu.getProgramCounter(), standardInstructions::LDH_nm_A);
+    mmu.writeWord(cpu.getProgramCounter() + 1, addrOffset);
+    int ticks = cpu.fetchDecodeAndExecute();
+    ASSERT_EQ(ticks, 3);
+    ASSERT_EQ(cpu.getFlag(), 0x00);
+    ASSERT_EQ(cpu.getProgramCounter(), 2);
+    ASSERT_EQ(mmu.read(expectedAddr), value);
+}
+
+TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadHighMemoryInAccumulatorShouldLoadCorrectly)
+{
+	byte addrOffset = 0x12;
+	uint16_t expectedAddr = 0xFF12;
+	byte value = 0x42;
+	mmu.write(expectedAddr, value);
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LDH_A_nm);
+	mmu.writeWord(cpu.getProgramCounter() + 1, addrOffset);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.getProgramCounter(), 2);
+	ASSERT_EQ(cpu.getRegisterA(), value);
+}
