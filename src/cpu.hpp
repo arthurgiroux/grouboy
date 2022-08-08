@@ -1126,15 +1126,15 @@ class CPU
 	 */
 	void callImmediateSubroutine();
 
-    /**
-     * Push the current program counter on the stack pointer
-     * and load the immediate value in the program counter.
-     *
-     * @opcodes:
-     *     0xC4 0xD4 0xCC 0xDC
-     * @flags_affected: N/A
-     * @number_of_ticks: 6 if condition satisfied, 3 otherwise
-     */
+	/**
+	 * Push the current program counter on the stack pointer
+	 * and load the immediate value in the program counter.
+	 *
+	 * @opcodes:
+	 *     0xC4 0xD4 0xCC 0xDC
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 6 if condition satisfied, 3 otherwise
+	 */
 	void callImmediateSubroutineIfConditionSatisfied(bool cond);
 
 	/**
@@ -1239,18 +1239,18 @@ class CPU
 	 */
 	void invertsCarryFlag();
 
-    /**
-     * Push the content of a register pair onto the stack pointer.
-     *
-     * @param regMsb   the register containing the msb that will be pushed on the sp
-     * @param regLsb   the register containing the lsb that will be pushed on the sp
-     *
-     * @opcodes:
-     *     0xC5 0xD5 0xE5 0xF5
-     * @flags_affected: N/A
-     * @number_of_ticks: 4
-     */
-    void push16BitsOntoStackPointer(byte regMsb, byte regLsb);
+	/**
+	 * Push the content of a register pair onto the stack pointer.
+	 *
+	 * @param regMsb   the register containing the msb that will be pushed on the sp
+	 * @param regLsb   the register containing the lsb that will be pushed on the sp
+	 *
+	 * @opcodes:
+	 *     0xC5 0xD5 0xE5 0xF5
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
+	 */
+	void push16BitsOntoStackPointer(byte regMsb, byte regLsb);
 
 	/**
 	 * Call one of the predefined restart routine.
@@ -1258,12 +1258,12 @@ class CPU
 	 *
 	 * @param memoryAddr       the address of the routine
 	 *
-     * @opcodes:
-     *     0xC7 0xD7 0xE7 0xF7 0xCF 0xDF 0xEF 0xFF
-     * @flags_affected: N/A
-     * @number_of_ticks: 4
+	 * @opcodes:
+	 *     0xC7 0xD7 0xE7 0xF7 0xCF 0xDF 0xEF 0xFF
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
 	 */
-    void callRestartRoutine(byte memoryAddr);
+	void callRestartRoutine(byte memoryAddr);
 
 	/**
 	 * Load the content of the accumulator to the memory address
