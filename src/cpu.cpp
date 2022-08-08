@@ -237,20 +237,6 @@ void CPU::ADD_SP_X(sbyte X)
 	lastInstructionTicks = 4;
 }
 
-void CPU::LDH_Nm_X(byte X)
-{
-	mmu.write(0xFF00 | mmu.read(pc), X);
-	pc++;
-	lastInstructionTicks = 3;
-}
-
-void CPU::LDH_X_Nm(byte& X)
-{
-	X = mmu.read(0xFF00 + mmu.read(pc));
-	pc++;
-	lastInstructionTicks = 3;
-}
-
 void CPU::LD_Xm_Y(byte X, byte Y)
 {
 	mmu.write(0xFF00 | X, Y);
@@ -1231,7 +1217,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LDH_nm_A:
-		LDH_Nm_X(a);
+        loadAccumulatorInHighMemoryValue();
 		break;
 
 	case POP_HL:
@@ -1278,7 +1264,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LDH_A_nm:
-		LDH_X_Nm(a);
+        loadHighMemoryValueInAccumulator();
 		break;
 
 	case POP_AF:

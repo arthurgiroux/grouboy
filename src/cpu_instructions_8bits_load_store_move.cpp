@@ -81,3 +81,17 @@ void CPU::add8BitsValueTo8BitsRegister(byte& reg, byte value)
     lastInstructionTicks = 1;
 }
 
+void CPU::loadAccumulatorInHighMemoryValue()
+{
+    mmu.write(0xFF00 | mmu.read(pc), a);
+    pc++;
+    lastInstructionTicks = 3;
+}
+
+void CPU::loadHighMemoryValueInAccumulator()
+{
+    a = mmu.read(0xFF00 | mmu.read(pc));
+    pc++;
+    lastInstructionTicks = 3;
+}
+
