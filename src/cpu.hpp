@@ -324,9 +324,6 @@ class CPU
 	 */
 	void load16BitsImmediateValueIntoRegister(uint16_t& reg);
 
-	// Load the byte pointed by the address pointed by pc into X
-	void LD_X_NNm(byte& X);
-
 	/**
 	 * Load the 16 bits value of the given register to the immediate address.
 	 *
@@ -359,6 +356,17 @@ class CPU
 	 * @number_of_ticks: 2
 	 */
 	void loadImmediateValueInRegister(byte& reg);
+
+	/**
+	 * Load the immediate 16 bits value in the given 8 bits register.
+	 *
+	 * @param reg   the register in which to load the value
+	 * @opcodes:
+	 *     0xFA
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
+	 */
+	void loadImmediate16BitsValueIn8BitsRegister(byte& reg);
 
 	/**
 	 * Load the given value to the memory pointed by the given address.
@@ -1287,17 +1295,32 @@ class CPU
 	 */
 	void loadHighMemoryValueInAccumulator();
 
-	void LD_Xm_Y(byte X, byte Y);
+	/**
+	 * Load the content of the accumulator to the memory address
+	 * ($FF00 + other register value)
+	 *
+	 * @param   reg     the register to use for the memory value
+	 * @opcodes:
+	 *     0xE2
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
+	void loadAccumulatorInHighMemoryValue(byte reg);
 
-	void LD_X_Ym(byte& X, byte Y);
+	/**
+	 * Load the content of memory address ($FF00 + other register value)
+	 * into accumulator
+	 *
+	 * @param   reg     the register to use for the memory value
+	 *
+	 * @opcodes:
+	 *     0xF2
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
+	void loadHighMemoryValueInAccumulator(byte reg);
 
 	void ADD_SP_X(sbyte X);
-
-	// Load the value of X in the value pointed by 0xFF00 + pc
-	// void LDH_Xm_Y(byte X, byte Y);
-
-	// Load the value pointed by 0xFF + pc in X
-	// void LDH_X_Nm(byte& X);
 
 	// Set/unset the zero flag depending on value
 	void changeZeroValueFlag(byte value);

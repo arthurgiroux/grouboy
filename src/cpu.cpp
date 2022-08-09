@@ -95,13 +95,6 @@ void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z)
 	lastInstructionTicks = 3;
 }
 
-void CPU::LD_X_NNm(byte& X)
-{
-	X = mmu.read(mmu.readWord(pc));
-	pc += 2;
-	lastInstructionTicks = 4;
-}
-
 void CPU::SLA_X(byte& X)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -236,31 +229,6 @@ void CPU::ADD_SP_X(sbyte X)
 	setHalfCarryFlag((value <= 0x00FF) && (sp > 0x00FF));
 	lastInstructionTicks = 4;
 }
-
-void CPU::LD_Xm_Y(byte X, byte Y)
-{
-	mmu.write(0xFF00 | X, Y);
-	lastInstructionTicks = 2;
-}
-
-void CPU::LD_X_Ym(byte& X, byte Y)
-{
-	X = mmu.read(0xFF00 | Y);
-	lastInstructionTicks = 2;
-}
-
-/*
-void CPU::LDH_Xm_Y(byte X, byte Y) {
-    mmu.write(mmu.read(0xFF00 + mmu.read(pc)), X);
-    mmu.write(0xFF00 + mmu.read(X), Y);
-    lastInstructionTicks = 3;
-}
-
-void CPU::LDH_X_Nm(byte& X) {
-    (X = mmu.read(0xFF00 + mmu.read(pc));
-    pc++;
-    lastInstructionTicks = 3;
-}*/
 
 void CPU::executeInstruction(const byte& opCode)
 {
@@ -1225,7 +1193,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_Cm_A:
-		LD_Xm_Y(c, a);
+		loadAccumulatorInHighMemoryValue(c);
 		break;
 
 	case PUSH_HL:
@@ -1272,7 +1240,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_Cm:
-		LD_Xm_Y(h, l);
+		loadHighMemoryValueInAccumulator(c);
 		break;
 
 	case DI:
@@ -1302,7 +1270,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_nnm:
-		LD_X_NNm(a);
+        loadImmediate16BitsValueIn8BitsRegister(a);
 		break;
 
 	case EI:
