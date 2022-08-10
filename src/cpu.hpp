@@ -310,8 +310,32 @@ class CPU
 	 */
 	void load16BitsValueInRegisters(byte& msbRegister, byte& lsbRegister);
 
-	// Load the
-	void LD_XY_Z_N(byte& X, byte& Y, uint16_t Z);
+	/**
+	 * Load a 16 bits register + an immediate signed offset into another 16 bits register.
+	 *
+	 * @param msbRegister   the register that will be set to the 8 bit MSB of the value.
+	 * @param lsbRegister   the register that will be set to the 8 bit LSB of the value.
+	 * @param otherReg      The register containing the value to load
+	 * @opcodes:
+	 *     0xF8
+	 * @flags_affected: Zero, Substraction, Half-carry, Carry
+	 * @number_of_ticks: 3
+	 */
+	void load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister, byte& lsbRegister, uint16_t otherReg);
+
+	/**
+	 * Load two 8 bits register into a 16 bits register.
+	 *
+	 * @param reg      The register where to load the value
+	 * @param msbValue   the msb value to use.
+	 * @param lsbValue   the lsb value to use.
+
+	 * @opcodes:
+	 *     0xF9
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
+	void loadTwo8BitsRegisterIn16BitsRegister(uint16_t& reg, byte msbValue, byte lsbValue);
 
 	/**
 	 * Load the 16 bits immediate value into the given register.
