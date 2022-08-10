@@ -81,20 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::LD_XY_Z_N(byte& X, byte& Y, uint16_t Z)
-{
-	unsetFlag(CpuFlags::ZERO);
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	uint16_t value = (X << 8) | Y;
-	uint16_t xy = static_cast<int8_t>(mmu.read(pc)) + Z;
-	pc++;
-	X = (xy >> 8);
-	Y = xy & 0x00FF;
-	setCarryFlag((value > xy));
-	setHalfCarryFlag((value <= 0xFF) && (xy > 0xFF));
-	lastInstructionTicks = 3;
-}
-
 void CPU::SLA_X(byte& X)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -1261,12 +1247,11 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LDHL_SP_d:
-		LD_XY_Z_N(h, l, sp);
+        load16BitsRegisterAndImmediateOffsetIn16BitsRegister(h, l, sp);
 		break;
 
 	case LD_SP_HL:
-		mmu.writeWord(sp, (h << 8) | l);
-		lastInstructionTicks = 2;
+		loadTwo8BitsRegisterIn16BitsRegister(sp, h, l);
 		break;
 
 	case LD_A_nnm:
