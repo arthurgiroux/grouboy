@@ -1230,8 +1230,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case DI:
-		ticksBeforeDisablingInterrupts = 2;
-		lastInstructionTicks = 1;
+		disableInterrupts();
 		break;
 
 	case PUSH_AF:
@@ -1259,8 +1258,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case EI:
-		ticksBeforeEnablingInterrupts = 2;
-		lastInstructionTicks = 1;
+		enableInterrupts();
 		break;
 
 	case CP_n:
