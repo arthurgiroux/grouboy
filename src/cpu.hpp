@@ -1118,6 +1118,26 @@ class CPU
 	void popMemoryIntoRegisterPair(byte& regMsb, byte& regLsb);
 
 	/**
+	 * Enable interrupts routine.
+	 *
+	 * @opcodes:
+	 *     0xFB
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
+	void enableInterrupts();
+
+	/**
+	 * Disable interrupts routine.
+	 *
+	 * @opcodes:
+	 *     0xF3
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
+	void disableInterrupts();
+
+	/**
 	 * Return control to the caller of the subroutine.
 	 *
 	 * @opcodes:
