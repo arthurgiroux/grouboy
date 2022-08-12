@@ -1385,7 +1385,15 @@ class CPU
 	 */
 	void loadHighMemoryValueInAccumulator(byte reg);
 
-	void ADD_SP_X(sbyte X);
+    /**
+     * Add the content of the 8-bits immediate value to the stack pointer.
+     *
+     * @opcodes:
+     *     0xE8
+     * @flags_affected: Zero, Substraction, Half-Carry, Carry
+     * @number_of_ticks: 4
+     */
+	void addImmediateValueToStackPointer();
 
 	// Set/unset the zero flag depending on value
 	void changeZeroValueFlag(byte value);
