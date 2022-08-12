@@ -755,11 +755,33 @@ class CPU
 	 */
 	void rotateValueInMemoryRight(byte addrMsb, byte addrLsb);
 
-	// Shift left arithmetic of X
-	void SLA_X(byte& X);
+	/**
+	 * Shift left arithmetic of a register.
+	 * The value is shifted by 1 to the left and the bit 7 is put in the carry flag.
+	 *
+	 * @param reg   the register to shift
+	 *
+	 * @opcodes:
+	 *     0x20 0x21 0x22 0x23 0x24 0x25 0x27
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void shiftLeftArithmeticRegister(byte& reg);
 
-	// Shift left arithmetic of the value pointed by XY
-	void SLA_XYm(byte X, byte Y);
+	/**
+	 * Shift left arithmetic of a memory value.
+	 * The value is shifted by 1 to the left and the bit 7 is put in the carry flag.
+	 *
+	 * @param memoryAddr   the memory address of value to shift
+	 *
+	 * @opcodes:
+	 *     0x26
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 4
+	 */
+	void shiftLeftArithmeticMemory(uint16_t memoryAddr);
 
 	// Shift right arithmetic of X
 	void SRA_X(byte X);
@@ -1385,14 +1407,14 @@ class CPU
 	 */
 	void loadHighMemoryValueInAccumulator(byte reg);
 
-    /**
-     * Add the content of the 8-bits immediate value to the stack pointer.
-     *
-     * @opcodes:
-     *     0xE8
-     * @flags_affected: Zero, Substraction, Half-Carry, Carry
-     * @number_of_ticks: 4
-     */
+	/**
+	 * Add the content of the 8-bits immediate value to the stack pointer.
+	 *
+	 * @opcodes:
+	 *     0xE8
+	 * @flags_affected: Zero, Substraction, Half-Carry, Carry
+	 * @number_of_ticks: 4
+	 */
 	void addImmediateValueToStackPointer();
 
 	// Set/unset the zero flag depending on value
