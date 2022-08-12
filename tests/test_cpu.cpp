@@ -906,7 +906,7 @@ TEST_F(CpuInstructionTest, InstructionAddTwo8BitsRegisterToTwo8BitsRegister)
 TEST_F(CpuInstructionTest, InstructionAdd16BitsRegisterToTwo8BitsRegister)
 {
 	std::vector<uint16_t> startValues = {0x0000, 0x00FF, 0xFFFF, 0x0FFF, 0x0FFF};
-	std::vector<uint16_t> addValues = {0x0012, 0x0012, 0x0050, 0x0012, 0x0000};
+	std::vector<uint16_t> addValues = {0x1234, 0x1234, 0x0050, 0x0012, 0x0000};
 	add16BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_SP, cpu.h, cpu.l, cpu.sp, startValues, addValues);
 }
 

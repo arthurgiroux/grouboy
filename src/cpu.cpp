@@ -468,7 +468,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case ADD_HL_SP:
-		addTwo8BitsRegistersToTwo8BitsRegisters(h, l, (sp << 8), (sp & 0x00FF));
+		addTwo8BitsRegistersToTwo8BitsRegisters(h, l, getMsbFromWord(sp), getLsbFromWord(sp));
 		break;
 
 	case LD_A_HLm_D:
