@@ -1138,6 +1138,27 @@ class CPU
 	void disableInterrupts();
 
 	/**
+	 * Stop system clock and oscillator circuit.
+	 *
+	 * @opcodes:
+	 *     0x10
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
+	void stopInstruction();
+
+	/**
+	 * Stop system clock and enter halt mode.
+	 * Oscillator circuit and LCD controller continue to operate.
+	 *
+	 * @opcodes:
+	 *     0x76
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
+	void haltInstruction();
+
+	/**
 	 * Return control to the caller of the subroutine.
 	 *
 	 * @opcodes:
