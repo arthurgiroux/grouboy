@@ -296,9 +296,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case STOP:
-		// TODO:
-		// Stop cpu and gpu and wait for button to be pressed
-		lastInstructionTicks = 2;
+		stopInstruction();
 		break;
 
 	case LD_DE_nn:
@@ -730,8 +728,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case HALT:
-		halted = true;
-		lastInstructionTicks = 1;
+		haltInstruction();
 		break;
 
 	case LD_HLm_A:
