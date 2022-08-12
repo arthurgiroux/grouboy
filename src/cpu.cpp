@@ -1168,7 +1168,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LDH_nm_A:
-        loadAccumulatorInHighMemoryValue();
+		loadAccumulatorInHighMemoryValue();
 		break;
 
 	case POP_HL:
@@ -1215,7 +1215,7 @@ void CPU::executeInstruction(const byte& opCode)
 		/******************************************************/
 
 	case LDH_A_nm:
-        loadHighMemoryValueInAccumulator();
+		loadHighMemoryValueInAccumulator();
 		break;
 
 	case POP_AF:
@@ -1243,7 +1243,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LDHL_SP_d:
-        load16BitsRegisterAndImmediateOffsetIn16BitsRegister(h, l, sp);
+		load16BitsRegisterAndImmediateOffsetIn16BitsRegister(h, l, sp);
 		break;
 
 	case LD_SP_HL:
@@ -1251,7 +1251,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case LD_A_nnm:
-        loadImmediate16BitsValueIn8BitsRegister(a);
+		loadImmediate16BitsValueIn8BitsRegister(a);
 		break;
 
 	case EI:
