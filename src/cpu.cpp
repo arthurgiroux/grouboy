@@ -205,17 +205,6 @@ void CPU::SET_X_YZm(byte X, byte Y, byte Z)
 	lastInstructionTicks = 4;
 }
 
-void CPU::ADD_SP_X(sbyte X)
-{
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::ZERO);
-	uint16_t value = sp;
-	sp += X;
-	setCarryFlag(value > sp);
-	setHalfCarryFlag((value <= 0x00FF) && (sp > 0x00FF));
-	lastInstructionTicks = 4;
-}
-
 void CPU::executeInstruction(const byte& opCode)
 {
 	using namespace standardInstructions;
@@ -1192,7 +1181,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case ADD_SP_d:
-		ADD_SP_X(static_cast<sbyte>(mmu.read(pc++)));
+		addImmediateValueToStackPointer();
 		break;
 
 	case JP_HLm:
