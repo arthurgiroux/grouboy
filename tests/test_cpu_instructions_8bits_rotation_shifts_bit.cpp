@@ -298,9 +298,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterAF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterAShouldShiftByOne)
 {
-	cpu.setRegisterA(0x02);
+	cpu.setRegisterA(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_A);
-	ASSERT_EQ(cpu.getRegisterA(), 0x01);
+	ASSERT_EQ(cpu.getRegisterA(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -309,7 +309,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterAS
 {
 	cpu.setRegisterA(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_A);
-	ASSERT_EQ(cpu.getRegisterA(), 0x78);
+	ASSERT_EQ(cpu.getRegisterA(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -325,9 +325,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterBF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterBShouldShiftByOne)
 {
-	cpu.setRegisterB(0x02);
+	cpu.setRegisterB(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_B);
-	ASSERT_EQ(cpu.getRegisterB(), 0x01);
+	ASSERT_EQ(cpu.getRegisterB(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -336,7 +336,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterBS
 {
 	cpu.setRegisterB(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_B);
-	ASSERT_EQ(cpu.getRegisterB(), 0x78);
+	ASSERT_EQ(cpu.getRegisterB(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -352,9 +352,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterCF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterCShouldShiftByOne)
 {
-	cpu.setRegisterC(0x02);
+	cpu.setRegisterC(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_C);
-	ASSERT_EQ(cpu.getRegisterC(), 0x01);
+	ASSERT_EQ(cpu.getRegisterC(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -363,7 +363,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterCS
 {
 	cpu.setRegisterC(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_C);
-	ASSERT_EQ(cpu.getRegisterC(), 0x78);
+	ASSERT_EQ(cpu.getRegisterC(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -379,9 +379,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterDF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterDShouldShiftByOne)
 {
-	cpu.setRegisterD(0x02);
+	cpu.setRegisterD(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_D);
-	ASSERT_EQ(cpu.getRegisterD(), 0x01);
+	ASSERT_EQ(cpu.getRegisterD(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -390,7 +390,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterDS
 {
 	cpu.setRegisterD(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_D);
-	ASSERT_EQ(cpu.getRegisterD(), 0x78);
+	ASSERT_EQ(cpu.getRegisterD(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -406,9 +406,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterEF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterEShouldShiftByOne)
 {
-	cpu.setRegisterE(0x02);
+	cpu.setRegisterE(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_E);
-	ASSERT_EQ(cpu.getRegisterE(), 0x01);
+	ASSERT_EQ(cpu.getRegisterE(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -417,7 +417,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterES
 {
 	cpu.setRegisterE(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_E);
-	ASSERT_EQ(cpu.getRegisterE(), 0x78);
+	ASSERT_EQ(cpu.getRegisterE(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -433,9 +433,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterHF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterHShouldShiftByOne)
 {
-	cpu.setRegisterH(0x02);
+	cpu.setRegisterH(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_H);
-	ASSERT_EQ(cpu.getRegisterH(), 0x01);
+	ASSERT_EQ(cpu.getRegisterH(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -444,7 +444,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterHS
 {
 	cpu.setRegisterH(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_H);
-	ASSERT_EQ(cpu.getRegisterH(), 0x78);
+	ASSERT_EQ(cpu.getRegisterH(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -460,9 +460,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterLF
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterLShouldShiftByOne)
 {
-	cpu.setRegisterL(0x02);
+	cpu.setRegisterL(0x82);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_L);
-	ASSERT_EQ(cpu.getRegisterL(), 0x01);
+	ASSERT_EQ(cpu.getRegisterL(), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -471,7 +471,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterLS
 {
 	cpu.setRegisterL(0xF1);
 	assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SRA_L);
-	ASSERT_EQ(cpu.getRegisterL(), 0x78);
+	ASSERT_EQ(cpu.getRegisterL(), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -493,9 +493,9 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLSh
 	uint16_t addr = 0x1234;
 	cpu.setRegisterH(getMsbFromWord(addr));
 	cpu.setRegisterL(getLsbFromWord(addr));
-	mmu.write(addr, 0x02);
+	mmu.write(addr, 0x82);
 	assertShiftRightArithmeticInMemoryWasPerformed(extendedInstructions::SRA_HLm);
-	ASSERT_EQ(mmu.read(addr), 0x01);
+	ASSERT_EQ(mmu.read(addr), 0xC1);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
@@ -507,7 +507,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLSh
 	cpu.setRegisterL(getLsbFromWord(addr));
 	mmu.write(addr, 0xF1);
 	assertShiftRightArithmeticInMemoryWasPerformed(extendedInstructions::SRA_HLm);
-	ASSERT_EQ(mmu.read(addr), 0x78);
+	ASSERT_EQ(mmu.read(addr), 0xF8);
 	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }

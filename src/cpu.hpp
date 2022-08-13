@@ -783,33 +783,35 @@ class CPU
 	 */
 	void shiftLeftArithmeticMemory(uint16_t memoryAddr);
 
-    /**
-     * Shift right arithmetic of a register.
-     * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
-     *
-     * @param reg   the register to shift
-     *
-     * @opcodes:
-     *     0x28 0x29 0x2A 0x2B 0x2C 0x2D 0x2F
-     *
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void shiftRightArithmeticRegister(byte& reg);
+	/**
+	 * Shift right arithmetic of a register.
+	 * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
+	 * The bit 7 is kept intact.
+	 *
+	 * @param reg   the register to shift
+	 *
+	 * @opcodes:
+	 *     0x28 0x29 0x2A 0x2B 0x2C 0x2D 0x2F
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void shiftRightArithmeticRegister(byte& reg);
 
-    /**
-     * Shift right arithmetic of a memory value.
-     * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
-     *
-     * @param memoryAddr   the memory address of value to shift
-     *
-     * @opcodes:
-     *     0x2E
-     *
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 4
-     */
-    void shiftRightArithmeticMemory(uint16_t memoryAddr);
+	/**
+	 * Shift right arithmetic of a memory value.
+	 * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
+	 * The bit 7 is kept intact.
+	 *
+	 * @param memoryAddr   the memory address of value to shift
+	 *
+	 * @opcodes:
+	 *     0x2E
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 4
+	 */
+	void shiftRightArithmeticMemory(uint16_t memoryAddr);
 
 	// Shift right logical of X
 	void SRL_X(byte& X);
