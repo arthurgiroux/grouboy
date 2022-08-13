@@ -283,22 +283,3 @@ void CPU::compareAccumulatorAndImmediateValue()
     compareAccumulatorAndRegister(mmu.read(pc++));
     lastInstructionTicks = 2;
 }
-
-void CPU::shiftLeftArithmeticRegister(byte& reg)
-{
-    unsetFlag(CpuFlags::SUBSTRACTION);
-    unsetFlag(CpuFlags::ZERO);
-    unsetFlag(CpuFlags::HALF_CARRY);
-    setCarryFlag((reg & 0x80) > 0);
-    reg = (reg << 1);
-    changeZeroValueFlag(reg);
-    lastInstructionTicks = 2;
-}
-
-void CPU::shiftLeftArithmeticMemory(uint16_t memoryAddr)
-{
-    byte value = mmu.read(memoryAddr);
-    shiftLeftArithmeticRegister(value);
-    mmu.write(memoryAddr, value);
-    lastInstructionTicks = 4;
-}
