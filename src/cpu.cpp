@@ -81,26 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::SRA_X(byte X)
-{
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::ZERO);
-	unsetFlag(CpuFlags::HALF_CARRY);
-	unsetFlag(CpuFlags::CARRY);
-
-	X = ((X & 0x80) | (X >> 1));
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
-}
-
-void CPU::SRA_XYm(byte X, byte Y)
-{
-	byte value = mmu.read((X << 8) | Y);
-	SRA_X(value);
-	mmu.write((X << 8) | Y, value);
-	lastInstructionTicks = 4;
-}
-
 void CPU::SRL_X(byte& X)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -1422,31 +1402,35 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		break;
 
 	case SRA_B:
-		SRA_X(b);
+		shiftRightArithmeticRegister(b);
 		break;
 
 	case SRA_C:
-		SRA_X(c);
+		shiftRightArithmeticRegister(c);
 		break;
 
 	case SRA_D:
-		SRA_X(d);
+		shiftRightArithmeticRegister(d);
 		break;
 
 	case SRA_E:
-		SRA_X(e);
+		shiftRightArithmeticRegister(e);
 		break;
 
 	case SRA_H:
-		SRA_X(h);
+		shiftRightArithmeticRegister(h);
 		break;
 
+    case SRA_L:
+        shiftRightArithmeticRegister(l);
+        break;
+
 	case SRA_HLm:
-		SRA_XYm(h, l);
+        shiftRightArithmeticMemory(createAddrFromHighAndLowBytes(h, l));
 		break;
 
 	case SRA_A:
-		SRA_X(a);
+		shiftRightArithmeticRegister(a);
 		break;
 
 		/******************************************************/
