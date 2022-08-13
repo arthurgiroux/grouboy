@@ -813,11 +813,33 @@ class CPU
 	 */
 	void shiftRightArithmeticMemory(uint16_t memoryAddr);
 
-	// Shift right logical of X
-	void SRL_X(byte& X);
+    /**
+     * Shift right logical of a register.
+     * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
+     *
+     * @param reg   the register to shift
+     *
+     * @opcodes:
+     *     0x38 0x39 0x3A 0x3B 0x3C 0x3D 0x3F
+     *
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void shiftRightLogicalRegister(byte& reg);
 
-	// Shift right logical of the value pointed by XY
-	void SRL_XYm(byte X, byte Y);
+    /**
+     * Shift right logical of a memory value.
+     * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
+     *
+     * @param memoryAddr   the memory address of value to shift
+     *
+     * @opcodes:
+     *     0x3E
+     *
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 4
+     */
+    void shiftRightLogicalMemory(uint16_t memoryAddr);
 
 	// Swap the high and low nibble of X
 	void SWAP_X(byte& X);

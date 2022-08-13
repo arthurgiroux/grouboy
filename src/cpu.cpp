@@ -81,26 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::SRL_X(byte& X)
-{
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::ZERO);
-	unsetFlag(CpuFlags::HALF_CARRY);
-
-	setCarryFlag((X & 0x01) > 0);
-	X = (X >> 1);
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
-}
-
-void CPU::SRL_XYm(byte X, byte Y)
-{
-	byte value = mmu.read((X << 8) | Y);
-	SRL_X(value);
-	mmu.write((X << 8) | Y, value);
-	lastInstructionTicks = 4;
-}
-
 void CPU::SWAP_X(byte& X)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -1457,6 +1437,10 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		SWAP_X(h);
 		break;
 
+    case SWAP_L:
+        SWAP_X(l);
+        break;
+
 	case SWAP_HLm:
 		SWAP_XYm(h, l);
 		break;
@@ -1466,31 +1450,35 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		break;
 
 	case SRL_B:
-		SRL_X(b);
+		shiftRightLogicalRegister(b);
 		break;
 
 	case SRL_C:
-		SRL_X(c);
+		shiftRightLogicalRegister(c);
 		break;
 
 	case SRL_D:
-		SRL_X(d);
+		shiftRightLogicalRegister(d);
 		break;
 
 	case SRL_E:
-		SRL_X(e);
+		shiftRightLogicalRegister(e);
 		break;
 
 	case SRL_H:
-		SRL_X(h);
+		shiftRightLogicalRegister(h);
 		break;
 
+    case SRL_L:
+        shiftRightLogicalRegister(l);
+        break;
+
 	case SRL_HLm:
-		SRL_XYm(h, l);
+		shiftRightLogicalMemory(createAddrFromHighAndLowBytes(h, l));
 		break;
 
 	case SRL_A:
-		SRL_X(a);
+		shiftRightLogicalRegister(a);
 		break;
 
 		/******************************************************/
