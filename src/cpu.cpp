@@ -81,27 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::SWAP_X(byte& X)
-{
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::ZERO);
-	unsetFlag(CpuFlags::HALF_CARRY);
-	unsetFlag(CpuFlags::CARRY);
-
-	// swap the two nibbles
-	X = ((X >> 4) | (X << 4));
-	changeZeroValueFlag(X);
-	lastInstructionTicks = 2;
-}
-
-void CPU::SWAP_XYm(byte X, byte Y)
-{
-	byte value = mmu.read((X << 8) | Y);
-	SWAP_X(value);
-	mmu.write((X << 8) | Y, value);
-	lastInstructionTicks = 4;
-}
-
 void CPU::BIT_X_Y(byte X, byte Y)
 {
 	unsetFlag(CpuFlags::SUBSTRACTION);
@@ -1418,35 +1397,35 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case SWAP_B:
-		SWAP_X(b);
+		swapNibblesInRegister(b);
 		break;
 
 	case SWAP_C:
-		SWAP_X(c);
+		swapNibblesInRegister(c);
 		break;
 
 	case SWAP_D:
-		SWAP_X(d);
+		swapNibblesInRegister(d);
 		break;
 
 	case SWAP_E:
-		SWAP_X(e);
+		swapNibblesInRegister(e);
 		break;
 
 	case SWAP_H:
-		SWAP_X(h);
+		swapNibblesInRegister(h);
 		break;
 
     case SWAP_L:
-        SWAP_X(l);
+        swapNibblesInRegister(l);
         break;
 
 	case SWAP_HLm:
-		SWAP_XYm(h, l);
+		swapNibblesInMemory(createAddrFromHighAndLowBytes(h, l));
 		break;
 
 	case SWAP_A:
-		SWAP_X(a);
+		swapNibblesInRegister(a);
 		break;
 
 	case SRL_B:

@@ -166,3 +166,23 @@ void CPU::shiftRightLogicalMemory(uint16_t memoryAddr)
     mmu.write(memoryAddr, value);
     lastInstructionTicks = 4;
 }
+
+void CPU::swapNibblesInRegister(byte& reg)
+{
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::HALF_CARRY);
+    unsetFlag(CpuFlags::CARRY);
+
+    // swap the two nibbles
+    reg = ((reg >> 4) | (reg << 4));
+    changeZeroValueFlag(reg);
+    lastInstructionTicks = 2;
+}
+
+void CPU::swapNibblesInMemory(uint16_t memoryAddr)
+{
+    byte value = mmu.read(memoryAddr);
+    swapNibblesInRegister(value);
+    mmu.write(memoryAddr, value);
+    lastInstructionTicks = 4;
+}

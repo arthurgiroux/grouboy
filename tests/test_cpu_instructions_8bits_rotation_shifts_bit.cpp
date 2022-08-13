@@ -74,6 +74,31 @@ class CpuInstructions8BitsRotationShiftsBitTest : public ::testing::Test
         ASSERT_FALSE(cpu.isFlagSet(CPU::HALF_CARRY));
         ASSERT_EQ(cpu.getProgramCounter(), 2);
     }
+
+    void assertSwapNibblesInRegisterWasPerformed(byte instruction)
+    {
+        mmu.write(cpu.getProgramCounter(), standardInstructions::EXT_OPS);
+        mmu.write(cpu.getProgramCounter() + 1, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 2);
+        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
+        ASSERT_FALSE(cpu.isFlagSet(CPU::HALF_CARRY));
+        ASSERT_FALSE(cpu.isFlagSet(CPU::CARRY));
+        ASSERT_EQ(cpu.getProgramCounter(), 2);
+    }
+
+    void assertSwapNibblesInMemoryWasPerformed(byte instruction)
+    {
+        mmu.write(cpu.getProgramCounter(), standardInstructions::EXT_OPS);
+        mmu.write(cpu.getProgramCounter() + 1, instruction);
+        int ticks = cpu.fetchDecodeAndExecute();
+        ASSERT_EQ(ticks, 4);
+        ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
+        ASSERT_FALSE(cpu.isFlagSet(CPU::HALF_CARRY));
+        ASSERT_FALSE(cpu.isFlagSet(CPU::CARRY));
+        ASSERT_EQ(cpu.getProgramCounter(), 2);
+    }
+
 	MMU mmu;
 	CPU cpu = CPU(mmu);
 };
@@ -761,3 +786,140 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLSh
     ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
 #pragma endregion
+
+#pragma region Swap nibbles
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterAForZeroShouldDoNothing)
+{
+    cpu.setRegisterA(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_A);
+    ASSERT_EQ(cpu.getRegisterA(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterAShouldSwapCorrectly)
+{
+    cpu.setRegisterA(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_A);
+    ASSERT_EQ(cpu.getRegisterA(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterBForZeroShouldDoNothing)
+{
+    cpu.setRegisterB(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_B);
+    ASSERT_EQ(cpu.getRegisterB(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterBShouldSwapCorrectly)
+{
+    cpu.setRegisterB(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_B);
+    ASSERT_EQ(cpu.getRegisterB(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterCForZeroShouldDoNothing)
+{
+    cpu.setRegisterC(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_C);
+    ASSERT_EQ(cpu.getRegisterC(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterCShouldSwapCorrectly)
+{
+    cpu.setRegisterC(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_C);
+    ASSERT_EQ(cpu.getRegisterC(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterDForZeroShouldDoNothing)
+{
+    cpu.setRegisterD(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_D);
+    ASSERT_EQ(cpu.getRegisterD(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterDShouldSwapCorrectly)
+{
+    cpu.setRegisterD(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_D);
+    ASSERT_EQ(cpu.getRegisterD(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterEForZeroShouldDoNothing)
+{
+    cpu.setRegisterE(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_E);
+    ASSERT_EQ(cpu.getRegisterE(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterEShouldSwapCorrectly)
+{
+    cpu.setRegisterE(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_E);
+    ASSERT_EQ(cpu.getRegisterE(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterHForZeroShouldDoNothing)
+{
+    cpu.setRegisterH(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_H);
+    ASSERT_EQ(cpu.getRegisterH(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterHShouldSwapCorrectly)
+{
+    cpu.setRegisterH(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_H);
+    ASSERT_EQ(cpu.getRegisterH(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterLForZeroShouldDoNothing)
+{
+    cpu.setRegisterL(0x00);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_L);
+    ASSERT_EQ(cpu.getRegisterL(), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterLShouldSwapCorrectly)
+{
+    cpu.setRegisterL(0x12);
+    assertShiftRightArithmeticRegisterWasPerformed(extendedInstructions::SWAP_L);
+    ASSERT_EQ(cpu.getRegisterL(), 0x21);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesInMemoryHLForZeroShouldDoNothing)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0x00);
+    assertShiftRightArithmeticInMemoryWasPerformed(extendedInstructions::SWAP_HLm);
+    ASSERT_EQ(mmu.read(addr), 0x00);
+    ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesInMemoryHLShouldSwapCorrectly)
+{
+    uint16_t addr = 0x1234;
+    cpu.setRegisterH(getMsbFromWord(addr));
+    cpu.setRegisterL(getLsbFromWord(addr));
+    mmu.write(addr, 0x56);
+    assertShiftRightArithmeticInMemoryWasPerformed(extendedInstructions::SWAP_HLm);
+    ASSERT_EQ(mmu.read(addr), 0x65);
+    ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::ZERO));
+}
+#pragma  endregion

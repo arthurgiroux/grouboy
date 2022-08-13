@@ -841,11 +841,31 @@ class CPU
      */
     void shiftRightLogicalMemory(uint16_t memoryAddr);
 
-	// Swap the high and low nibble of X
-	void SWAP_X(byte& X);
+    /**
+     * Swap the two nibbles of a register value.
+     *
+     * @param reg   the register to swap
+     *
+     * @opcodes:
+	 *     0x30 0x31 0x32 0x33 0x34 0x35 0x37
+     *
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 2
+     */
+    void swapNibblesInRegister(byte& reg);
 
-	// Swap the high and low nibble of the value pointed by XY
-	void SWAP_XYm(byte X, byte Y);
+    /**
+     * Swap the two nibbles of a memory value.
+     *
+     * @param memoryAddr   the memory address of value to swap
+     *
+     * @opcodes:
+     *     0x36
+     *
+     * @flags_affected: Zero, Carry, Half-carry, Substraction
+     * @number_of_ticks: 4
+     */
+    void swapNibblesInMemory(uint16_t memoryAddr);
 
 	// Test if the bit at position X is set in Y
 	void BIT_X_Y(byte X, byte Y);
