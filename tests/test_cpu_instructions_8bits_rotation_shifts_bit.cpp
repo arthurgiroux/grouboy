@@ -148,6 +148,32 @@ class CpuInstructions8BitsRotationShiftsBitTest : public ::testing::Test
 		ASSERT_FALSE(cpu.isFlagSet(CPU::ZERO));
 		ASSERT_EQ(cpu.getProgramCounter(), 2);
 	}
+
+	void assertBitSetWasPerformed(byte instruction)
+	{
+		mmu.write(cpu.getProgramCounter(), standardInstructions::EXT_OPS);
+		mmu.write(cpu.getProgramCounter() + 1, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_FALSE(cpu.isFlagSet(CPU::HALF_CARRY));
+		ASSERT_FALSE(cpu.isFlagSet(CPU::CARRY));
+		ASSERT_FALSE(cpu.isFlagSet(CPU::ZERO));
+		ASSERT_EQ(cpu.getProgramCounter(), 2);
+	}
+
+	void assertBitSetInMemoryWasPerformed(byte instruction)
+	{
+		mmu.write(cpu.getProgramCounter(), standardInstructions::EXT_OPS);
+		mmu.write(cpu.getProgramCounter() + 1, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 4);
+		ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
+		ASSERT_FALSE(cpu.isFlagSet(CPU::HALF_CARRY));
+		ASSERT_FALSE(cpu.isFlagSet(CPU::CARRY));
+		ASSERT_FALSE(cpu.isFlagSet(CPU::ZERO));
+		ASSERT_EQ(cpu.getProgramCounter(), 2);
+	}
 	MMU mmu;
 	CPU cpu = CPU(mmu);
 };
@@ -2862,5 +2888,951 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit7ShouldR
 	mmu.write(addr, 0b11111111);
 	assertBitResetInMemoryWasPerformed(extendedInstructions::RES_7_HLm);
 	ASSERT_EQ(mmu.read(addr), 0b01111111);
+}
+#pragma endregion
+
+#pragma region Bit Set
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterA(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegABit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterA(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterB(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegBBit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterB(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterC(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegCBit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterC(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterD(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegDBit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterD(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterE(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegEBit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterE(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterH(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegHBit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterH(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit0ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b00000001);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit0ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_0_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit1ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b00000010);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit1ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_1_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit2ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b00000100);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit2ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_2_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit3ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b00001000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit3ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_3_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit4ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b00010000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit4ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_4_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit5ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b00100000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit5ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_5_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit6ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b01000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit6ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_6_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit7ShouldNotChangeBitWhenSet)
+{
+	cpu.setRegisterL(0b10000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit7ShouldSetBitWhenUnset)
+{
+	cpu.setRegisterL(0b00000000);
+	assertBitSetWasPerformed(extendedInstructions::SET_7_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit0ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000001);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_0_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit0ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_0_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit1ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000010);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_1_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit1ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_1_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00000010);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit2ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000100);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_2_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit2ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_2_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00000100);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit3ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00001000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_3_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit3ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_3_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00001000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit4ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00010000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_4_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit4ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_4_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00010000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit5ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00100000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_5_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit5ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_5_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b00100000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit6ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b01000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_6_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit6ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_6_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit7ShouldNotChangeBitWhenSet)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b10000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_7_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit7ShouldSetBitWhenUnset)
+{
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, 0b00000000);
+	assertBitSetInMemoryWasPerformed(extendedInstructions::SET_7_HLm);
+	ASSERT_EQ(mmu.read(addr), 0b10000000);
 }
 #pragma endregion
