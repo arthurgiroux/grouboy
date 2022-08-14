@@ -931,11 +931,36 @@ class CPU
 	 */
 	void resetBitInMemory(uint16_t memoryAddr, byte bitPosition);
 
-	// Set the value of the bit at position X in Y
-	void SET_X_Y(byte X, byte& Y);
+	/**
+	 * Set the bit at "bitPosition" for the given value.
+	 *
+	 * @param reg           the value to change
+	 * @param bitPosition   the position of the bit to set ([0,7])
+	 *
+	 * @opcodes:
+	 *     0xC0 0xC1 0xC2 0xC3 0xC4 0xC5 0xC7 0xC8 0xC9 0xCA 0xCB 0xCC 0xCD 0xCF
+	 *     0xD0 0xD1 0xD2 0xD3 0xD4 0xD5 0xD7 0xD8 0xD9 0xDA 0xDB 0xDC 0xDD 0xDF
+	 *     0xE0 0xE1 0xE2 0xE3 0xE4 0xE5 0xE7 0xE8 0xE9 0xEA 0xEB 0xEC 0xED 0xEF
+	 *     0xF0 0xF1 0xF2 0xF3 0xF4 0xF5 0xF7 0xF8 0xF9 0xFA 0xFB 0xFC 0xFD 0xFF
+	 *
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 2
+	 */
+	void setBitForValue(byte& value, byte bitPosition);
 
-	// Set the value of the bit at position X in the value pointed by YZ
-	void SET_X_YZm(byte X, byte Y, byte Z);
+	/**
+	 * Set the bit at "bitPosition" at the given memory address.
+	 *
+	 * @param memoryAddr   the memory address of the value to change
+	 * @param bitPosition   the position of the bit to set ([0,7])
+	 *
+	 * @opcodes:
+	 *     0xC6 0xD6 0xE6 0xF6 0xCE 0xDE 0xEE 0xFE
+	 *
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 4
+	 */
+	void setBitInMemory(uint16_t memoryAddr, byte bitPosition);
 
 	/**
 	 * Arithmetic operation of adding the 16 bits value made from two

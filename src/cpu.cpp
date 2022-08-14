@@ -81,20 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::SET_X_Y(byte X, byte& Y)
-{
-	Y = (Y | (0x01 << X));
-	lastInstructionTicks = 2;
-}
-
-void CPU::SET_X_YZm(byte X, byte Y, byte Z)
-{
-	byte value = mmu.read((Y << 8) | Z);
-	SET_X_Y(X, value);
-	mmu.write((Y << 8) | Z, value);
-	lastInstructionTicks = 4;
-}
-
 void CPU::executeInstruction(const byte& opCode)
 {
 	using namespace standardInstructions;
@@ -1979,59 +1965,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case SET_0_B:
-		SET_X_Y(0, b);
+		setBitForValue(b, 0);
 		break;
 
 	case SET_0_C:
-		SET_X_Y(0, c);
+		setBitForValue(c, 0);
 		break;
 
 	case SET_0_D:
-		SET_X_Y(0, d);
+		setBitForValue(d, 0);
 		break;
 
 	case SET_0_E:
-		SET_X_Y(0, e);
+		setBitForValue(e, 0);
 		break;
 
 	case SET_0_H:
-		SET_X_Y(0, h);
+		setBitForValue(h, 0);
+		break;
+
+	case SET_0_L:
+		setBitForValue(l, 0);
 		break;
 
 	case SET_0_HLm:
-		SET_X_YZm(0, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 0);
 		break;
 
 	case SET_0_A:
-		SET_X_Y(0, a);
+		setBitForValue(a, 0);
 		break;
 
 	case SET_1_B:
-		SET_X_Y(1, b);
+		setBitForValue(b, 1);
 		break;
 
 	case SET_1_C:
-		SET_X_Y(1, c);
+		setBitForValue(c, 1);
 		break;
 
 	case SET_1_D:
-		SET_X_Y(1, d);
+		setBitForValue(d, 1);
 		break;
 
 	case SET_1_E:
-		SET_X_Y(1, e);
+		setBitForValue(e, 1);
 		break;
 
 	case SET_1_H:
-		SET_X_Y(1, h);
+		setBitForValue(h, 1);
+		break;
+
+	case SET_1_L:
+		setBitForValue(l, 1);
 		break;
 
 	case SET_1_HLm:
-		SET_X_YZm(1, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 1);
 		break;
 
 	case SET_1_A:
-		SET_X_Y(1, a);
+		setBitForValue(a, 1);
 		break;
 
 		/******************************************************/
@@ -2039,59 +2033,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case SET_2_B:
-		SET_X_Y(2, b);
+		setBitForValue(b, 2);
 		break;
 
 	case SET_2_C:
-		SET_X_Y(2, c);
+		setBitForValue(c, 2);
 		break;
 
 	case SET_2_D:
-		SET_X_Y(2, d);
+		setBitForValue(d, 2);
 		break;
 
 	case SET_2_E:
-		SET_X_Y(2, e);
+		setBitForValue(e, 2);
 		break;
 
 	case SET_2_H:
-		SET_X_Y(2, h);
+		setBitForValue(h, 2);
+		break;
+
+	case SET_2_L:
+		setBitForValue(l, 2);
 		break;
 
 	case SET_2_HLm:
-		SET_X_YZm(2, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 2);
 		break;
 
 	case SET_2_A:
-		SET_X_Y(2, a);
+		setBitForValue(a, 2);
 		break;
 
 	case SET_3_B:
-		SET_X_Y(3, b);
+		setBitForValue(b, 3);
 		break;
 
 	case SET_3_C:
-		SET_X_Y(3, c);
+		setBitForValue(c, 3);
 		break;
 
 	case SET_3_D:
-		SET_X_Y(3, d);
+		setBitForValue(d, 3);
 		break;
 
 	case SET_3_E:
-		SET_X_Y(3, e);
+		setBitForValue(e, 3);
 		break;
 
 	case SET_3_H:
-		SET_X_Y(3, h);
+		setBitForValue(h, 3);
+		break;
+
+	case SET_3_L:
+		setBitForValue(l, 3);
 		break;
 
 	case SET_3_HLm:
-		SET_X_YZm(3, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 3);
 		break;
 
 	case SET_3_A:
-		SET_X_Y(3, a);
+		setBitForValue(a, 3);
 		break;
 
 		/******************************************************/
@@ -2099,59 +2101,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case SET_4_B:
-		SET_X_Y(4, b);
+		setBitForValue(b, 4);
 		break;
 
 	case SET_4_C:
-		SET_X_Y(4, c);
+		setBitForValue(c, 4);
 		break;
 
 	case SET_4_D:
-		SET_X_Y(4, d);
+		setBitForValue(d, 4);
 		break;
 
 	case SET_4_E:
-		SET_X_Y(4, e);
+		setBitForValue(e, 4);
 		break;
 
 	case SET_4_H:
-		SET_X_Y(4, h);
+		setBitForValue(h, 4);
+		break;
+
+	case SET_4_L:
+		setBitForValue(l, 4);
 		break;
 
 	case SET_4_HLm:
-		SET_X_YZm(4, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 4);
 		break;
 
 	case SET_4_A:
-		SET_X_Y(4, a);
+		setBitForValue(a, 4);
 		break;
 
 	case SET_5_B:
-		SET_X_Y(5, b);
+		setBitForValue(b, 5);
 		break;
 
 	case SET_5_C:
-		SET_X_Y(5, c);
+		setBitForValue(c, 5);
 		break;
 
 	case SET_5_D:
-		SET_X_Y(5, d);
+		setBitForValue(d, 5);
 		break;
 
 	case SET_5_E:
-		SET_X_Y(5, e);
+		setBitForValue(e, 5);
 		break;
 
 	case SET_5_H:
-		SET_X_Y(5, h);
+		setBitForValue(h, 5);
+		break;
+
+	case SET_5_L:
+		setBitForValue(l, 5);
 		break;
 
 	case SET_5_HLm:
-		SET_X_YZm(5, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 5);
 		break;
 
 	case SET_5_A:
-		SET_X_Y(5, a);
+		setBitForValue(a, 5);
 		break;
 
 		/******************************************************/
@@ -2159,59 +2169,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case SET_6_B:
-		SET_X_Y(6, b);
+		setBitForValue(b, 6);
 		break;
 
 	case SET_6_C:
-		SET_X_Y(6, c);
+		setBitForValue(c, 6);
 		break;
 
 	case SET_6_D:
-		SET_X_Y(6, d);
+		setBitForValue(d, 6);
 		break;
 
 	case SET_6_E:
-		SET_X_Y(6, e);
+		setBitForValue(e, 6);
 		break;
 
 	case SET_6_H:
-		SET_X_Y(6, h);
+		setBitForValue(h, 6);
+		break;
+
+	case SET_6_L:
+		setBitForValue(l, 6);
 		break;
 
 	case SET_6_HLm:
-		SET_X_YZm(6, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 6);
 		break;
 
 	case SET_6_A:
-		SET_X_Y(6, a);
+		setBitForValue(a, 6);
 		break;
 
 	case SET_7_B:
-		SET_X_Y(7, b);
+		setBitForValue(b, 7);
 		break;
 
 	case SET_7_C:
-		SET_X_Y(7, c);
+		setBitForValue(c, 7);
 		break;
 
 	case SET_7_D:
-		SET_X_Y(7, d);
+		setBitForValue(d, 7);
 		break;
 
 	case SET_7_E:
-		SET_X_Y(7, e);
+		setBitForValue(e, 7);
 		break;
 
 	case SET_7_H:
-		SET_X_Y(7, h);
+		setBitForValue(h, 7);
+		break;
+
+	case SET_7_L:
+		setBitForValue(l, 7);
 		break;
 
 	case SET_7_HLm:
-		SET_X_YZm(7, h, l);
+		setBitInMemory(createAddrFromHighAndLowBytes(h, l), 7);
 		break;
 
 	case SET_7_A:
-		SET_X_Y(7, a);
+		setBitForValue(a, 7);
 		break;
 
 	default:
