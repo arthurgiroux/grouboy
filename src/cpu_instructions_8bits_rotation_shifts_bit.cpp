@@ -201,3 +201,17 @@ void CPU::isBitSetInMemory(uint16_t memoryAddr, byte bitPosition)
     isBitSetForValue(mmu.read(memoryAddr), bitPosition);
     lastInstructionTicks = 4;
 }
+
+void CPU::resetBitForValue(byte& value, byte bitPosition)
+{
+    value &= ~(1 << bitPosition);
+    lastInstructionTicks = 2;
+}
+
+void CPU::resetBitInMemory(uint16_t memoryAddr, byte bitPosition)
+{
+	byte value = mmu.read(memoryAddr);
+    resetBitForValue(value, bitPosition);
+    mmu.write(memoryAddr, value);
+    lastInstructionTicks = 4;
+}

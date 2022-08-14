@@ -81,20 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::RES_X_Y(byte X, byte& Y)
-{
-	Y = (Y & ~(0x01 << X));
-	lastInstructionTicks = 2;
-}
-
-void CPU::RES_X_YZm(byte X, byte Y, byte Z)
-{
-	byte value = mmu.read((Y << 8) | Z);
-	RES_X_Y(X, value);
-	mmu.write((Y << 8) | Z, value);
-	lastInstructionTicks = 4;
-}
-
 void CPU::SET_X_Y(byte X, byte& Y)
 {
 	Y = (Y | (0x01 << X));
@@ -1364,12 +1350,12 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		shiftRightArithmeticRegister(h);
 		break;
 
-    case SRA_L:
-        shiftRightArithmeticRegister(l);
-        break;
+	case SRA_L:
+		shiftRightArithmeticRegister(l);
+		break;
 
 	case SRA_HLm:
-        shiftRightArithmeticMemory(createAddrFromHighAndLowBytes(h, l));
+		shiftRightArithmeticMemory(createAddrFromHighAndLowBytes(h, l));
 		break;
 
 	case SRA_A:
@@ -1400,9 +1386,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		swapNibblesInRegister(h);
 		break;
 
-    case SWAP_L:
-        swapNibblesInRegister(l);
-        break;
+	case SWAP_L:
+		swapNibblesInRegister(l);
+		break;
 
 	case SWAP_HLm:
 		swapNibblesInMemory(createAddrFromHighAndLowBytes(h, l));
@@ -1432,9 +1418,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		shiftRightLogicalRegister(h);
 		break;
 
-    case SRL_L:
-        shiftRightLogicalRegister(l);
-        break;
+	case SRL_L:
+		shiftRightLogicalRegister(l);
+		break;
 
 	case SRL_HLm:
 		shiftRightLogicalMemory(createAddrFromHighAndLowBytes(h, l));
@@ -1468,9 +1454,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 0);
 		break;
 
-    case BIT_0_L:
-        isBitSetForValue(l, 0);
-        break;
+	case BIT_0_L:
+		isBitSetForValue(l, 0);
+		break;
 
 	case BIT_0_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 0);
@@ -1500,9 +1486,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 1);
 		break;
 
-    case BIT_1_L:
-        isBitSetForValue(l, 1);
-        break;
+	case BIT_1_L:
+		isBitSetForValue(l, 1);
+		break;
 
 	case BIT_1_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 1);
@@ -1536,9 +1522,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 2);
 		break;
 
-    case BIT_2_L:
-        isBitSetForValue(l, 2);
-        break;
+	case BIT_2_L:
+		isBitSetForValue(l, 2);
+		break;
 
 	case BIT_2_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 2);
@@ -1568,9 +1554,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 3);
 		break;
 
-    case BIT_3_L:
-        isBitSetForValue(l, 3);
-        break;
+	case BIT_3_L:
+		isBitSetForValue(l, 3);
+		break;
 
 	case BIT_3_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 3);
@@ -1604,9 +1590,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 4);
 		break;
 
-    case BIT_4_L:
-        isBitSetForValue(l, 4);
-        break;
+	case BIT_4_L:
+		isBitSetForValue(l, 4);
+		break;
 
 	case BIT_4_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 4);
@@ -1636,9 +1622,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 5);
 		break;
 
-    case BIT_5_L:
-        isBitSetForValue(l, 5);
-        break;
+	case BIT_5_L:
+		isBitSetForValue(l, 5);
+		break;
 
 	case BIT_5_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 5);
@@ -1672,9 +1658,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 6);
 		break;
 
-    case BIT_6_L:
-        isBitSetForValue(l, 6);
-        break;
+	case BIT_6_L:
+		isBitSetForValue(l, 6);
+		break;
 
 	case BIT_6_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 6);
@@ -1704,9 +1690,9 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		isBitSetForValue(h, 7);
 		break;
 
-    case BIT_7_L:
-        isBitSetForValue(l, 7);
-        break;
+	case BIT_7_L:
+		isBitSetForValue(l, 7);
+		break;
 
 	case BIT_7_HLm:
 		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 7);
@@ -1721,59 +1707,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case RES_0_B:
-		RES_X_Y(0, b);
+		resetBitForValue(b, 0);
 		break;
 
 	case RES_0_C:
-		RES_X_Y(0, c);
+		resetBitForValue(c, 0);
 		break;
 
 	case RES_0_D:
-		RES_X_Y(0, d);
+		resetBitForValue(d, 0);
 		break;
 
 	case RES_0_E:
-		RES_X_Y(0, e);
+		resetBitForValue(e, 0);
 		break;
 
 	case RES_0_H:
-		RES_X_Y(0, h);
+		resetBitForValue(h, 0);
+		break;
+
+	case RES_0_L:
+		resetBitForValue(l, 0);
 		break;
 
 	case RES_0_HLm:
-		RES_X_YZm(0, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 0);
 		break;
 
 	case RES_0_A:
-		RES_X_Y(0, a);
+		resetBitForValue(a, 0);
 		break;
 
 	case RES_1_B:
-		RES_X_Y(1, b);
+		resetBitForValue(b, 1);
 		break;
 
 	case RES_1_C:
-		RES_X_Y(1, c);
+		resetBitForValue(c, 1);
 		break;
 
 	case RES_1_D:
-		RES_X_Y(1, d);
+		resetBitForValue(d, 1);
 		break;
 
 	case RES_1_E:
-		RES_X_Y(1, e);
+		resetBitForValue(e, 1);
 		break;
 
 	case RES_1_H:
-		RES_X_Y(1, h);
+		resetBitForValue(h, 1);
+		break;
+
+	case RES_1_L:
+		resetBitForValue(l, 1);
 		break;
 
 	case RES_1_HLm:
-		RES_X_YZm(1, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 1);
 		break;
 
 	case RES_1_A:
-		RES_X_Y(1, a);
+		resetBitForValue(a, 1);
 		break;
 
 		/******************************************************/
@@ -1781,59 +1775,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case RES_2_B:
-		RES_X_Y(2, b);
+		resetBitForValue(b, 2);
 		break;
 
 	case RES_2_C:
-		RES_X_Y(2, c);
+		resetBitForValue(c, 2);
 		break;
 
 	case RES_2_D:
-		RES_X_Y(2, d);
+		resetBitForValue(d, 2);
 		break;
 
 	case RES_2_E:
-		RES_X_Y(2, e);
+		resetBitForValue(e, 2);
 		break;
 
 	case RES_2_H:
-		RES_X_Y(2, h);
+		resetBitForValue(h, 2);
+		break;
+
+	case RES_2_L:
+		resetBitForValue(l, 2);
 		break;
 
 	case RES_2_HLm:
-		RES_X_YZm(2, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 2);
 		break;
 
 	case RES_2_A:
-		RES_X_Y(2, a);
+		resetBitForValue(a, 2);
 		break;
 
 	case RES_3_B:
-		RES_X_Y(3, b);
+		resetBitForValue(b, 3);
 		break;
 
 	case RES_3_C:
-		RES_X_Y(3, c);
+		resetBitForValue(c, 3);
 		break;
 
 	case RES_3_D:
-		RES_X_Y(3, d);
+		resetBitForValue(d, 3);
 		break;
 
 	case RES_3_E:
-		RES_X_Y(3, e);
+		resetBitForValue(e, 3);
 		break;
 
 	case RES_3_H:
-		RES_X_Y(3, h);
+		resetBitForValue(h, 3);
+		break;
+
+	case RES_3_L:
+		resetBitForValue(l, 3);
 		break;
 
 	case RES_3_HLm:
-		RES_X_YZm(3, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 3);
 		break;
 
 	case RES_3_A:
-		RES_X_Y(3, a);
+		resetBitForValue(a, 3);
 		break;
 
 		/******************************************************/
@@ -1841,59 +1843,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case RES_4_B:
-		RES_X_Y(4, b);
+		resetBitForValue(b, 4);
 		break;
 
 	case RES_4_C:
-		RES_X_Y(4, c);
+		resetBitForValue(c, 4);
 		break;
 
 	case RES_4_D:
-		RES_X_Y(4, d);
+		resetBitForValue(d, 4);
 		break;
 
 	case RES_4_E:
-		RES_X_Y(4, e);
+		resetBitForValue(e, 4);
 		break;
 
 	case RES_4_H:
-		RES_X_Y(4, h);
+		resetBitForValue(h, 4);
+		break;
+
+	case RES_4_L:
+		resetBitForValue(l, 4);
 		break;
 
 	case RES_4_HLm:
-		RES_X_YZm(4, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 4);
 		break;
 
 	case RES_4_A:
-		RES_X_Y(4, a);
+		resetBitForValue(a, 4);
 		break;
 
 	case RES_5_B:
-		RES_X_Y(5, b);
+		resetBitForValue(b, 5);
 		break;
 
 	case RES_5_C:
-		RES_X_Y(5, c);
+		resetBitForValue(c, 5);
 		break;
 
 	case RES_5_D:
-		RES_X_Y(5, d);
+		resetBitForValue(d, 5);
 		break;
 
 	case RES_5_E:
-		RES_X_Y(5, e);
+		resetBitForValue(e, 5);
 		break;
 
 	case RES_5_H:
-		RES_X_Y(5, h);
+		resetBitForValue(h, 5);
+		break;
+
+	case RES_5_L:
+		resetBitForValue(l, 5);
 		break;
 
 	case RES_5_HLm:
-		RES_X_YZm(5, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 5);
 		break;
 
 	case RES_5_A:
-		RES_X_Y(5, a);
+		resetBitForValue(a, 5);
 		break;
 
 		/******************************************************/
@@ -1901,59 +1911,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case RES_6_B:
-		RES_X_Y(6, b);
+		resetBitForValue(b, 6);
 		break;
 
 	case RES_6_C:
-		RES_X_Y(6, c);
+		resetBitForValue(c, 6);
 		break;
 
 	case RES_6_D:
-		RES_X_Y(6, d);
+		resetBitForValue(d, 6);
 		break;
 
 	case RES_6_E:
-		RES_X_Y(6, e);
+		resetBitForValue(e, 6);
 		break;
 
 	case RES_6_H:
-		RES_X_Y(6, h);
+		resetBitForValue(h, 6);
+		break;
+
+	case RES_6_L:
+		resetBitForValue(l, 6);
 		break;
 
 	case RES_6_HLm:
-		RES_X_YZm(6, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 6);
 		break;
 
 	case RES_6_A:
-		RES_X_Y(6, a);
+		resetBitForValue(a, 6);
 		break;
 
 	case RES_7_B:
-		RES_X_Y(7, b);
+		resetBitForValue(b, 7);
 		break;
 
 	case RES_7_C:
-		RES_X_Y(7, c);
+		resetBitForValue(c, 7);
 		break;
 
 	case RES_7_D:
-		RES_X_Y(7, d);
+		resetBitForValue(d, 7);
 		break;
 
 	case RES_7_E:
-		RES_X_Y(7, e);
+		resetBitForValue(e, 7);
 		break;
 
 	case RES_7_H:
-		RES_X_Y(7, h);
+		resetBitForValue(h, 7);
+		break;
+
+	case RES_7_L:
+		resetBitForValue(l, 7);
 		break;
 
 	case RES_7_HLm:
-		RES_X_YZm(7, h, l);
+		resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 7);
 		break;
 
 	case RES_7_A:
-		RES_X_Y(7, a);
+		resetBitForValue(a, 7);
 		break;
 
 		/******************************************************/
