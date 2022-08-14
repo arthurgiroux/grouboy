@@ -186,3 +186,18 @@ void CPU::swapNibblesInMemory(uint16_t memoryAddr)
     mmu.write(memoryAddr, value);
     lastInstructionTicks = 4;
 }
+
+void CPU::isBitSetForValue(byte value, byte bitPosition)
+{
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    setFlag(CpuFlags::HALF_CARRY);
+    // If the value of the bit is not set then we set the flag zero
+    setFlagIfTrue(((value >> bitPosition) ^ 0x01), CpuFlags::ZERO);
+    lastInstructionTicks = 2;
+}
+
+void CPU::isBitSetInMemory(uint16_t memoryAddr, byte bitPosition)
+{
+    isBitSetForValue(mmu.read(memoryAddr), bitPosition);
+    lastInstructionTicks = 4;
+}

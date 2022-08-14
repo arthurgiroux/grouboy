@@ -813,65 +813,92 @@ class CPU
 	 */
 	void shiftRightArithmeticMemory(uint16_t memoryAddr);
 
-    /**
-     * Shift right logical of a register.
-     * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
-     *
-     * @param reg   the register to shift
-     *
-     * @opcodes:
-     *     0x38 0x39 0x3A 0x3B 0x3C 0x3D 0x3F
-     *
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void shiftRightLogicalRegister(byte& reg);
+	/**
+	 * Shift right logical of a register.
+	 * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
+	 *
+	 * @param reg   the register to shift
+	 *
+	 * @opcodes:
+	 *     0x38 0x39 0x3A 0x3B 0x3C 0x3D 0x3F
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void shiftRightLogicalRegister(byte& reg);
 
-    /**
-     * Shift right logical of a memory value.
-     * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
-     *
-     * @param memoryAddr   the memory address of value to shift
-     *
-     * @opcodes:
-     *     0x3E
-     *
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 4
-     */
-    void shiftRightLogicalMemory(uint16_t memoryAddr);
+	/**
+	 * Shift right logical of a memory value.
+	 * The value is shifted by 1 to the right and the bit 0 is put in the carry flag.
+	 *
+	 * @param memoryAddr   the memory address of value to shift
+	 *
+	 * @opcodes:
+	 *     0x3E
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 4
+	 */
+	void shiftRightLogicalMemory(uint16_t memoryAddr);
 
-    /**
-     * Swap the two nibbles of a register value.
-     *
-     * @param reg   the register to swap
-     *
-     * @opcodes:
+	/**
+	 * Swap the two nibbles of a register value.
+	 *
+	 * @param reg   the register to swap
+	 *
+	 * @opcodes:
 	 *     0x30 0x31 0x32 0x33 0x34 0x35 0x37
-     *
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 2
-     */
-    void swapNibblesInRegister(byte& reg);
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void swapNibblesInRegister(byte& reg);
 
-    /**
-     * Swap the two nibbles of a memory value.
-     *
-     * @param memoryAddr   the memory address of value to swap
-     *
-     * @opcodes:
-     *     0x36
-     *
-     * @flags_affected: Zero, Carry, Half-carry, Substraction
-     * @number_of_ticks: 4
-     */
-    void swapNibblesInMemory(uint16_t memoryAddr);
+	/**
+	 * Swap the two nibbles of a memory value.
+	 *
+	 * @param memoryAddr   the memory address of value to swap
+	 *
+	 * @opcodes:
+	 *     0x36
+	 *
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 4
+	 */
+	void swapNibblesInMemory(uint16_t memoryAddr);
 
-	// Test if the bit at position X is set in Y
-	void BIT_X_Y(byte X, byte Y);
+	/**
+	 * Test if the bit at "bitPosition" is set for the given value.
+	 * The Zero flag will be set if the given bit is not set.
+	 *
+	 * @param reg           the value to test
+	 * @param bitPosition   the position of the bit to test ([0,7])
+	 *
+	 * @opcodes:
+	 *     0x40 0x41 0x42 0x43 0x44 0x45 0x47 0x48 0x49 0x4A 0x4B 0x4C 0x4D 0x4F
+	 *     0x50 0x51 0x52 0x53 0x54 0x55 0x57 0x58 0x59 0x5A 0x5B 0x5C 0x5D 0x5F
+	 *     0x60 0x61 0x62 0x63 0x64 0x65 0x67 0x68 0x69 0x6A 0x6B 0x6C 0x6D 0x6F
+	 *     0x70 0x71 0x72 0x73 0x74 0x75 0x77 0x78 0x79 0x7A 0x7B 0x7C 0x7D 0x7F
+	 *
+	 * @flags_affected: Zero, Half-carry, Substraction
+	 * @number_of_ticks: 2
+	 */
+	void isBitSetForValue(byte value, byte bitPosition);
 
-	// Test if the bit at position X is set in the value pointed by YZ
-	void BIT_X_YZm(byte X, byte Y, byte Z);
+	/**
+	 * Test if the bit at "bitPosition" is set for the value at the given memory address.
+	 * The Zero flag will be set if the given bit is not set.
+	 *
+	 * @param memoryAddr   the memory address of the value to test
+	 * @param bitPosition   the position of the bit to test ([0,7])
+	 *
+	 * @opcodes:
+	 *     0x46 0x56 0x66 0x76 0x4E 0x5E 0x6E 0x7E
+	 *
+	 * @flags_affected: Zero, Half-carry, Substraction
+	 * @number_of_ticks: 4
+	 */
+	void isBitSetInMemory(uint16_t memoryAddr, byte bitPosition);
 
 	// Reset the value of the bit at position X in Y
 	void RES_X_Y(byte X, byte& Y);
