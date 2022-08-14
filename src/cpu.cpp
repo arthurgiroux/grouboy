@@ -81,22 +81,6 @@ void CPU::changeZeroValueFlag(byte value)
 
 CPU::~CPU() = default;
 
-void CPU::BIT_X_Y(byte X, byte Y)
-{
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	setFlag(CpuFlags::HALF_CARRY);
-	// If the value of the bit is set then we set the flag zero
-	changeZeroValueFlag((Y >> X) & 0x01);
-	lastInstructionTicks = 2;
-}
-
-void CPU::BIT_X_YZm(byte X, byte Y, byte Z)
-{
-	byte value = mmu.read((Y << 8) | Z);
-	BIT_X_Y(X, value);
-	lastInstructionTicks = 4;
-}
-
 void CPU::RES_X_Y(byte X, byte& Y)
 {
 	Y = (Y & ~(0x01 << X));
@@ -1465,59 +1449,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case BIT_0_B:
-		BIT_X_Y(0, b);
+		isBitSetForValue(b, 0);
 		break;
 
 	case BIT_0_C:
-		BIT_X_Y(0, c);
+		isBitSetForValue(c, 0);
 		break;
 
 	case BIT_0_D:
-		BIT_X_Y(0, d);
+		isBitSetForValue(d, 0);
 		break;
 
 	case BIT_0_E:
-		BIT_X_Y(0, e);
+		isBitSetForValue(e, 0);
 		break;
 
 	case BIT_0_H:
-		BIT_X_Y(0, h);
+		isBitSetForValue(h, 0);
 		break;
 
+    case BIT_0_L:
+        isBitSetForValue(l, 0);
+        break;
+
 	case BIT_0_HLm:
-		BIT_X_YZm(0, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 0);
 		break;
 
 	case BIT_0_A:
-		BIT_X_Y(0, a);
+		isBitSetForValue(a, 0);
 		break;
 
 	case BIT_1_B:
-		BIT_X_Y(1, b);
+		isBitSetForValue(b, 1);
 		break;
 
 	case BIT_1_C:
-		BIT_X_Y(1, c);
+		isBitSetForValue(c, 1);
 		break;
 
 	case BIT_1_D:
-		BIT_X_Y(1, d);
+		isBitSetForValue(d, 1);
 		break;
 
 	case BIT_1_E:
-		BIT_X_Y(1, e);
+		isBitSetForValue(e, 1);
 		break;
 
 	case BIT_1_H:
-		BIT_X_Y(1, h);
+		isBitSetForValue(h, 1);
 		break;
 
+    case BIT_1_L:
+        isBitSetForValue(l, 1);
+        break;
+
 	case BIT_1_HLm:
-		BIT_X_YZm(1, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 1);
 		break;
 
 	case BIT_1_A:
-		BIT_X_Y(1, a);
+		isBitSetForValue(a, 1);
 		break;
 
 		/******************************************************/
@@ -1525,59 +1517,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case BIT_2_B:
-		BIT_X_Y(2, b);
+		isBitSetForValue(b, 2);
 		break;
 
 	case BIT_2_C:
-		BIT_X_Y(2, c);
+		isBitSetForValue(c, 2);
 		break;
 
 	case BIT_2_D:
-		BIT_X_Y(2, d);
+		isBitSetForValue(d, 2);
 		break;
 
 	case BIT_2_E:
-		BIT_X_Y(2, e);
+		isBitSetForValue(e, 2);
 		break;
 
 	case BIT_2_H:
-		BIT_X_Y(2, h);
+		isBitSetForValue(h, 2);
 		break;
 
+    case BIT_2_L:
+        isBitSetForValue(l, 2);
+        break;
+
 	case BIT_2_HLm:
-		BIT_X_YZm(2, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 2);
 		break;
 
 	case BIT_2_A:
-		BIT_X_Y(2, a);
+		isBitSetForValue(a, 2);
 		break;
 
 	case BIT_3_B:
-		BIT_X_Y(3, b);
+		isBitSetForValue(b, 3);
 		break;
 
 	case BIT_3_C:
-		BIT_X_Y(3, c);
+		isBitSetForValue(c, 3);
 		break;
 
 	case BIT_3_D:
-		BIT_X_Y(3, d);
+		isBitSetForValue(d, 3);
 		break;
 
 	case BIT_3_E:
-		BIT_X_Y(3, e);
+		isBitSetForValue(e, 3);
 		break;
 
 	case BIT_3_H:
-		BIT_X_Y(3, h);
+		isBitSetForValue(h, 3);
 		break;
 
+    case BIT_3_L:
+        isBitSetForValue(l, 3);
+        break;
+
 	case BIT_3_HLm:
-		BIT_X_YZm(3, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 3);
 		break;
 
 	case BIT_3_A:
-		BIT_X_Y(3, a);
+		isBitSetForValue(a, 3);
 		break;
 
 		/******************************************************/
@@ -1585,59 +1585,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case BIT_4_B:
-		BIT_X_Y(4, b);
+		isBitSetForValue(b, 4);
 		break;
 
 	case BIT_4_C:
-		BIT_X_Y(4, c);
+		isBitSetForValue(c, 4);
 		break;
 
 	case BIT_4_D:
-		BIT_X_Y(4, d);
+		isBitSetForValue(d, 4);
 		break;
 
 	case BIT_4_E:
-		BIT_X_Y(4, e);
+		isBitSetForValue(e, 4);
 		break;
 
 	case BIT_4_H:
-		BIT_X_Y(4, h);
+		isBitSetForValue(h, 4);
 		break;
 
+    case BIT_4_L:
+        isBitSetForValue(l, 4);
+        break;
+
 	case BIT_4_HLm:
-		BIT_X_YZm(4, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 4);
 		break;
 
 	case BIT_4_A:
-		BIT_X_Y(4, a);
+		isBitSetForValue(a, 4);
 		break;
 
 	case BIT_5_B:
-		BIT_X_Y(5, b);
+		isBitSetForValue(b, 5);
 		break;
 
 	case BIT_5_C:
-		BIT_X_Y(5, c);
+		isBitSetForValue(c, 5);
 		break;
 
 	case BIT_5_D:
-		BIT_X_Y(5, d);
+		isBitSetForValue(d, 5);
 		break;
 
 	case BIT_5_E:
-		BIT_X_Y(5, e);
+		isBitSetForValue(e, 5);
 		break;
 
 	case BIT_5_H:
-		BIT_X_Y(5, h);
+		isBitSetForValue(h, 5);
 		break;
 
+    case BIT_5_L:
+        isBitSetForValue(l, 5);
+        break;
+
 	case BIT_5_HLm:
-		BIT_X_YZm(5, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 5);
 		break;
 
 	case BIT_5_A:
-		BIT_X_Y(5, a);
+		isBitSetForValue(a, 5);
 		break;
 
 		/******************************************************/
@@ -1645,59 +1653,67 @@ void CPU::executeExtendedInstruction(const byte& opCode)
 		/******************************************************/
 
 	case BIT_6_B:
-		BIT_X_Y(6, b);
+		isBitSetForValue(b, 6);
 		break;
 
 	case BIT_6_C:
-		BIT_X_Y(6, c);
+		isBitSetForValue(c, 6);
 		break;
 
 	case BIT_6_D:
-		BIT_X_Y(6, d);
+		isBitSetForValue(d, 6);
 		break;
 
 	case BIT_6_E:
-		BIT_X_Y(6, e);
+		isBitSetForValue(e, 6);
 		break;
 
 	case BIT_6_H:
-		BIT_X_Y(6, h);
+		isBitSetForValue(h, 6);
 		break;
 
+    case BIT_6_L:
+        isBitSetForValue(l, 6);
+        break;
+
 	case BIT_6_HLm:
-		BIT_X_YZm(6, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 6);
 		break;
 
 	case BIT_6_A:
-		BIT_X_Y(6, a);
+		isBitSetForValue(a, 6);
 		break;
 
 	case BIT_7_B:
-		BIT_X_Y(7, b);
+		isBitSetForValue(b, 7);
 		break;
 
 	case BIT_7_C:
-		BIT_X_Y(7, c);
+		isBitSetForValue(c, 7);
 		break;
 
 	case BIT_7_D:
-		BIT_X_Y(7, d);
+		isBitSetForValue(d, 7);
 		break;
 
 	case BIT_7_E:
-		BIT_X_Y(7, e);
+		isBitSetForValue(e, 7);
 		break;
 
 	case BIT_7_H:
-		BIT_X_Y(7, h);
+		isBitSetForValue(h, 7);
 		break;
 
+    case BIT_7_L:
+        isBitSetForValue(l, 7);
+        break;
+
 	case BIT_7_HLm:
-		BIT_X_YZm(7, h, l);
+		isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 7);
 		break;
 
 	case BIT_7_A:
-		BIT_X_Y(7, a);
+		isBitSetForValue(a, 7);
 		break;
 
 		/******************************************************/
