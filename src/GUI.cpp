@@ -157,9 +157,14 @@ void GUI::displayGameView()
 	ImGui::Text("Frame: %d", lastFrameId);
 	ImGui::Text("Ticks: %d", emulator.getCurrentTicks());
 
-	if (ImGui::Button("Start"))
+	if (!goToNextFrame && ImGui::Button("Start"))
 	{
 		goToNextFrame = true;
+	}
+
+	else if (goToNextFrame && ImGui::Button("Pause"))
+	{
+		goToNextFrame = false;
 	}
 
 	ImGui::Text("A: %02.2X", emulator.getCPU().getRegisterA());
