@@ -35,9 +35,9 @@ void CPU::popMemoryIntoRegisterPair(byte& regMsb, byte& regLsb)
 void CPU::push16BitsOntoStackPointer(byte regMsb, byte regLsb)
 {
 	sp -= 2;
-	mmu.write(sp, regMsb);
-	mmu.write(sp + 1, regLsb);
 	lastInstructionTicks = 4;
+	mmu.write(sp, regLsb);
+	mmu.write(sp + 1, regMsb);
 }
 
 void CPU::load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister, byte& lsbRegister, uint16_t otherReg)
