@@ -1,9 +1,11 @@
 
 #include "gpu.hpp"
+#include <bitset>
 
 void GPU::step(int nbrTicks)
 {
-	ticksSpentInCurrentMode += nbrTicks;
+	// TODO: Check if we really need this multiplier
+	ticksSpentInCurrentMode += nbrTicks * CPU_TICKS_TO_GPU_TICKS;
 
 	if (currentMode == OAM_ACCESS && ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
 	{
@@ -30,46 +32,73 @@ void GPU::step(int nbrTicks)
 	}
 	else if (currentMode == VBLANK && ticksSpentInCurrentMode >= VBLANK_TICKS)
 	{
-		setMode(OAM_ACCESS);
-		currentScanline = 0;
+		currentScanline++;
+		ticksSpentInCurrentMode = 0;
+		// TODO: Check if it's really necessary to increase scanline value during vblank
+		if (currentScanline > MAX_SCANLINE_VALUE)
+		{
+			setMode(OAM_ACCESS);
+			currentScanline = 0;
+		}
 	}
+	mmu.write(ADDR_SCANLINE, currentScanline);
 }
 
 void GPU::renderScanline(int scanline)
 {
 	updateParameters();
 
-	byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * 3;
+	// We retrieve the offset of the line we want to render in the RGB frame
+	byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * BYTES_PER_PIXEL;
 
-	TileMap background = getTileMap(useBackgroundTileMap0 ? 0 : 1);
+	// Retrieve the tilemap we are going to use
+	TileMap background = getTileMap(useBackgroundTileMap1 ? 1 : 0);
 
-	// Retrieve the lines in the Tilemap that corresponds to the current scanline
-	int lineInTileMap = (((scanline + scrollY) / Tile::TILE_HEIGHT) * TILEMAP_WIDTH);
+	/*
+	 * The tilemap is a 32x32 map of tiles of 8x8 pixels.
+	 * Since we are rendering only a line here, we can already compute which
+	 * line of the tilemap we are going to render.
+	 * We can compute the line by seeing how many tiles we span vertically.
+	 */
+	int lineInTileMap = (scanline + scrollY) / Tile::TILE_HEIGHT;
+
+	int offsetInTileMap = lineInTileMap * TILEMAP_WIDTH;
 
 	/*
 	 * For each pixels in the line, we are going to retrieve the corresponding tile and copy the
 	 * pixels that corresponds in the current frame buffer.
 	 */
-	for (int i = 0; i < SCREEN_WIDTH; ++i)
+	for (int x = 0; x < SCREEN_WIDTH; ++x)
 	{
-		int xIndexOffset = scrollX + i;
+		int xIndexOffset = scrollX + x;
+
 		// The background map is not clamped, if we go "too far right",
-		// it will display tiles that are on the left.
+		// it should display tiles that are on the left.
 		if (xIndexOffset > TILEMAP_WIDTH * Tile::TILE_WIDTH)
 		{
 			xIndexOffset = (TILEMAP_WIDTH * Tile::TILE_WIDTH) - xIndexOffset;
 		}
 
-		int tileIndex = lineInTileMap + (xIndexOffset / Tile::TILE_WIDTH);
+		// We see how many tiles we span horizontally and add it to our offset to find the tile index
+		int tileIndex = offsetInTileMap + (xIndexOffset / Tile::TILE_WIDTH);
 		const Tile::TileRGBArray& tileRGBArray = background[tileIndex].toRGB();
 
-		int xOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
-		int yOffsetTile = (xIndexOffset % Tile::TILE_WIDTH);
+		/*
+		 * Now that we retrieve the tile corresponding to the pixel, we need to copy the pixel
+		 * that corresponds to the one we are rendering.
+		 * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
+		 */
+		int xOffsetTile = xIndexOffset % Tile::TILE_WIDTH;
+		int yOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
 
+		// Finally we copy the correct pixel in our temporary frame.
 		// TODO: Encapsulate in a Frame class.
-		frameScanlineStartAddr[i * 3] = tileRGBArray[xOffsetTile * Tile::TILE_WIDTH * 3 + yOffsetTile];
-		frameScanlineStartAddr[i * 3 + 1] = tileRGBArray[xOffsetTile * Tile::TILE_WIDTH * 3 + yOffsetTile + 1];
-		frameScanlineStartAddr[i * 3 + 2] = tileRGBArray[xOffsetTile * Tile::TILE_WIDTH * 3 + yOffsetTile + 2];
+		frameScanlineStartAddr[x * BYTES_PER_PIXEL] =
+		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 0];
+		frameScanlineStartAddr[x * BYTES_PER_PIXEL + 1] =
+		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 1];
+		frameScanlineStartAddr[x * BYTES_PER_PIXEL + 2] =
+		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 2];
 	}
 }
 
@@ -87,16 +116,15 @@ void GPU::updateParameters()
 {
 	scrollX = mmu.read(ADDR_SCROLL_X);
 	scrollY = mmu.read(ADDR_SCROLL_Y);
-
-	byte lcdGpuControl = mmu.read(ADDR_LCD_GPU_CONTROL);
-	paramBackgroundStatus = ((lcdGpuControl & 1) == 1);
-	paramBackgroundStatus = ((lcdGpuControl & 2) == 2);
-	paramSpriteSize = ((lcdGpuControl & 3) == 3);
-	useBackgroundTileMap0 = ((lcdGpuControl & 4) == 4);
-	paramBackgroundTileSet = ((lcdGpuControl & 5) == 5);
-	paramWindowStatus = ((lcdGpuControl & 6) == 6);
-	paramWindowTileMap = ((lcdGpuControl & 7) == 7);
-	paramDisplayStatus = ((lcdGpuControl & 8) == 8);
+	std::bitset<8> lcdGpuControl = mmu.read(ADDR_LCD_GPU_CONTROL);
+	paramBackgroundStatus = lcdGpuControl[0];
+	paramSpritesStatus = lcdGpuControl[1];
+	paramSpriteSize = lcdGpuControl[2];
+	useBackgroundTileMap1 = lcdGpuControl[3];
+	paramBackgroundTileSet = lcdGpuControl[4];
+	paramWindowStatus = lcdGpuControl[5];
+	paramWindowTileMap = lcdGpuControl[6];
+	paramDisplayStatus = lcdGpuControl[7];
 }
 
 Tile GPU::getTileById(int16_t tileId, int8_t tileSetId)
