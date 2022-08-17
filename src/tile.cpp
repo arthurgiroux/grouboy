@@ -28,18 +28,29 @@ byte Tile::paletteValueToGrayscale(byte value) const
 
 void Tile::convertToPixels()
 {
-	for (int i = 0; i < BYTES_PER_TILE; i += BYTES_PER_TILE_VALUE)
+	for (int line = 0; line < TILE_HEIGHT; line++)
 	{
-		std::bitset<8> msb(data[i + 1]);
-		std::bitset<8> lsb(data[i]);
-		for (int j = 0; j < 8; j++)
+		/*
+		 * The color of a pixel for a tile is encoded on 2 bits of two adjacents bytes.
+		 * Example:
+		 *      [0x803E] [ 0 | 1 | 0 | 0 | 1 | 1 | 1 | 0 ]
+		 *      [0x803F] [ 1 | 0 | 0 | 0 | 1 | 0 | 1 | 1 ]
+		 *      data  =    2   1   0   0   3   1   3   2
+		 *
+		 *  This data  will then be converted to a color through a palette giving a grayscale value.
+		 *
+		 */
+		std::bitset<8> msb(data[line * BYTES_PER_TILE_VALUE + 1]);
+		std::bitset<8> lsb(data[line * BYTES_PER_TILE_VALUE]);
+		for (int x = 0; x < TILE_WIDTH; x++)
 		{
-			byte rawValue = (msb[j] << 1) | lsb[j];
-			byte grayscaleValue = paletteValueToGrayscale(rawValue);
-			int x = i / 2;
-			pixels[x * 8 * 3 + j * 3] = grayscaleValue;
-			pixels[x * 8 * 3 + j * 3 + 1] = grayscaleValue;
-			pixels[x * 8 * 3 + j * 3 + 2] = grayscaleValue;
+			// The pixels are ordered from left to right, the highest bit is the leftmost pixel.
+			byte tileData = (msb[7 - x] << 1) | lsb[7 - x];
+			byte grayscaleValue = paletteValueToGrayscale(tileData);
+
+			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL] = grayscaleValue;
+			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL + 1] = grayscaleValue;
+			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL + 2] = grayscaleValue;
 		}
 	}
 }
