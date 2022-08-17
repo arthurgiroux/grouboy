@@ -11,7 +11,8 @@ class GPU
   public:
 	static const int SCREEN_WIDTH = 160;
 	static const int SCREEN_HEIGHT = 144;
-	using FrameRGB = std::array<byte, SCREEN_WIDTH * SCREEN_HEIGHT * 3>;
+    static const int BYTES_PER_PIXEL = 3;
+	using FrameRGB = std::array<byte, SCREEN_WIDTH * SCREEN_HEIGHT * BYTES_PER_PIXEL>;
 
 	static const int TILEMAP_HEIGHT = 32;
 	static const int TILEMAP_WIDTH = 32;
@@ -75,12 +76,13 @@ class GPU
 	static const int OAM_ACCESS_TICKS = 80;
 	static const int VRAM_ACCESS_TICKS = 172;
 	static const int HBLANK_TICKS = 204;
-	static const int VBLANK_TICKS = 4560;
+	static const int VBLANK_TICKS = 456;
+    static const int MAX_SCANLINE_VALUE = 153;
 
 	MMU& mmu;
 
-	std::array<byte, SCREEN_WIDTH* SCREEN_HEIGHT* 3> temporaryFrame = {};
-	std::array<byte, SCREEN_WIDTH* SCREEN_HEIGHT* 3> currentFrame = {};
+    FrameRGB temporaryFrame = {};
+    FrameRGB currentFrame = {};
 
 	static const int ADDR_MAP_0 = 0x9800;
 	static const int ADDR_MAP_1 = 0x9C00;
@@ -94,6 +96,7 @@ class GPU
 	static const int ADDR_BG_PALETTE = 0xFF47;
 	static const int TILES_PER_LINE = 20;
 	static const int TILE_MAP_SIZE = 32;
+    static const int CPU_TICKS_TO_GPU_TICKS = 4;
 
 	byte scrollY;
 	byte scrollX;
@@ -102,7 +105,7 @@ class GPU
 	bool paramBackgroundStatus;
 	bool paramSpritesStatus;
 	bool paramSpriteSize;
-	bool useBackgroundTileMap0;
+	bool useBackgroundTileMap1;
 	bool paramBackgroundTileSet;
 	bool paramWindowStatus;
 	bool paramWindowTileMap;
