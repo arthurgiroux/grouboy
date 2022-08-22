@@ -41,7 +41,6 @@ class MMU
 #endif
 
 	static const size_t TOTAL_MEMORY = 65536;
-	static const size_t START_ROM_OFFSET = 256;
 
 	std::array<byte, TOTAL_MEMORY> memory{};
 

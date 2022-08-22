@@ -73,8 +73,10 @@ bool MMU::loadROM(const std::string& filepath)
 	bool ret = false;
 	if (input.good())
 	{
+		// The BIOS is always present, we only load the ROM after the BIOS
+		input.seekg(BIOS.size());
 		std::copy(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>(),
-		          memory.begin() + START_ROM_OFFSET);
+		          memory.begin() + BIOS.size());
 		ret = true;
 	}
 
