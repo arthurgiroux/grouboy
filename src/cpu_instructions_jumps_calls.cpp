@@ -104,7 +104,7 @@ void CPU::callImmediateSubroutine()
     sp -= 2;
     mmu.writeWord(sp, pc + 2);
     pc = mmu.readWord(pc);
-    lastInstructionTicks = 6;
+    lastInstructionTicks = 5;
 }
 
 void CPU::callRestartRoutine(byte memoryAddr) {
