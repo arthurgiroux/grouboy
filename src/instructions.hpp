@@ -799,6 +799,8 @@ static std::string opCodeToString(OpCode op)
 		return "CP_n";
 	case RST_38:
 		return "RST_38";
+	default:
+		return "UNHANDLED";
 	}
 }
 } // namespace standardInstructions
@@ -1611,6 +1613,8 @@ static std::string opCodeToString(OpCode op)
 		return "SET_7_HLm";
 	case SET_7_A:
 		return "SET_7_A";
+	default:
+		return "UNHANDLED";
 	}
 }
 } // namespace extendedInstructions
