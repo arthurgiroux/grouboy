@@ -82,7 +82,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
 		mmu.write(routineAddr, standardInstructions::RET);
 
         int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 6);
+        ASSERT_EQ(ticks, 5);
         ASSERT_EQ(cpu.getProgramCounter(), routineAddr);
 		cpu.fetchDecodeAndExecute();
 		ASSERT_EQ(cpu.getProgramCounter(), startPc + 3);
