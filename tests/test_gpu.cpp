@@ -137,6 +137,12 @@ TEST_F(GpuTest, ModeShouldSwitchFromVBlankToOamIfEnoughTicksPassedAndItsNotTheLa
 		}
 	}
 
+	for (int i = GPU::SCREEN_HEIGHT + 1; i <= GPU::MAX_SCANLINE_VALUE; ++i)
+	{
+		gpu.step(GPU::VBLANK_TICKS);
+		ASSERT_EQ(gpu.getCurrentScanline(), i);
+	}
+
 	gpu.step(GPU::VBLANK_TICKS);
 	ASSERT_EQ(gpu.getCurrentScanline(), 0);
 	ASSERT_EQ(gpu.getMode(), GPU::Mode::OAM_ACCESS);
