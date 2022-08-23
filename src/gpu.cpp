@@ -126,15 +126,17 @@ void GPU::updateParameters()
 	paramDisplayStatus = lcdGpuControl[7];
 }
 
-Tile GPU::getTileById(int16_t tileId, int8_t tileSetId)
+Tile GPU::getTileById(byte tileId, int8_t tileSetId)
 {
 	int tileSetOffset = ADDR_TILE_SET_0;
+	int tileIdCorrected = tileId;
 	if (tileSetId == 1)
 	{
 		tileSetOffset = ADDR_TILE_SET_1;
+        tileIdCorrected = static_cast<sbyte>(tileId);
 	}
 
-	uint16_t tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileId;
+	uint16_t tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileIdCorrected;
 	Tile::TileDataArray dataArray = {};
 	// TODO: Read word
 	for (int i = 0; i < Tile::BYTES_PER_TILE; ++i)

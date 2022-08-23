@@ -42,7 +42,7 @@ class GPU
 		return currentScanline;
 	}
 
-	Tile getTileById(int16_t tileId, int8_t tileSetId);
+	Tile getTileById(byte tileId, int8_t tileSetId);
 
 	const FrameRGB& getCurrentFrame() const
 	{
