@@ -4,8 +4,7 @@
 
 void GPU::step(int nbrTicks)
 {
-	// TODO: Check if we really need this multiplier
-	ticksSpentInCurrentMode += nbrTicks * CPU_TICKS_TO_GPU_TICKS;
+	ticksSpentInCurrentMode += nbrTicks;
 
 	if (currentMode == OAM_ACCESS && ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
 	{

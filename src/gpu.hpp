@@ -73,10 +73,11 @@ class GPU
 	Mode currentMode = OAM_ACCESS;
 	int currentScanline = 0;
 
-	static const int OAM_ACCESS_TICKS = 80;
-	static const int VRAM_ACCESS_TICKS = 172;
-	static const int HBLANK_TICKS = 204;
-	static const int VBLANK_TICKS = 456;
+    static const int M_CYCLES_TO_T_CYCLES = 4;
+    static const int OAM_ACCESS_TICKS = 80 * M_CYCLES_TO_T_CYCLES;
+	static const int VRAM_ACCESS_TICKS = 172 * M_CYCLES_TO_T_CYCLES;
+	static const int HBLANK_TICKS = 204 * M_CYCLES_TO_T_CYCLES;
+	static const int VBLANK_TICKS = 456 * M_CYCLES_TO_T_CYCLES;
     static const int MAX_SCANLINE_VALUE = 153;
 
 	MMU& mmu;
@@ -96,7 +97,6 @@ class GPU
 	static const int ADDR_BG_PALETTE = 0xFF47;
 	static const int TILES_PER_LINE = 20;
 	static const int TILE_MAP_SIZE = 32;
-    static const int CPU_TICKS_TO_GPU_TICKS = 4;
 
 	byte scrollY;
 	byte scrollX;
