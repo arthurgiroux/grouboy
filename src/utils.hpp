@@ -38,7 +38,7 @@ static byte getMsbFromWord(uint16_t value)
  */
 static byte getLsbFromWord(uint16_t value)
 {
-    return value;
+    return static_cast<byte>(value);
 }
 
 /**

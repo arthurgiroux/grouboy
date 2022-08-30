@@ -131,7 +131,7 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadSPAndPositiveOffsetInHLGivesE
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadSPAndNegativeOffsetInHLGivesExpectedResult)
 {
-	assertloadSPAndOffsetInHLGivesExpectedResult(0x1234, 0xDE, 0x1212);
+	assertloadSPAndOffsetInHLGivesExpectedResult(0x1234, static_cast<sbyte>(0xDE), 0x1212);
 }
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadHLInSPGivesExpectedResult)
