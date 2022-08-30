@@ -45,7 +45,7 @@ void Tile::convertToPixels()
 		for (int x = 0; x < TILE_WIDTH; x++)
 		{
 			// The pixels are ordered from left to right, the highest bit is the leftmost pixel.
-			byte tileData = (msb[7 - x] << 1) | lsb[7 - x];
+			byte tileData = (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
 			byte grayscaleValue = paletteValueToGrayscale(tileData);
 
 			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL] = grayscaleValue;

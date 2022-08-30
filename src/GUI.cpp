@@ -49,7 +49,7 @@ void GUI::initTextures()
 	loadRawRGBInTexture(tileRenderTexture, 256, 128, nullptr);
 
 	tileMapRenderTexture = createRGBTexture();
-	loadRawRGBInTexture(tileMapRenderTexture, tileMapSize.y, tileMapSize.y, nullptr);
+	loadRawRGBInTexture(tileMapRenderTexture, static_cast<int>(tileMapSize.y), static_cast<int>(tileMapSize.y), nullptr);
 }
 
 void GUI::startMainLoop()
@@ -129,7 +129,7 @@ void GUI::displayTileMapView()
 void GUI::displayTileView()
 {
 	ImGui::Begin("Tiles");
-	int xoffsetForTileSet2 = (tileViewSize.x / 2);
+	int xoffsetForTileSet2 = (static_cast<int>(tileViewSize.x) / 2);
 	for (int x = 0; x < numberOfTileToDisplayPerLine; x++)
 	{
 		for (int y = 0; y < numberOfTileToDisplayPerLine; y++)
@@ -244,8 +244,8 @@ bool GUI::initSDL()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_WindowFlags window_flags =
 	    (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-	mainWindow = SDL_CreateWindow("GameBoy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowSize.x,
-	                              windowSize.y, window_flags);
+	mainWindow = SDL_CreateWindow("GameBoy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(windowSize.x),
+                                  static_cast<int>(windowSize.y), window_flags);
 	sdlGlContext = SDL_GL_CreateContext(mainWindow);
 	SDL_GL_MakeCurrent(mainWindow, sdlGlContext);
 	SDL_GL_SetSwapInterval(1); // Enable vsync

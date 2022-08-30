@@ -201,9 +201,9 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = reg;
 			byte expectedValue = (registerValue << 1) | (registerValue >> 7);
@@ -227,9 +227,9 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = mmu.read(addr);
 			byte expectedValue = (registerValue << 1) | (registerValue >> 7);
@@ -249,13 +249,13 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = reg;
 			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
-			byte expectedValue = (registerValue << 1) | isCarryFlagSet;
+			byte expectedValue = (registerValue << 1) | static_cast<int>(isCarryFlagSet);
 			int ticks = cpu.fetchDecodeAndExecute();
 			ASSERT_EQ(ticks, expectedTicks);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
@@ -275,13 +275,13 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = mmu.read(addr);
 			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
-			byte expectedValue = (registerValue << 1) | isCarryFlagSet;
+			byte expectedValue = (registerValue << 1) | static_cast<int>(isCarryFlagSet);
 			int ticks = cpu.fetchDecodeAndExecute();
 			ASSERT_EQ(ticks, expectedTicks);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
@@ -296,7 +296,7 @@ class CpuInstructionTest : public ::testing::Test
 	                                           byte& valueRegMsb, byte& valueRegLsb, std::vector<uint16_t>& startValues,
 	                                           std::vector<uint16_t>& addValues)
 	{
-		for (int i = 0; i < startValues.size(); ++i)
+		for (size_t i = 0; i < startValues.size(); ++i)
 		{
 			uint16_t startValue = startValues[i];
 			uint16_t addValue = addValues[i];
@@ -319,7 +319,7 @@ class CpuInstructionTest : public ::testing::Test
 	                                         uint16_t& valueReg, std::vector<uint16_t>& startValues,
 	                                         std::vector<uint16_t>& addValues)
 	{
-		for (int i = 0; i < startValues.size(); ++i)
+		for (size_t i = 0; i < startValues.size(); ++i)
 		{
 			uint16_t startValue = startValues[i];
 			uint16_t addValue = addValues[i];
@@ -343,9 +343,9 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = reg;
 			byte expectedValue = (registerValue << 7) | (registerValue >> 1);
@@ -369,9 +369,9 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = mmu.read(addr);
 			byte expectedValue = (registerValue << 7) | (registerValue >> 1);
@@ -391,9 +391,9 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = reg;
 			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
@@ -417,9 +417,9 @@ class CpuInstructionTest : public ::testing::Test
 		cpu.pc = 0x00;
 		for (int i = 0; i < 9; ++i)
 		{
-			for (int j = 0; j < instructions.size(); ++j)
+			for (size_t j = 0; j < instructions.size(); ++j)
 			{
-				mmu.write(cpu.pc + j, instructions[j]);
+				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
 			}
 			byte registerValue = mmu.read(addr);
 			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
@@ -1406,7 +1406,7 @@ TEST_F(CpuTest, GetSetProgramCounterShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterAShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterA(), 0x00);
     cpu.setRegisterA(value);
     ASSERT_EQ(cpu.getRegisterA(), value);
@@ -1414,7 +1414,7 @@ TEST_F(CpuTest, GetSetRegisterAShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterBShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterB(), 0x00);
     cpu.setRegisterB(value);
     ASSERT_EQ(cpu.getRegisterB(), value);
@@ -1422,7 +1422,7 @@ TEST_F(CpuTest, GetSetRegisterBShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterCShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterC(), 0x00);
     cpu.setRegisterC(value);
     ASSERT_EQ(cpu.getRegisterC(), value);
@@ -1430,7 +1430,7 @@ TEST_F(CpuTest, GetSetRegisterCShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterDShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterD(), 0x00);
     cpu.setRegisterD(value);
     ASSERT_EQ(cpu.getRegisterD(), value);
@@ -1438,7 +1438,7 @@ TEST_F(CpuTest, GetSetRegisterDShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterEShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterE(), 0x00);
     cpu.setRegisterE(value);
     ASSERT_EQ(cpu.getRegisterE(), value);
@@ -1446,7 +1446,7 @@ TEST_F(CpuTest, GetSetRegisterEShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterHShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterH(), 0x00);
     cpu.setRegisterH(value);
     ASSERT_EQ(cpu.getRegisterH(), value);
@@ -1454,7 +1454,7 @@ TEST_F(CpuTest, GetSetRegisterHShouldChangeValue)
 
 TEST_F(CpuTest, GetSetRegisterLShouldChangeValue)
 {
-    uint16_t value = 0x12;
+    byte value = 0x12;
     ASSERT_EQ(cpu.getRegisterL(), 0x00);
     cpu.setRegisterL(value);
     ASSERT_EQ(cpu.getRegisterL(), value);
