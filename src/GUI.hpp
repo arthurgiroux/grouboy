@@ -137,6 +137,7 @@ class GUI
 	ImVec2 tileMapSize = ImVec2(GPU::TILEMAP_WIDTH * Tile::TILE_WIDTH, GPU::TILEMAP_HEIGHT* Tile::TILE_HEIGHT);
 	ImVec2 tileViewSize = ImVec2(256, 128);
 	int numberOfTileToDisplayPerLine = 16;
+	static const int GAMEVIEW_UPSCALE_RATIO = 2;
 };
 
 #endif // GBEMULATOR_GUI_H

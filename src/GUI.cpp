@@ -153,7 +153,7 @@ void GUI::displayGameView()
 	ImGui::Begin("Game");
 	loadRawRGBInTexture(gameRenderTexture, GPU::SCREEN_WIDTH, GPU::SCREEN_HEIGHT,
 	                    emulator.getGPU().getCurrentFrame().data());
-	ImGui::Image((void*)(intptr_t)gameRenderTexture, ImVec2(GPU::SCREEN_WIDTH, GPU::SCREEN_HEIGHT));
+	ImGui::Image((void*)(intptr_t)gameRenderTexture, ImVec2(GPU::SCREEN_WIDTH * GAMEVIEW_UPSCALE_RATIO, GPU::SCREEN_HEIGHT * GAMEVIEW_UPSCALE_RATIO));
 	ImGui::Text("Frame: %d", lastFrameId);
 	ImGui::Text("Ticks: %d", emulator.getCurrentTicks());
 
