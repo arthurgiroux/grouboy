@@ -15,6 +15,7 @@
 
  ***********************************/
 
+
 class MMU
 {
   public:
@@ -27,6 +28,9 @@ class MMU
 	void writeWord(const uint16_t& addr, const uint16_t& value);
 	bool loadROM(const std::string& filepath);
 
+    static const size_t MEMORY_SIZE_IN_BYTES = 65536;
+    static const std::array<byte, 256> BIOS;
+
 	class InvalidMemoryAccessException : public std::exception
 	{
 	  public:
@@ -36,15 +40,8 @@ class MMU
 		}
 	};
 
-#ifndef UNIT_TESTING
   private:
-#endif
-
-	static const size_t TOTAL_MEMORY = 65536;
-
-	std::array<byte, TOTAL_MEMORY> memory{};
-
-	static const std::array<byte, 256> BIOS;
+	std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
 };
 
 #endif
