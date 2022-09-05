@@ -28,7 +28,7 @@ MMU::MMU()
 
 byte MMU::read(const uint16_t& addr)
 {
-	if (addr >= TOTAL_MEMORY)
+	if (addr >= MEMORY_SIZE_IN_BYTES)
 	{
 		throw InvalidMemoryAccessException();
 	}
@@ -38,7 +38,7 @@ byte MMU::read(const uint16_t& addr)
 
 uint16_t MMU::readWord(const uint16_t& addr)
 {
-	if (addr >= TOTAL_MEMORY - 1)
+	if (addr >= MEMORY_SIZE_IN_BYTES - 1)
 	{
 		throw InvalidMemoryAccessException();
 	}
@@ -48,7 +48,7 @@ uint16_t MMU::readWord(const uint16_t& addr)
 
 void MMU::write(const uint16_t& addr, const byte& value)
 {
-	if (addr >= TOTAL_MEMORY)
+	if (addr >= MEMORY_SIZE_IN_BYTES)
 	{
 		throw InvalidMemoryAccessException();
 	}
@@ -58,7 +58,7 @@ void MMU::write(const uint16_t& addr, const byte& value)
 
 void MMU::writeWord(const uint16_t& addr, const uint16_t& value)
 {
-	if (addr >= TOTAL_MEMORY - 1)
+	if (addr >= MEMORY_SIZE_IN_BYTES - 1)
 	{
 		throw InvalidMemoryAccessException();
 	}
