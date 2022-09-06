@@ -40,7 +40,7 @@ endif()
 
 target_link_libraries(IMGUI PUBLIC SDL2main SDL2 ${CMAKE_DL_LIBS})
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES
 	src/cpu.cpp

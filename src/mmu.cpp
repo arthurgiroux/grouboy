@@ -3,6 +3,9 @@
 #include <cstring>
 #include <fstream>
 #include <memory>
+#include <vector>
+
+#include "cartridge.hpp"
 
 const std::array<byte, 256> MMU::BIOS = {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E, 0x11, 0x3E, 0x80,
@@ -22,15 +25,35 @@ const std::array<byte, 256> MMU::BIOS = {
 
 MMU::MMU()
 {
-	memory.fill(0);
-	std::copy(BIOS.begin(), BIOS.end(), memory.begin());
 }
+
+/***********************************
+            MEMORY LAYOUT
+
+[ BIOS | ROM BANK 0 | ROM BANK 1 | GPU VRAM | Ext. RAM | Working RAM | Sprites info | I/O | ZRAM ]
+    0     256b   8k    16k    24k   32k        40k        48k           56k                         64k
+
+
+    ***********************************/
 
 byte MMU::read(const uint16_t& addr)
 {
 	if (addr >= MEMORY_SIZE_IN_BYTES)
 	{
 		throw InvalidMemoryAccessException();
+	}
+
+	if (addr < BIOS.size()) {
+		return BIOS[addr];
+	}
+
+	else if (addr < 32 * 1024) {
+		if (cartridge != nullptr) {
+			return cartridge->getData()[addr];
+		}
+		else {
+			return 0;
+		}
 	}
 
 	return memory[addr];
@@ -67,16 +90,14 @@ void MMU::writeWord(const uint16_t& addr, const uint16_t& value)
 	memory[addr + 1] = value >> 8u;
 }
 
-bool MMU::loadROM(const std::string& filepath)
+bool MMU::loadCartridge(const std::string& filepath)
 {
 	std::ifstream input(filepath, std::ios::binary);
 	bool ret = false;
 	if (input.good())
 	{
-		// The BIOS is always present, we only load the ROM after the BIOS
-		input.seekg(BIOS.size());
-		std::copy(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>(),
-		          memory.begin() + BIOS.size());
+		std::vector<byte> data((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+		cartridge = std::make_unique<Cartridge>(data);
 		ret = true;
 	}
 
@@ -84,4 +105,7 @@ bool MMU::loadROM(const std::string& filepath)
 	return ret;
 }
 
-MMU::~MMU() = default;
+Cartridge* MMU::getCartridge()
+{
+	return cartridge.get();
+}
