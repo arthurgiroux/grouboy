@@ -18,6 +18,8 @@ class Cartridge
 	 */
 	explicit Cartridge(std::vector<byte> binaryData);
 
+	~Cartridge() = default;
+
 	/**
 	 * Get the title
 	 * @return an ascii string (max 11 characters)

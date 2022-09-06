@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <utility>
+#include <algorithm>
 
 Cartridge::Cartridge(std::vector<byte> binaryData) : data(std::move(binaryData))
 {

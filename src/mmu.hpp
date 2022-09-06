@@ -3,8 +3,10 @@
 
 #include <array>
 #include <stdexcept>
+#include <memory>
 
 #include "types.hpp"
+#include "cartridge.hpp"
 
 /***********************************
             MEMORY LAYOUT
@@ -15,18 +17,18 @@
 
  ***********************************/
 
-
 class MMU
 {
   public:
 	MMU();
-	~MMU();
+	~MMU() = default;
 
 	byte read(const uint16_t& addr);
 	uint16_t readWord(const uint16_t& addr);
 	void write(const uint16_t& addr, const byte& value);
 	void writeWord(const uint16_t& addr, const uint16_t& value);
-	bool loadROM(const std::string& filepath);
+	bool loadCartridge(const std::string& filepath);
+    Cartridge* getCartridge();
 
     static const size_t MEMORY_SIZE_IN_BYTES = 65536;
     static const std::array<byte, 256> BIOS;
@@ -42,6 +44,7 @@ class MMU
 
   private:
 	std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
+	std::unique_ptr<Cartridge> cartridge = nullptr;
 };
 
 #endif

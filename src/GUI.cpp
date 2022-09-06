@@ -49,12 +49,12 @@ void GUI::initTextures()
 	loadRawRGBInTexture(tileRenderTexture, 256, 128, nullptr);
 
 	tileMapRenderTexture = createRGBTexture();
-	loadRawRGBInTexture(tileMapRenderTexture, static_cast<int>(tileMapSize.y), static_cast<int>(tileMapSize.y), nullptr);
+	loadRawRGBInTexture(tileMapRenderTexture, static_cast<int>(tileMapSize.y), static_cast<int>(tileMapSize.y),
+	                    nullptr);
 }
 
 void GUI::startMainLoop()
 {
-
 	bool shouldExit = false;
 
 	while (!shouldExit)
@@ -153,9 +153,10 @@ void GUI::displayGameView()
 	ImGui::Begin("Game");
 	loadRawRGBInTexture(gameRenderTexture, GPU::SCREEN_WIDTH, GPU::SCREEN_HEIGHT,
 	                    emulator.getGPU().getCurrentFrame().data());
-	ImGui::Image((void*)(intptr_t)gameRenderTexture, ImVec2(GPU::SCREEN_WIDTH * GAMEVIEW_UPSCALE_RATIO, GPU::SCREEN_HEIGHT * GAMEVIEW_UPSCALE_RATIO));
-	ImGui::Text("Frame: %d", lastFrameId);
-	ImGui::Text("Ticks: %d", emulator.getCurrentTicks());
+	ImGui::BeginGroup();
+
+	ImGui::Image((void*)(intptr_t)gameRenderTexture,
+	             ImVec2(GPU::SCREEN_WIDTH * GAMEVIEW_UPSCALE_RATIO, GPU::SCREEN_HEIGHT * GAMEVIEW_UPSCALE_RATIO));
 
 	if (!goToNextFrame && ImGui::Button("Start"))
 	{
@@ -167,6 +168,17 @@ void GUI::displayGameView()
 		goToNextFrame = false;
 	}
 
+	ImGui::EndGroup();
+	ImGui::SameLine();
+	ImGui::BeginGroup();
+
+	Cartridge* cartridge = emulator.getMMU().getCartridge();
+	if (cartridge != nullptr)
+	{
+		ImGui::Text("Cartridge: %s", cartridge->getTitle().c_str());
+		ImGui::Text("Manufacturer: %s", cartridge->getManufacturerCode().c_str());
+		ImGui::Separator();
+	}
 	ImGui::Text("A: %02.2X", emulator.getCPU().getRegisterA());
 	ImGui::Text("B: %02.2X", emulator.getCPU().getRegisterB());
 	ImGui::Text("C: %02.2X", emulator.getCPU().getRegisterC());
@@ -177,6 +189,10 @@ void GUI::displayGameView()
 
 	ImGui::Text("PC: %04.4X", emulator.getCPU().getProgramCounter());
 	ImGui::Text("SP: %04.4X", emulator.getCPU().getStackPointer());
+
+	ImGui::Text("Frame: %d", lastFrameId);
+	ImGui::Text("Ticks: %d", emulator.getCurrentTicks());
+	ImGui::EndGroup();
 
 	ImGui::End();
 }
@@ -244,8 +260,8 @@ bool GUI::initSDL()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_WindowFlags window_flags =
 	    (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-	mainWindow = SDL_CreateWindow("GameBoy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, static_cast<int>(windowSize.x),
-                                  static_cast<int>(windowSize.y), window_flags);
+	mainWindow = SDL_CreateWindow("GameBoy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+	                              static_cast<int>(windowSize.x), static_cast<int>(windowSize.y), window_flags);
 	sdlGlContext = SDL_GL_CreateContext(mainWindow);
 	SDL_GL_MakeCurrent(mainWindow, sdlGlContext);
 	SDL_GL_SetSwapInterval(1); // Enable vsync
