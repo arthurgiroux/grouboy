@@ -173,25 +173,34 @@ void GUI::displayGameView()
 	ImGui::BeginGroup();
 
 	Cartridge* cartridge = emulator.getMMU().getCartridge();
-	if (cartridge != nullptr)
+	if (ImGui::CollapsingHeader("Cartridge info", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Text("Cartridge: %s", cartridge->getTitle().c_str());
-		ImGui::Text("Manufacturer: %s", cartridge->getManufacturerCode().c_str());
-		ImGui::Separator();
+		ImGui::Text("Title: %s", cartridge != nullptr ? cartridge->getTitle().c_str() : "");
+		ImGui::Text("Manufacturer: %s", cartridge != nullptr ? cartridge->getManufacturerCode().c_str() : "");
+		ImGui::Text("Type: %s",
+		            cartridge != nullptr ? Cartridge::cartridgeTypeToString(cartridge->getType()).c_str() : "");
 	}
-	ImGui::Text("A: %02.2X", emulator.getCPU().getRegisterA());
-	ImGui::Text("B: %02.2X", emulator.getCPU().getRegisterB());
-	ImGui::Text("C: %02.2X", emulator.getCPU().getRegisterC());
-	ImGui::Text("D: %02.2X", emulator.getCPU().getRegisterD());
-	ImGui::Text("E: %02.2X", emulator.getCPU().getRegisterE());
-	ImGui::Text("H: %02.2X", emulator.getCPU().getRegisterH());
-	ImGui::Text("L: %02.2X", emulator.getCPU().getRegisterL());
 
-	ImGui::Text("PC: %04.4X", emulator.getCPU().getProgramCounter());
-	ImGui::Text("SP: %04.4X", emulator.getCPU().getStackPointer());
+	if (ImGui::CollapsingHeader("Registers", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Text("A: %02.2X", emulator.getCPU().getRegisterA());
+		ImGui::Text("B: %02.2X", emulator.getCPU().getRegisterB());
+		ImGui::Text("C: %02.2X", emulator.getCPU().getRegisterC());
+		ImGui::Text("D: %02.2X", emulator.getCPU().getRegisterD());
+		ImGui::Text("E: %02.2X", emulator.getCPU().getRegisterE());
+		ImGui::Text("H: %02.2X", emulator.getCPU().getRegisterH());
+		ImGui::Text("L: %02.2X", emulator.getCPU().getRegisterL());
 
-	ImGui::Text("Frame: %d", lastFrameId);
-	ImGui::Text("Ticks: %d", emulator.getCurrentTicks());
+		ImGui::Text("PC: %04.4X", emulator.getCPU().getProgramCounter());
+		ImGui::Text("SP: %04.4X", emulator.getCPU().getStackPointer());
+	}
+
+	if (ImGui::CollapsingHeader("Frame info", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Text("Frame: %d", lastFrameId);
+		ImGui::Text("Ticks: %d", emulator.getCurrentTicks());
+	}
+
 	ImGui::EndGroup();
 
 	ImGui::End();
