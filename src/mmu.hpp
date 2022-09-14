@@ -45,6 +45,7 @@ class MMU
   private:
 	std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
 	std::unique_ptr<Cartridge> cartridge = nullptr;
+	static const int ROM_BANK_1_END_ADDR = 0x8000;
 };
 
 #endif
