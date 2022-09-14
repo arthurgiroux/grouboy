@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -25,6 +26,7 @@ const std::array<byte, 256> MMU::BIOS = {
 
 MMU::MMU()
 {
+	std::copy(BIOS.begin(), BIOS.end(), memory.begin());
 }
 
 /***********************************
@@ -43,17 +45,14 @@ byte MMU::read(const uint16_t& addr)
 		throw InvalidMemoryAccessException();
 	}
 
-	if (addr < BIOS.size()) {
-		return BIOS[addr];
+	if (addr < BIOS.size())
+	{
+		return memory[addr];
 	}
 
-	else if (addr < 32 * 1024) {
-		if (cartridge != nullptr) {
-			return cartridge->getData()[addr];
-		}
-		else {
-			return 0;
-		}
+	else if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
+	{
+		return cartridge->getData()[addr];
 	}
 
 	return memory[addr];
@@ -76,7 +75,15 @@ void MMU::write(const uint16_t& addr, const byte& value)
 		throw InvalidMemoryAccessException();
 	}
 
-	memory[addr] = value;
+	// TODO: Check if it's normal to write to ROM section
+	if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
+	{
+		cartridge->getData()[addr] = value;
+	}
+	else
+	{
+		memory[addr] = value;
+	}
 }
 
 void MMU::writeWord(const uint16_t& addr, const uint16_t& value)
@@ -86,8 +93,8 @@ void MMU::writeWord(const uint16_t& addr, const uint16_t& value)
 		throw InvalidMemoryAccessException();
 	}
 
-	memory[addr] = value & 0x00FFu;
-	memory[addr + 1] = value >> 8u;
+	write(addr, value & 0x00FFu);
+	write(addr + 1, value >> 8u);
 }
 
 bool MMU::loadCartridge(const std::string& filepath)
