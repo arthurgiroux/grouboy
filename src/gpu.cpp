@@ -1,6 +1,7 @@
 
 #include "gpu.hpp"
 #include <bitset>
+#include <cassert>
 
 void GPU::step(int nbrTicks)
 {
@@ -60,6 +61,8 @@ void GPU::renderScanline(int scanline)
 	 * We can compute the line by seeing how many tiles we span vertically.
 	 */
 	int lineInTileMap = (scanline + scrollY) / Tile::TILE_HEIGHT;
+	lineInTileMap %= TILEMAP_HEIGHT;
+	assert(lineInTileMap < TILEMAP_HEIGHT);
 
 	int offsetInTileMap = lineInTileMap * TILEMAP_WIDTH;
 
@@ -75,8 +78,9 @@ void GPU::renderScanline(int scanline)
 		// it should display tiles that are on the left.
 		if (xIndexOffset > TILEMAP_WIDTH * Tile::TILE_WIDTH)
 		{
-			xIndexOffset = (TILEMAP_WIDTH * Tile::TILE_WIDTH) - xIndexOffset;
+			xIndexOffset %= TILEMAP_WIDTH * Tile::TILE_WIDTH;
 		}
+		assert(xIndexOffset < TILEMAP_WIDTH * Tile::TILE_WIDTH);
 
 		// We see how many tiles we span horizontally and add it to our offset to find the tile index
 		int tileIndex = offsetInTileMap + (xIndexOffset / Tile::TILE_WIDTH);
