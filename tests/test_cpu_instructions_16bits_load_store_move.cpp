@@ -144,3 +144,51 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadHLInSPGivesExpectedResult)
     ASSERT_EQ(cpu.getStackPointer(), 0x1234);
 	ASSERT_EQ(cpu.getProgramCounter(), 1);
 }
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, BlarggTestSpecial05PopAF) {
+	/**
+	 * This test is an adaptation of Blargg test special 05 "POP AF".
+	 * The original assembly code for the test is:
+	 *
+	 *      ld   bc,$1200
+	 * -    push bc
+	 *      pop  af
+	 *      push af
+	 *      pop  de
+	 *      ld   a,c
+	 *      and  $F0
+	 *      cp   e
+	 *      jp   nz,test_failed
+	 *      inc  b
+	 *      inc  c
+	 *      jr   nz,-
+	 */
+    mmu.write(cpu.getProgramCounter(), standardInstructions::LD_BC_nn);
+    mmu.writeWord(cpu.getProgramCounter() + 1, 0x1200);
+    cpu.fetchDecodeAndExecute();
+	bool finished = false;
+	while (!finished)
+	{
+		mmu.write(cpu.getProgramCounter(), standardInstructions::PUSH_BC);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::POP_AF);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::PUSH_AF);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::POP_DE);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::LD_A_C);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::AND_n);
+		mmu.write(cpu.getProgramCounter() + 1, 0xF0);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::CP_E);
+		cpu.fetchDecodeAndExecute();
+		ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
+        mmu.write(cpu.getProgramCounter(), standardInstructions::INC_B);
+        cpu.fetchDecodeAndExecute();
+        mmu.write(cpu.getProgramCounter(), standardInstructions::INC_C);
+        cpu.fetchDecodeAndExecute();
+        finished = cpu.isFlagSet(CPU::ZERO);
+	}
+}
