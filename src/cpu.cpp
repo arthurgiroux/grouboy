@@ -1085,6 +1085,9 @@ void CPU::executeInstruction(const byte& opCode)
 
 	case POP_AF:
 		popMemoryIntoRegisterPair(a, f);
+		// The lower nibble of the flag register is hardwired to 0
+		// We reset this part if it was affected by the operation
+		f &= 0xF0;
 		break;
 
 	case LD_A_Cm:

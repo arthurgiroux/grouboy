@@ -85,7 +85,7 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, PopRegisterAFShouldPutSPInAF)
 	int lsbValue = 0x5F;
 	assertPopIntoMemoryIsPerformed(standardInstructions::POP_AF, msbValue, lsbValue);
 	ASSERT_EQ(cpu.getRegisterA(), msbValue);
-	ASSERT_EQ(cpu.getFlag(), lsbValue);
+	ASSERT_EQ(cpu.getFlag(), lsbValue & 0xF0);
 }
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, PushRegisterBCShouldPutBCInSP)
