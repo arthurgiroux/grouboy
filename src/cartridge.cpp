@@ -35,7 +35,8 @@ void Cartridge::readTitle()
 {
 	const byte* startAddr = data.data() + TITLE_START_ADDR;
 	// The title can be null terminated or not if it has the max size
-	size_t len = std::min(static_cast<int>(strlen(reinterpret_cast<const char*>(startAddr))), TITLE_LENGTH);
+	int tileLength = TITLE_LENGTH;
+	size_t len = std::min(static_cast<int>(strlen(reinterpret_cast<const char*>(startAddr))), tileLength);
 	title = std::string(startAddr, startAddr + len);
 }
 
