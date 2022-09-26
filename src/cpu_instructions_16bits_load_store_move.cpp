@@ -49,8 +49,8 @@ void CPU::load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister
 	pc++;
 	msbRegister = getMsbFromWord(newValue);
 	lsbRegister = getLsbFromWord(newValue);
-	// TODO: Check if carry and half carry should apply to + operation or generic load operation
-	setCarryFlag((offset < 0 && newValue > otherReg) || (offset > 0 && newValue < otherReg));
+	setHalfCarryFlag((((otherReg & 0xF) + (offset & 0xF)) & 0x10) == 0x10);
+	setCarryFlag((((otherReg & 0xFF) + (offset & 0xFF)) & 0x100) == 0x100);
 	lastInstructionTicks = 3;
 }
 
