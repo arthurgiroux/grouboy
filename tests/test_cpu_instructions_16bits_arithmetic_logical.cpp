@@ -44,7 +44,7 @@ TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddImmediateValueToMaxSPGives
 {
 	cpu.setStackPointer(0xFFFF);
 	assertAddImmediateValueToSPGaveExpectedResult(0xFF, 0x00FE);
-	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
+	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
 
@@ -53,5 +53,5 @@ TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddImmediateValueToMidSPRaise
 	cpu.setStackPointer(0x00FF);
 	assertAddImmediateValueToSPGaveExpectedResult(0x01, 0x0100);
 	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-	ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
+	ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 }
