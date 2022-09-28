@@ -118,12 +118,10 @@ void CPU::add8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
     uint16_t result = reg + value;
-    if (isFlagSet(CpuFlags::CARRY))
-    {
-        result++;
-    }
+	int offset = isFlagSet(CpuFlags::CARRY) ? 1 : 0;
+	result += offset;
     setCarryFlag(result > 0xFF);
-    setHalfCarryFlag(reg <= 0x0F && result > 0x0F);
+    setHalfCarryFlag((((reg & 0xF) + (value & 0xF) + offset) & 0x10) == 0x10);
     reg = static_cast<byte>(result);
     changeZeroValueFlag(reg);
     lastInstructionTicks = 1;
@@ -152,7 +150,7 @@ void CPU::substract8BitsValueFrom8BitsRegister(byte& reg, byte value)
     setFlag(CpuFlags::SUBSTRACTION);
     uint16_t result = reg - value;
     setCarryFlag(result > 0xFF);
-    setHalfCarryFlag(reg > 0x0F && result <= 0x0F);
+    setHalfCarryFlag(((reg & 0xF) - (value & 0xF)) < 0);
     reg = static_cast<byte>(result);
     changeZeroValueFlag(reg);
     lastInstructionTicks = 1;
@@ -174,12 +172,10 @@ void CPU::sub8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
     setFlag(CpuFlags::SUBSTRACTION);
     uint16_t result = reg - value;
-    if (isFlagSet(CpuFlags::CARRY))
-    {
-        result--;
-    }
+	int offset = isFlagSet(CpuFlags::CARRY) ? 1 : 0;
+	result -= offset;
     setCarryFlag(result > 0xFF);
-    setHalfCarryFlag(reg > 0x0F && result <= 0x0F);
+    setHalfCarryFlag(((reg & 0xF) - (value & 0xF) - offset) < 0);
     reg = static_cast<byte>(result);
     changeZeroValueFlag(reg);
     lastInstructionTicks = 1;

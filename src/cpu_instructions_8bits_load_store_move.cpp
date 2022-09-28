@@ -75,8 +75,8 @@ void CPU::add8BitsValueTo8BitsRegister(byte& reg, byte value)
 	unsetFlag(CpuFlags::SUBSTRACTION);
 	uint16_t result = reg + value;
 	setCarryFlag(result > 0xFF);
-	setHalfCarryFlag(reg <= 0x0F && result > 0x0F);
-	reg = static_cast<byte>(result);
+    setHalfCarryFlag((((reg & 0xF) + (value & 0xF)) & 0x10) == 0x10);
+    reg = static_cast<byte>(result);
 	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
