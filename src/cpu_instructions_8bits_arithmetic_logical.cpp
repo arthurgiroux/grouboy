@@ -267,7 +267,7 @@ void CPU::compareAccumulatorAndRegister(byte value)
 {
     setFlag(CpuFlags::SUBSTRACTION);
     setFlagIfTrue(a == value, CpuFlags::ZERO);
-    setHalfCarryFlag(a > value);
+    setHalfCarryFlag(((a & 0xf) - (value & 0xf)) < 0);
     setCarryFlag(a < value);
     lastInstructionTicks = 1;
 }
