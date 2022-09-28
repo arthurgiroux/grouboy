@@ -693,11 +693,11 @@ class CpuInstructionTest : public ::testing::Test
 	void testCompareOperationWithRegister(byte instruction, byte& reg)
 	{
 		testCompareOperationWithRegister(instruction, 0x00, reg, 0x00, CPU::ZERO);
-		testCompareOperationWithRegister(instruction, 0x0F, reg, 0x00, CPU::HALF_CARRY);
-		testCompareOperationWithRegister(instruction, 0x00, reg, 0x0F, CPU::CARRY);
+		testCompareOperationWithRegister(instruction, 0x0F, reg, 0x00, 0);
+		testCompareOperationWithRegister(instruction, 0x00, reg, 0x0F, CPU::CARRY | CPU::HALF_CARRY);
 		testCompareOperationWithRegister(instruction, 0xFF, reg, 0xFF, CPU::ZERO);
-		testCompareOperationWithRegister(instruction, 0x09, reg, 0x08, CPU::HALF_CARRY);
-		testCompareOperationWithRegister(instruction, 0x08, reg, 0x09, CPU::CARRY);
+		testCompareOperationWithRegister(instruction, 0x09, reg, 0x08, 0);
+		testCompareOperationWithRegister(instruction, 0x08, reg, 0x09, CPU::CARRY | CPU::HALF_CARRY);
 	}
 
 	void testCompareOperationWithImmediateValue(byte instruction, byte startValue, byte value, int expectedFlags)
@@ -1290,11 +1290,11 @@ TEST_F(CpuInstructionTest, InstructionCompareAccumulatorAndRegister)
 TEST_F(CpuInstructionTest, InstructionCompareWithImmediateValue)
 {
     testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x00, 0x00, CPU::ZERO);
-    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x0F, 0x00, CPU::HALF_CARRY);
-    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x00, 0x0F, CPU::CARRY);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x0F, 0x00, 0);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x00, 0x0F, CPU::CARRY | CPU::HALF_CARRY);
     testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0xFF, 0xFF, CPU::ZERO);
-    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x09, 0x08, CPU::HALF_CARRY);
-    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x08, 0x09, CPU::CARRY);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x09, 0x08, 0);
+    testCompareOperationWithImmediateValue(standardInstructions::CP_n, 0x08, 0x09, CPU::CARRY | CPU::HALF_CARRY);
 
 }
 
@@ -1303,11 +1303,11 @@ TEST_F(CpuInstructionTest, InstructionCompareWithMemory)
     cpu.h = 0x12;
     cpu.l = 0x23;
     testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x00, cpu.h, cpu.l, 0x00, CPU::ZERO);
-    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x0F, cpu.h, cpu.l, 0x00, CPU::HALF_CARRY);
-    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x00, cpu.h, cpu.l, 0x0F, CPU::CARRY);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x0F, cpu.h, cpu.l, 0x00, 0);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x00, cpu.h, cpu.l, 0x0F, CPU::CARRY | CPU::HALF_CARRY);
     testCompareOperationWithMemory(standardInstructions::CP_HLm, 0xFF, cpu.h, cpu.l, 0xFF, CPU::ZERO);
-    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x09, cpu.h, cpu.l, 0x08, CPU::HALF_CARRY);
-    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x08, cpu.h, cpu.l, 0x09, CPU::CARRY);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x09, cpu.h, cpu.l, 0x08, 0);
+    testCompareOperationWithMemory(standardInstructions::CP_HLm, 0x08, cpu.h, cpu.l, 0x09, CPU::CARRY | CPU::HALF_CARRY);
 }
 
 TEST_F(CpuInstructionTest, InstructionReturn)
