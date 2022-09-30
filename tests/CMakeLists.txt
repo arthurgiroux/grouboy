@@ -25,6 +25,7 @@ add_executable(
         ../src/tile.cpp
         ../src/tile.hpp
         ../src/utils.hpp
+        ../src/utils.cpp
         ../src/cartridge.cpp
         ../src/cartridge.hpp
         test_mmu.cpp
