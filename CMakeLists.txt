@@ -64,6 +64,7 @@ set(SOURCE_FILES
 	src/tile.cpp
 	src/tile.hpp
 	src/utils.hpp
+	src/utils.cpp
 	src/GUI.cpp
 	src/GUI.hpp
 	src/cartridge.cpp
