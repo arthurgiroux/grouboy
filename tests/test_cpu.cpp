@@ -195,12 +195,17 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testRotateLeftCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks)
+	void testRotateLeftCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks, bool isZeroFlagUsed = true)
 	{
-		reg = 0b00000001;
+		// We test the zero value first
+		reg = 0b00000000;
 		cpu.pc = 0x00;
-		for (int i = 0; i < 9; ++i)
+		for (int i = 0; i < 10; ++i)
 		{
+			// Once zero is tested, we inject a bit to test all values
+			if (i == 1) {
+				reg = 0b00000001;
+			}
 			for (size_t j = 0; j < instructions.size(); ++j)
 			{
 				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
@@ -211,7 +216,7 @@ class CpuInstructionTest : public ::testing::Test
 			ASSERT_EQ(ticks, expectedTicks);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed && expectedValue == 0);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
 			ASSERT_EQ(reg, expectedValue);
 		}
@@ -243,7 +248,7 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testRotateLeft(const std::vector<byte>& instructions, byte& reg, int expectedTicks)
+	void testRotateLeft(const std::vector<byte>& instructions, byte& reg, int expectedTicks, bool isZeroFlagUsed = true)
 	{
 		reg = 0b00000001;
 		cpu.pc = 0x00;
@@ -260,7 +265,7 @@ class CpuInstructionTest : public ::testing::Test
 			ASSERT_EQ(ticks, expectedTicks);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed && expectedValue == 0);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
 			ASSERT_EQ(reg, expectedValue);
 		}
@@ -337,12 +342,18 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testRotateRightCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks)
+	void testRotateRightCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks, bool isZeroFlagUsed = true)
 	{
-		reg = 0b10000000;
+        // We test the zero value first
+        reg = 0b00000000;
 		cpu.pc = 0x00;
-		for (int i = 0; i < 9; ++i)
+		for (int i = 0; i < 10; ++i)
 		{
+            // Once zero is tested, we inject a bit to test all values
+            if (i == 1) {
+				reg = 0b10000000;
+			}
+
 			for (size_t j = 0; j < instructions.size(); ++j)
 			{
 				mmu.write(static_cast<uint16_t>(cpu.pc + j), instructions[j]);
@@ -353,7 +364,7 @@ class CpuInstructionTest : public ::testing::Test
 			ASSERT_EQ(ticks, expectedTicks);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed &&expectedValue == 0);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
 			ASSERT_EQ(reg, expectedValue);
 		}
@@ -385,7 +396,7 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testRotateRight(const std::vector<byte>& instructions, byte& reg, int expectedTicks)
+	void testRotateRight(const std::vector<byte>& instructions, byte& reg, int expectedTicks, bool isZeroFlagUsed = true)
 	{
 		reg = 0b10000000;
 		cpu.pc = 0x00;
@@ -402,7 +413,7 @@ class CpuInstructionTest : public ::testing::Test
 			ASSERT_EQ(ticks, expectedTicks);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed && expectedValue == 0);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
 			ASSERT_EQ(reg, expectedValue);
 		}
@@ -847,7 +858,7 @@ TEST_F(CpuInstructionTest, InstructionDecrementRegister)
 
 TEST_F(CpuInstructionTest, InstructionRotateLeftCircular)
 {
-	testRotateLeftCircular({standardInstructions::RLC_A}, cpu.a, 1);
+	testRotateLeftCircular({standardInstructions::RLC_A}, cpu.a, 1, false);
 	testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_A}, cpu.a, 2);
 	testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_B}, cpu.b, 2);
 	testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_C}, cpu.c, 2);
@@ -864,6 +875,7 @@ TEST_F(CpuInstructionTest, InstructionRotateLeftCircularFromMemory)
 
 TEST_F(CpuInstructionTest, InstructionRotateLeft)
 {
+    testRotateLeft({standardInstructions::RL_A}, cpu.a, 1, false);
 	testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_A}, cpu.a, 2);
 	testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_B}, cpu.b, 2);
 	testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_C}, cpu.c, 2);
@@ -924,7 +936,7 @@ TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterToSameRegisters)
 
 TEST_F(CpuInstructionTest, InstructionRotateRightCircular)
 {
-	testRotateRightCircular({standardInstructions::RRC_A}, cpu.a, 1);
+	testRotateRightCircular({standardInstructions::RRC_A}, cpu.a, 1, false);
 	testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_A}, cpu.a, 2);
 	testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_B}, cpu.b, 2);
 	testRotateRightCircular({standardInstructions::EXT_OPS, extendedInstructions::RRC_C}, cpu.c, 2);
@@ -941,6 +953,7 @@ TEST_F(CpuInstructionTest, InstructionRotateRightCircularFromMemory)
 
 TEST_F(CpuInstructionTest, InstructionRotateRight)
 {
+    testRotateRight({standardInstructions::RR_A}, cpu.a, 1, false);
 	testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_A}, cpu.a, 2);
 	testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_B}, cpu.b, 2);
 	testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_C}, cpu.c, 2);
