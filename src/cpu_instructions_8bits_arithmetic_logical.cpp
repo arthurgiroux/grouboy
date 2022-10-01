@@ -38,7 +38,7 @@ void CPU::incrementRegisterValue(byte& reg)
     unsetFlag(CpuFlags::SUBSTRACTION);
 
     reg++;
-    setHalfCarryFlag(reg == 0x10);
+    setHalfCarryFlag((reg & 0x0F) == 0x00);
     changeZeroValueFlag(reg);
     lastInstructionTicks = 1;
 }

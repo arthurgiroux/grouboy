@@ -9,14 +9,14 @@ using namespace utils;
 class CpuInstructions8BitsArithmeticLogicalTest : public ::testing::Test
 {
   protected:
-	void assertIncrementRegisterWasPerformed(byte instruction, byte expectedValue)
+	void assertIncrementRegisterWasPerformed(byte instruction, byte expectedValue, int expectedFlag = 0)
 	{
 		mmu.write(cpu.getProgramCounter(), instruction);
 		int ticks = cpu.fetchDecodeAndExecute();
 		ASSERT_EQ(ticks, 1);
 		ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-		ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expectedValue == 0x10);
-		ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expectedFlag & CPU::HALF_CARRY) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), (expectedFlag & CPU::ZERO) > 0);
 		ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 		ASSERT_EQ(cpu.getProgramCounter(), 1);
 	}
@@ -75,9 +75,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterAFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterA(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_A, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_A, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterA(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterAFromMidShouldRaiseHalfCarry)
@@ -85,9 +84,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterAFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterA(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_A, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_A, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterA(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterBFrom0ShouldGive1)
@@ -104,9 +102,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterBFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterB(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_B, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_B, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterB(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterBFromMidShouldRaiseHalfCarry)
@@ -114,9 +111,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterBFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterB(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_B, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_B, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterB(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterCFrom0ShouldGive1)
@@ -133,9 +129,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterCFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterC(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_C, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_C, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterC(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterCFromMidShouldRaiseHalfCarry)
@@ -143,9 +138,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterCFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterC(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_C, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_C, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterC(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterDFrom0ShouldGive1)
@@ -162,9 +156,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterDFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterD(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_D, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_D, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterD(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterDFromMidShouldRaiseHalfCarry)
@@ -172,9 +165,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterDFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterD(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_D, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_D, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterD(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterEFrom0ShouldGive1)
@@ -191,9 +183,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterEFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterE(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_E, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_E, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterE(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterEFromMidShouldRaiseHalfCarry)
@@ -201,9 +192,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterEFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterE(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_E, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_E, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterE(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterHFrom0ShouldGive1)
@@ -220,9 +210,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterHFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterH(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_H, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_H, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterH(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterHFromMidShouldRaiseHalfCarry)
@@ -230,9 +219,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterHFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterH(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_H, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_H, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterH(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterLFrom0ShouldGive1)
@@ -241,7 +229,6 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterLFrom0ShouldG
 	byte expected = 0x01;
 	cpu.setRegisterL(startValue);
 	assertIncrementRegisterWasPerformed(standardInstructions::INC_L, expected);
-	ASSERT_EQ(cpu.getRegisterL(), expected);
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterLFromMaxShouldGive0)
@@ -249,9 +236,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterLFromMaxShoul
 	byte startValue = 0xFF;
 	byte expected = 0x00;
 	cpu.setRegisterL(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_L, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_L, expected, CPU::ZERO | CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterL(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterLFromMidShouldRaiseHalfCarry)
@@ -259,9 +245,8 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementRegisterLFromMidShoul
 	byte startValue = 0x0F;
 	byte expected = 0x10;
 	cpu.setRegisterL(startValue);
-	assertIncrementRegisterWasPerformed(standardInstructions::INC_L, expected);
+	assertIncrementRegisterWasPerformed(standardInstructions::INC_L, expected, CPU::HALF_CARRY);
 	ASSERT_EQ(cpu.getRegisterL(), expected);
-	ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
 }
 #pragma endregion
 
