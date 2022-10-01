@@ -12,8 +12,6 @@ void CPU::rotateRegisterLeftCircular(byte& reg)
 	setCarryFlag((reg & 0x80) > 0);
 	/* Rotate the value circularly */
 	reg = (reg << 1) | (reg >> 7);
-	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
-	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
@@ -23,6 +21,7 @@ void CPU::rotateValueInMemoryLeftCircular(byte addrMsb, byte addrLsb)
 	byte value = mmu.read(addr);
 	rotateRegisterLeftCircular(value);
 	mmu.write(addr, value);
+    changeZeroValueFlag(value);
 	lastInstructionTicks = 4;
 }
 
@@ -36,8 +35,6 @@ void CPU::rotateRegisterRightCircular(byte& reg)
 	setCarryFlag((reg & 0x01) > 0);
 	/* Rotate the value circularly */
 	reg = (reg << 7) | (reg >> 1);
-	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
-	changeZeroValueFlag(reg);
 	lastInstructionTicks = 1;
 }
 
@@ -47,21 +44,27 @@ void CPU::rotateValueInMemoryRightCircular(byte addrMsb, byte addrLsb)
 	byte value = mmu.read(addr);
 	rotateRegisterRightCircular(value);
 	mmu.write(addr, value);
+    changeZeroValueFlag(value);
 	lastInstructionTicks = 4;
+}
+
+void CPU::rotateRegisterLeft(byte& reg)
+{
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+
+    byte currentCarry = isFlagSet(CpuFlags::CARRY);
+    /* Set the carry flag to the highest bit of reg */
+    setCarryFlag((reg & 0x80) > 0);
+    /* Rotate the accumulator and set the last bit to the original carry flag */
+    reg = (reg << 1) | currentCarry;
+    lastInstructionTicks = 1;
 }
 
 void CPU::rotateRegisterLeftExtended(byte& reg)
 {
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::ZERO);
-	unsetFlag(CpuFlags::HALF_CARRY);
-
-	byte currentCarry = isFlagSet(CpuFlags::CARRY);
-	/* Set the carry flag to the highest bit of reg */
-	setCarryFlag((reg & 0x80) > 0);
-	/* Rotate the accumulator and set the last bit to the original carry flag */
-	reg = (reg << 1) | currentCarry;
-	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
+    rotateRegisterLeft(reg);
 	changeZeroValueFlag(reg);
 	lastInstructionTicks = 2;
 }
@@ -75,18 +78,23 @@ void CPU::rotateValueInMemoryLeft(byte addrMsb, byte addrLsb)
 	lastInstructionTicks = 4;
 }
 
+void CPU::rotateRegisterRight(byte& reg)
+{
+    unsetFlag(CpuFlags::SUBSTRACTION);
+    unsetFlag(CpuFlags::ZERO);
+    unsetFlag(CpuFlags::HALF_CARRY);
+
+    byte currentCarry = isFlagSet(CpuFlags::CARRY);
+    /* Set the carry flag to the lowest bit of X */
+    setCarryFlag((reg & 0x01) > 0);
+    /* Rotate the accumulator and set the highest bit to the original carry flag */
+    reg = (currentCarry << 7) | (reg >> 1);
+    lastInstructionTicks = 1;
+}
+
 void CPU::rotateRegisterRightExtended(byte& reg)
 {
-	unsetFlag(CpuFlags::SUBSTRACTION);
-	unsetFlag(CpuFlags::ZERO);
-	unsetFlag(CpuFlags::HALF_CARRY);
-
-	byte currentCarry = isFlagSet(CpuFlags::CARRY);
-	/* Set the carry flag to the lowest bit of X */
-	setCarryFlag((reg & 0x01) > 0);
-	/* Rotate the accumulator and set the highest bit to the original carry flag */
-	reg = (currentCarry << 7) | (reg >> 1);
-	// TODO: Confirm that the Zero flag should also be set in the standard instruction set
+    rotateRegisterRight(reg);
 	changeZeroValueFlag(reg);
 	lastInstructionTicks = 2;
 }
@@ -103,12 +111,14 @@ void CPU::rotateValueInMemoryRight(byte addrMsb, byte addrLsb)
 void CPU::rotateRegisterLeftCircularExtended(byte& reg)
 {
 	rotateRegisterLeftCircular(reg);
+    changeZeroValueFlag(reg);
 	lastInstructionTicks = 2;
 }
 
 void CPU::rotateRegisterRightCircularExtended(byte& reg)
 {
 	rotateRegisterRightCircular(reg);
+    changeZeroValueFlag(reg);
 	lastInstructionTicks = 2;
 }
 

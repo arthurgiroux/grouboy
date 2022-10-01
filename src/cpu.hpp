@@ -703,6 +703,21 @@ class CPU
 	 * @opcodes:
 	 *     0x17
 	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void rotateRegisterLeft(byte& reg);
+
+	/**
+	 * Rotate the value inside the given register to the
+	 * left by 1 bit.
+	 *
+	 * The carry is used as a buffer for the rotation.
+	 *
+	 * See {@link #rotateRegisterLeft(byte&)} for details.
+	 * @param reg   the register to rotate to the left by 1 bit.
+	 * @opcodes:
+	 *     0x10 0x11 0x12 0x13 0x14 0x15 0x17
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
 	 * @number_of_ticks: 2
 	 */
 	void rotateRegisterLeftExtended(byte& reg);
@@ -737,6 +752,22 @@ class CPU
 	 * @param reg   the register to rotate to the right by 1 bit.
 	 * @opcodes:
 	 *     0x1F
+	 * @flags_affected: Zero, Carry, Half-carry, Substraction
+	 * @number_of_ticks: 1
+	 */
+	void rotateRegisterRight(byte& reg);
+
+	/**
+	 * Rotate the value inside the given register to the
+	 * right by 1 bit.
+	 *
+	 * The carry is used as a buffer for the rotation.
+	 *
+	 * See {@link #rotateRegisterRight(byte&)} for details.
+	 *
+	 * @param reg   the register to rotate to the right by 1 bit.
+	 * @opcodes:
+	 *     0x18 0x19 0x1A 0x1B 0x1C 0x1D 0x1F
 	 * @flags_affected: Zero, Carry, Half-carry, Substraction
 	 * @number_of_ticks: 2
 	 */

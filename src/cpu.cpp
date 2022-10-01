@@ -189,7 +189,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RL_A:
-		rotateRegisterLeftExtended(a);
+        rotateRegisterLeft(a);
 		break;
 
 	case JR_n:
@@ -221,7 +221,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RR_A:
-		rotateRegisterRightExtended(a);
+		rotateRegisterRight(a);
 		break;
 
 		/******************************************************/
