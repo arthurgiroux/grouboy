@@ -48,7 +48,7 @@ void CPU::decrementRegisterValue(byte& reg)
     setFlag(CpuFlags::SUBSTRACTION);
 
     reg--;
-    setHalfCarryFlag(reg == 0x0F);
+    setHalfCarryFlag((reg & 0x0F) == 0x0F);
     changeZeroValueFlag(reg);
     lastInstructionTicks = 1;
 }
