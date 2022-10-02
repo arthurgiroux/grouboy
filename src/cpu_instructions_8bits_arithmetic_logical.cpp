@@ -61,23 +61,29 @@ void CPU::decrementRegisterValue(uint16_t& reg)
 
 void CPU::decimalAdjustAccumulator()
 {
-    byte valueToAdd = 0;
-    if (((a & 0x0F) > 9) || isFlagSet(CpuFlags::HALF_CARRY))
-    {
-        valueToAdd += 0x06;
-    }
-
-    if (((a >> 4) > 9) || isFlagSet(CpuFlags::CARRY))
-    {
-        valueToAdd += 0x60;
-        setFlag(CpuFlags::CARRY);
-    }
-    else
-    {
-        unsetFlag(CpuFlags::CARRY);
-    }
-
-    a += valueToAdd;
+    // After an addition, adjust if (half-)carry occurred or if result is out of bounds
+	if (!isFlagSet(SUBSTRACTION)) {
+        if (isFlagSet(CpuFlags::CARRY) || a > 0x99)
+        {
+            a += 0x60;
+            setFlag(CpuFlags::CARRY);
+        }
+        if (isFlagSet(CpuFlags::HALF_CARRY) || ((a & 0x0F) > 9))
+        {
+            a += 0x06;
+        }
+	}
+    // after a subtraction, only adjust if (half-)carry occurred
+	else {
+        if (isFlagSet(CpuFlags::CARRY))
+        {
+            a -= 0x60;
+        }
+        if (isFlagSet(CpuFlags::HALF_CARRY))
+        {
+            a -= 0x06;
+        }
+	}
 
     setFlagIfTrue(a == 0, CpuFlags::ZERO);
     unsetFlag(CpuFlags::HALF_CARRY);
