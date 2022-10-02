@@ -128,7 +128,7 @@ class CpuInstructionTest : public ::testing::Test
 			int ticks = cpu.fetchDecodeAndExecute();
 			ASSERT_EQ(ticks, 3);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x10);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expected_value & 0x0F) == 0x00);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 			ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
@@ -186,7 +186,7 @@ class CpuInstructionTest : public ::testing::Test
 			int ticks = cpu.fetchDecodeAndExecute();
 			ASSERT_EQ(ticks, 3);
 			ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), expected_value == 0x0F);
+			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expected_value & 0x0F) == 0x0F);
 			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
 			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 			ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
