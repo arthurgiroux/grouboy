@@ -16,7 +16,7 @@ void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
     byte value = oldvalue + 1;
     mmu.write(addr, value);
     changeZeroValueFlag(value);
-    setHalfCarryFlag(value == 0x10);
+    setHalfCarryFlag((value & 0x0F) == 0x00);
 
     lastInstructionTicks = 3;
 }
@@ -29,7 +29,7 @@ void CPU::decrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
     byte value = oldvalue - 1;
     mmu.write(addr, value);
     changeZeroValueFlag(value);
-    setHalfCarryFlag(value == 0x0F);
+    setHalfCarryFlag((value & 0x0F) == 0x0F);
     lastInstructionTicks = 3;
 }
 
