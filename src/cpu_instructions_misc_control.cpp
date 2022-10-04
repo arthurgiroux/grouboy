@@ -7,16 +7,15 @@ void CPU::NoOperation()
 
 void CPU::enableInterrupts()
 {
-	// TODO: Review interrupts logic
-	ticksBeforeEnablingInterrupts = 2;
+    interruptsEnabledRequested = true;
 	lastInstructionTicks = 1;
 }
 
 void CPU::disableInterrupts()
 {
-	// TODO: Review interrupts logic
-	ticksBeforeDisablingInterrupts = 2;
-	lastInstructionTicks = 1;
+    interruptsEnabledRequested = false;
+	interruptsEnabled = false;
+    lastInstructionTicks = 1;
 }
 
 void CPU::stopInstruction()

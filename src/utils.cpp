@@ -38,4 +38,14 @@ bool isNthBitSet(int value, int bitPosition)
 {
     return (value & (1 << bitPosition)) > 0;
 }
+
+void setNthBit(int& value, int bitPosition, bool state)
+{
+	if (state) {
+        value |= (1 << bitPosition);
+	}
+	else {
+        value &= ~(1 << bitPosition);
+	}
+}
 } // namespace utils

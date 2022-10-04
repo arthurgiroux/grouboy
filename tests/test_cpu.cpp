@@ -782,7 +782,7 @@ TEST_F(CpuTest, CheckCpuStateAtInit)
 	ASSERT_EQ(cpu.pc, 0);
 	ASSERT_EQ(cpu.sp, 0);
 	ASSERT_EQ(cpu.halted, false);
-	ASSERT_EQ(cpu.interrupts, false);
+	ASSERT_EQ(cpu.interruptsEnabled, false);
 }
 
 TEST_F(CpuTest, FlagAreUnsetByDefault)
@@ -1410,7 +1410,7 @@ TEST_F(CpuInstructionTest, InstructionReturnConditionalNotZeroFalse)
 
 TEST_F(CpuInstructionTest, InstructionReturnAfterInterrupt)
 {
-	cpu.interrupts = true;
+	cpu.interruptsEnabled = true;
     uint16_t callerAddr = 0x1234;
     mmu.writeWord(cpu.pc, callerAddr);
     cpu.pc += 2;
@@ -1419,7 +1419,7 @@ TEST_F(CpuInstructionTest, InstructionReturnAfterInterrupt)
     ASSERT_EQ(ticks, 4);
     ASSERT_EQ(cpu.getFlag(), 0x00);
     ASSERT_EQ(cpu.pc, callerAddr);
-	ASSERT_FALSE(cpu.interrupts);
+	ASSERT_FALSE(cpu.interruptsEnabled);
 }
 
 TEST_F(CpuTest, GetSetStackPointerShouldChangeValue)

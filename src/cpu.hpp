@@ -2,9 +2,11 @@
 #define CPU_H
 
 #include "instructions.hpp"
+#include "interrupt_handler.hpp"
 #include "mmu.hpp"
 #include "types.hpp"
 #include "utils.hpp"
+#include <map>
 
 /**
  * Implementation of the CPU for the classic GameBoy.
@@ -268,6 +270,16 @@ class CPU
 			return str.c_str();
 		}
 	};
+
+	/**
+	 * Disable interrupts routine.
+	 *
+	 * @opcodes:
+	 *     0xF3
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
+	void disableInterrupts();
 
 #ifndef UNIT_TESTING
   private:
@@ -1324,16 +1336,6 @@ class CPU
 	void enableInterrupts();
 
 	/**
-	 * Disable interrupts routine.
-	 *
-	 * @opcodes:
-	 *     0xF3
-	 * @flags_affected: N/A
-	 * @number_of_ticks: 1
-	 */
-	void disableInterrupts();
-
-	/**
 	 * Stop system clock and oscillator circuit.
 	 *
 	 * @opcodes:
@@ -1613,6 +1615,8 @@ class CPU
 
 	void setCarryFlag(bool state);
 
+	void handleInterrupts();
+
 	/**
 	 * Reset all CPU flags
 	 */
@@ -1648,13 +1652,12 @@ class CPU
 	// Whether of not the CPU is halted
 	bool halted;
 
-	bool interrupts;
+	// Whether or not interrupts are enabled
+	bool interruptsEnabled;
 
-	// How many ticks left before enabling the interrupts
-	byte ticksBeforeEnablingInterrupts;
+	bool interruptsEnabledRequested;
 
-	// How many ticks left before disabling the interrupts
-	byte ticksBeforeDisablingInterrupts;
+	std::vector<std::unique_ptr<InterruptHandler>> interruptHandlers = {};
 };
 
 #endif
