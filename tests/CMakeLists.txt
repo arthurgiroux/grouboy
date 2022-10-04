@@ -28,6 +28,8 @@ add_executable(
         ../src/utils.cpp
         ../src/cartridge.cpp
         ../src/cartridge.hpp
+        ../src/interrupt_handler.cpp
+        ../src/interrupt_handler.hpp
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp

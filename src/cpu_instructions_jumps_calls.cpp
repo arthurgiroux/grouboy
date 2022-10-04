@@ -82,7 +82,7 @@ void CPU::returnInstructionAfterInterrupt()
     returnInstruction();
     // TODO:
     // Revisit what to do after implementing interrups
-    interrupts = false;
+	interruptsEnabled = false;
 }
 
 void CPU::callImmediateSubroutineIfConditionSatisfied(bool condition)

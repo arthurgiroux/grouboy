@@ -1,6 +1,8 @@
 #include "cpu.hpp"
 #include <iostream>
 
+#include <memory>
+
 using namespace utils;
 
 CPU::CPU(MMU& mmu_) : mmu(mmu_)
@@ -10,9 +12,7 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_)
 	pc = 0;
 	sp = 0;
 	halted = false;
-	interrupts = false;
-	ticksBeforeEnablingInterrupts = 0;
-	ticksBeforeDisablingInterrupts = 0;
+	interruptsEnabled = false;
 	a = 0;
 	b = 0;
 	c = 0;
@@ -21,33 +21,26 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_)
 	h = 0;
 	l = 0;
 	f = 0;
+
+    interruptHandlers.push_back(std::make_unique<InterruptHandlerVBlank>(this, &mmu));
+    interruptHandlers.push_back(std::make_unique<InterruptHandlerLCDStat>(this, &mmu));
+    interruptHandlers.push_back(std::make_unique<InterruptHandlerTimer>(this, &mmu));
+    interruptHandlers.push_back(std::make_unique<InterruptHandlerSerial>(this, &mmu));
+    interruptHandlers.push_back(std::make_unique<InterruptHandlerJoypad>(this, &mmu));
 }
 
 int CPU::fetchDecodeAndExecute()
 {
-	// TODO: Review interrupts logic
-	if (ticksBeforeEnablingInterrupts > 0)
+	handleInterrupts();
+
+	if (interruptsEnabledRequested)
 	{
-		ticksBeforeEnablingInterrupts--;
-	}
-	else if (ticksBeforeDisablingInterrupts > 0)
-	{
-		ticksBeforeDisablingInterrupts--;
+		interruptsEnabled = true;
+		interruptsEnabledRequested = false;
 	}
 
 	executeInstruction(mmu.read(pc++));
 	tick += lastInstructionTicks;
-
-	if (ticksBeforeEnablingInterrupts == 1)
-	{
-		interrupts = true;
-		ticksBeforeEnablingInterrupts = 0;
-	}
-	else if (ticksBeforeDisablingInterrupts == 1)
-	{
-		interrupts = false;
-		ticksBeforeDisablingInterrupts = 0;
-	}
 
 	return lastInstructionTicks;
 }
@@ -77,6 +70,20 @@ void CPU::setFlagIfTrue(bool condition, CpuFlags flag)
 void CPU::changeZeroValueFlag(byte value)
 {
 	setFlagIfTrue(value == 0, CpuFlags::ZERO);
+}
+
+void CPU::handleInterrupts()
+{
+	if (!interruptsEnabled) {
+		return;
+	}
+
+	for (auto& handler : interruptHandlers) {
+		if (handler->handle()) {
+            interruptsEnabled = false;
+			break;
+		}
+	}
 }
 
 CPU::~CPU() = default;
@@ -189,7 +196,7 @@ void CPU::executeInstruction(const byte& opCode)
 		break;
 
 	case RL_A:
-        rotateRegisterLeft(a);
+		rotateRegisterLeft(a);
 		break;
 
 	case JR_n:

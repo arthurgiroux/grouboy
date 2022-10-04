@@ -71,6 +71,9 @@ void decrement16BitsValueStoredIn8BitsValues(byte& msb, byte& lsb);
  * @return true if the bit is set, false otherwise
  */
 bool isNthBitSet(int value, int bitPosition);
+
+void setNthBit(int& value, int bitPosition, bool state);
+
 } // namespace utils
 
 #endif // GBEMULATOR_UTILS_HPP
