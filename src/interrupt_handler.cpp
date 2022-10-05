@@ -15,8 +15,9 @@ bool InterruptHandler::handle()
         isNthBitSet(IF, interruptFlagBit)) {
         uint16_t pc = cpu->getProgramCounter();
         uint16_t sp = cpu->getStackPointer();
-        mmu->write(sp, getLsbFromWord(pc));
-        mmu->write(sp + 1, getMsbFromWord(pc));
+        sp -= 2;
+        cpu->setStackPointer(sp);
+        mmu->writeWord(sp, pc);
 
         setNthBit(reinterpret_cast<int&>(IF), interruptFlagBit, false);
 		mmu->write(INTERRUPT_FLAG_ADDR, IF);
