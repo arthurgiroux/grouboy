@@ -33,6 +33,10 @@ int CPU::fetchDecodeAndExecute()
 {
 	handleInterrupts();
 
+	if (halted) {
+		return 1;
+	}
+
 	if (interruptsEnabledRequested)
 	{
 		interruptsEnabled = true;
