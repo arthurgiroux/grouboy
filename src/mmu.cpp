@@ -45,7 +45,7 @@ byte MMU::read(const uint16_t& addr)
 		throw InvalidMemoryAccessException();
 	}
 
-	if (addr < BIOS.size())
+	if (addr < BIOS.size() && isBootRomActive())
 	{
 		return memory[addr];
 	}
@@ -115,4 +115,9 @@ bool MMU::loadCartridge(const std::string& filepath)
 Cartridge* MMU::getCartridge()
 {
 	return cartridge.get();
+}
+
+bool MMU::isBootRomActive()
+{
+	return read(BOOT_ROM_UNMAPPED_FLAG_ADDR) != 1;
 }
