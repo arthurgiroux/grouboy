@@ -102,6 +102,11 @@ class GUI
 	void displayGameView();
 
 	/**
+	 * Display a view of the VRAM content.
+	 */
+	void displayVRAMView();
+
+	/**
 	 * Display a view of the tile maps.
 	 */
 	void displayTileMapView();
@@ -138,6 +143,12 @@ class GUI
 	ImVec2 tileViewSize = ImVec2(256, 128);
 	int numberOfTileToDisplayPerLine = 16;
 	static const int GAMEVIEW_UPSCALE_RATIO = 2;
+	enum class VRAMDisplayMode
+	{
+		BG_MAP,
+		TILES
+	};
+	VRAMDisplayMode currentVRAMDisplayMode = VRAMDisplayMode::BG_MAP;
 };
 
 #endif // GBEMULATOR_GUI_H
