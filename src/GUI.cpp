@@ -84,7 +84,7 @@ void GUI::startMainLoop()
 		createImGuiFrame();
 
 		displayGameView();
-        displayVRAMView();
+		displayVRAMView();
 
 		renderImGuiFrame();
 	}
@@ -101,51 +101,56 @@ void GUI::displayVRAMView()
 {
 	ImGui::Begin("VRAM Display");
 
-	if (ImGui::Button("BG Maps")) {
+	if (ImGui::Button("BG Maps"))
+	{
 		currentVRAMDisplayMode = VRAMDisplayMode::BG_MAP;
 	}
 
-    ImGui::SameLine();
+	ImGui::SameLine();
 
-    if (ImGui::Button("Tiles")) {
-        currentVRAMDisplayMode = VRAMDisplayMode::TILES;
-    }
-
-	if (currentVRAMDisplayMode == VRAMDisplayMode::BG_MAP) {
-        displayTileMapView();
+	if (ImGui::Button("Tiles"))
+	{
+		currentVRAMDisplayMode = VRAMDisplayMode::TILES;
 	}
 
-	if (currentVRAMDisplayMode == VRAMDisplayMode::TILES) {
-        displayTileView();
+	if (currentVRAMDisplayMode == VRAMDisplayMode::BG_MAP)
+	{
+		displayTileMapView();
 	}
 
-    ImGui::End();
+	if (currentVRAMDisplayMode == VRAMDisplayMode::TILES)
+	{
+		displayTileView();
+	}
+
+	ImGui::End();
 }
 
-void GUI::displayTileMapView() {
-    if (ImGui::Button("Tile Map 0"))
-    {
-        tileMapId = 0;
-    }
+void GUI::displayTileMapView()
+{
+	if (ImGui::Button("Tile Map 0"))
+	{
+		tileMapId = 0;
+	}
 
-    ImGui::SameLine();
+	ImGui::SameLine();
 
-    if (ImGui::Button("Tile Map 1"))
-    {
-        tileMapId = 1;
-    }
+	if (ImGui::Button("Tile Map 1"))
+	{
+		tileMapId = 1;
+	}
 
-    GPU::TileMap map = emulator.getGPU().getTileMap(tileMapId);
-    for (int y = 0; y < GPU::TILEMAP_HEIGHT; y++)
-    {
-        for (int x = 0; x < GPU::TILEMAP_WIDTH; x++)
-        {
-            Tile tile = map[y * GPU::TILEMAP_WIDTH + x];
-            loadRawRGBInSubTexture(tileMapRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, Tile::TILE_WIDTH,
-                                   Tile::TILE_HEIGHT, tile.toRGB().data());
-        }
-    }
-    ImGui::Image((void*)(intptr_t)tileMapRenderTexture, tileMapSize);
+	GPU::TileMap map = emulator.getGPU().getTileMap(tileMapId);
+	for (int y = 0; y < GPU::TILEMAP_HEIGHT; y++)
+	{
+		for (int x = 0; x < GPU::TILEMAP_WIDTH; x++)
+		{
+			Tile tile = map[y * GPU::TILEMAP_WIDTH + x];
+			loadRawRGBInSubTexture(tileMapRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, Tile::TILE_WIDTH,
+			                       Tile::TILE_HEIGHT, tile.toRGB().data());
+		}
+	}
+	ImGui::Image((void*)(intptr_t)tileMapRenderTexture, tileMapSize);
 }
 
 void GUI::displayTileView()
@@ -165,31 +170,44 @@ void GUI::displayTileView()
 			                       Tile::TILE_WIDTH, Tile::TILE_HEIGHT, tile2.toRGB().data());
 		}
 	}
-    {
-        float my_tex_w = tileViewSize.x;
-        float my_tex_h = tileViewSize.y;
-        ImGuiIO& io = ImGui::GetIO();
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
-        ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f); // 50% opaque white
-        ImGui::Image((void*)(intptr_t)tileRenderTexture, tileViewSize);
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::BeginTooltip();
-            float region_sz = Tile::TILE_HEIGHT;
-            int region_x = static_cast<int>((io.MousePos.x - pos.x) / region_sz) * region_sz;
-            int region_y = static_cast<int>((io.MousePos.y - pos.y) / region_sz) * region_sz;
-            float zoom = 8.0f;
-            if (region_x < 0.0f) { region_x = 0.0f; }
-            else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
-            if (region_y < 0.0f) { region_y = 0.0f; }
-            else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
-            ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y) / my_tex_h);
-            ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y + region_sz) / my_tex_h);
-            ImGui::Image((void*)(intptr_t)tileRenderTexture, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1, tint_col, border_col);
-            ImGui::EndTooltip();
-        }
-    }
+	{
+		float my_tex_w = tileViewSize.x;
+		float my_tex_h = tileViewSize.y;
+		ImGuiIO& io = ImGui::GetIO();
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
+		ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f); // 50% opaque white
+		ImGui::Image((void*)(intptr_t)tileRenderTexture, tileViewSize);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			float region_sz = Tile::TILE_HEIGHT;
+			int region_x = static_cast<int>((io.MousePos.x - pos.x) / region_sz) * region_sz;
+			int region_y = static_cast<int>((io.MousePos.y - pos.y) / region_sz) * region_sz;
+			float zoom = 8.0f;
+			if (region_x < 0.0f)
+			{
+				region_x = 0.0f;
+			}
+			else if (region_x > my_tex_w - region_sz)
+			{
+				region_x = my_tex_w - region_sz;
+			}
+			if (region_y < 0.0f)
+			{
+				region_y = 0.0f;
+			}
+			else if (region_y > my_tex_h - region_sz)
+			{
+				region_y = my_tex_h - region_sz;
+			}
+			ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y) / my_tex_h);
+			ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y + region_sz) / my_tex_h);
+			ImGui::Image((void*)(intptr_t)tileRenderTexture, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1,
+			             tint_col, border_col);
+			ImGui::EndTooltip();
+		}
+	}
 }
 
 void GUI::displayGameView()
