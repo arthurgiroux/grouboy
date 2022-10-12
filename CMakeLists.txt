@@ -70,7 +70,9 @@ set(SOURCE_FILES
 	src/cartridge.cpp
 	src/cartridge.hpp
 	src/interrupt_handler.cpp
-	src/interrupt_handler.hpp)
+	src/interrupt_handler.hpp
+	src/input.cpp
+	src/input.hpp)
 
 add_executable(gbemulator ${SOURCE_FILES})
 target_link_libraries(gbemulator IMGUI)
