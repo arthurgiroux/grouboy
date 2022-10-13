@@ -30,6 +30,8 @@ add_executable(
         ../src/cartridge.hpp
         ../src/interrupt_handler.cpp
         ../src/interrupt_handler.hpp
+        ../src/input.cpp
+        ../src/input.hpp
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp
@@ -42,7 +44,8 @@ add_executable(
         test_cpu_instructions_misc_control.cpp
         test_cpu_instructions_16bits_arithmetic_logical.cpp
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        test_cartridge.cpp)
+        test_cartridge.cpp
+        test_input.cpp)
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
 
