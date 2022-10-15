@@ -1,6 +1,6 @@
-#include "input.hpp"
+#include "input_controller.hpp"
 
-Input::Input()
+InputController::InputController()
 {
 	buttonStates = {
 	    {Button::UP, ButtonState::RELEASED},     {Button::DOWN, ButtonState::RELEASED},
@@ -10,17 +10,17 @@ Input::Input()
 	};
 }
 
-void Input::setButtonPressed(Input::Button button)
+void InputController::setButtonPressed(InputController::Button button)
 {
 	buttonStates[button] = ButtonState::PRESSED;
 }
 
-void Input::setButtonReleased(Input::Button button)
+void InputController::setButtonReleased(InputController::Button button)
 {
 	buttonStates[button] = ButtonState::RELEASED;
 }
 
-bool Input::isButtonPressed(Input::Button button) const
+bool InputController::isButtonPressed(InputController::Button button) const
 {
 	return buttonStates.at(button) == ButtonState::PRESSED;
 }
