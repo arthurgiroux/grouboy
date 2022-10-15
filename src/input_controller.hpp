@@ -1,12 +1,12 @@
-#ifndef GBEMULATOR_INPUT_HPP
-#define GBEMULATOR_INPUT_HPP
+#ifndef GBEMULATOR_INPUT_CONTROLLER_HPP
+#define GBEMULATOR_INPUT_CONTROLLER_HPP
 
 #include <map>
 
 /**
- * Abstraction class for manual input through buttons
+ * Controller for manual input through buttons
  */
-class Input
+class InputController
 {
   public:
 	/**
@@ -27,12 +27,12 @@ class Input
 	/**
 	 * Create a new Input object
 	 */
-	Input();
+	InputController();
 
 	/**
 	 * Destroy an Input object
 	 */
-	~Input() = default;
+	~InputController() = default;
 
 	/**
 	 * Set the given button as being pressed
@@ -69,4 +69,4 @@ class Input
 	std::map<Button, ButtonState> buttonStates = {};
 };
 
-#endif // GBEMULATOR_INPUT_HPP
+#endif // GBEMULATOR_INPUT_CONTROLLER_HPP
