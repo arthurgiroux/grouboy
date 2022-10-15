@@ -3,22 +3,24 @@
 Input::Input()
 {
 	buttonStates = {
-	    {Button::UP, false}, {Button::DOWN, false}, {Button::LEFT, false},   {Button::RIGHT, false},
-	    {Button::A, false},  {Button::B, false},    {Button::SELECT, false}, {Button::START, false},
+	    {Button::UP, ButtonState::RELEASED},     {Button::DOWN, ButtonState::RELEASED},
+	    {Button::LEFT, ButtonState::RELEASED},   {Button::RIGHT, ButtonState::RELEASED},
+	    {Button::A, ButtonState::RELEASED},      {Button::B, ButtonState::RELEASED},
+	    {Button::SELECT, ButtonState::RELEASED}, {Button::START, ButtonState::RELEASED},
 	};
 }
 
 void Input::setButtonPressed(Input::Button button)
 {
-	buttonStates[button] = true;
+	buttonStates[button] = ButtonState::PRESSED;
 }
 
 void Input::setButtonReleased(Input::Button button)
 {
-	buttonStates[button] = false;
+	buttonStates[button] = ButtonState::RELEASED;
 }
 
 bool Input::isButtonPressed(Input::Button button) const
 {
-	return buttonStates.at(button);
+	return buttonStates.at(button) == ButtonState::PRESSED;
 }
