@@ -2,11 +2,14 @@
 #define MMU_H
 
 #include <array>
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
-#include "types.hpp"
 #include "cartridge.hpp"
+#include "types.hpp"
+
+// Forward declaration
+class InputController;
 
 /***********************************
             MEMORY LAYOUT
@@ -28,11 +31,12 @@ class MMU
 	void write(const uint16_t& addr, const byte& value);
 	void writeWord(const uint16_t& addr, const uint16_t& value);
 	bool loadCartridge(const std::string& filepath);
-    bool isBootRomActive();
-    Cartridge* getCartridge();
+	bool isBootRomActive();
+	Cartridge* getCartridge();
+	void setInputController(InputController* controller);
 
-    static const size_t MEMORY_SIZE_IN_BYTES = 65536;
-    static const std::array<byte, 256> BIOS;
+	static const size_t MEMORY_SIZE_IN_BYTES = 65536;
+	static const std::array<byte, 256> BIOS;
 
 	class InvalidMemoryAccessException : public std::exception
 	{
@@ -47,7 +51,9 @@ class MMU
 	std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
 	std::unique_ptr<Cartridge> cartridge = nullptr;
 	static const int ROM_BANK_1_END_ADDR = 0x8000;
-    static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
+	static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
+	InputController* inputController;
+	static const int JOYPAD_MAP_ADDR = 0xFF00;
 };
 
 #endif

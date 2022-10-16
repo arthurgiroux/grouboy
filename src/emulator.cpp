@@ -2,6 +2,7 @@
 
 Emulator::Emulator() : cpu(mmu), gpu(mmu)
 {
+	mmu.setInputController(&inputController);
 }
 
 Emulator::~Emulator() = default;

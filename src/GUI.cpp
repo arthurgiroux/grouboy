@@ -70,6 +70,8 @@ void GUI::startMainLoop()
 				shouldExit = true;
 		}
 
+		handleInput();
+
 		if (goToNextFrame)
 		{
 			while (lastFrameId == emulator.getGPU().getFrameId())
@@ -304,12 +306,14 @@ bool GUI::initSDL()
 	// Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 	// GL ES 2.0 + GLSL 100
+	glslVersion = "#version 100";
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #elif defined(__APPLE__)
 	// GL 3.2 Core + GLSL 150
+	glslVersion = "#version 150";
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -350,4 +354,28 @@ void GUI::initImGui()
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(mainWindow, sdlGlContext);
 	ImGui_ImplOpenGL3_Init(glslVersion.c_str());
+}
+
+void GUI::handleInput()
+{
+	sendKeyStatusToInputController(SDL_SCANCODE_UP, InputController::Button::UP);
+	sendKeyStatusToInputController(SDL_SCANCODE_DOWN, InputController::Button::DOWN);
+	sendKeyStatusToInputController(SDL_SCANCODE_LEFT, InputController::Button::LEFT);
+	sendKeyStatusToInputController(SDL_SCANCODE_RIGHT, InputController::Button::RIGHT);
+	sendKeyStatusToInputController(SDL_SCANCODE_A, InputController::Button::A);
+	sendKeyStatusToInputController(SDL_SCANCODE_B, InputController::Button::B);
+	sendKeyStatusToInputController(SDL_SCANCODE_RETURN, InputController::Button::START);
+	sendKeyStatusToInputController(SDL_SCANCODE_S, InputController::Button::SELECT);
+}
+
+void GUI::sendKeyStatusToInputController(int keycode, InputController::Button button)
+{
+	if (ImGui::IsKeyPressed(keycode))
+	{
+		emulator.getInputController().setButtonPressed(button);
+	}
+	else
+	{
+		emulator.getInputController().setButtonReleased(button);
+	}
 }
