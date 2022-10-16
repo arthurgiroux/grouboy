@@ -3,6 +3,7 @@
 
 #include "cpu.hpp"
 #include "gpu.hpp"
+#include "input_controller.hpp"
 #include "mmu.hpp"
 
 class Emulator
@@ -27,6 +28,11 @@ class Emulator
 		return cpu;
 	}
 
+	InputController& getInputController()
+	{
+		return inputController;
+	}
+
 	int getCurrentTicks() const
 	{
 		return currentTicks;
@@ -36,6 +42,7 @@ class Emulator
 	MMU mmu;
 	CPU cpu;
 	GPU gpu;
+	InputController inputController;
 	int currentTicks = 0;
 };
 

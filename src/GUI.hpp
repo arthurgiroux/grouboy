@@ -126,6 +126,19 @@ class GUI
 	 */
 	void renderImGuiFrame();
 
+	/**
+	 * Handle input coming from keyboard / mouse.
+	 */
+	void handleInput();
+
+	/**
+	 * update the input controller with the status of the given key.
+	 *
+	 * @param keycode 	the keycode of the key to update
+	 * @param button 	the button of the input controller that we will map to
+	 */
+	void sendKeyStatusToInputController(int keycode, InputController::Button button);
+
 	Emulator& emulator;
 	SDL_GLContext sdlGlContext = nullptr;
 	SDL_Window* mainWindow = nullptr;
