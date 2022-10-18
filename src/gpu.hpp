@@ -11,7 +11,7 @@ class GPU
   public:
 	static const int SCREEN_WIDTH = 160;
 	static const int SCREEN_HEIGHT = 144;
-    static const int BYTES_PER_PIXEL = 3;
+	static const int BYTES_PER_PIXEL = 3;
 	using FrameRGB = std::array<byte, SCREEN_WIDTH * SCREEN_HEIGHT * BYTES_PER_PIXEL>;
 
 	static const int TILEMAP_HEIGHT = 32;
@@ -54,6 +54,62 @@ class GPU
 		return frameId;
 	}
 
+	/**
+	 * Return if the display is enabled in the LCD control
+	 *
+	 * @return true if the display is enabled, false otherwise
+	 */
+	bool isDisplayEnabled() const;
+
+	/**
+	 * Return the index of the tilemap to use for tile in the "window"
+	 *
+	 * @return index of the tilemap to use
+	 */
+	int tileMapIndexForWindow() const;
+
+	/**
+	 * Return if the "window" is enabled in the LCD control
+	 *
+	 * @return true if "window" is enabled, false otherwise
+	 */
+	bool isWindowEnabled() const;
+
+	/**
+	 * Return the index of the tile data area to use for background and window
+	 *
+	 * @return index of the tile data area to use
+	 */
+	int backgroundAndWindowTileDataAreaIndex() const;
+
+	/**
+	 * Return the index of the tile map to use for the background
+	 *
+	 * @return index of the tile map to use
+	 */
+	int backgroundTileMapIndex() const;
+
+	/**
+	 * Return the size of the sprites to use
+	 *
+	 * @return 8 for 8x8, 16 for 8x16
+	 */
+	int spriteSize() const;
+
+	/**
+	 * Return if sprite rendering is enabled in the LCD control
+	 *
+	 * @return true if sprite rendering is enabled, false otherwise
+	 */
+	bool areSpritesEnabled() const;
+
+	/**
+	 * Return if background and window rendering are enabled in the LCD control
+	 *
+	 * @return true if background and window rendering are enabled, false otherwise
+	 */
+	bool areBackgroundAndWindowEnabled() const;
+
 #ifndef UNIT_TESTING
   private:
 #endif
@@ -65,6 +121,13 @@ class GPU
 	};
 
 	void renderScanline(int scanline);
+
+	/**
+	 * Render the background part of the given scanline
+	 * @param scanline 	the scanline to render
+	 */
+	void renderScanlineBackground(int scanline);
+
 	void renderFrame();
 	void updateParameters();
 
@@ -73,17 +136,17 @@ class GPU
 	Mode currentMode = OAM_ACCESS;
 	int currentScanline = 0;
 
-    static const int M_CYCLES_TO_T_CYCLES = 4;
-    static const int OAM_ACCESS_TICKS = 80 * M_CYCLES_TO_T_CYCLES;
+	static const int M_CYCLES_TO_T_CYCLES = 4;
+	static const int OAM_ACCESS_TICKS = 80 * M_CYCLES_TO_T_CYCLES;
 	static const int VRAM_ACCESS_TICKS = 172 * M_CYCLES_TO_T_CYCLES;
 	static const int HBLANK_TICKS = 204 * M_CYCLES_TO_T_CYCLES;
 	static const int VBLANK_TICKS = 456 * M_CYCLES_TO_T_CYCLES;
-    static const int MAX_SCANLINE_VALUE = 153;
+	static const int MAX_SCANLINE_VALUE = 153;
 
 	MMU& mmu;
 
-    FrameRGB temporaryFrame = {};
-    FrameRGB currentFrame = {};
+	FrameRGB temporaryFrame = {};
+	FrameRGB currentFrame = {};
 
 	static const int ADDR_MAP_0 = 0x9800;
 	static const int ADDR_MAP_1 = 0x9C00;
@@ -97,19 +160,6 @@ class GPU
 	static const int ADDR_BG_PALETTE = 0xFF47;
 	static const int TILES_PER_LINE = 20;
 	static const int TILE_MAP_SIZE = 32;
-
-	byte scrollY;
-	byte scrollX;
-	int backgroundPalette;
-
-	bool paramBackgroundStatus;
-	bool paramSpritesStatus;
-	bool paramSpriteSize;
-	bool useBackgroundTileMap1;
-	bool paramBackgroundTileSet;
-	bool paramWindowStatus;
-	bool paramWindowTileMap;
-	bool paramDisplayStatus;
 };
 
 #endif // GBEMULATOR_GPU_HPP

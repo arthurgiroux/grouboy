@@ -46,13 +46,27 @@ void GPU::step(int nbrTicks)
 
 void GPU::renderScanline(int scanline)
 {
-	updateParameters();
+	if (!isDisplayEnabled())
+	{
+		return;
+	}
+
+	if (areBackgroundAndWindowEnabled())
+	{
+		renderScanlineBackground(scanline);
+	}
+}
+
+void GPU::renderScanlineBackground(int scanline)
+{
+	byte scrollX = mmu.read(ADDR_SCROLL_X);
+	byte scrollY = mmu.read(ADDR_SCROLL_Y);
 
 	// We retrieve the offset of the line we want to render in the RGB frame
 	byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * BYTES_PER_PIXEL;
 
 	// Retrieve the tilemap we are going to use
-	TileMap background = getTileMap(useBackgroundTileMap1 ? 1 : 0);
+	TileMap background = getTileMap(backgroundTileMapIndex());
 
 	/*
 	 * The tilemap is a 32x32 map of tiles of 8x8 pixels.
@@ -115,21 +129,6 @@ GPU::GPU(MMU& mmu_) : mmu(mmu_)
 {
 }
 
-void GPU::updateParameters()
-{
-	scrollX = mmu.read(ADDR_SCROLL_X);
-	scrollY = mmu.read(ADDR_SCROLL_Y);
-	std::bitset<8> lcdGpuControl = mmu.read(ADDR_LCD_GPU_CONTROL);
-	paramBackgroundStatus = lcdGpuControl[0];
-	paramSpritesStatus = lcdGpuControl[1];
-	paramSpriteSize = lcdGpuControl[2];
-	useBackgroundTileMap1 = lcdGpuControl[3];
-	paramBackgroundTileSet = lcdGpuControl[4];
-	paramWindowStatus = lcdGpuControl[5];
-	paramWindowTileMap = lcdGpuControl[6];
-	paramDisplayStatus = lcdGpuControl[7];
-}
-
 Tile GPU::getTileById(byte tileId, int8_t tileSetId)
 {
 	int tileSetOffset = ADDR_TILE_SET_0;
@@ -137,7 +136,7 @@ Tile GPU::getTileById(byte tileId, int8_t tileSetId)
 	if (tileSetId == 1)
 	{
 		tileSetOffset = ADDR_TILE_SET_1;
-        tileIdCorrected = static_cast<sbyte>(tileId);
+		tileIdCorrected = static_cast<sbyte>(tileId);
 	}
 
 	uint16_t tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileIdCorrected;
@@ -163,4 +162,44 @@ GPU::TileMap GPU::getTileMap(int index)
 	}
 
 	return map;
+}
+
+bool GPU::isDisplayEnabled() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 7);
+}
+
+int GPU::tileMapIndexForWindow() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 6);
+}
+
+bool GPU::isWindowEnabled() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 5);
+}
+
+int GPU::backgroundAndWindowTileDataAreaIndex() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 4);
+}
+
+int GPU::backgroundTileMapIndex() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 3);
+}
+
+int GPU::spriteSize() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 2);
+}
+
+bool GPU::areSpritesEnabled() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 1);
+}
+
+bool GPU::areBackgroundAndWindowEnabled() const
+{
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 0);
 }
