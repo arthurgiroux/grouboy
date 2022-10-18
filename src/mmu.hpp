@@ -52,7 +52,7 @@ class MMU
 	std::unique_ptr<Cartridge> cartridge = nullptr;
 	static const int ROM_BANK_1_END_ADDR = 0x8000;
 	static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
-	InputController* inputController;
+	InputController* inputController = nullptr;
 	static const int JOYPAD_MAP_ADDR = 0xFF00;
 };
 
