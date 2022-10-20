@@ -2,6 +2,7 @@
 #include "gpu.hpp"
 #include <bitset>
 #include <cassert>
+#include <iostream>
 
 void GPU::step(int nbrTicks)
 {
@@ -34,7 +35,6 @@ void GPU::step(int nbrTicks)
 	{
 		currentScanline++;
 		ticksSpentInCurrentMode = 0;
-		// TODO: Check if it's really necessary to increase scanline value during vblank
 		if (currentScanline > MAX_SCANLINE_VALUE)
 		{
 			setMode(OAM_ACCESS);
@@ -54,6 +54,16 @@ void GPU::renderScanline(int scanline)
 	if (areBackgroundAndWindowEnabled())
 	{
 		renderScanlineBackground(scanline);
+
+		if (isWindowEnabled())
+		{
+			renderScanlineWindow(scanline);
+		}
+	}
+
+	if (areSpritesEnabled())
+	{
+		renderScanlineSprite(scanline);
 	}
 }
 
@@ -116,6 +126,63 @@ void GPU::renderScanlineBackground(int scanline)
 		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 1];
 		frameScanlineStartAddr[x * BYTES_PER_PIXEL + 2] =
 		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 2];
+	}
+}
+
+void GPU::renderScanlineWindow(int scanline)
+{
+	// TODO: render window
+}
+
+void GPU::renderScanlineSprite(int scanline)
+{
+	int nbrSpritesInScanline = 0;
+	byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * BYTES_PER_PIXEL;
+
+	for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
+	{
+		// TODO: Fix ugly code
+		byte y = mmu.read(SPRITE_ATTR_TABLE_ADDR + 4 * i + 0);
+		byte x = mmu.read(SPRITE_ATTR_TABLE_ADDR + 4 * i + 1);
+		byte idx = mmu.read(SPRITE_ATTR_TABLE_ADDR + 4 * i + 2);
+		int spriteSz = spriteSize();
+		int spriteStartVerticalPos = y - 16;
+		int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
+		if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
+		{
+			nbrSpritesInScanline++;
+			if (x == 0 || x >= 168)
+			{
+				continue;
+			}
+
+			Tile tile = getTileById(idx, 0);
+			auto tileRGBArray = tile.toRGB();
+			int yOffsetTile = scanline - spriteStartVerticalPos;
+			int xOffset = x - 8;
+			for (int j = 0; j < 8; j++)
+			{
+				if (xOffset + j < 0)
+				{
+					continue;
+				}
+				if (xOffset + j > SCREEN_WIDTH)
+				{
+					break;
+				}
+
+				// TODO: Encapsulate
+				frameScanlineStartAddr[(xOffset + j) * BYTES_PER_PIXEL] =
+				    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + j) * BYTES_PER_PIXEL + 0];
+				frameScanlineStartAddr[(xOffset + j) * BYTES_PER_PIXEL + 1] =
+				    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + j) * BYTES_PER_PIXEL + 1];
+				frameScanlineStartAddr[(xOffset + j) * BYTES_PER_PIXEL + 2] =
+				    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + j) * BYTES_PER_PIXEL + 2];
+			}
+
+			std::cout << "SPRITE " << (int)idx << "size=" << spriteSz << " display at (" << (int)x << "," << (int)y
+			          << ")" << std::endl;
+		}
 	}
 }
 
@@ -191,7 +258,7 @@ int GPU::backgroundTileMapIndex() const
 
 int GPU::spriteSize() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 2);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 2) ? 16 : 8;
 }
 
 bool GPU::areSpritesEnabled() const

@@ -128,6 +128,18 @@ class GPU
 	 */
 	void renderScanlineBackground(int scanline);
 
+	/**
+	 * Render the window part of the given scanline
+	 * @param scanline 	the scanline to render
+	 */
+	void renderScanlineWindow(int scanline);
+
+	/**
+	 * Render the sprite part of the given scanline
+	 * @param scanline 	the scanline to render
+	 */
+	void renderScanlineSprite(int scanline);
+
 	void renderFrame();
 	void updateParameters();
 
@@ -160,6 +172,11 @@ class GPU
 	static const int ADDR_BG_PALETTE = 0xFF47;
 	static const int TILES_PER_LINE = 20;
 	static const int TILE_MAP_SIZE = 32;
+	static const int WINDOW_ADDR_SCROLL_Y = 0xFF4A;
+	static const int WINDOW_ADDR_SCROLL_X = 0xFF4B;
+	static const int SPRITE_ATTR_TABLE_ADDR = 0xFE00;
+	static const int NBR_SPRITES = 40;
+	static const int MAX_NBR_SPRITES_PER_SCANLINE = 10;
 };
 
 #endif // GBEMULATOR_GPU_HPP
