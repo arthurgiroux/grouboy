@@ -2,6 +2,7 @@
 #define GBEMULATOR_GPU_HPP
 
 #include "mmu.hpp"
+#include "rgb_image.hpp"
 #include "tile.hpp"
 #include <array>
 #include <vector>
@@ -12,8 +13,6 @@ class GPU
 	static const int SCREEN_WIDTH = 160;
 	static const int SCREEN_HEIGHT = 144;
 	static const int BYTES_PER_PIXEL = 3;
-	using FrameRGB = std::array<byte, SCREEN_WIDTH * SCREEN_HEIGHT * BYTES_PER_PIXEL>;
-
 	static const int TILEMAP_HEIGHT = 32;
 	static const int TILEMAP_WIDTH = 32;
 	using TileMap = std::vector<Tile>;
@@ -44,7 +43,7 @@ class GPU
 
 	Tile getTileById(byte tileId, int8_t tileSetId);
 
-	const FrameRGB& getCurrentFrame() const
+	const RGBImage& getCurrentFrame() const
 	{
 		return currentFrame;
 	}
@@ -157,8 +156,8 @@ class GPU
 
 	MMU& mmu;
 
-	FrameRGB temporaryFrame = {};
-	FrameRGB currentFrame = {};
+	RGBImage temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
+	RGBImage currentFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
 
 	static const int ADDR_MAP_0 = 0x9800;
 	static const int ADDR_MAP_1 = 0x9C00;

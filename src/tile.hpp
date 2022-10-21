@@ -1,6 +1,7 @@
 #ifndef GBEMULATOR_TILE_H
 #define GBEMULATOR_TILE_H
 
+#include "rgb_image.hpp"
 #include "types.hpp"
 #include <array>
 
@@ -11,15 +12,12 @@ class Tile
 	static const int BYTES_PER_TILE_VALUE = 2;
 	static const int TILE_WIDTH = 8;
 	static const int TILE_HEIGHT = 8;
-	static const int TILE_SIZE = TILE_WIDTH * TILE_HEIGHT;
-	static const int BYTES_PER_PIXEL = 3;
 
-	using TileRGBArray = std::array<byte, TILE_SIZE * BYTES_PER_PIXEL>;
 	using TileDataArray = std::array<byte, BYTES_PER_TILE>;
 
 	Tile(const TileDataArray& data);
 
-	const TileRGBArray& toRGB();
+	const RGBImage& getImage() const;
 
 #ifndef UNIT_TESTING
   private:
@@ -28,7 +26,7 @@ class Tile
 	void convertToPixels();
 
 	TileDataArray data = {};
-	TileRGBArray pixels = {};
+	RGBImage image = RGBImage(TILE_HEIGHT, TILE_WIDTH);
 
 	static const int COLOR_BLACK;
 	static const int COLOR_WHITE;

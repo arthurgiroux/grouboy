@@ -32,6 +32,8 @@ add_executable(
         ../src/interrupt_handler.hpp
         ../src/input_controller.cpp
         ../src/input_controller.hpp
+        ../src/rgb_image.cpp
+        ../src/rgb_image.hpp
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp

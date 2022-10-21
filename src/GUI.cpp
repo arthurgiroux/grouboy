@@ -29,28 +29,28 @@ GLuint GUI::createRGBTexture()
 	return image_texture;
 }
 
-void GUI::loadRawRGBInTexture(GLuint texture_id, int width, int height, const unsigned char* data)
+void GUI::loadRGBImageInTexture(GLuint texture_id, const RGBImage& image)
 {
 	glBindTexture(GL_TEXTURE_2D, texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE,
+	             image.getData().data());
 }
 
-void GUI::loadRawRGBInSubTexture(GLuint texture_id, int xoffset, int yoffset, int width, int height,
-                                 const unsigned char* data)
+void GUI::loadRGBImageInSubTexture(GLuint texture_id, int xoffset, int yoffset, const RGBImage& image)
 {
 	glBindTexture(GL_TEXTURE_2D, texture_id);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, xoffset, yoffset, image.getWidth(), image.getHeight(), GL_RGB, GL_UNSIGNED_BYTE,
+	                image.getData().data());
 }
 
 void GUI::initTextures()
 {
 	gameRenderTexture = createRGBTexture();
 	tileRenderTexture = createRGBTexture();
-	loadRawRGBInTexture(tileRenderTexture, 256, 128, nullptr);
+	loadRGBImageInTexture(tileRenderTexture, RGBImage(128, 256));
 
 	tileMapRenderTexture = createRGBTexture();
-	loadRawRGBInTexture(tileMapRenderTexture, static_cast<int>(tileMapSize.y), static_cast<int>(tileMapSize.y),
-	                    nullptr);
+	loadRGBImageInTexture(tileMapRenderTexture, RGBImage(tileMapSize.x, tileMapSize.y));
 }
 
 void GUI::startMainLoop()
@@ -148,8 +148,8 @@ void GUI::displayTileMapView()
 		for (int x = 0; x < GPU::TILEMAP_WIDTH; x++)
 		{
 			Tile tile = map[y * GPU::TILEMAP_WIDTH + x];
-			loadRawRGBInSubTexture(tileMapRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, Tile::TILE_WIDTH,
-			                       Tile::TILE_HEIGHT, tile.toRGB().data());
+			loadRGBImageInSubTexture(tileMapRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT,
+			                         tile.getImage());
 		}
 	}
 	ImGui::Image((void*)(intptr_t)tileMapRenderTexture, tileMapSize);
@@ -164,12 +164,11 @@ void GUI::displayTileView()
 		{
 			int tileId = y * numberOfTileToDisplayPerLine + x;
 			Tile tile = emulator.getGPU().getTileById(tileId, 0);
-			loadRawRGBInSubTexture(tileRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, Tile::TILE_WIDTH,
-			                       Tile::TILE_HEIGHT, tile.toRGB().data());
+			loadRGBImageInSubTexture(tileRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, tile.getImage());
 
 			Tile tile2 = emulator.getGPU().getTileById(tileId, 1);
-			loadRawRGBInSubTexture(tileRenderTexture, xoffsetForTileSet2 + x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT,
-			                       Tile::TILE_WIDTH, Tile::TILE_HEIGHT, tile2.toRGB().data());
+			loadRGBImageInSubTexture(tileRenderTexture, xoffsetForTileSet2 + x * Tile::TILE_WIDTH,
+			                         y * Tile::TILE_HEIGHT, tile2.getImage());
 		}
 	}
 	{
@@ -215,8 +214,7 @@ void GUI::displayTileView()
 void GUI::displayGameView()
 {
 	ImGui::Begin("Game");
-	loadRawRGBInTexture(gameRenderTexture, GPU::SCREEN_WIDTH, GPU::SCREEN_HEIGHT,
-	                    emulator.getGPU().getCurrentFrame().data());
+	loadRGBImageInTexture(gameRenderTexture, emulator.getGPU().getCurrentFrame());
 	ImGui::BeginGroup();
 
 	ImGui::Image((void*)(intptr_t)gameRenderTexture,

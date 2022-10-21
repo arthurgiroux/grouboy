@@ -72,9 +72,6 @@ void GPU::renderScanlineBackground(int scanline)
 	byte scrollX = mmu.read(ADDR_SCROLL_X);
 	byte scrollY = mmu.read(ADDR_SCROLL_Y);
 
-	// We retrieve the offset of the line we want to render in the RGB frame
-	byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * BYTES_PER_PIXEL;
-
 	// Retrieve the tilemap we are going to use
 	TileMap background = getTileMap(backgroundTileMapIndex());
 
@@ -108,7 +105,7 @@ void GPU::renderScanlineBackground(int scanline)
 
 		// We see how many tiles we span horizontally and add it to our offset to find the tile index
 		int tileIndex = offsetInTileMap + (xIndexOffset / Tile::TILE_WIDTH);
-		const Tile::TileRGBArray& tileRGBArray = background[tileIndex].toRGB();
+		const RGBImage& tileImage = background[tileIndex].getImage();
 
 		/*
 		 * Now that we retrieve the tile corresponding to the pixel, we need to copy the pixel
@@ -119,13 +116,7 @@ void GPU::renderScanlineBackground(int scanline)
 		int yOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
 
 		// Finally we copy the correct pixel in our temporary frame.
-		// TODO: Encapsulate in a Frame class.
-		frameScanlineStartAddr[x * BYTES_PER_PIXEL] =
-		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 0];
-		frameScanlineStartAddr[x * BYTES_PER_PIXEL + 1] =
-		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 1];
-		frameScanlineStartAddr[x * BYTES_PER_PIXEL + 2] =
-		    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + xOffsetTile) * BYTES_PER_PIXEL + 2];
+		temporaryFrame.copyPixel(x, scanline, tileImage, xOffsetTile, yOffsetTile);
 	}
 }
 
@@ -137,7 +128,6 @@ void GPU::renderScanlineWindow(int scanline)
 void GPU::renderScanlineSprite(int scanline)
 {
 	int nbrSpritesInScanline = 0;
-	byte* frameScanlineStartAddr = temporaryFrame.data() + scanline * SCREEN_WIDTH * BYTES_PER_PIXEL;
 
 	for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
 	{
@@ -157,7 +147,7 @@ void GPU::renderScanlineSprite(int scanline)
 			}
 
 			Tile tile = getTileById(idx, 0);
-			auto tileRGBArray = tile.toRGB();
+			auto tileImage = tile.getImage();
 			int yOffsetTile = scanline - spriteStartVerticalPos;
 			int xOffset = x - 8;
 			for (int j = 0; j < 8; j++)
@@ -171,13 +161,7 @@ void GPU::renderScanlineSprite(int scanline)
 					break;
 				}
 
-				// TODO: Encapsulate
-				frameScanlineStartAddr[(xOffset + j) * BYTES_PER_PIXEL] =
-				    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + j) * BYTES_PER_PIXEL + 0];
-				frameScanlineStartAddr[(xOffset + j) * BYTES_PER_PIXEL + 1] =
-				    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + j) * BYTES_PER_PIXEL + 1];
-				frameScanlineStartAddr[(xOffset + j) * BYTES_PER_PIXEL + 2] =
-				    tileRGBArray[(yOffsetTile * Tile::TILE_WIDTH + j) * BYTES_PER_PIXEL + 2];
+				temporaryFrame.copyPixel(xOffset + j, scanline, tileImage, j, yOffsetTile);
 			}
 
 			std::cout << "SPRITE " << (int)idx << "size=" << spriteSz << " display at (" << (int)x << "," << (int)y

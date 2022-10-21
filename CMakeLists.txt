@@ -72,7 +72,9 @@ set(SOURCE_FILES
         src/interrupt_handler.cpp
         src/interrupt_handler.hpp
         src/input_controller.cpp
-        src/input_controller.hpp)
+        src/input_controller.hpp
+        src/rgb_image.cpp
+        src/rgb_image.hpp)
 
 add_executable(gbemulator ${SOURCE_FILES})
 target_link_libraries(gbemulator IMGUI)
