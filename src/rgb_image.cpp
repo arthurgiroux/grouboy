@@ -57,3 +57,12 @@ byte RGBImage::getPixelB(int x, int y) const
 {
 	return _data[(y * _width + x) * BYTES_PER_PIXEL + 2];
 }
+
+bool RGBImage::isPixelWhite(int x, int y) const
+{
+	int r = getPixelR(x, y);
+	int g = getPixelG(x, y);
+	int b = getPixelB(x, y);
+
+	return r == 255 && g == 255 && b == 255;
+}

@@ -99,6 +99,15 @@ class RGBImage
 	 */
 	byte getPixelB(int x, int y) const;
 
+	/**
+	 * Return if the given pixel is white.
+	 *
+	 * @param x 	the x coordinate of the pixel
+	 * @param y 	the y coordinate of the pixel
+	 * @return 		true if pixel is white, false otherwise
+	 */
+	bool isPixelWhite(int x, int y) const;
+
   private:
 	int _height;
 	int _width;
