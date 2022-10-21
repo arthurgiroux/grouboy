@@ -5,7 +5,7 @@ TEST(TileTest, AllZeroTileShouldBeAllWhite)
 {
 	Tile::TileDataArray data = {};
 	Tile tile(data);
-	const Tile::TileRGBArray& pixels = tile.toRGB();
+	const std::vector<byte>& pixels = tile.getImage().getData();
 
 	for (size_t i = 0; i < pixels.size(); i++)
 	{
@@ -18,7 +18,7 @@ TEST(TileTest, FilledTileShouldBeAllBlack)
 	Tile::TileDataArray data = {};
 	data.fill(0xFF);
 	Tile tile(data);
-	const Tile::TileRGBArray& pixels = tile.toRGB();
+	const std::vector<byte>& pixels = tile.getImage().getData();
 
 	for (size_t i = 0; i < pixels.size(); i++)
 	{
@@ -41,7 +41,7 @@ TEST(TileTest, LSBTileShouldBeAllLightGray)
 		}
 	}
 	Tile tile(data);
-	const Tile::TileRGBArray& pixels = tile.toRGB();
+	const std::vector<byte>& pixels = tile.getImage().getData();
 
 	for (size_t i = 0; i < pixels.size(); i++)
 	{
@@ -64,7 +64,7 @@ TEST(TileTest, MSBTileShouldBeAllDarkGray)
 		}
 	}
 	Tile tile(data);
-	const Tile::TileRGBArray& pixels = tile.toRGB();
+	const std::vector<byte>& pixels = tile.getImage().getData();
 
 	for (size_t i = 0; i < pixels.size(); i++)
 	{

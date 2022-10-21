@@ -71,27 +71,22 @@ class GUI
 	GLuint createRGBTexture();
 
 	/**
-	 * Load raw RGB pixels value in an OpenGL texture.
+	 * Load a RGB image in an OpenGL texture.
 	 *
 	 * @param texture_id    the id of the texture to write to
-	 * @param width         The width of the image
-	 * @param height        the height of the image
-	 * @param data          the pointer to the raw data
+	 * @param image         The image to load
 	 */
-	void loadRawRGBInTexture(GLuint texture_id, int width, int height, const unsigned char* data);
+	void loadRGBImageInTexture(GLuint texture_id, const RGBImage& image);
 
 	/**
-	 * Load raw RGB pixels value in a subsection of an OpenGL texture.
+	 * Load a RGB image in a subsection of an OpenGL texture.
 	 *
 	 * @param texture_id    the id of the texture to write to
 	 * @param xoffset       the x offset in pixels
 	 * @param yoffset       the y offset in pixels
-	 * @param width         the width in pixels of the subsection
-	 * @param height        the height in pixels of the subsection
-	 * @param data          the pointer to the raw data
+	 * @param image         the image to load
 	 */
-	void loadRawRGBInSubTexture(GLuint texture_id, int xoffset, int yoffset, int width, int height,
-	                            const unsigned char* data);
+	void loadRGBImageInSubTexture(GLuint texture_id, int xoffset, int yoffset, const RGBImage& image);
 
 	/**
 	 * Display the game view.

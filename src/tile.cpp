@@ -48,9 +48,7 @@ void Tile::convertToPixels()
 			byte tileData = (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
 			byte grayscaleValue = paletteValueToGrayscale(tileData);
 
-			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL] = grayscaleValue;
-			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL + 1] = grayscaleValue;
-			pixels[(line * TILE_WIDTH + x) * BYTES_PER_PIXEL + 2] = grayscaleValue;
+			image.setPixel(x, line, grayscaleValue);
 		}
 	}
 }
@@ -60,7 +58,7 @@ Tile::Tile(const Tile::TileDataArray& data_) : data(data_)
 	convertToPixels();
 }
 
-const Tile::TileRGBArray& Tile::toRGB()
+const RGBImage& Tile::getImage() const
 {
-	return pixels;
+	return image;
 }
