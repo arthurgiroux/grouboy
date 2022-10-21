@@ -161,7 +161,11 @@ void GPU::renderScanlineSprite(int scanline)
 					break;
 				}
 
-				temporaryFrame.copyPixel(xOffset + j, scanline, tileImage, j, yOffsetTile);
+				// A white pixel is considered as transparent, we are not copying it in that case
+				if (!tileImage.isPixelWhite(j, yOffsetTile))
+				{
+					temporaryFrame.copyPixel(xOffset + j, scanline, tileImage, j, yOffsetTile);
+				}
 			}
 
 			std::cout << "SPRITE " << (int)idx << "size=" << spriteSz << " display at (" << (int)x << "," << (int)y
