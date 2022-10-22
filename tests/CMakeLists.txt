@@ -34,6 +34,8 @@ add_executable(
         ../src/input_controller.hpp
         ../src/rgb_image.cpp
         ../src/rgb_image.hpp
+        ../src/sprite.cpp
+        ../src/sprite.hpp
         test_mmu.cpp
         test_gpu.cpp
         test_cpu.cpp
