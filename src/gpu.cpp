@@ -129,47 +129,61 @@ void GPU::renderScanlineSprite(int scanline)
 {
 	int nbrSpritesInScanline = 0;
 
+	std::vector<Sprite*> spritesToRender = {};
+	/*
+	 * In order to find which sprites to render, we need to check the coordinate of every sprites.
+	 * There's a maximum number of sprites that can be rendered per scanline.
+	 */
 	for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
 	{
-		// TODO: Fix ugly code
-		byte y = mmu.read(SPRITE_ATTR_TABLE_ADDR + 4 * i + 0);
-		byte x = mmu.read(SPRITE_ATTR_TABLE_ADDR + 4 * i + 1);
-		byte idx = mmu.read(SPRITE_ATTR_TABLE_ADDR + 4 * i + 2);
+		auto& sprite = _sprites[i];
 		int spriteSz = spriteSize();
-		int spriteStartVerticalPos = y - 16;
+		int spriteStartVerticalPos = sprite->getYPositionOnScreen();
 		int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
 		if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
 		{
 			nbrSpritesInScanline++;
-			if (x == 0 || x >= 168)
+			/*
+			 * If the sprite is outside the screen bound then it's not going to be effectively rendered
+			 * but it still counts as if it was rendered.
+			 */
+			if (sprite->getXPositionOnScreen() < 0 || sprite->getXPositionOnScreen() >= GPU::SCREEN_WIDTH)
 			{
 				continue;
 			}
 
-			Tile tile = getTileById(idx, 0);
-			auto tileImage = tile.getImage();
-			int yOffsetTile = scanline - spriteStartVerticalPos;
-			int xOffset = x - 8;
-			for (int j = 0; j < 8; j++)
-			{
-				if (xOffset + j < 0)
-				{
-					continue;
-				}
-				if (xOffset + j > SCREEN_WIDTH)
-				{
-					break;
-				}
+			spritesToRender.push_back(sprite.get());
+		}
+	}
 
-				// A white pixel is considered as transparent, we are not copying it in that case
-				if (!tileImage.isPixelWhite(j, yOffsetTile))
-				{
-					temporaryFrame.copyPixel(xOffset + j, scanline, tileImage, j, yOffsetTile);
-				}
+	// TODO: Implement sprite ordering
+
+	for (auto* sprite : spritesToRender)
+	{
+		Tile tile = getTileById(sprite->getTileId(), 0);
+		auto tileImage = tile.getImage();
+		// TODO: Implement flip image if necessary
+		int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
+		for (int xOffset = 0; xOffset < Tile::TILE_WIDTH; xOffset++)
+		{
+			int xCoordinateOnScreen = sprite->getXPositionOnScreen() + xOffset;
+			// If we are outside the screen on the left we just skip the current pixel
+			if (xCoordinateOnScreen < 0)
+			{
+				continue;
 			}
 
-			std::cout << "SPRITE " << (int)idx << "size=" << spriteSz << " display at (" << (int)x << "," << (int)y
-			          << ")" << std::endl;
+			// If we are outside the screen on the right we can stop rendering the tile
+			if (xCoordinateOnScreen > SCREEN_WIDTH)
+			{
+				break;
+			}
+
+			// We are copying the pixel if it's not white, white is treated as transparent
+			if (!tileImage.isPixelWhite(xOffset, yCoordinateInTile))
+			{
+				temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xOffset, yCoordinateInTile);
+			}
 		}
 	}
 }
@@ -182,6 +196,10 @@ void GPU::renderFrame()
 
 GPU::GPU(MMU& mmu_) : mmu(mmu_)
 {
+	for (int i = 0; i < _sprites.size(); ++i)
+	{
+		_sprites[i] = std::make_unique<Sprite>(mmu, i);
+	}
 }
 
 Tile GPU::getTileById(byte tileId, int8_t tileSetId)

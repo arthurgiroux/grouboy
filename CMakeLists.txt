@@ -74,7 +74,7 @@ set(SOURCE_FILES
         src/input_controller.cpp
         src/input_controller.hpp
         src/rgb_image.cpp
-        src/rgb_image.hpp)
+        src/rgb_image.hpp src/sprite.cpp src/sprite.hpp)
 
 add_executable(gbemulator ${SOURCE_FILES})
 target_link_libraries(gbemulator IMGUI)

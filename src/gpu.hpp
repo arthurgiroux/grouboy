@@ -3,6 +3,7 @@
 
 #include "mmu.hpp"
 #include "rgb_image.hpp"
+#include "sprite.hpp"
 #include "tile.hpp"
 #include <array>
 #include <vector>
@@ -12,7 +13,6 @@ class GPU
   public:
 	static const int SCREEN_WIDTH = 160;
 	static const int SCREEN_HEIGHT = 144;
-	static const int BYTES_PER_PIXEL = 3;
 	static const int TILEMAP_HEIGHT = 32;
 	static const int TILEMAP_WIDTH = 32;
 	using TileMap = std::vector<Tile>;
@@ -173,9 +173,9 @@ class GPU
 	static const int TILE_MAP_SIZE = 32;
 	static const int WINDOW_ADDR_SCROLL_Y = 0xFF4A;
 	static const int WINDOW_ADDR_SCROLL_X = 0xFF4B;
-	static const int SPRITE_ATTR_TABLE_ADDR = 0xFE00;
 	static const int NBR_SPRITES = 40;
 	static const int MAX_NBR_SPRITES_PER_SCANLINE = 10;
+	std::array<std::unique_ptr<Sprite>, NBR_SPRITES> _sprites;
 };
 
 #endif // GBEMULATOR_GPU_HPP
