@@ -16,14 +16,12 @@ int Sprite::getTileId() const
 
 bool Sprite::isFlippedVertically() const
 {
-	// TODO: read from attribute flag
-	return false;
+	return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_VFLIP);
 }
 
 bool Sprite::isFlippedHorizontally() const
 {
-	// TODO: read from attribute flag
-	return false;
+	return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_HFLIP);
 }
 
 int Sprite::readDataFromPayload(int idx) const

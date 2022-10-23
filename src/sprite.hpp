@@ -86,6 +86,8 @@ class Sprite
 	static const int PAYLOAD_DATA_FLAG_ATTR_IDX = 3;
 	static const int Y_SCREEN_OFFSET = 16;
 	static const int X_SCREEN_OFFSET = 8;
+	static const int DATA_FLAG_BIT_VFLIP = 6;
+	static const int DATA_FLAG_BIT_HFLIP = 5;
 	MMU& _mmu;
 	int _id;
 };

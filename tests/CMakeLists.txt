@@ -50,7 +50,7 @@ add_executable(
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
         test_cartridge.cpp
         test_input_controller.cpp
-        test_rgb_image.cpp)
+        test_rgb_image.cpp test_sprite.cpp)
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
 
