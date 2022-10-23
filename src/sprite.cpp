@@ -9,19 +9,9 @@ int Sprite::getId() const
 	return _id;
 }
 
-int Sprite::getXCoordinate() const
-{
-	return readPayload(PAYLOAD_DATA_X_IDX);
-}
-
-int Sprite::getYCoordinate() const
-{
-	return readPayload(PAYLOAD_DATA_Y_IDX);
-}
-
 int Sprite::getTileId() const
 {
-	return readPayload(PAYLOAD_DATA_TILEID_IDX);
+	return readDataFromPayload(PAYLOAD_DATA_TILEID_IDX);
 }
 
 bool Sprite::isFlippedVertically() const
@@ -36,17 +26,17 @@ bool Sprite::isFlippedHorizontally() const
 	return false;
 }
 
-int Sprite::readPayload(int idx) const
+int Sprite::readDataFromPayload(int idx) const
 {
 	return _mmu.read(SPRITE_ATTR_TABLE_ADDR + PAYLOAD_PER_SPRITE * _id + idx);
 }
 
 int Sprite::getXPositionOnScreen() const
 {
-	return getXCoordinate() - X_SCREEN_OFFSET;
+	return readDataFromPayload(PAYLOAD_DATA_X_IDX) - X_SCREEN_OFFSET;
 }
 
 int Sprite::getYPositionOnScreen() const
 {
-	return getYCoordinate() - Y_SCREEN_OFFSET;
+	return readDataFromPayload(PAYLOAD_DATA_Y_IDX) - Y_SCREEN_OFFSET;
 }
