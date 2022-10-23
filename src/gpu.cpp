@@ -162,8 +162,13 @@ void GPU::renderScanlineSprite(int scanline)
 	{
 		Tile tile = getTileById(sprite->getTileId(), 0);
 		auto tileImage = tile.getImage();
-		// TODO: Implement flip image if necessary
+
 		int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
+		if (sprite->isFlippedVertically())
+		{
+			yCoordinateInTile = Tile::TILE_HEIGHT - 1 - yCoordinateInTile;
+		}
+
 		for (int xOffset = 0; xOffset < Tile::TILE_WIDTH; xOffset++)
 		{
 			int xCoordinateOnScreen = sprite->getXPositionOnScreen() + xOffset;
@@ -179,10 +184,17 @@ void GPU::renderScanlineSprite(int scanline)
 				break;
 			}
 
-			// We are copying the pixel if it's not white, white is treated as transparent
-			if (!tileImage.isPixelWhite(xOffset, yCoordinateInTile))
+			int xCoordinateInTile = xOffset;
+			if (sprite->isFlippedHorizontally())
 			{
-				temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xOffset, yCoordinateInTile);
+				xCoordinateInTile = Tile::TILE_WIDTH - 1 - xCoordinateInTile;
+			}
+
+			// We are copying the pixel if it's not white, white is treated as transparent
+			if (!tileImage.isPixelWhite(xCoordinateInTile, yCoordinateInTile))
+			{
+				temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xCoordinateInTile,
+				                         yCoordinateInTile);
 			}
 		}
 	}
