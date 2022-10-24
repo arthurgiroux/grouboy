@@ -54,6 +54,7 @@ class MMU
 	static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
 	InputController* inputController = nullptr;
 	static const int JOYPAD_MAP_ADDR = 0xFF00;
+	byte getJoypadMemoryRepresentation();
 };
 
 #endif
