@@ -59,25 +59,47 @@ byte MMU::read(const uint16_t& addr)
 
 	else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
 	{
-		int value = memory[addr];
-		std::bitset<8> joypad(value);
-		bool isAction = (joypad[5] == 0);
-		utils::setNthBit(value, 0,
-		                 isAction ? !inputController->isButtonPressed(InputController::Button::A)
-		                          : !inputController->isButtonPressed(InputController::Button::RIGHT));
-		utils::setNthBit(value, 1,
-		                 isAction ? !inputController->isButtonPressed(InputController::Button::B)
-		                          : !inputController->isButtonPressed(InputController::Button::LEFT));
-		utils::setNthBit(value, 2,
-		                 isAction ? !inputController->isButtonPressed(InputController::Button::SELECT)
-		                          : !inputController->isButtonPressed(InputController::Button::UP));
-		utils::setNthBit(value, 3,
-		                 isAction ? !inputController->isButtonPressed(InputController::Button::START)
-		                          : !inputController->isButtonPressed(InputController::Button::DOWN));
-		return value;
+		return getJoypadMemoryRepresentation();
 	}
 
 	return memory[addr];
+}
+
+byte MMU::getJoypadMemoryRepresentation()
+{
+	/**
+	 * This is the internal memory representation
+	 * of the joypad status in memory at location JOYPAD_MAP_ADDR.
+	 *
+	 * Bit 7 - Not used
+	 * Bit 6 - Not used
+	 * Bit 5 - P15 Select Action buttons    (0=Select)
+	 * Bit 4 - P14 Select Direction buttons (0=Select)
+	 * Bit 3 - P13 Input: Down  or Start    (0=Pressed) (Read Only)
+	 * Bit 2 - P12 Input: Up    or Select   (0=Pressed) (Read Only)
+	 * Bit 1 - P11 Input: Left  or B        (0=Pressed) (Read Only)
+	 * Bit 0 - P10 Input: Right or A        (0=Pressed) (Read Only)
+	 */
+	int value = memory[JOYPAD_MAP_ADDR];
+	bool isAction = !utils::isNthBitSet(value, 5);
+	
+	InputController::Button buttonSelectedForBit0 =
+	    isAction ? InputController::Button::A : InputController::Button::RIGHT;
+	utils::setNthBit(value, 0, !inputController->isButtonPressed(buttonSelectedForBit0));
+
+	InputController::Button buttonSelectedForBit1 =
+	    isAction ? InputController::Button::B : InputController::Button::LEFT;
+	utils::setNthBit(value, 1, !inputController->isButtonPressed(buttonSelectedForBit1));
+
+	InputController::Button buttonSelectedForBit2 =
+	    isAction ? InputController::Button::SELECT : InputController::Button::UP;
+	utils::setNthBit(value, 2, !inputController->isButtonPressed(buttonSelectedForBit2));
+
+	InputController::Button buttonSelectedForBit3 =
+	    isAction ? InputController::Button::START : InputController::Button::DOWN;
+	utils::setNthBit(value, 3, !inputController->isButtonPressed(buttonSelectedForBit3));
+
+	return value;
 }
 
 uint16_t MMU::readWord(const uint16_t& addr)
