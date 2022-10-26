@@ -368,7 +368,7 @@ void GUI::handleInput()
 
 void GUI::sendKeyStatusToInputController(int keycode, InputController::Button button)
 {
-	if (ImGui::IsKeyPressed(keycode))
+	if (ImGui::IsKeyDown(keycode))
 	{
 		emulator.getInputController().setButtonPressed(button);
 	}
