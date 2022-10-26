@@ -24,3 +24,8 @@ bool InputController::isButtonPressed(InputController::Button button) const
 {
 	return buttonStates.at(button) == ButtonState::PRESSED;
 }
+
+bool InputController::isButtonReleased(InputController::Button button) const
+{
+	return buttonStates.at(button) == ButtonState::RELEASED;
+}

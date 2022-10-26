@@ -82,24 +82,18 @@ byte MMU::getJoypadMemoryRepresentation()
 	 */
 	int value = memory[JOYPAD_MAP_ADDR];
 	bool isAction = !utils::isNthBitSet(value, 5);
-	
-	InputController::Button buttonSelectedForBit0 =
-	    isAction ? InputController::Button::A : InputController::Button::RIGHT;
-	utils::setNthBit(value, 0, !inputController->isButtonPressed(buttonSelectedForBit0));
 
-	InputController::Button buttonSelectedForBit1 =
-	    isAction ? InputController::Button::B : InputController::Button::LEFT;
-	utils::setNthBit(value, 1, !inputController->isButtonPressed(buttonSelectedForBit1));
-
-	InputController::Button buttonSelectedForBit2 =
-	    isAction ? InputController::Button::SELECT : InputController::Button::UP;
-	utils::setNthBit(value, 2, !inputController->isButtonPressed(buttonSelectedForBit2));
-
-	InputController::Button buttonSelectedForBit3 =
-	    isAction ? InputController::Button::START : InputController::Button::DOWN;
-	utils::setNthBit(value, 3, !inputController->isButtonPressed(buttonSelectedForBit3));
+	setNthBitIfButtonIsReleased(isAction ? InputController::Button::A : InputController::Button::RIGHT, 0, value);
+	setNthBitIfButtonIsReleased(isAction ? InputController::Button::B : InputController::Button::LEFT, 1, value);
+	setNthBitIfButtonIsReleased(isAction ? InputController::Button::SELECT : InputController::Button::UP, 2, value);
+	setNthBitIfButtonIsReleased(isAction ? InputController::Button::START : InputController::Button::DOWN, 3, value);
 
 	return value;
+}
+
+void MMU::setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value)
+{
+	utils::setNthBit(value, bitPosition, inputController->isButtonReleased(button));
 }
 
 uint16_t MMU::readWord(const uint16_t& addr)

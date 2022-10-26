@@ -29,6 +29,15 @@ TEST_F(InputControllerTest, AllButtonsAreReleasedByDefault)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonUpCanBePressed)
@@ -42,12 +51,22 @@ TEST_F(InputControllerTest, ButtonUpCanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonUpCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
 
 	inputController.setButtonReleased(InputController::Button::UP);
 
@@ -59,6 +78,15 @@ TEST_F(InputControllerTest, ButtonUpCanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonDownCanBePressed)
@@ -72,12 +100,22 @@ TEST_F(InputControllerTest, ButtonDownCanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonDownCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
 
 	inputController.setButtonReleased(InputController::Button::DOWN);
 
@@ -89,6 +127,15 @@ TEST_F(InputControllerTest, ButtonDownCanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonLeftCanBePressed)
@@ -102,12 +149,22 @@ TEST_F(InputControllerTest, ButtonLeftCanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonLeftCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
 
 	inputController.setButtonReleased(InputController::Button::LEFT);
 
@@ -119,6 +176,15 @@ TEST_F(InputControllerTest, ButtonLeftCanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonRightCanBePressed)
@@ -132,12 +198,22 @@ TEST_F(InputControllerTest, ButtonRightCanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonRightCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
 
 	inputController.setButtonReleased(InputController::Button::RIGHT);
 
@@ -149,6 +225,15 @@ TEST_F(InputControllerTest, ButtonRightCanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonACanBePressed)
@@ -162,12 +247,22 @@ TEST_F(InputControllerTest, ButtonACanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonACanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
 
 	inputController.setButtonReleased(InputController::Button::A);
 
@@ -179,6 +274,15 @@ TEST_F(InputControllerTest, ButtonACanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonBCanBePressed)
@@ -192,12 +296,22 @@ TEST_F(InputControllerTest, ButtonBCanBePressed)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonBCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
 
 	inputController.setButtonReleased(InputController::Button::B);
 
@@ -209,6 +323,15 @@ TEST_F(InputControllerTest, ButtonBCanBeReleased)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonSelectCanBePressed)
@@ -222,12 +345,22 @@ TEST_F(InputControllerTest, ButtonSelectCanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonSelectCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
 
 	inputController.setButtonReleased(InputController::Button::SELECT);
 
@@ -239,6 +372,15 @@ TEST_F(InputControllerTest, ButtonSelectCanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonStartCanBePressed)
@@ -252,12 +394,22 @@ TEST_F(InputControllerTest, ButtonStartCanBePressed)
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 }
 
 TEST_F(InputControllerTest, ButtonStartCanBeReleased)
 {
 	setAllButtonsPressed();
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::START));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::START));
 
 	inputController.setButtonReleased(InputController::Button::START);
 
@@ -269,4 +421,13 @@ TEST_F(InputControllerTest, ButtonStartCanBeReleased)
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::B));
 	ASSERT_TRUE(inputController.isButtonPressed(InputController::Button::SELECT));
 	ASSERT_FALSE(inputController.isButtonPressed(InputController::Button::START));
+
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::UP));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::DOWN));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::LEFT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::RIGHT));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::A));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::B));
+	ASSERT_FALSE(inputController.isButtonReleased(InputController::Button::SELECT));
+	ASSERT_TRUE(inputController.isButtonReleased(InputController::Button::START));
 }
