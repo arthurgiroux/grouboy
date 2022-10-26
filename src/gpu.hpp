@@ -147,11 +147,10 @@ class GPU
 	Mode currentMode = OAM_ACCESS;
 	int currentScanline = 0;
 
-	static const int M_CYCLES_TO_T_CYCLES = 4;
-	static const int OAM_ACCESS_TICKS = 80 * M_CYCLES_TO_T_CYCLES;
-	static const int VRAM_ACCESS_TICKS = 172 * M_CYCLES_TO_T_CYCLES;
-	static const int HBLANK_TICKS = 204 * M_CYCLES_TO_T_CYCLES;
-	static const int VBLANK_TICKS = 456 * M_CYCLES_TO_T_CYCLES;
+	static const int OAM_ACCESS_TICKS = 80;
+	static const int VRAM_ACCESS_TICKS = 172;
+	static const int HBLANK_TICKS = 204;
+	static const int VBLANK_TICKS = 456;
 	static const int MAX_SCANLINE_VALUE = 153;
 
 	MMU& mmu;
