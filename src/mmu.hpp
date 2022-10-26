@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "cartridge.hpp"
+#include "input_controller.hpp"
 #include "types.hpp"
 
 // Forward declaration
@@ -55,6 +56,7 @@ class MMU
 	InputController* inputController = nullptr;
 	static const int JOYPAD_MAP_ADDR = 0xFF00;
 	byte getJoypadMemoryRepresentation();
+	void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
 };
 
 #endif

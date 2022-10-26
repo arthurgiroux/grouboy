@@ -53,6 +53,13 @@ class InputController
 	 */
 	bool isButtonPressed(Button button) const;
 
+	/**
+	 * Returns if a button is currently released
+	 * @param button 	the button to check
+	 * @return 	True is button is released, false otherwise
+	 */
+	bool isButtonReleased(Button button) const;
+
   private:
 	/**
 	 * Possible state for a button
