@@ -9,14 +9,18 @@ Here's what's implemented so far:
 * Memory abstraction
 * All CPU instructions
 * PPU abstraction
-* Very simple GUI
-* Graphics (WIP)
+* GUI
+* Sprites
+* Inputs
 
 Future work:
 
+* Memory Bus Controller
 * Sound
-* Inputs
-* Advanced GUI
+
+## Demo
+
+![Demo](demo_image/emulator_demo.gif)
 
 ## Compilation
 
