@@ -239,6 +239,7 @@ void GUI::displayGameView()
 		if (ImGui::Button("Reset"))
 		{
 			emulator.reset();
+			lastFrameId = 0;
 		}
 	}
 
