@@ -1,5 +1,5 @@
-#ifndef GBEMULATOR_GPU_HPP
-#define GBEMULATOR_GPU_HPP
+#ifndef GBEMULATOR_PPU_HPP
+#define GBEMULATOR_PPU_HPP
 
 #include "mmu.hpp"
 #include "rgb_image.hpp"
@@ -8,7 +8,7 @@
 #include <array>
 #include <vector>
 
-class GPU
+class PPU
 {
   public:
 	static const int SCREEN_WIDTH = 160;
@@ -18,8 +18,8 @@ class GPU
 	using TileMap = std::vector<Tile>;
 	TileMap getTileMap(int index);
 
-	GPU(MMU& mmu);
-	~GPU() = default;
+	PPU(MMU& mmu);
+	~PPU() = default;
 
 	enum Mode
 	{
@@ -163,7 +163,7 @@ class GPU
 	static const int ADDR_TILE_SET_0 = 0x8000;
 	static const int ADDR_TILE_SET_1 = 0x9000;
 
-	static const int ADDR_LCD_GPU_CONTROL = 0xFF40;
+	static const int ADDR_LCD_PPU_CONTROL = 0xFF40;
 	static const int ADDR_SCROLL_Y = 0xFF42;
 	static const int ADDR_SCROLL_X = 0xFF43;
 	static const int ADDR_SCANLINE = 0xFF44;
@@ -177,4 +177,4 @@ class GPU
 	std::array<std::unique_ptr<Sprite>, NBR_SPRITES> _sprites;
 };
 
-#endif // GBEMULATOR_GPU_HPP
+#endif // GBEMULATOR_PPU_HPP

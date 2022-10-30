@@ -20,8 +20,8 @@ add_executable(
         ../src/cpu_instructions_16bits_arithmetic_logical.cpp
         ../src/cpu_instructions_8bits_rotation_shifts_bit.cpp
         ../src/cpu.hpp
-        ../src/gpu.cpp
-        ../src/gpu.hpp
+        ../src/ppu.cpp
+        ../src/ppu.hpp
         ../src/tile.cpp
         ../src/tile.hpp
         ../src/utils.hpp
@@ -37,7 +37,7 @@ add_executable(
         ../src/sprite.cpp
         ../src/sprite.hpp
         test_mmu.cpp
-        test_gpu.cpp
+        test_ppu.cpp
         test_cpu.cpp
         test_tile.cpp
         test_utils.cpp
@@ -50,7 +50,8 @@ add_executable(
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
         test_cartridge.cpp
         test_input_controller.cpp
-        test_rgb_image.cpp test_sprite.cpp)
+        test_rgb_image.cpp
+        test_sprite.cpp)
 
 target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
 
