@@ -208,6 +208,8 @@ void PPU::renderFrame()
 
 PPU::PPU(MMU& mmu_) : mmu(mmu_)
 {
+	reset();
+	
 	for (int i = 0; i < _sprites.size(); ++i)
 	{
 		_sprites[i] = std::make_unique<Sprite>(mmu, i);
@@ -287,4 +289,14 @@ bool PPU::areSpritesEnabled() const
 bool PPU::areBackgroundAndWindowEnabled() const
 {
 	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 0);
+}
+
+void PPU::reset()
+{
+	frameId = 0;
+	ticksSpentInCurrentMode = 0;
+	currentMode = OAM_ACCESS;
+	currentScanline = 0;
+	temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
+	currentFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
 }

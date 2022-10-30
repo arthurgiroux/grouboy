@@ -7,20 +7,7 @@ using namespace utils;
 
 CPU::CPU(MMU& mmu_) : mmu(mmu_)
 {
-	tick = 0;
-	lastInstructionTicks = 0;
-	pc = 0;
-	sp = 0;
-	halted = false;
-	interruptsEnabled = false;
-	a = 0;
-	b = 0;
-	c = 0;
-	d = 0;
-	e = 0;
-	h = 0;
-	l = 0;
-	f = 0;
+	reset();
 
     interruptHandlers.push_back(std::make_unique<InterruptHandlerVBlank>(this, &mmu));
     interruptHandlers.push_back(std::make_unique<InterruptHandlerLCDStat>(this, &mmu));
@@ -88,6 +75,24 @@ void CPU::handleInterrupts()
 			break;
 		}
 	}
+}
+
+void CPU::reset()
+{
+	tick = 0;
+	lastInstructionTicks = 0;
+	pc = 0;
+	sp = 0;
+	halted = false;
+	interruptsEnabled = false;
+	a = 0;
+	b = 0;
+	c = 0;
+	d = 0;
+	e = 0;
+	h = 0;
+	l = 0;
+	f = 0;
 }
 
 CPU::~CPU() = default;

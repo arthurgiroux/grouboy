@@ -35,6 +35,7 @@ class MMU
 	bool isBootRomActive();
 	Cartridge* getCartridge();
 	void setInputController(InputController* controller);
+	void reset();
 
 	static const size_t MEMORY_SIZE_IN_BYTES = 65536;
 	static const std::array<byte, 256> BIOS;

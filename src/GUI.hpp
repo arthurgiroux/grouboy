@@ -143,7 +143,7 @@ class GUI
 	GLuint tileRenderTexture;
 	GLuint tileMapRenderTexture;
 	bool frameByFrameEnabled = false;
-	bool goToNextFrame = false;
+	bool goToNextFrame = true;
 	int tileMapId = 0;
 	int lastFrameId = 0;
 	ImVec2 windowSize = ImVec2(1280, 720);

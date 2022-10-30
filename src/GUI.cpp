@@ -220,19 +220,27 @@ void GUI::displayGameView()
 	ImGui::Image((void*)(intptr_t)gameRenderTexture,
 	             ImVec2(PPU::SCREEN_WIDTH * GAMEVIEW_UPSCALE_RATIO, PPU::SCREEN_HEIGHT * GAMEVIEW_UPSCALE_RATIO));
 
-	if (!goToNextFrame && ImGui::Button("Start"))
-	{
-		goToNextFrame = true;
-	}
-
-	else if (goToNextFrame && ImGui::Button("Pause"))
-	{
-		goToNextFrame = false;
-	}
-
 	ImGui::EndGroup();
 	ImGui::SameLine();
 	ImGui::BeginGroup();
+
+	if (ImGui::CollapsingHeader("Controls", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		if (!goToNextFrame && ImGui::Button("Start"))
+		{
+			goToNextFrame = true;
+		}
+
+		else if (goToNextFrame && ImGui::Button("Pause"))
+		{
+			goToNextFrame = false;
+		}
+
+		if (ImGui::Button("Reset"))
+		{
+			emulator.reset();
+		}
+	}
 
 	Cartridge* cartridge = emulator.getMMU().getCartridge();
 	if (ImGui::CollapsingHeader("Cartridge info", ImGuiTreeNodeFlags_DefaultOpen))

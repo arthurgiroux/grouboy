@@ -16,3 +16,11 @@ void Emulator::exec()
 
 	currentTicks += lastInstructionTicks;
 }
+
+void Emulator::reset()
+{
+	ppu.reset();
+	cpu.reset();
+	mmu.reset();
+	currentTicks = 0;
+}
