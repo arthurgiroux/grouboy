@@ -234,6 +234,11 @@ class CPU
 	}
 
 	/**
+	 * Reset the CPU to the original state.
+	 */
+	void reset();
+
+	/**
 	 * Exception raised when an instruction parsed by the CPU is not handled.
 	 */
 	class UnhandledInstructionException : public std::exception

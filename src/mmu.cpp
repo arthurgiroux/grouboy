@@ -28,6 +28,12 @@ const std::array<byte, 256> MMU::BIOS = {
 
 MMU::MMU()
 {
+	reset();
+}
+
+void MMU::reset()
+{
+	memory = {};
 	std::copy(BIOS.begin(), BIOS.end(), memory.begin());
 }
 

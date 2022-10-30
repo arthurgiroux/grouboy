@@ -109,6 +109,8 @@ class PPU
 	 */
 	bool areBackgroundAndWindowEnabled() const;
 
+	void reset();
+
 #ifndef UNIT_TESTING
   private:
 #endif

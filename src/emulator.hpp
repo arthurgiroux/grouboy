@@ -12,6 +12,7 @@ class Emulator
 	Emulator();
 	~Emulator();
 	void exec();
+	void reset();
 
 	PPU& getPPU()
 	{
