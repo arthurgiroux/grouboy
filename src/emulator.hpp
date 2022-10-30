@@ -2,9 +2,9 @@
 #define EMULATOR_H
 
 #include "cpu.hpp"
-#include "gpu.hpp"
 #include "input_controller.hpp"
 #include "mmu.hpp"
+#include "ppu.hpp"
 
 class Emulator
 {
@@ -13,9 +13,9 @@ class Emulator
 	~Emulator();
 	void exec();
 
-	GPU& getGPU()
+	PPU& getPPU()
 	{
-		return gpu;
+		return ppu;
 	}
 
 	MMU& getMMU()
@@ -41,7 +41,7 @@ class Emulator
   private:
 	MMU mmu;
 	CPU cpu;
-	GPU gpu;
+	PPU ppu;
 	InputController inputController;
 	int currentTicks = 0;
 };

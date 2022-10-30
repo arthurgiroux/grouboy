@@ -1,10 +1,10 @@
 
-#include "gpu.hpp"
+#include "ppu.hpp"
 #include <bitset>
 #include <cassert>
 #include <iostream>
 
-void GPU::step(int nbrTicks)
+void PPU::step(int nbrTicks)
 {
 	ticksSpentInCurrentMode += nbrTicks;
 
@@ -44,7 +44,7 @@ void GPU::step(int nbrTicks)
 	mmu.write(ADDR_SCANLINE, currentScanline);
 }
 
-void GPU::renderScanline(int scanline)
+void PPU::renderScanline(int scanline)
 {
 	if (!isDisplayEnabled())
 	{
@@ -67,7 +67,7 @@ void GPU::renderScanline(int scanline)
 	}
 }
 
-void GPU::renderScanlineBackground(int scanline)
+void PPU::renderScanlineBackground(int scanline)
 {
 	byte scrollX = mmu.read(ADDR_SCROLL_X);
 	byte scrollY = mmu.read(ADDR_SCROLL_Y);
@@ -120,12 +120,12 @@ void GPU::renderScanlineBackground(int scanline)
 	}
 }
 
-void GPU::renderScanlineWindow(int scanline)
+void PPU::renderScanlineWindow(int scanline)
 {
 	// TODO: render window
 }
 
-void GPU::renderScanlineSprite(int scanline)
+void PPU::renderScanlineSprite(int scanline)
 {
 	int nbrSpritesInScanline = 0;
 
@@ -147,7 +147,7 @@ void GPU::renderScanlineSprite(int scanline)
 			 * If the sprite is outside the screen bound then it's not going to be effectively rendered
 			 * but it still counts as if it was rendered.
 			 */
-			if (sprite->getXPositionOnScreen() < 0 || sprite->getXPositionOnScreen() >= GPU::SCREEN_WIDTH)
+			if (sprite->getXPositionOnScreen() < 0 || sprite->getXPositionOnScreen() >= PPU::SCREEN_WIDTH)
 			{
 				continue;
 			}
@@ -200,13 +200,13 @@ void GPU::renderScanlineSprite(int scanline)
 	}
 }
 
-void GPU::renderFrame()
+void PPU::renderFrame()
 {
 	currentFrame = temporaryFrame;
 	frameId++;
 }
 
-GPU::GPU(MMU& mmu_) : mmu(mmu_)
+PPU::PPU(MMU& mmu_) : mmu(mmu_)
 {
 	for (int i = 0; i < _sprites.size(); ++i)
 	{
@@ -214,7 +214,7 @@ GPU::GPU(MMU& mmu_) : mmu(mmu_)
 	}
 }
 
-Tile GPU::getTileById(byte tileId, int8_t tileSetId)
+Tile PPU::getTileById(byte tileId, int8_t tileSetId)
 {
 	int tileSetOffset = ADDR_TILE_SET_0;
 	int tileIdCorrected = tileId;
@@ -235,7 +235,7 @@ Tile GPU::getTileById(byte tileId, int8_t tileSetId)
 	return Tile(dataArray);
 }
 
-GPU::TileMap GPU::getTileMap(int index)
+PPU::TileMap PPU::getTileMap(int index)
 {
 	int tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
 	TileMap map = {};
@@ -249,42 +249,42 @@ GPU::TileMap GPU::getTileMap(int index)
 	return map;
 }
 
-bool GPU::isDisplayEnabled() const
+bool PPU::isDisplayEnabled() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 7);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 7);
 }
 
-int GPU::tileMapIndexForWindow() const
+int PPU::tileMapIndexForWindow() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 6);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 6);
 }
 
-bool GPU::isWindowEnabled() const
+bool PPU::isWindowEnabled() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 5);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 5);
 }
 
-int GPU::backgroundAndWindowTileDataAreaIndex() const
+int PPU::backgroundAndWindowTileDataAreaIndex() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 4);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 4);
 }
 
-int GPU::backgroundTileMapIndex() const
+int PPU::backgroundTileMapIndex() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 3);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 3);
 }
 
-int GPU::spriteSize() const
+int PPU::spriteSize() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 2) ? 16 : 8;
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 2) ? 16 : 8;
 }
 
-bool GPU::areSpritesEnabled() const
+bool PPU::areSpritesEnabled() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 1);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 1);
 }
 
-bool GPU::areBackgroundAndWindowEnabled() const
+bool PPU::areBackgroundAndWindowEnabled() const
 {
-	return utils::isNthBitSet(mmu.read(ADDR_LCD_GPU_CONTROL), 0);
+	return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 0);
 }

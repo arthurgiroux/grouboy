@@ -59,8 +59,8 @@ set(SOURCE_FILES
         src/mmu.hpp
         src/types.hpp
         src/main.cpp
-        src/gpu.cpp
-        src/gpu.hpp
+        src/ppu.cpp
+        src/ppu.hpp
         src/tile.cpp
         src/tile.hpp
         src/utils.hpp

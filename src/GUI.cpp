@@ -74,13 +74,13 @@ void GUI::startMainLoop()
 
 		if (goToNextFrame)
 		{
-			while (lastFrameId == emulator.getGPU().getFrameId())
+			while (lastFrameId == emulator.getPPU().getFrameId())
 			{
 				emulator.exec();
 			}
 
 			goToNextFrame = !frameByFrameEnabled;
-			lastFrameId = emulator.getGPU().getFrameId();
+			lastFrameId = emulator.getPPU().getFrameId();
 		}
 
 		createImGuiFrame();
@@ -142,12 +142,12 @@ void GUI::displayTileMapView()
 		tileMapId = 1;
 	}
 
-	GPU::TileMap map = emulator.getGPU().getTileMap(tileMapId);
-	for (int y = 0; y < GPU::TILEMAP_HEIGHT; y++)
+	PPU::TileMap map = emulator.getPPU().getTileMap(tileMapId);
+	for (int y = 0; y < PPU::TILEMAP_HEIGHT; y++)
 	{
-		for (int x = 0; x < GPU::TILEMAP_WIDTH; x++)
+		for (int x = 0; x < PPU::TILEMAP_WIDTH; x++)
 		{
-			Tile tile = map[y * GPU::TILEMAP_WIDTH + x];
+			Tile tile = map[y * PPU::TILEMAP_WIDTH + x];
 			loadRGBImageInSubTexture(tileMapRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT,
 			                         tile.getImage());
 		}
@@ -163,10 +163,10 @@ void GUI::displayTileView()
 		for (int x = 0; x < numberOfTileToDisplayPerLine; x++)
 		{
 			int tileId = y * numberOfTileToDisplayPerLine + x;
-			Tile tile = emulator.getGPU().getTileById(tileId, 0);
+			Tile tile = emulator.getPPU().getTileById(tileId, 0);
 			loadRGBImageInSubTexture(tileRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, tile.getImage());
 
-			Tile tile2 = emulator.getGPU().getTileById(tileId, 1);
+			Tile tile2 = emulator.getPPU().getTileById(tileId, 1);
 			loadRGBImageInSubTexture(tileRenderTexture, xoffsetForTileSet2 + x * Tile::TILE_WIDTH,
 			                         y * Tile::TILE_HEIGHT, tile2.getImage());
 		}
@@ -214,11 +214,11 @@ void GUI::displayTileView()
 void GUI::displayGameView()
 {
 	ImGui::Begin("Game");
-	loadRGBImageInTexture(gameRenderTexture, emulator.getGPU().getCurrentFrame());
+	loadRGBImageInTexture(gameRenderTexture, emulator.getPPU().getCurrentFrame());
 	ImGui::BeginGroup();
 
 	ImGui::Image((void*)(intptr_t)gameRenderTexture,
-	             ImVec2(GPU::SCREEN_WIDTH * GAMEVIEW_UPSCALE_RATIO, GPU::SCREEN_HEIGHT * GAMEVIEW_UPSCALE_RATIO));
+	             ImVec2(PPU::SCREEN_WIDTH * GAMEVIEW_UPSCALE_RATIO, PPU::SCREEN_HEIGHT * GAMEVIEW_UPSCALE_RATIO));
 
 	if (!goToNextFrame && ImGui::Button("Start"))
 	{
