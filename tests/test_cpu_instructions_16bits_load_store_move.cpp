@@ -138,14 +138,15 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadHLInSPGivesExpectedResult)
 {
 	cpu.setRegisterH(0x12);
 	cpu.setRegisterL(0x34);
-    mmu.write(cpu.getProgramCounter(), standardInstructions::LD_SP_HL);
-    int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 2);
-    ASSERT_EQ(cpu.getStackPointer(), 0x1234);
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_SP_HL);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 2);
+	ASSERT_EQ(cpu.getStackPointer(), 0x1234);
 	ASSERT_EQ(cpu.getProgramCounter(), 1);
 }
 
-TEST_F(CpuInstructions16BitsLoadStoreMoveTest, BlarggTestSpecial05PopAF) {
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, BlarggTestSpecial05PopAF)
+{
 	/**
 	 * This test is an adaptation of Blargg test special 05 "POP AF".
 	 * The original assembly code for the test is:
@@ -163,9 +164,9 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, BlarggTestSpecial05PopAF) {
 	 *      inc  c
 	 *      jr   nz,-
 	 */
-    mmu.write(cpu.getProgramCounter(), standardInstructions::LD_BC_nn);
-    mmu.writeWord(cpu.getProgramCounter() + 1, 0x1200);
-    cpu.fetchDecodeAndExecute();
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_BC_nn);
+	mmu.writeWord(cpu.getProgramCounter() + 1, 0x1200);
+	cpu.fetchDecodeAndExecute();
 	bool finished = false;
 	while (!finished)
 	{
@@ -185,10 +186,67 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, BlarggTestSpecial05PopAF) {
 		mmu.write(cpu.getProgramCounter(), standardInstructions::CP_E);
 		cpu.fetchDecodeAndExecute();
 		ASSERT_TRUE(cpu.isFlagSet(CPU::ZERO));
-        mmu.write(cpu.getProgramCounter(), standardInstructions::INC_B);
-        cpu.fetchDecodeAndExecute();
-        mmu.write(cpu.getProgramCounter(), standardInstructions::INC_C);
-        cpu.fetchDecodeAndExecute();
-        finished = cpu.isFlagSet(CPU::ZERO);
+		mmu.write(cpu.getProgramCounter(), standardInstructions::INC_B);
+		cpu.fetchDecodeAndExecute();
+		mmu.write(cpu.getProgramCounter(), standardInstructions::INC_C);
+		cpu.fetchDecodeAndExecute();
+		finished = cpu.isFlagSet(CPU::ZERO);
 	}
+}
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInBCShouldLoadMSBInBAndLSBInC)
+{
+	uint16_t value = 0x1234;
+	byte msb = 0x12;
+	byte lsb = 0x34;
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_BC_nn);
+	mmu.writeWord(cpu.getProgramCounter() + 1, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.getRegisterB(), msb);
+	ASSERT_EQ(cpu.getRegisterC(), lsb);
+	ASSERT_EQ(cpu.getProgramCounter(), 3);
+}
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInDEShouldLoadMSBInDAndLSBInE)
+{
+	uint16_t value = 0x1234;
+	byte msb = 0x12;
+	byte lsb = 0x34;
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_DE_nn);
+	mmu.writeWord(cpu.getProgramCounter() + 1, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.getRegisterD(), msb);
+	ASSERT_EQ(cpu.getRegisterE(), lsb);
+	ASSERT_EQ(cpu.getProgramCounter(), 3);
+}
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInHLShouldLoadMSBInHAndLSBInL)
+{
+	uint16_t value = 0x1234;
+	byte msb = 0x12;
+	byte lsb = 0x34;
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_HL_nn);
+	mmu.writeWord(cpu.getProgramCounter() + 1, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.getRegisterH(), msb);
+	ASSERT_EQ(cpu.getRegisterL(), lsb);
+	ASSERT_EQ(cpu.getProgramCounter(), 3);
+}
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInSPShouldLoadInSP)
+{
+	uint16_t value = 0x1234;
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_SP_nn);
+	mmu.writeWord(cpu.getProgramCounter() + 1, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), 0x00);
+	ASSERT_EQ(cpu.getStackPointer(), value);
+	ASSERT_EQ(cpu.getProgramCounter(), 3);
 }

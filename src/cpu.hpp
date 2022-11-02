@@ -239,6 +239,76 @@ class CPU
 	void reset();
 
 	/**
+	 * Retrieves the current value of the flag register.
+	 *
+	 * @return the 8-bit flag register value
+	 */
+	byte getFlag() const;
+
+	/**
+	 * Set the given CPU flag in the flag register.
+	 *
+	 * @param flag the cpu flag to set.
+	 */
+	void setFlag(CpuFlags flag);
+
+	/**
+	 * Unset the given CPU flag in the flag register.
+	 *
+	 * @param flag the cpu flag to unset.
+	 */
+	void unsetFlag(CpuFlags flag);
+
+	/**
+	 * Is the given CPU flag set in the flag register.
+	 *
+	 * @param flag the CPU flag to check
+	 * @return true if the flag is set, false otherwise
+	 */
+	bool isFlagSet(CpuFlags flag) const;
+
+	/**
+	 * Set the given flag in the flag register if the condition is satisfied
+	 *
+	 * @param condition The condition that needs to be true to set the flag
+	 * @param flag 		The flag to set
+	 */
+	void setFlagIfTrue(bool condition, CpuFlags flag);
+
+	/**
+	 * Set/Unset the Half-Carry flag in the flag register
+	 * @param state Whether or not to set the flag
+	 */
+	void setHalfCarryFlag(bool state);
+
+	/**
+	 * Set/Unset the Carry flag in the flag register
+	 * @param state Whether or not to set the flag
+	 */
+	void setCarryFlag(bool state);
+
+	/**
+	 * Get the current tick of the CPU.
+	 *
+	 * @return the current tick in CPU-cycles.
+	 */
+	int getCurrentTick() const;
+
+	/**
+	 * Get if the interrupts are currently enabled or disabled.
+	 *
+	 * @return True if they are enabled, false otherwise
+	 */
+	bool areInterruptsEnabled() const;
+
+	/**
+	 * Get if the CPU is currently halted.
+	 *
+	 * @return True if it's halted, false otherwise
+	 */
+	bool isHalted() const;
+
+	/**
 	 * Exception raised when an instruction parsed by the CPU is not handled.
 	 */
 	class UnhandledInstructionException : public std::exception
@@ -286,9 +356,7 @@ class CPU
 	 */
 	void disableInterrupts();
 
-#ifndef UNIT_TESTING
   private:
-#endif
 	/**
 	 * Execute an instruction that is part of the standard instruction set.
 	 *
@@ -1600,25 +1668,6 @@ class CPU
 
 	// Set/unset the zero flag depending on value
 	void changeZeroValueFlag(byte value);
-
-	// Set the given flag if the condition is true, reset it otherwise
-	void setFlagIfTrue(bool condition, CpuFlags flag);
-
-	// Set the given flag
-	void setFlag(CpuFlags flag);
-
-	// Unset the given flag
-	void unsetFlag(CpuFlags flag);
-
-	// Set the given flag
-	bool isFlagSet(CpuFlags flag) const;
-
-	// Retrieve the current flag value
-	byte getFlag() const;
-
-	void setHalfCarryFlag(bool state);
-
-	void setCarryFlag(bool state);
 
 	void handleInterrupts();
 
