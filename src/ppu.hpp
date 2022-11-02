@@ -11,10 +11,6 @@
 class PPU
 {
   public:
-	static const int SCREEN_WIDTH = 160;
-	static const int SCREEN_HEIGHT = 144;
-	static const int TILEMAP_HEIGHT = 32;
-	static const int TILEMAP_WIDTH = 32;
 	using TileMap = std::vector<Tile>;
 	TileMap getTileMap(int index);
 
@@ -111,9 +107,17 @@ class PPU
 
 	void reset();
 
-#ifndef UNIT_TESTING
+	static const int SCREEN_WIDTH = 160;
+	static const int SCREEN_HEIGHT = 144;
+	static const int TILEMAP_HEIGHT = 32;
+	static const int TILEMAP_WIDTH = 32;
+	static const int OAM_ACCESS_TICKS = 80;
+	static const int VRAM_ACCESS_TICKS = 172;
+	static const int HBLANK_TICKS = 204;
+	static const int VBLANK_TICKS = 456;
+	static const int MAX_SCANLINE_VALUE = 153;
+
   private:
-#endif
 	void setMode(Mode value)
 	{
 		currentMode = value;
@@ -148,12 +152,6 @@ class PPU
 	int ticksSpentInCurrentMode = 0;
 	Mode currentMode = OAM_ACCESS;
 	int currentScanline = 0;
-
-	static const int OAM_ACCESS_TICKS = 80;
-	static const int VRAM_ACCESS_TICKS = 172;
-	static const int HBLANK_TICKS = 204;
-	static const int VBLANK_TICKS = 456;
-	static const int MAX_SCANLINE_VALUE = 153;
 
 	MMU& mmu;
 

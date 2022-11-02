@@ -9,18 +9,19 @@ CPU::CPU(MMU& mmu_) : mmu(mmu_)
 {
 	reset();
 
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerVBlank>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerLCDStat>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerTimer>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerSerial>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerJoypad>(this, &mmu));
+	interruptHandlers.push_back(std::make_unique<InterruptHandlerVBlank>(this, &mmu));
+	interruptHandlers.push_back(std::make_unique<InterruptHandlerLCDStat>(this, &mmu));
+	interruptHandlers.push_back(std::make_unique<InterruptHandlerTimer>(this, &mmu));
+	interruptHandlers.push_back(std::make_unique<InterruptHandlerSerial>(this, &mmu));
+	interruptHandlers.push_back(std::make_unique<InterruptHandlerJoypad>(this, &mmu));
 }
 
 int CPU::fetchDecodeAndExecute()
 {
 	handleInterrupts();
 
-	if (halted) {
+	if (halted)
+	{
 		return 1;
 	}
 
@@ -65,13 +66,16 @@ void CPU::changeZeroValueFlag(byte value)
 
 void CPU::handleInterrupts()
 {
-	if (!interruptsEnabled) {
+	if (!interruptsEnabled)
+	{
 		return;
 	}
 
-	for (auto& handler : interruptHandlers) {
-		if (handler->handle()) {
-            interruptsEnabled = false;
+	for (auto& handler : interruptHandlers)
+	{
+		if (handler->handle())
+		{
+			interruptsEnabled = false;
 			break;
 		}
 	}
@@ -93,6 +97,11 @@ void CPU::reset()
 	h = 0;
 	l = 0;
 	f = 0;
+}
+
+int CPU::getCurrentTick() const
+{
+	return tick;
 }
 
 CPU::~CPU() = default;

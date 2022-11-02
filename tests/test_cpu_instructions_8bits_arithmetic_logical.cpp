@@ -27,8 +27,8 @@ class CpuInstructions8BitsArithmeticLogicalTest : public ::testing::Test
 		int ticks = cpu.fetchDecodeAndExecute();
 		ASSERT_EQ(ticks, 1);
 		ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-        ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expectedFlag & CPU::HALF_CARRY) > 0);
-        ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), (expectedFlag & CPU::ZERO) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expectedFlag & CPU::HALF_CARRY) > 0);
+		ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), (expectedFlag & CPU::ZERO) > 0);
 		ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
 		ASSERT_EQ(cpu.getProgramCounter(), 1);
 	}
@@ -40,7 +40,7 @@ class CpuInstructions8BitsArithmeticLogicalTest : public ::testing::Test
 		ASSERT_EQ(ticks, 1);
 		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), cpu.getRegisterA() == 0);
 		ASSERT_EQ(cpu.getProgramCounter(), 1);
-		ASSERT_EQ(cpu.a, expectedRegisterValue);
+		ASSERT_EQ(cpu.getRegisterA(), expectedRegisterValue);
 		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), expectedCarryFlag);
 		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), false);
 	}
@@ -555,7 +555,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAWithMaxLSBValueAndWithoutFl
 
 /*
  *     // After an addition, adjust if (half-)carry occurred or if result is out of bounds
-	if (!isFlagSet(SUBSTRACTION)) {
+    if (!isFlagSet(SUBSTRACTION)) {
         if (isFlagSet(CpuFlags::CARRY) || a > 0x99)
         {
             a += 0x60;
@@ -565,9 +565,9 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAWithMaxLSBValueAndWithoutFl
         {
             a += 0x06;
         }
-	}
+    }
     // after a subtraction, only adjust if (half-)carry occurred
-	else {
+    else {
         if (isFlagSet(CpuFlags::CARRY))
         {
             a -= 0x60;
@@ -576,47 +576,47 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAWithMaxLSBValueAndWithoutFl
         {
             a -= 0x06;
         }
-	}
+    }
  */
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAAfterSubstractionWithoutCarryFlagShouldNotDecreaseValue)
 {
 	cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
-    cpu.setCarryFlag(false);
-    cpu.setRegisterA(0x00);
-    assertDecimalAdjustAccumulatorGivesExpectedResult(0x00, false);
+	cpu.setCarryFlag(false);
+	cpu.setRegisterA(0x00);
+	assertDecimalAdjustAccumulatorGivesExpectedResult(0x00, false);
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAAfterSubstractionWithCarryFlagShouldDecreaseValueBy60)
 {
-    cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
-    cpu.setCarryFlag(true);
-    cpu.setRegisterA(0x66);
-    assertDecimalAdjustAccumulatorGivesExpectedResult(0x06, true);
+	cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
+	cpu.setCarryFlag(true);
+	cpu.setRegisterA(0x66);
+	assertDecimalAdjustAccumulatorGivesExpectedResult(0x06, true);
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAAfterSubstractionWithoutHalfCarryFlagShouldNotDecreaseValue)
 {
-    cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
-    cpu.setHalfCarryFlag(false);
-    cpu.setRegisterA(0x00);
-    assertDecimalAdjustAccumulatorGivesExpectedResult(0x00, false);
+	cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
+	cpu.setHalfCarryFlag(false);
+	cpu.setRegisterA(0x00);
+	assertDecimalAdjustAccumulatorGivesExpectedResult(0x00, false);
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAAfterSubstractionWithHalfCarryFlagShouldDecreaseValueBy6)
 {
-    cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
-    cpu.setHalfCarryFlag(true);
-    cpu.setRegisterA(0x66);
-    assertDecimalAdjustAccumulatorGivesExpectedResult(0x60, false);
+	cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
+	cpu.setHalfCarryFlag(true);
+	cpu.setRegisterA(0x66);
+	assertDecimalAdjustAccumulatorGivesExpectedResult(0x60, false);
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAAfterSubstractionWithCarryAndHalfCarryFlagShouldDecreaseValueBy66)
 {
-    cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
-    cpu.setCarryFlag(true);
-    cpu.setHalfCarryFlag(true);
-    cpu.setRegisterA(0x66);
-    assertDecimalAdjustAccumulatorGivesExpectedResult(0x00, true);
+	cpu.setFlag(CPU::CpuFlags::SUBSTRACTION);
+	cpu.setCarryFlag(true);
+	cpu.setHalfCarryFlag(true);
+	cpu.setRegisterA(0x66);
+	assertDecimalAdjustAccumulatorGivesExpectedResult(0x00, true);
 }
 
 TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DAAWithMaxLSBAndMSBBelow9AndWithoutFlagsShouldIncreaseValueBy66)
