@@ -54,35 +54,6 @@ class CpuInstructionTest : public ::testing::Test
 		ASSERT_EQ(cpu.getFlag(), expectedFlag);
 	}
 
-	void testRotateLeftCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks,
-	                            bool isZeroFlagUsed = true)
-	{
-		// We test the zero value first
-		reg = 0b00000000;
-		cpu.setProgramCounter(0x00);
-		for (int i = 0; i < 10; ++i)
-		{
-			// Once zero is tested, we inject a bit to test all values
-			if (i == 1)
-			{
-				reg = 0b00000001;
-			}
-			for (size_t j = 0; j < instructions.size(); ++j)
-			{
-				mmu.write(static_cast<uint16_t>(cpu.getProgramCounter() + j), instructions[j]);
-			}
-			byte registerValue = reg;
-			byte expectedValue = (registerValue << 1) | (registerValue >> 7);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, expectedTicks);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed && expectedValue == 0);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
-			ASSERT_EQ(reg, expectedValue);
-		}
-	}
-
 	void testRotateLeftCircularFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb,
 	                                      int expectedTicks)
 	{
@@ -721,17 +692,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 }
 
 /*
-TEST_F(CpuInstructionTest, InstructionRotateLeftCircular)
-{
-    testRotateLeftCircular({standardInstructions::RLC_A}, cpu.getRegisterA(), 1, false);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_A}, cpu.getRegisterA(), 2);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_B}, cpu.b, 2);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_C}, cpu.c, 2);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_D}, cpu.d, 2);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_E}, cpu.e, 2);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_H}, cpu.h, 2);
-    testRotateLeftCircular({standardInstructions::EXT_OPS, extendedInstructions::RLC_L}, cpu.l, 2);
-}
 
 TEST_F(CpuInstructionTest, InstructionRotateLeftCircularFromMemory)
 {
