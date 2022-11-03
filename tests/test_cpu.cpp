@@ -54,52 +54,6 @@ class CpuInstructionTest : public ::testing::Test
 		ASSERT_EQ(cpu.getFlag(), expectedFlag);
 	}
 
-	void testIncrement8BitsMemoryValue(byte instruction, byte& msbRegister, byte& lsbRegister)
-	{
-		cpu.setProgramCounter(0x00);
-		msbRegister = 0x0F;
-		lsbRegister = 0xFF;
-		mmu.write(createAddrFromHighAndLowBytes(msbRegister, lsbRegister), 0);
-		uint16_t expected_pc = 1;
-		for (int i = 1; i <= UINT8_MAX + 1; ++i)
-		{
-			byte expected_value = i;
-			mmu.write(cpu.getProgramCounter(), instruction);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, 3);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expected_value & 0x0F) == 0x00);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
-			ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
-			ASSERT_EQ(cpu.getProgramCounter(), expected_pc);
-			expected_pc++;
-		}
-	}
-
-	void testDecrement8BitsMemoryValue(byte instruction, byte& msbRegister, byte& lsbRegister)
-	{
-		cpu.setProgramCounter(0x00);
-		msbRegister = 0x0F;
-		lsbRegister = 0xFF;
-		mmu.write(createAddrFromHighAndLowBytes(msbRegister, lsbRegister), 0);
-		uint16_t expected_pc = 1;
-		for (int i = UINT8_MAX; i >= 0; --i)
-		{
-			byte expected_value = i;
-			mmu.write(cpu.getProgramCounter(), instruction);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, 3);
-			ASSERT_TRUE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY), (expected_value & 0x0F) == 0x0F);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expected_value == 0);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::CARRY));
-			ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msbRegister, lsbRegister)), expected_value);
-			ASSERT_EQ(cpu.getProgramCounter(), expected_pc);
-			expected_pc++;
-		}
-	}
-
 	void testRotateLeftCircular(const std::vector<byte>& instructions, byte& reg, int expectedTicks,
 	                            bool isZeroFlagUsed = true)
 	{
@@ -439,85 +393,85 @@ class CpuInstructionTest : public ::testing::Test
 	/*
 	void testAdd8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
 	{
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x05, false, false, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x05, 0x14, false, true, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0x04, false, true, true);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x01, 0x00, false, true, true);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xF0, otherReg, 0xF0, 0xE0, false, false, true);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x05, false, false, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x05, 0x14, false, true, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0x04, false, true, true);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x01, 0x00, false, true, true);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xF0, otherReg, 0xF0, 0xE0, false, false, true);
 	}
 
 	void testAdd8BitsRegisterAndCarryTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
 	{
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x01, true, false, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x05, false, false, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x06, true, false, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x00, 0x10, true, true, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x05, 0x14, false, true, false);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0x04, false, true, true);
-		testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0x00, true, true, true);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x01, true, false, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x05, false, false, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0x06, true, false, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x00, 0x10, true, true, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0x0F, otherReg, 0x05, 0x14, false, true, false);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0x04, false, true, true);
+	    testAdd8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0x00, true, true, true);
 	}
 
 	void testSub8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue, byte& otherReg, byte value,
 	                                         byte expectedResult, bool carryFlag, bool expectedHalfCarryFlag,
 	                                         bool expectedCarryFlag)
 	{
-		testOp8BitsRegisterTo8BitsRegister(instruction, reg, startValue, otherReg, value, expectedResult, carryFlag,
-		                                   expectedHalfCarryFlag, expectedCarryFlag, true);
+	    testOp8BitsRegisterTo8BitsRegister(instruction, reg, startValue, otherReg, value, expectedResult, carryFlag,
+	                                       expectedHalfCarryFlag, expectedCarryFlag, true);
 	}
 
 	void testSubValueFromMemoryToRegister(byte instruction, byte& reg, byte startValue, byte regAddrMsb,
 	                                      byte regAddrLsb, byte value, byte expectedResult, bool carryFlag,
 	                                      bool expectedHalfCarryFlag, bool expectedCarryFlag)
 	{
-		testOpFromMemoryToRegister(instruction, reg, startValue, regAddrMsb, regAddrLsb, value, expectedResult,
-		                           carryFlag, expectedHalfCarryFlag, expectedCarryFlag, true);
+	    testOpFromMemoryToRegister(instruction, reg, startValue, regAddrMsb, regAddrLsb, value, expectedResult,
+	                               carryFlag, expectedHalfCarryFlag, expectedCarryFlag, true);
 	}
 
 	void testSubImmediateValueToRegister(byte instruction, byte& reg, byte startValue, byte value, byte expectedResult,
 	                                     bool carryFlag, bool expectedHalfCarryFlag, bool expectedCarryFlag)
 	{
-		testOpImmediateValueToRegister(instruction, reg, startValue, value, expectedResult, carryFlag,
-		                               expectedHalfCarryFlag, expectedCarryFlag, true);
+	    testOpImmediateValueToRegister(instruction, reg, startValue, value, expectedResult, carryFlag,
+	                                   expectedHalfCarryFlag, expectedCarryFlag, true);
 	}
 
 	void testSub8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
 	{
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFB, false, true, true);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x05, 0x0B, false, true, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x01, 0xFF, false, true, true);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFB, false, true, true);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x05, 0x0B, false, true, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x01, 0xFF, false, true, true);
 	}
 
 	void testSub8BitsRegisterAndCarryTo8BitsRegister(byte instruction, byte& reg, byte& otherReg)
 	{
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0xFF, true, true, true);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFB, false, true, true);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFA, true, true, true);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x00, 0x0F, true, true, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x05, 0x0B, false, true, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
-		testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0xFE, true, false, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0x00, false, false, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x00, 0xFF, true, true, true);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFB, false, true, true);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x00, otherReg, 0x05, 0xFA, true, true, true);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x00, 0x0F, true, true, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0x10, otherReg, 0x05, 0x0B, false, true, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
+	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0xFE, true, false, false);
 	}
 
 	void testAndOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, byte expectedResult)
 	{
-		testOp8BitsRegisterTo8BitsRegister(instruction, cpu.getRegisterA(), startValue, reg, value, expectedResult,
-		                                   true, true, false, false);
+	    testOp8BitsRegisterTo8BitsRegister(instruction, cpu.getRegisterA(), startValue, reg, value, expectedResult,
+	                                       true, true, false, false);
 	}
 
 	void testAndOperationWithRegister(byte instruction, byte& reg)
 	{
-		testAndOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
-		testAndOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x00);
-		testAndOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x00);
-		testAndOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x0F);
-		testAndOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0xF0);
-		testAndOperationWithRegister(instruction, 0x01, reg, 0x01, 0x01);
-		testAndOperationWithRegister(instruction, 0x10, reg, 0x10, 0x10);
+	    testAndOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
+	    testAndOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x00);
+	    testAndOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x00);
+	    testAndOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x0F);
+	    testAndOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0xF0);
+	    testAndOperationWithRegister(instruction, 0x01, reg, 0x01, 0x01);
+	    testAndOperationWithRegister(instruction, 0x10, reg, 0x10, 0x10);
 	}
 
 
@@ -543,16 +497,16 @@ class CpuInstructionTest : public ::testing::Test
 
 	void testXorOperationWithRegister(byte instruction, byte& reg)
 	{
-		testXorOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
-		testXorOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x0F);
-		testXorOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x0F);
-		testXorOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x00);
-		testXorOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0x00);
-		testXorOperationWithRegister(instruction, 0x01, reg, 0x01, 0x00);
-		testXorOperationWithRegister(instruction, 0x10, reg, 0x10, 0x00);
-		testXorOperationWithRegister(instruction, 0x01, reg, 0x00, 0x01);
-		testXorOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
-		testXorOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0x00);
+	    testXorOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
+	    testXorOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x0F);
+	    testXorOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x0F);
+	    testXorOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x00);
+	    testXorOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0x00);
+	    testXorOperationWithRegister(instruction, 0x01, reg, 0x01, 0x00);
+	    testXorOperationWithRegister(instruction, 0x10, reg, 0x10, 0x00);
+	    testXorOperationWithRegister(instruction, 0x01, reg, 0x00, 0x01);
+	    testXorOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
+	    testXorOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0x00);
 	}
 
 
@@ -573,7 +527,7 @@ class CpuInstructionTest : public ::testing::Test
 	{
 	    testOp8BitsRegisterTo8BitsRegister(instruction, cpu.getRegisterA(), startValue, reg, value, expectedResult,
 	                                       true, false, false, false);
-	}/*
+	}
 
 	void testOrOperationWithRegister(byte instruction, byte& reg)
 	{
@@ -588,7 +542,7 @@ class CpuInstructionTest : public ::testing::Test
 	    testOrOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
 	    testOrOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0xFF);
 	}
-	/*
+
 	    void testOrOperationWithImmediateValue(byte instruction, byte startValue, byte value, byte expectedResult)
 	    {
 	        testOpImmediateValueToRegister(instruction, cpu.getRegisterA(), startValue, value, expectedResult, true,
@@ -604,58 +558,58 @@ class CpuInstructionTest : public ::testing::Test
 
 	void testCompareOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, int expectedFlags)
 	{
-		cpu.setProgramCounter(0x00);
-		cpu.setRegisterA(startValue);
-		reg = value;
-		mmu.write(cpu.getProgramCounter(), instruction);
-		int ticks = cpu.fetchDecodeAndExecute();
-		ASSERT_EQ(ticks, 1);
-		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
-		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
-		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
-		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
-		ASSERT_EQ(cpu.getProgramCounter(), 1);
+	    cpu.setProgramCounter(0x00);
+	    cpu.setRegisterA(startValue);
+	    reg = value;
+	    mmu.write(cpu.getProgramCounter(), instruction);
+	    int ticks = cpu.fetchDecodeAndExecute();
+	    ASSERT_EQ(ticks, 1);
+	    ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+	    ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
+	    ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
+	    ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
+	    ASSERT_EQ(cpu.getProgramCounter(), 1);
 	}
 
 	void testCompareOperationWithRegister(byte instruction, byte& reg)
 	{
-		testCompareOperationWithRegister(instruction, 0x00, reg, 0x00, CPU::ZERO);
-		testCompareOperationWithRegister(instruction, 0x0F, reg, 0x00, 0);
-		testCompareOperationWithRegister(instruction, 0x00, reg, 0x0F, CPU::CARRY | CPU::HALF_CARRY);
-		testCompareOperationWithRegister(instruction, 0xFF, reg, 0xFF, CPU::ZERO);
-		testCompareOperationWithRegister(instruction, 0x09, reg, 0x08, 0);
-		testCompareOperationWithRegister(instruction, 0x08, reg, 0x09, CPU::CARRY | CPU::HALF_CARRY);
+	    testCompareOperationWithRegister(instruction, 0x00, reg, 0x00, CPU::ZERO);
+	    testCompareOperationWithRegister(instruction, 0x0F, reg, 0x00, 0);
+	    testCompareOperationWithRegister(instruction, 0x00, reg, 0x0F, CPU::CARRY | CPU::HALF_CARRY);
+	    testCompareOperationWithRegister(instruction, 0xFF, reg, 0xFF, CPU::ZERO);
+	    testCompareOperationWithRegister(instruction, 0x09, reg, 0x08, 0);
+	    testCompareOperationWithRegister(instruction, 0x08, reg, 0x09, CPU::CARRY | CPU::HALF_CARRY);
 	}
 
 	void testCompareOperationWithImmediateValue(byte instruction, byte startValue, byte value, int expectedFlags)
 	{
-		cpu.setProgramCounter(0x00);
-		cpu.setRegisterA(startValue);
-		mmu.write(cpu.getProgramCounter(), instruction);
-		mmu.write(cpu.getProgramCounter() + 1, value);
-		int ticks = cpu.fetchDecodeAndExecute();
-		ASSERT_EQ(ticks, 2);
-		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
-		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
-		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
-		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
-		ASSERT_EQ(cpu.getProgramCounter(), 2);
+	    cpu.setProgramCounter(0x00);
+	    cpu.setRegisterA(startValue);
+	    mmu.write(cpu.getProgramCounter(), instruction);
+	    mmu.write(cpu.getProgramCounter() + 1, value);
+	    int ticks = cpu.fetchDecodeAndExecute();
+	    ASSERT_EQ(ticks, 2);
+	    ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+	    ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
+	    ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
+	    ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
+	    ASSERT_EQ(cpu.getProgramCounter(), 2);
 	}
 
 	void testCompareOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
 	                                    int expectedFlags)
 	{
-		cpu.setProgramCounter(0x00);
-		cpu.setRegisterA(startValue);
-		mmu.write(createAddrFromHighAndLowBytes(regAddrMsb, regAddrLsb), value);
-		mmu.write(cpu.getProgramCounter(), instruction);
-		int ticks = cpu.fetchDecodeAndExecute();
-		ASSERT_EQ(ticks, 2);
-		ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
-		ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
-		ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
-		ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
-		ASSERT_EQ(cpu.getProgramCounter(), 1);
+	    cpu.setProgramCounter(0x00);
+	    cpu.setRegisterA(startValue);
+	    mmu.write(createAddrFromHighAndLowBytes(regAddrMsb, regAddrLsb), value);
+	    mmu.write(cpu.getProgramCounter(), instruction);
+	    int ticks = cpu.fetchDecodeAndExecute();
+	    ASSERT_EQ(ticks, 2);
+	    ASSERT_TRUE(cpu.isFlagSet(CPU::SUBSTRACTION));
+	    ASSERT_EQ(cpu.isFlagSet(CPU::ZERO), (expectedFlags & CPU::ZERO) > 0);
+	    ASSERT_EQ(cpu.isFlagSet(CPU::CARRY), (expectedFlags & CPU::CARRY) > 0);
+	    ASSERT_EQ(cpu.isFlagSet(CPU::HALF_CARRY), (expectedFlags & CPU::HALF_CARRY) > 0);
+	    ASSERT_EQ(cpu.getProgramCounter(), 1);
 	}
 	 */
 
@@ -767,16 +721,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 }
 
 /*
-TEST_F(CpuInstructionTest, InstructionIncrementRegister)
-{
-    testIncrement8BitsMemoryValue(standardInstructions::INC_HLm, cpu.h, cpu.l);
-}
-
-TEST_F(CpuInstructionTest, InstructionDecrementRegister)
-{
-    testDecrement8BitsMemoryValue(standardInstructions::DEC_HLm, cpu.h, cpu.l);
-}
-
 TEST_F(CpuInstructionTest, InstructionRotateLeftCircular)
 {
     testRotateLeftCircular({standardInstructions::RLC_A}, cpu.getRegisterA(), 1, false);
