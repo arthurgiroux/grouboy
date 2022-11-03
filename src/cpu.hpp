@@ -44,7 +44,11 @@ class CPU
 		 * Set if a carry occurred from the last math operation or if register A is the smaller value when executing the
 		 * CP instruction.
 		 */
-		CARRY = 0x10
+		CARRY = 0x10,
+		/**
+		 * Convenient value to be used when no flags should be set
+		 */
+		NONE = 0x00
 	};
 
 	/**
