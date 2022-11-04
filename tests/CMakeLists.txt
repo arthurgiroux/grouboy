@@ -7,40 +7,22 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+include_directories(../src)
+
 add_executable(
-        emulator_tests
-        ../src/mmu.cpp
-        ../src/mmu.hpp
-        ../src/cpu.cpp
-        ../src/cpu_instructions_misc_control.cpp
-        ../src/cpu_instructions_jumps_calls.cpp
-        ../src/cpu_instructions_8bits_load_store_move.cpp
-        ../src/cpu_instructions_16bits_load_store_move.cpp
-        ../src/cpu_instructions_8bits_arithmetic_logical.cpp
-        ../src/cpu_instructions_16bits_arithmetic_logical.cpp
-        ../src/cpu_instructions_8bits_rotation_shifts_bit.cpp
-        ../src/cpu.hpp
-        ../src/ppu.cpp
-        ../src/ppu.hpp
-        ../src/tile.cpp
-        ../src/tile.hpp
-        ../src/utils.hpp
-        ../src/utils.cpp
-        ../src/cartridge.cpp
-        ../src/cartridge.hpp
-        ../src/interrupt_handler.cpp
-        ../src/interrupt_handler.hpp
-        ../src/input_controller.cpp
-        ../src/input_controller.hpp
-        ../src/rgb_image.cpp
-        ../src/rgb_image.hpp
-        ../src/sprite.cpp
-        ../src/sprite.hpp
-        test_mmu.cpp
-        test_ppu.cpp
-        test_cpu.cpp
-        test_tile.cpp
+        utils_tests
         test_utils.cpp
+)
+
+target_link_libraries(
+        utils_tests
+        gbemulator_core
+        gtest_main
+)
+
+add_executable(
+        cpu_tests
+        test_cpu.cpp
         test_cpu_instructions_jumps_calls.cpp
         test_cpu_instructions_8bits_load_store_move.cpp
         test_cpu_instructions_8bits_arithmetic_logical.cpp
@@ -48,19 +30,43 @@ add_executable(
         test_cpu_instructions_misc_control.cpp
         test_cpu_instructions_16bits_arithmetic_logical.cpp
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        test_cartridge.cpp
-        test_input_controller.cpp
-        test_rgb_image.cpp
-        test_sprite.cpp)
-
-target_compile_definitions(emulator_tests PRIVATE -DUNIT_TESTING)
-
-target_include_directories(emulator_tests PRIVATE ../src/)
+)
 
 target_link_libraries(
-        emulator_tests
+        cpu_tests
+        gbemulator_core
+        gtest_main
+)
+
+add_executable(
+        ppu_tests
+        test_ppu.cpp
+        test_tile.cpp
+        test_rgb_image.cpp
+        test_sprite.cpp
+)
+
+target_link_libraries(
+        ppu_tests
+        gbemulator_core
+        gtest_main
+)
+
+add_executable(
+        mmu_tests
+        test_mmu.cpp
+        test_cartridge.cpp
+        test_input_controller.cpp
+)
+
+target_link_libraries(
+        mmu_tests
+        gbemulator_core
         gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(emulator_tests)
+gtest_discover_tests(utils_tests)
+gtest_discover_tests(cpu_tests)
+gtest_discover_tests(ppu_tests)
+gtest_discover_tests(mmu_tests)

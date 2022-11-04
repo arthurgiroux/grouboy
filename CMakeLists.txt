@@ -58,7 +58,6 @@ set(SOURCE_FILES
         src/mmu.cpp
         src/mmu.hpp
         src/types.hpp
-        src/main.cpp
         src/ppu.cpp
         src/ppu.hpp
         src/tile.cpp
@@ -74,10 +73,16 @@ set(SOURCE_FILES
         src/input_controller.cpp
         src/input_controller.hpp
         src/rgb_image.cpp
-        src/rgb_image.hpp src/sprite.cpp src/sprite.hpp)
+        src/rgb_image.hpp
+        src/sprite.cpp
+        src/sprite.hpp)
 
-add_executable(gbemulator ${SOURCE_FILES})
-target_link_libraries(gbemulator IMGUI)
+add_library(gbemulator_core ${SOURCE_FILES})
+target_link_libraries(gbemulator_core IMGUI)
+
+add_executable(gbemulator src/main.cpp)
+
+target_link_libraries(gbemulator gbemulator_core)
 
 enable_testing()
 add_subdirectory(tests/)
