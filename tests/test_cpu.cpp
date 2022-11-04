@@ -54,81 +54,6 @@ class CpuInstructionTest : public ::testing::Test
 		ASSERT_EQ(cpu.getFlag(), expectedFlag);
 	}
 
-	void testRotateLeftCircularFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb,
-	                                      int expectedTicks)
-	{
-		regMsb = 0x42;
-		regLsb = 0x11;
-		uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
-		mmu.write(addr, 0b00000001);
-		cpu.setProgramCounter(0x00);
-		for (int i = 0; i < 9; ++i)
-		{
-			for (size_t j = 0; j < instructions.size(); ++j)
-			{
-				mmu.write(static_cast<uint16_t>(cpu.getProgramCounter() + j), instructions[j]);
-			}
-			byte registerValue = mmu.read(addr);
-			byte expectedValue = (registerValue << 1) | (registerValue >> 7);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, expectedTicks);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
-			ASSERT_EQ(mmu.read(addr), expectedValue);
-		}
-	}
-
-	void testRotateLeft(const std::vector<byte>& instructions, byte& reg, int expectedTicks, bool isZeroFlagUsed = true)
-	{
-		reg = 0b00000001;
-		cpu.setProgramCounter(0x00);
-		for (int i = 0; i < 9; ++i)
-		{
-			for (size_t j = 0; j < instructions.size(); ++j)
-			{
-				mmu.write(static_cast<uint16_t>(cpu.getProgramCounter() + j), instructions[j]);
-			}
-			byte registerValue = reg;
-			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
-			byte expectedValue = (registerValue << 1) | static_cast<int>(isCarryFlagSet);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, expectedTicks);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed && expectedValue == 0);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
-			ASSERT_EQ(reg, expectedValue);
-		}
-	}
-
-	void testRotateLeftFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb, int expectedTicks)
-	{
-		regMsb = 0x42;
-		regLsb = 0x11;
-		uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
-		mmu.write(addr, 0b00000001);
-		cpu.setProgramCounter(0x00);
-		for (int i = 0; i < 9; ++i)
-		{
-			for (size_t j = 0; j < instructions.size(); ++j)
-			{
-				mmu.write(static_cast<uint16_t>(cpu.getProgramCounter() + j), instructions[j]);
-			}
-			byte registerValue = mmu.read(addr);
-			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
-			byte expectedValue = (registerValue << 1) | static_cast<int>(isCarryFlagSet);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, expectedTicks);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x80) > 0);
-			ASSERT_EQ(mmu.read(addr), expectedValue);
-		}
-	}
-
 	void addTwo8BitsRegisterToTwo8BitsRegister(byte instruction, byte& resultRegMsb, byte& resultRegLsb,
 	                                           byte& valueRegMsb, byte& valueRegLsb, std::vector<uint16_t>& startValues,
 	                                           std::vector<uint16_t>& addValues, std::vector<int>& expectedFlags)
@@ -692,23 +617,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 }
 
 /*
-
-TEST_F(CpuInstructionTest, InstructionRotateLeft)
-{
-    testRotateLeft({standardInstructions::RL_A}, cpu.getRegisterA(), 1, false);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_A}, cpu.getRegisterA(), 2);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_B}, cpu.b, 2);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_C}, cpu.c, 2);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_D}, cpu.d, 2);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_E}, cpu.e, 2);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_H}, cpu.h, 2);
-    testRotateLeft({standardInstructions::EXT_OPS, extendedInstructions::RL_L}, cpu.l, 2);
-}
-
-TEST_F(CpuInstructionTest, InstructionRotateLeftFromMemory)
-{
-    testRotateLeftFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RL_HLm}, cpu.h, cpu.l, 4);
-}
 
 TEST_F(CpuInstructionTest, InstructionLoad16BitsRegisterAtImmediateAddr)
 {
