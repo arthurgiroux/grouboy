@@ -3867,7 +3867,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit7ShouldSet
 }
 #pragma endregion
 
-#pragma region Rotations
+#pragma region Left Circular Rotations
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, RotateLeftCircularRegisterAForValue0ShouldNotChangeValue)
 {
 	cpu.setRegisterA(0x00);
@@ -4089,5 +4089,48 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
 	setExpectedFlags(CPU::CpuFlags::CARRY);
 	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RLC_L);
 	ASSERT_EQ(cpu.getRegisterL(), 0b00000001);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftCircularInMemoryForValue0ShouldNotChangeValue)
+{
+	byte startValue = 0x00;
+	byte expectedValue = 0x00;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, startValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	setExpectedTicks(4);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RLC_HLm);
+	ASSERT_EQ(mmu.read(addr), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftCircularInMemoryForValue1ShouldGive2)
+{
+	byte startValue = 0b00000001;
+	byte expectedValue = 0b00000010;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, startValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	setExpectedTicks(4);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RLC_HLm);
+	ASSERT_EQ(mmu.read(addr), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateLeftCircularInMemoryForMaxBitShouldSetCarryAndLoopAround)
+{
+	byte startValue = 0b10000000;
+	byte expectedValue = 0b00000001;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, startValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	setExpectedTicks(4);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RLC_HLm);
+	ASSERT_EQ(mmu.read(addr), expectedValue);
 }
 #pragma endregion

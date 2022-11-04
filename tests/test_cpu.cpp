@@ -693,11 +693,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 
 /*
 
-TEST_F(CpuInstructionTest, InstructionRotateLeftCircularFromMemory)
-{
-    testRotateLeftCircularFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RLC_HLm}, cpu.h, cpu.l, 4);
-}
-
 TEST_F(CpuInstructionTest, InstructionRotateLeft)
 {
     testRotateLeft({standardInstructions::RL_A}, cpu.getRegisterA(), 1, false);
