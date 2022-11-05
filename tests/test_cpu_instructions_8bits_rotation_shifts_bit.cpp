@@ -4394,3 +4394,271 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftInMemoryForM
 	ASSERT_EQ(mmu.read(addr), expectedValue);
 }
 #pragma endregion
+
+#pragma region Right Circular Rotations
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, RotateRightCircularRegisterAForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterA(0x00);
+	setExpectedTicks(1);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::RRC_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, RotateRightCircularRegisterAForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterA(0b10000000);
+	setExpectedTicks(1);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::RRC_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, RotateRightCircularRegisterAForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterA(0b00000001);
+	setExpectedTicks(1);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::RRC_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterAForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterA(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterAForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterA(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterAForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterA(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_A);
+	ASSERT_EQ(cpu.getRegisterA(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterBForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterB(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterBForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterB(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterBForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterB(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_B);
+	ASSERT_EQ(cpu.getRegisterB(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterCForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterC(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterCForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterC(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterCForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterC(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_C);
+	ASSERT_EQ(cpu.getRegisterC(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterDForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterD(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterDForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterD(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterDForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterD(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_D);
+	ASSERT_EQ(cpu.getRegisterD(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterEForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterE(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterEForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterE(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterEForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterE(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_E);
+	ASSERT_EQ(cpu.getRegisterE(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterHForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterH(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterHForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterH(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterHForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterH(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_H);
+	ASSERT_EQ(cpu.getRegisterH(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterLForValue0ShouldNotChangeValue)
+{
+	cpu.setRegisterL(0x00);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0x00);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularRegisterLForValueMaxBitShouldShiftProperly)
+{
+	cpu.setRegisterL(0b10000000);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b01000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularRegisterLForMinBitShouldSetCarryAndLoopAround)
+{
+	cpu.setRegisterL(0b00000001);
+	setExpectedTicks(2);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_L);
+	ASSERT_EQ(cpu.getRegisterL(), 0b10000000);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularInMemoryForValue0ShouldNotChangeValue)
+{
+	byte startValue = 0x00;
+	byte expectedValue = 0x00;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, startValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	setExpectedTicks(4);
+	setExpectedFlags(CPU::CpuFlags::ZERO);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_HLm);
+	ASSERT_EQ(mmu.read(addr), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularInMemoryForValueMaxBitShouldShiftProperly)
+{
+	byte startValue = 0b10000000;
+	byte expectedValue = 0b01000000;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, startValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	setExpectedTicks(4);
+	setExpectedFlags(CPU::CpuFlags::NONE);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_HLm);
+	ASSERT_EQ(mmu.read(addr), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
+       ExtendedRotateRightCircularInMemoryForMinBitShouldSetCarryAndLoopAround)
+{
+	byte startValue = 0b000000001;
+	byte expectedValue = 0b10000000;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, startValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	setExpectedTicks(4);
+	setExpectedFlags(CPU::CpuFlags::CARRY);
+	assertExtendedInstructionWasExecutedCorrectly(extendedInstructions::RRC_HLm);
+	ASSERT_EQ(mmu.read(addr), expectedValue);
+}
+#pragma endregion
