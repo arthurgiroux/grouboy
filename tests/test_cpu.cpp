@@ -99,56 +99,6 @@ class CpuInstructionTest : public ::testing::Test
 		}
 	}
 
-	void testRotateRight(const std::vector<byte>& instructions, byte& reg, int expectedTicks,
-	                     bool isZeroFlagUsed = true)
-	{
-		reg = 0b10000000;
-		cpu.setProgramCounter(0x00);
-		for (int i = 0; i < 9; ++i)
-		{
-			for (size_t j = 0; j < instructions.size(); ++j)
-			{
-				mmu.write(static_cast<uint16_t>(cpu.getProgramCounter() + j), instructions[j]);
-			}
-			byte registerValue = reg;
-			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
-			byte expectedValue = (isCarryFlagSet << 7) | (registerValue >> 1);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, expectedTicks);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), isZeroFlagUsed && expectedValue == 0);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
-			ASSERT_EQ(reg, expectedValue);
-		}
-	}
-
-	void testRotateRightFromMemory(const std::vector<byte>& instructions, byte& regMsb, byte& regLsb, int expectedTicks)
-	{
-		regMsb = 0x42;
-		regLsb = 0x11;
-		uint16_t addr = createAddrFromHighAndLowBytes(regMsb, regLsb);
-		mmu.write(addr, 0b10000000);
-		cpu.setProgramCounter(0x00);
-		for (int i = 0; i < 9; ++i)
-		{
-			for (size_t j = 0; j < instructions.size(); ++j)
-			{
-				mmu.write(static_cast<uint16_t>(cpu.getProgramCounter() + j), instructions[j]);
-			}
-			byte registerValue = mmu.read(addr);
-			bool isCarryFlagSet = cpu.isFlagSet(CPU::CpuFlags::CARRY);
-			byte expectedValue = (isCarryFlagSet << 7) | (registerValue >> 1);
-			int ticks = cpu.fetchDecodeAndExecute();
-			ASSERT_EQ(ticks, expectedTicks);
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::HALF_CARRY));
-			ASSERT_FALSE(cpu.isFlagSet(CPU::CpuFlags::SUBSTRACTION));
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::ZERO), expectedValue == 0);
-			ASSERT_EQ(cpu.isFlagSet(CPU::CpuFlags::CARRY), (registerValue & 0x01) > 0);
-			ASSERT_EQ(mmu.read(addr), expectedValue);
-		}
-	}
-
 	void testOp8BitsRegisterTo8BitsRegister(byte instruction, byte& reg, byte startValue, byte& regOther,
 	                                        byte otherValue, byte expectedResult, bool carryFlag,
 	                                        bool expectedHalfCarryFlag, bool expectedCarryFlag,
@@ -605,23 +555,6 @@ TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterToSameRegisters)
     std::vector<int> expectedFlags = {0, 0, CPU::HALF_CARRY, CPU::CARRY};
     addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_HL, cpu.h, cpu.l, cpu.h, cpu.l, startValues,
                                           addValues, expectedFlags);
-}
-
-TEST_F(CpuInstructionTest, InstructionRotateRight)
-{
-    testRotateRight({standardInstructions::RR_A}, cpu.getRegisterA(), 1, false);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_A}, cpu.getRegisterA(), 2);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_B}, cpu.b, 2);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_C}, cpu.c, 2);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_D}, cpu.d, 2);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_E}, cpu.e, 2);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_H}, cpu.h, 2);
-    testRotateRight({standardInstructions::EXT_OPS, extendedInstructions::RR_L}, cpu.l, 2);
-}
-
-TEST_F(CpuInstructionTest, InstructionRotateRightFromMemory)
-{
-    testRotateRightFromMemory({standardInstructions::EXT_OPS, extendedInstructions::RR_HLm}, cpu.h, cpu.l, 4);
 }
 
 TEST_F(CpuInstructionTest, InstructionLoad16BitsImmediateValueInRegister)
