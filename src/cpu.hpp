@@ -360,6 +360,16 @@ class CPU
 	 */
 	void disableInterrupts();
 
+	/**
+	 * Enable interrupts routine.
+	 *
+	 * @opcodes:
+	 *     0xFB
+	 * @flags_affected: N/A
+	 * @number_of_ticks: 1
+	 */
+	void enableInterrupts();
+
   private:
 	/**
 	 * Execute an instruction that is part of the standard instruction set.
@@ -1401,16 +1411,6 @@ class CPU
 	 * @number_of_ticks: 3
 	 */
 	void popMemoryIntoRegisterPair(byte& regMsb, byte& regLsb);
-
-	/**
-	 * Enable interrupts routine.
-	 *
-	 * @opcodes:
-	 *     0xFB
-	 * @flags_affected: N/A
-	 * @number_of_ticks: 1
-	 */
-	void enableInterrupts();
 
 	/**
 	 * Stop system clock and oscillator circuit.
