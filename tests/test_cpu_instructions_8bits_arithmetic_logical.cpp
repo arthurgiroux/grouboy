@@ -61,6 +61,34 @@ class CpuInstructions8BitsArithmeticLogicalTest : public ::testing::Test
 		ASSERT_EQ(cpu.getProgramCounter(), 1);
 	}
 
+	void assertCompareOperationSetFlagsCorrectly(byte instruction, int expectedFlags)
+	{
+		mmu.write(cpu.getProgramCounter(), instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 1);
+		ASSERT_EQ(cpu.getFlag(), CPU::SUBSTRACTION | expectedFlags);
+		ASSERT_EQ(cpu.getProgramCounter(), 1);
+	}
+
+	void assertCompareWithImmediateValueSetFlagsCorrectly(byte instruction, byte value, int expectedFlags)
+	{
+		mmu.write(cpu.getProgramCounter(), instruction);
+		mmu.write(cpu.getProgramCounter() + 1, value);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.getFlag(), CPU::SUBSTRACTION | expectedFlags);
+		ASSERT_EQ(cpu.getProgramCounter(), 2);
+	}
+
+	void assertCompareWithMemorySetFlagsCorrectly(byte instruction, int expectedFlags)
+	{
+		mmu.write(cpu.getProgramCounter(), instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, 2);
+		ASSERT_EQ(cpu.getFlag(), CPU::SUBSTRACTION | expectedFlags);
+		ASSERT_EQ(cpu.getProgramCounter(), 1);
+	}
+
 	MMU mmu;
 	CPU cpu = CPU(mmu);
 	int expectedTicks = 1;
@@ -870,4 +898,342 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, Complement0xAAShouldGive0x55)
 	assertComplementRegisterGivesExpectedResult(0x55);
 }
 
+#pragma endregion
+
+#pragma region Compare
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterBWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterB(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_B, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterBWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterB(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_B, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterBWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterB(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_B, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterBWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterB(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_B, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterCWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterC(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_C, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterCWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterC(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_C, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterCWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterC(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_C, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterCWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterC(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_C, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterDWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterD(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_D, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterDWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterD(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_D, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterDWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterD(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_D, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterDWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterD(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_D, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterEWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterE(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_E, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterEWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterE(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_E, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterEWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterE(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_E, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterEWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterE(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_E, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterHWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterH(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_H, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterHWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterH(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_H, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterHWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterH(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_H, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterHWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterH(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_H, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterLWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterL(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_L, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterLWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterL(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_L, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterLWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterL(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_L, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterLWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	cpu.setRegisterL(registerValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_L, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareRegisterAWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	assertCompareOperationSetFlagsCorrectly(standardInstructions::CP_A, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareImmediateValueWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithImmediateValueSetFlagsCorrectly(standardInstructions::CP_n, registerValue, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareImmediateValueWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithImmediateValueSetFlagsCorrectly(standardInstructions::CP_n, registerValue, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareImmediateValueWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithImmediateValueSetFlagsCorrectly(standardInstructions::CP_n, registerValue, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareImmediateValueWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithImmediateValueSetFlagsCorrectly(standardInstructions::CP_n, registerValue, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithAccuShouldSetZeroFlagIfBothValuesAre0)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, registerValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithMemorySetFlagsCorrectly(standardInstructions::CP_HLm, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithBiggerAccuDoesntSetCarryFlag)
+{
+	byte accuValue = 0xF0;
+	byte registerValue = 0x00;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, registerValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithMemorySetFlagsCorrectly(standardInstructions::CP_HLm, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithSmallerAccuSetsCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0xF0;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, registerValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	int expectedFlags = CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithMemorySetFlagsCorrectly(standardInstructions::CP_HLm, expectedFlags);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithSmallerValueInLowestNibblesSetsHalfCarryFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x0F;
+	uint16_t addr = 0x1234;
+	mmu.write(addr, registerValue);
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	int expectedFlags = CPU::HALF_CARRY | CPU::CARRY;
+	cpu.setRegisterA(accuValue);
+	assertCompareWithMemorySetFlagsCorrectly(standardInstructions::CP_HLm, expectedFlags);
+}
 #pragma endregion
