@@ -250,3 +250,30 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInSPShouldLoadInSP)
 	ASSERT_EQ(cpu.getStackPointer(), value);
 	ASSERT_EQ(cpu.getProgramCounter(), 3);
 }
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, Load16BitsRegisterAtImmediateAddrShouldWriteValueToMemory)
+{
+	uint16_t expectedValue = 0x559A;
+	cpu.setStackPointer(expectedValue);
+	uint16_t addr = 0x5C8;
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_nnm_SP);
+	mmu.writeWord(cpu.getProgramCounter() + 1, addr);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 5);
+	ASSERT_EQ(cpu.getFlag(), CPU::CpuFlags::NONE);
+	uint16_t value = mmu.readWord(addr);
+	ASSERT_EQ(value, expectedValue);
+	ASSERT_EQ(cpu.getProgramCounter(), 3);
+}
+
+TEST_F(CpuInstructions16BitsLoadStoreMoveTest, Load16BitsImmediateValueInRegisterShouldChangeRegister)
+{
+	uint16_t value = 0x1234;
+	mmu.write(cpu.getProgramCounter(), standardInstructions::LD_SP_nn);
+	mmu.writeWord(cpu.getProgramCounter() + 1, value);
+	int ticks = cpu.fetchDecodeAndExecute();
+	ASSERT_EQ(ticks, 3);
+	ASSERT_EQ(cpu.getFlag(), CPU::CpuFlags::NONE);
+	ASSERT_EQ(cpu.getProgramCounter(), 3);
+	ASSERT_EQ(cpu.getStackPointer(), value);
+}
