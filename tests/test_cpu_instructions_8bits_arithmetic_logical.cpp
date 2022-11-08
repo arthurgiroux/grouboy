@@ -1507,3 +1507,259 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, OrBetweenAccuAndValueInMemoryF
 	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
 }
 #pragma endregion
+
+#pragma region Xor Instructions
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterAGivesExpectedResult)
+{
+	byte value = 0x12;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterAForBothZeroValueSetsZeroFlag)
+{
+	byte value = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterBGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte registerValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterB(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterBForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterB(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterCGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte registerValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterC(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterCForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterC(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterDGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte registerValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterD(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterDForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterD(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterEGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte registerValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterE(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterEForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterE(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterHGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte registerValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterH(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterHForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterH(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterLGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte registerValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	cpu.setRegisterL(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndRegisterLForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte registerValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	cpu.setRegisterL(registerValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndImmediateValueGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte immediateValue = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	mmu.write(cpu.getProgramCounter() + 1, immediateValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndImmediateValueForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte immediateValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	mmu.write(cpu.getProgramCounter() + 1, immediateValue);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndValueInMemoryGivesExpectedResult)
+{
+	byte accuValue = 0x12;
+	byte value = 0x34;
+	byte expectedValue = 0x26;
+	int expectedFlags = CPU::NONE;
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, value);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndValueInMemoryForBothZeroValueSetsZeroFlag)
+{
+	byte accuValue = 0x00;
+	byte value = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::ZERO;
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, value);
+	cpu.setRegisterA(accuValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::XOR_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+#pragma endregion

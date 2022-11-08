@@ -686,53 +686,6 @@ TEST_F(CpuInstructionTest, InstructionAndBetweenRegisterAndMemory)
     testAndOperationWithMemory(standardInstructions::AND_HLm, 0x01, cpu.h, cpu.l, 0x01, 0x01);
     testAndOperationWithMemory(standardInstructions::AND_HLm, 0x10, cpu.h, cpu.l, 0x10, 0x10);
 }
-
-TEST_F(CpuInstructionTest, InstructionXorBetweenRegisterAndAccumulator)
-{
-    testXorOperationWithRegister(standardInstructions::XOR_B, cpu.b);
-    testXorOperationWithRegister(standardInstructions::XOR_C, cpu.c);
-    testXorOperationWithRegister(standardInstructions::XOR_D, cpu.d);
-    testXorOperationWithRegister(standardInstructions::XOR_E, cpu.e);
-    testXorOperationWithRegister(standardInstructions::XOR_H, cpu.h);
-    testXorOperationWithRegister(standardInstructions::XOR_L, cpu.l);
-
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x00, cpu.getRegisterA(), 0x00, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x0F, cpu.getRegisterA(), 0x0F, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0xF0, cpu.getRegisterA(), 0xF0, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x01, cpu.getRegisterA(), 0x01, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0x10, cpu.getRegisterA(), 0x10, 0x00);
-    testXorOperationWithRegister(standardInstructions::XOR_A, 0xFF, cpu.getRegisterA(), 0xFF, 0x00);
-}
-
-TEST_F(CpuInstructionTest, InstructionXorBetweenRegisterAndImmediateValue)
-{
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x00, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x0F, 0x00, 0x0F);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x0F, 0x0F);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x0F, 0x0F, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0xF0, 0xF0, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x01, 0x01, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x10, 0x10, 0x00);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x01, 0x00, 0x01);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0x00, 0x01, 0x01);
-    testXorOperationWithImmediateValue(standardInstructions::XOR_n, 0xFF, 0xFF, 0x00);
-}
-
-TEST_F(CpuInstructionTest, InstructionXorBetweenRegisterAndMemory)
-{
-    cpu.h = 0x12;
-    cpu.l = 0x23;
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x00, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x0F, cpu.h, cpu.l, 0x00, 0x0F);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x0F, 0x0F);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x0F, cpu.h, cpu.l, 0x0F, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0xF0, cpu.h, cpu.l, 0xF0, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x01, cpu.h, cpu.l, 0x01, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x10, cpu.h, cpu.l, 0x10, 0x00);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x01, cpu.h, cpu.l, 0x00, 0x01);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0x00, cpu.h, cpu.l, 0x01, 0x01);
-    testXorOperationWithMemory(standardInstructions::XOR_HLm, 0xFF, cpu.h, cpu.l, 0xFF, 0x00);
-}
 */
 
 TEST_F(CpuTest, GetSetStackPointerShouldChangeValue)
