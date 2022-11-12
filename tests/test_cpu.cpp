@@ -246,72 +246,6 @@ class CpuInstructionTest : public ::testing::Test
 	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x05, 0xFA, false, false, false);
 	    testSub8BitsRegisterTo8BitsRegister(instruction, reg, 0xFF, otherReg, 0x00, 0xFE, true, false, false);
 	}
-
-	void testAndOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, byte expectedResult)
-	{
-	    testOp8BitsRegisterTo8BitsRegister(instruction, cpu.getRegisterA(), startValue, reg, value, expectedResult,
-	                                       true, true, false, false);
-	}
-
-	void testAndOperationWithRegister(byte instruction, byte& reg)
-	{
-	    testAndOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
-	    testAndOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x00);
-	    testAndOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x00);
-	    testAndOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x0F);
-	    testAndOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0xF0);
-	    testAndOperationWithRegister(instruction, 0x01, reg, 0x01, 0x01);
-	    testAndOperationWithRegister(instruction, 0x10, reg, 0x10, 0x10);
-	}
-
-
-	void testAndOperationWithImmediateValue(byte instruction, byte startValue, byte value, byte expectedResult)
-	{
-	    testOpImmediateValueToRegister(instruction, cpu.getRegisterA(), startValue, value, expectedResult, true, true,
-	                                   false, false);
-	}
-
-	void testAndOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
-	                                byte expectedResult)
-	{
-	    testOpFromMemoryToRegister(instruction, cpu.getRegisterA(), startValue, regAddrMsb, regAddrLsb, value,
-	                               expectedResult, true, true, false, false);
-	}
-
-	void testXorOperationWithRegister(byte instruction, byte startValue, byte& reg, byte value, byte expectedResult)
-	{
-	    testOp8BitsRegisterTo8BitsRegister(instruction, cpu.getRegisterA(), startValue, reg, value, expectedResult,
-	                                       true, false, false, false);
-	}
-
-
-	void testXorOperationWithRegister(byte instruction, byte& reg)
-	{
-	    testXorOperationWithRegister(instruction, 0x00, reg, 0x00, 0x00);
-	    testXorOperationWithRegister(instruction, 0x0F, reg, 0x00, 0x0F);
-	    testXorOperationWithRegister(instruction, 0x00, reg, 0x0F, 0x0F);
-	    testXorOperationWithRegister(instruction, 0x0F, reg, 0x0F, 0x00);
-	    testXorOperationWithRegister(instruction, 0xF0, reg, 0xF0, 0x00);
-	    testXorOperationWithRegister(instruction, 0x01, reg, 0x01, 0x00);
-	    testXorOperationWithRegister(instruction, 0x10, reg, 0x10, 0x00);
-	    testXorOperationWithRegister(instruction, 0x01, reg, 0x00, 0x01);
-	    testXorOperationWithRegister(instruction, 0x00, reg, 0x01, 0x01);
-	    testXorOperationWithRegister(instruction, 0xFF, reg, 0xFF, 0x00);
-	}
-
-
-	void testXorOperationWithImmediateValue(byte instruction, byte startValue, byte value, byte expectedResult)
-	{
-	    testOpImmediateValueToRegister(instruction, cpu.getRegisterA(), startValue, value, expectedResult, true, false,
-	                                   false, false);
-	}
-
-	void testXorOperationWithMemory(byte instruction, byte startValue, byte regAddrMsb, byte regAddrLsb, byte value,
-	                                byte expectedResult)
-	{
-	    testOpFromMemoryToRegister(instruction, cpu.getRegisterA(), startValue, regAddrMsb, regAddrLsb, value,
-	                               expectedResult, true, false, false, false);
-	}
 	 */
 };
 
@@ -645,46 +579,6 @@ TEST_F(CpuInstructionTest, InstructionSub8BitsRegisterAndCarryToAnother)
                                         0x10, 0x00, false, false, false);
     testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.getRegisterA(), 0x10, cpu.getRegisterA(),
                                         0x10, 0xFF, true, true, true);
-}
-
-TEST_F(CpuInstructionTest, InstructionAndBetweenRegisterAndAccumulator)
-{
-    testAndOperationWithRegister(standardInstructions::AND_B, cpu.b);
-    testAndOperationWithRegister(standardInstructions::AND_C, cpu.c);
-    testAndOperationWithRegister(standardInstructions::AND_D, cpu.d);
-    testAndOperationWithRegister(standardInstructions::AND_E, cpu.e);
-    testAndOperationWithRegister(standardInstructions::AND_H, cpu.h);
-    testAndOperationWithRegister(standardInstructions::AND_L, cpu.l);
-
-    testAndOperationWithRegister(standardInstructions::AND_A, 0x00, cpu.getRegisterA(), 0x00, 0x00);
-    testAndOperationWithRegister(standardInstructions::AND_A, 0x0F, cpu.getRegisterA(), 0x0F, 0x0F);
-    testAndOperationWithRegister(standardInstructions::AND_A, 0xF0, cpu.getRegisterA(), 0xF0, 0xF0);
-    testAndOperationWithRegister(standardInstructions::AND_A, 0x01, cpu.getRegisterA(), 0x01, 0x01);
-    testAndOperationWithRegister(standardInstructions::AND_A, 0x10, cpu.getRegisterA(), 0x10, 0x10);
-}
-
-TEST_F(CpuInstructionTest, InstructionAndBetweenRegisterAndImmediateValue)
-{
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0x00, 0x00, 0x00);
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0x0F, 0x00, 0x00);
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0x00, 0x0F, 0x00);
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0x0F, 0x0F, 0x0F);
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0xF0, 0xF0, 0xF0);
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0x01, 0x01, 0x01);
-    testAndOperationWithImmediateValue(standardInstructions::AND_n, 0x10, 0x10, 0x10);
-}
-
-TEST_F(CpuInstructionTest, InstructionAndBetweenRegisterAndMemory)
-{
-    cpu.h = 0x12;
-    cpu.l = 0x23;
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0x00, cpu.h, cpu.l, 0x00, 0x00);
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0x0F, cpu.h, cpu.l, 0x00, 0x00);
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0x00, cpu.h, cpu.l, 0x0F, 0x00);
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0x0F, cpu.h, cpu.l, 0x0F, 0x0F);
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0xF0, cpu.h, cpu.l, 0xF0, 0xF0);
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0x01, cpu.h, cpu.l, 0x01, 0x01);
-    testAndOperationWithMemory(standardInstructions::AND_HLm, 0x10, cpu.h, cpu.l, 0x10, 0x10);
 }
 */
 
