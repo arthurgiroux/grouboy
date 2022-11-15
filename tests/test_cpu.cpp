@@ -338,35 +338,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 
 /*
 
-TEST_F(CpuInstructionTest, InstructionAddTwo8BitsRegisterToTwo8BitsRegister)
-{
-    std::vector<uint16_t> startValues = {0x0000, 0x00FF, 0xFFFF, 0x0FFF, 0xF000};
-    std::vector<uint16_t> addValues = {0x0012, 0x0012, 0x0050, 0x0012, 0xF000};
-    std::vector<int> expectedFlags = {0, 0, CPU::CARRY | CPU::HALF_CARRY, CPU::HALF_CARRY, CPU::CARRY};
-    addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_BC, cpu.h, cpu.l, cpu.b, cpu.c, startValues,
-                                          addValues, expectedFlags);
-    addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_DE, cpu.h, cpu.l, cpu.d, cpu.e, startValues,
-                                          addValues, expectedFlags);
-}
-
-TEST_F(CpuInstructionTest, InstructionAdd16BitsRegisterToTwo8BitsRegister)
-{
-    std::vector<uint16_t> startValues = {0x0000, 0x00FF, 0xFFFF, 0x0FFF, 0xF000};
-    std::vector<uint16_t> addValues = {0x0012, 0x0012, 0x0050, 0x0012, 0xF000};
-    std::vector<int> expectedFlags = {0, 0, CPU::CARRY | CPU::HALF_CARRY, CPU::HALF_CARRY, CPU::CARRY};
-    add16BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_SP, cpu.h, cpu.l, cpu.sp, startValues, addValues,
-                                        expectedFlags);
-}
-
-TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterToSameRegisters)
-{
-    std::vector<uint16_t> startValues = {0x0012, 0x00FF, 0x0FFF, 0xF000};
-    std::vector<uint16_t> addValues = {0x0012, 0x00FF, 0x0FFF, 0xF000};
-    std::vector<int> expectedFlags = {0, 0, CPU::HALF_CARRY, CPU::CARRY};
-    addTwo8BitsRegisterToTwo8BitsRegister(standardInstructions::ADD_HL_HL, cpu.h, cpu.l, cpu.h, cpu.l, startValues,
-                                          addValues, expectedFlags);
-}
-
 TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterTogether)
 {
     testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_B, cpu.getRegisterA(), cpu.b);

@@ -39,8 +39,82 @@ class CpuInstructions16BitsArithmeticLogicalTest : public ::testing::Test
 		ASSERT_EQ(cpu.getProgramCounter(), 1);
 	}
 
+	void setExpectedTicks(int ticks)
+	{
+		expectedTicks = ticks;
+	}
+
+	void setExpectedFlags(int flags)
+	{
+		expectedFlags = flags;
+	}
+
+	void assertStandardInstructionWasExecutedCorrectly(byte instruction)
+	{
+		mmu.write(cpu.getProgramCounter(), instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, expectedTicks);
+		ASSERT_EQ(cpu.getFlag(), expectedFlags);
+	}
+
+	void assertExtendedInstructionWasExecutedCorrectly(byte instruction)
+	{
+		mmu.write(cpu.getProgramCounter(), standardInstructions::EXT_OPS);
+		mmu.write(cpu.getProgramCounter() + 1, instruction);
+		int ticks = cpu.fetchDecodeAndExecute();
+		ASSERT_EQ(ticks, expectedTicks);
+		ASSERT_EQ(cpu.getFlag(), expectedFlags);
+	}
+
+	void assertAddBCToHLGivesExpectedResult(int startValue, int addValue, int expectedValue)
+	{
+		cpu.setRegisterH(getMsbFromWord(startValue));
+		cpu.setRegisterL(getLsbFromWord(startValue));
+		cpu.setRegisterB(getMsbFromWord(addValue));
+		cpu.setRegisterC(getLsbFromWord(addValue));
+		setExpectedTicks(2);
+		assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADD_HL_BC);
+		ASSERT_EQ(cpu.getRegisterH(), getMsbFromWord(expectedValue));
+		ASSERT_EQ(cpu.getRegisterL(), getLsbFromWord(expectedValue));
+	}
+
+	void assertAddDEToHLGivesExpectedResult(int startValue, int addValue, int expectedValue)
+	{
+		cpu.setRegisterH(getMsbFromWord(startValue));
+		cpu.setRegisterL(getLsbFromWord(startValue));
+		cpu.setRegisterD(getMsbFromWord(addValue));
+		cpu.setRegisterE(getLsbFromWord(addValue));
+		setExpectedTicks(2);
+		assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADD_HL_DE);
+		ASSERT_EQ(cpu.getRegisterH(), getMsbFromWord(expectedValue));
+		ASSERT_EQ(cpu.getRegisterL(), getLsbFromWord(expectedValue));
+	}
+
+	void assertAddSPToHLGivesExpectedResult(int startValue, int addValue, int expectedValue)
+	{
+		cpu.setRegisterH(getMsbFromWord(startValue));
+		cpu.setRegisterL(getLsbFromWord(startValue));
+		cpu.setStackPointer(addValue);
+		setExpectedTicks(2);
+		assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADD_HL_SP);
+		ASSERT_EQ(cpu.getRegisterH(), getMsbFromWord(expectedValue));
+		ASSERT_EQ(cpu.getRegisterL(), getLsbFromWord(expectedValue));
+	}
+
+	void assertAddHLToHLGivesExpectedResult(int value, int expectedValue)
+	{
+		cpu.setRegisterH(getMsbFromWord(value));
+		cpu.setRegisterL(getLsbFromWord(value));
+		setExpectedTicks(2);
+		assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADD_HL_HL);
+		ASSERT_EQ(cpu.getRegisterH(), getMsbFromWord(expectedValue));
+		ASSERT_EQ(cpu.getRegisterL(), getLsbFromWord(expectedValue));
+	}
+
 	MMU mmu;
 	CPU cpu = CPU(mmu);
+	int expectedTicks = 1;
+	int expectedFlags = 0;
 };
 
 TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddImmediateValue0ToSPDoesntChangeResult)
@@ -364,5 +438,154 @@ TEST_F(CpuInstructions16BitsArithmeticLogicalTest, DecrementRegisterSPFromMinMsb
 	cpu.setStackPointer(startValue);
 	assertDecrementRegisterWasPerformed(standardInstructions::DEC_SP);
 	ASSERT_EQ(cpu.getStackPointer(), expectedValue);
+}
+#pragma endregion
+
+#pragma region Add Registers
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterBCToHLSetsValuesCorrectly)
+{
+	uint16_t startValue = 0x0000;
+	uint16_t addValue = 0x0012;
+	uint16_t expectedValue = 0x0012;
+	int expectedFlag = CPU::CpuFlags::NONE;
+	setExpectedFlags(expectedFlag);
+	assertAddBCToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterBCToHLSetsValuesCorrectlyAndSetsHalfCarryFlag)
+{
+	uint16_t startValue = 0x0FFF;
+	uint16_t addValue = 0x0012;
+	uint16_t expectedValue = 0x1011;
+	int expectedFlag = CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddBCToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterBCToHLSetsValuesCorrectlyAndSetsCarryFlag)
+{
+	uint16_t startValue = 0xF000;
+	uint16_t addValue = 0xF000;
+	uint16_t expectedValue = 0xE000;
+	int expectedFlag = CPU::CpuFlags::CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddBCToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterBCToHLSetsValuesCorrectlyAndSetsCarryAndHalfCarryFlag)
+{
+	uint16_t startValue = 0xFFFF;
+	uint16_t addValue = 0x0050;
+	uint16_t expectedValue = 0x004F;
+	int expectedFlag = CPU::CpuFlags::CARRY | CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddBCToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterDEToHLSetsValuesCorrectly)
+{
+	uint16_t startValue = 0x0000;
+	uint16_t addValue = 0x0012;
+	uint16_t expectedValue = 0x0012;
+	int expectedFlag = CPU::CpuFlags::NONE;
+	setExpectedFlags(expectedFlag);
+	assertAddDEToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterDEToHLSetsValuesCorrectlyAndSetsHalfCarryFlag)
+{
+	uint16_t startValue = 0x0FFF;
+	uint16_t addValue = 0x0012;
+	uint16_t expectedValue = 0x1011;
+	int expectedFlag = CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddDEToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterDEToHLSetsValuesCorrectlyAndSetsCarryFlag)
+{
+	uint16_t startValue = 0xF000;
+	uint16_t addValue = 0xF000;
+	uint16_t expectedValue = 0xE000;
+	int expectedFlag = CPU::CpuFlags::CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddDEToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterDEToHLSetsValuesCorrectlyAndSetsCarryAndHalfCarryFlag)
+{
+	uint16_t startValue = 0xFFFF;
+	uint16_t addValue = 0x0050;
+	uint16_t expectedValue = 0x004F;
+	int expectedFlag = CPU::CpuFlags::CARRY | CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddDEToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterSPToHLSetsValuesCorrectly)
+{
+	uint16_t startValue = 0x0000;
+	uint16_t addValue = 0x0012;
+	uint16_t expectedValue = 0x0012;
+	int expectedFlag = CPU::CpuFlags::NONE;
+	setExpectedFlags(expectedFlag);
+	assertAddSPToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterSPToHLSetsValuesCorrectlyAndSetsHalfCarryFlag)
+{
+	uint16_t startValue = 0x0FFF;
+	uint16_t addValue = 0x0012;
+	uint16_t expectedValue = 0x1011;
+	int expectedFlag = CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddSPToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterSPToHLSetsValuesCorrectlyAndSetsCarryFlag)
+{
+	uint16_t startValue = 0xF000;
+	uint16_t addValue = 0xF000;
+	uint16_t expectedValue = 0xE000;
+	int expectedFlag = CPU::CpuFlags::CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddSPToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterSPToHLSetsValuesCorrectlyAndSetsCarryAndHalfCarryFlag)
+{
+	uint16_t startValue = 0xFFFF;
+	uint16_t addValue = 0x0050;
+	uint16_t expectedValue = 0x004F;
+	int expectedFlag = CPU::CpuFlags::CARRY | CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddSPToHLGivesExpectedResult(startValue, addValue, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterHLToHLSetsValuesCorrectly)
+{
+	uint16_t value = 0x0012;
+	uint16_t expectedValue = 0x0024;
+	int expectedFlag = CPU::CpuFlags::NONE;
+	setExpectedFlags(expectedFlag);
+	assertAddHLToHLGivesExpectedResult(value, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterHLToHLSetsValuesCorrectlyAndSetsHalfCarryFlag)
+{
+	uint16_t value = 0x0FFF;
+	uint16_t expectedValue = 0x1FFE;
+	int expectedFlag = CPU::CpuFlags::HALF_CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddHLToHLGivesExpectedResult(value, expectedValue);
+}
+
+TEST_F(CpuInstructions16BitsArithmeticLogicalTest, AddRegisterHLToHLSetsValuesCorrectlyAndSetsCarryFlag)
+{
+	uint16_t value = 0xF000;
+	uint16_t expectedValue = 0xE000;
+	int expectedFlag = CPU::CpuFlags::CARRY;
+	setExpectedFlags(expectedFlag);
+	assertAddHLToHLGivesExpectedResult(value, expectedValue);
 }
 #pragma endregion
