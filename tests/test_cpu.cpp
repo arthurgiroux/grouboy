@@ -337,60 +337,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 }
 
 /*
-
-TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterTogether)
-{
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_B, cpu.getRegisterA(), cpu.b);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_C, cpu.getRegisterA(), cpu.c);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_D, cpu.getRegisterA(), cpu.d);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_E, cpu.getRegisterA(), cpu.e);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_H, cpu.getRegisterA(), cpu.h);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_L, cpu.getRegisterA(), cpu.l);
-
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.getRegisterA(), 0x00, cpu.getRegisterA(),
-                                        0x00, 0x00, false, false, false);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.getRegisterA(), 0x0F, cpu.getRegisterA(),
-                                        0x0F, 0x1E, false, true, false);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.getRegisterA(), 0xFF, cpu.getRegisterA(),
-                                        0xFF, 0xFE, false, true, true);
-    testAdd8BitsRegisterTo8BitsRegister(standardInstructions::ADD_A_A, cpu.getRegisterA(), 0xF0, cpu.getRegisterA(),
-                                        0xF0, 0xE0, false, false, true);
-}
-
-TEST_F(CpuInstructionTest, InstructionAddValueFromMemoryToRegister)
-{
-    cpu.h = 0x12;
-    cpu.l = 0x23;
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.getRegisterA(), 0x00, cpu.h, cpu.l, 0x00,
-                                     0x00, false, false, false);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.getRegisterA(), 0x00, cpu.h, cpu.l, 0x05,
-                                     0x05, false, false, false);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.getRegisterA(), 0x0F, cpu.h, cpu.l, 0x05,
-                                     0x14, false, true, false);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.getRegisterA(), 0xFF, cpu.h, cpu.l, 0x05,
-                                     0x04, false, true, true);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.getRegisterA(), 0xFF, cpu.h, cpu.l, 0x01,
-                                     0x00, false, true, true);
-    testAddValueFromMemoryToRegister(standardInstructions::ADD_A_HLm, cpu.getRegisterA(), 0xF0, cpu.h, cpu.l, 0xF0,
-                                     0xE0, false, false, true);
-}
-
-TEST_F(CpuInstructionTest, InstructionAddImmediateValueToRegister)
-{
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.getRegisterA(), 0x00, 0x00, 0x00, false, false,
-                                    false);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.getRegisterA(), 0x00, 0x05, 0x05, false, false,
-                                    false);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.getRegisterA(), 0x0F, 0x05, 0x14, false, true,
-                                    false);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.getRegisterA(), 0xFF, 0x05, 0x04, false, true,
-                                    true);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.getRegisterA(), 0xFF, 0x01, 0x00, false, true,
-                                    true);
-    testAddImmediateValueToRegister(standardInstructions::ADD_A_n, cpu.getRegisterA(), 0xF0, 0xF0, 0xE0, false, false,
-                                    true);
-}
-
 TEST_F(CpuInstructionTest, InstructionAdd8BitsRegisterAndCarryToAnother)
 {
     testAdd8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::ADC_A_B, cpu.getRegisterA(), cpu.b);
