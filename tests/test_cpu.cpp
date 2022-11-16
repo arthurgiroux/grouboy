@@ -142,28 +142,6 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 	ASSERT_EQ(cpu.getProgramCounter(), 0x01);
 }
 
-/*
-TEST_F(CpuInstructionTest, InstructionSub8BitsRegisterAndCarryToAnother)
-{
-    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_B, cpu.getRegisterA(), cpu.b);
-    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_C, cpu.getRegisterA(), cpu.c);
-    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_D, cpu.getRegisterA(), cpu.d);
-    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_E, cpu.getRegisterA(), cpu.e);
-    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_H, cpu.getRegisterA(), cpu.h);
-    testSub8BitsRegisterAndCarryTo8BitsRegister(standardInstructions::SBC_A_L, cpu.getRegisterA(), cpu.l);
-
-    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.getRegisterA(), 0x00, cpu.getRegisterA(),
-                                        0x00, 0x00, false, false, false);
-    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.getRegisterA(), 0x00, cpu.getRegisterA(),
-                                        0x00, 0xFF, true, true, true);
-
-    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.getRegisterA(), 0x10, cpu.getRegisterA(),
-                                        0x10, 0x00, false, false, false);
-    testSub8BitsRegisterTo8BitsRegister(standardInstructions::SBC_A_A, cpu.getRegisterA(), 0x10, cpu.getRegisterA(),
-                                        0x10, 0xFF, true, true, true);
-}
-*/
-
 TEST_F(CpuTest, GetSetStackPointerShouldChangeValue)
 {
 	uint16_t value = 0xCAFE;
