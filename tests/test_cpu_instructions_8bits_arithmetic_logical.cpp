@@ -2529,3 +2529,676 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddValueInMemorytoAGivesExpect
 	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
 }
 #pragma endregion
+
+#pragma region Add With Carry Instructions
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterAtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterAtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterAtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte expectedValue = 0x05;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterAtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte expectedValue = 0x1F;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterAtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte expectedValue = 0xE1;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_A);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterBtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	cpu.setRegisterB(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterBtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterB(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterBtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterB(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterBtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterB(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterBtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterB(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_B);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterCtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	cpu.setRegisterC(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterCtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterC(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterCtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterC(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterCtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterC(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterCtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterC(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_C);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterDtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	cpu.setRegisterD(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterDtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterD(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterDtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterD(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterDtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterD(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterDtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterD(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_D);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterEtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	cpu.setRegisterE(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterEtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterE(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterEtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterE(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterEtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterE(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterEtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterE(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_E);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterHtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	cpu.setRegisterH(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterHtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterH(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterHtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterH(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterHtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterH(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterHtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterH(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_H);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterLtoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	cpu.setRegisterL(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterLtoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterL(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterLtoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterL(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterLtoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterL(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryRegisterLtoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	cpu.setRegisterL(addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(1);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_L);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryImmediateValuetoARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	mmu.write(cpu.getProgramCounter() + 1, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryImmediateValuetoAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	mmu.write(cpu.getProgramCounter() + 1, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryImmediateValuetoAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	mmu.write(cpu.getProgramCounter() + 1, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryImmediateValuetoAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	mmu.write(cpu.getProgramCounter() + 1, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryImmediateValuetoAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	mmu.write(cpu.getProgramCounter() + 1, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_n);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToARaisesZeroFlagForZeroValue)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x00;
+	int expectedFlags = CPU::CpuFlags::ZERO;
+	cpu.setRegisterA(value);
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAWhenCarryIsSetAddsPlusOne)
+{
+	byte value = 0x00;
+	byte addValue = 0x00;
+	byte expectedValue = 0x01;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAGivesExpectedResult)
+{
+	byte value = 0x02;
+	byte addValue = 0x10;
+	byte expectedValue = 0x13;
+	int expectedFlags = CPU::CpuFlags::NONE;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAGivesExpectedResultAndRaisesHalfCarry)
+{
+	byte value = 0x0F;
+	byte addValue = 0x08;
+	byte expectedValue = 0x18;
+	int expectedFlags = CPU::CpuFlags::HALF_CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+
+TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAGivesExpectedResultAndRaisesCarry)
+{
+	byte value = 0xF0;
+	byte addValue = 0xA0;
+	byte expectedValue = 0x91;
+	int expectedFlags = CPU::CpuFlags::CARRY;
+	cpu.setFlag(CPU::CpuFlags::CARRY);
+	cpu.setRegisterA(value);
+	uint16_t addr = 0x1234;
+	cpu.setRegisterH(getMsbFromWord(addr));
+	cpu.setRegisterL(getLsbFromWord(addr));
+	mmu.write(addr, addValue);
+	setExpectedFlags(expectedFlags);
+	setExpectedTicks(2);
+	assertStandardInstructionWasExecutedCorrectly(standardInstructions::ADC_A_HLm);
+	ASSERT_EQ(cpu.getRegisterA(), expectedValue);
+}
+#pragma endregion
