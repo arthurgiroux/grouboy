@@ -12,7 +12,4 @@ ColumnLimit: '120'
 IndentWidth: '4'
 NamespaceIndentation: Inner
 PointerAlignment: Left
-TabWidth: '4'
-UseTab: ForIndentation
-
 ...

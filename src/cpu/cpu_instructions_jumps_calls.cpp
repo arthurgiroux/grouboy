@@ -53,7 +53,6 @@ void CPU::jumpRelative()
     lastInstructionTicks = 3;
 }
 
-
 void CPU::returnInstruction()
 {
     // We unpop the address of the caller
@@ -82,7 +81,7 @@ void CPU::returnInstructionAfterInterrupt()
     returnInstruction();
     // TODO:
     // Revisit what to do after implementing interrups
-	interruptsEnabled = false;
+    interruptsEnabled = false;
 }
 
 void CPU::callImmediateSubroutineIfConditionSatisfied(bool condition)
@@ -93,11 +92,10 @@ void CPU::callImmediateSubroutineIfConditionSatisfied(bool condition)
     }
     else
     {
-		pc += 2;
+        pc += 2;
         lastInstructionTicks = 3;
     }
 }
-
 
 void CPU::callImmediateSubroutine()
 {
@@ -107,7 +105,8 @@ void CPU::callImmediateSubroutine()
     lastInstructionTicks = 5;
 }
 
-void CPU::callRestartRoutine(byte memoryAddr) {
+void CPU::callRestartRoutine(byte memoryAddr)
+{
     sp -= 2;
     mmu.writeWord(sp, pc);
     pc = memoryAddr;

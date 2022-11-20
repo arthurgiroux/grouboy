@@ -28,13 +28,13 @@ const std::array<byte, 256> MMU::BIOS = {
 
 MMU::MMU()
 {
-	reset();
+    reset();
 }
 
 void MMU::reset()
 {
-	memory = {};
-	std::copy(BIOS.begin(), BIOS.end(), memory.begin());
+    memory = {};
+    std::copy(BIOS.begin(), BIOS.end(), memory.begin());
 }
 
 /***********************************
@@ -48,125 +48,125 @@ void MMU::reset()
 
 byte MMU::read(const uint16_t& addr)
 {
-	if (addr >= MEMORY_SIZE_IN_BYTES)
-	{
-		throw InvalidMemoryAccessException();
-	}
+    if (addr >= MEMORY_SIZE_IN_BYTES)
+    {
+        throw InvalidMemoryAccessException();
+    }
 
-	if (addr < BIOS.size() && isBootRomActive())
-	{
-		return memory[addr];
-	}
+    if (addr < BIOS.size() && isBootRomActive())
+    {
+        return memory[addr];
+    }
 
-	else if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
-	{
-		return cartridge->getData()[addr];
-	}
+    else if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
+    {
+        return cartridge->getData()[addr];
+    }
 
-	else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
-	{
-		return getJoypadMemoryRepresentation();
-	}
+    else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
+    {
+        return getJoypadMemoryRepresentation();
+    }
 
-	return memory[addr];
+    return memory[addr];
 }
 
 byte MMU::getJoypadMemoryRepresentation()
 {
-	/**
-	 * This is the internal memory representation
-	 * of the joypad status in memory at location JOYPAD_MAP_ADDR.
-	 *
-	 * Bit 7 - Not used
-	 * Bit 6 - Not used
-	 * Bit 5 - P15 Select Action buttons    (0=Select)
-	 * Bit 4 - P14 Select Direction buttons (0=Select)
-	 * Bit 3 - P13 Input: Down  or Start    (0=Pressed) (Read Only)
-	 * Bit 2 - P12 Input: Up    or Select   (0=Pressed) (Read Only)
-	 * Bit 1 - P11 Input: Left  or B        (0=Pressed) (Read Only)
-	 * Bit 0 - P10 Input: Right or A        (0=Pressed) (Read Only)
-	 */
-	int value = memory[JOYPAD_MAP_ADDR];
-	bool isAction = !utils::isNthBitSet(value, 5);
+    /**
+     * This is the internal memory representation
+     * of the joypad status in memory at location JOYPAD_MAP_ADDR.
+     *
+     * Bit 7 - Not used
+     * Bit 6 - Not used
+     * Bit 5 - P15 Select Action buttons    (0=Select)
+     * Bit 4 - P14 Select Direction buttons (0=Select)
+     * Bit 3 - P13 Input: Down  or Start    (0=Pressed) (Read Only)
+     * Bit 2 - P12 Input: Up    or Select   (0=Pressed) (Read Only)
+     * Bit 1 - P11 Input: Left  or B        (0=Pressed) (Read Only)
+     * Bit 0 - P10 Input: Right or A        (0=Pressed) (Read Only)
+     */
+    int value = memory[JOYPAD_MAP_ADDR];
+    bool isAction = !utils::isNthBitSet(value, 5);
 
-	setNthBitIfButtonIsReleased(isAction ? InputController::Button::A : InputController::Button::RIGHT, 0, value);
-	setNthBitIfButtonIsReleased(isAction ? InputController::Button::B : InputController::Button::LEFT, 1, value);
-	setNthBitIfButtonIsReleased(isAction ? InputController::Button::SELECT : InputController::Button::UP, 2, value);
-	setNthBitIfButtonIsReleased(isAction ? InputController::Button::START : InputController::Button::DOWN, 3, value);
+    setNthBitIfButtonIsReleased(isAction ? InputController::Button::A : InputController::Button::RIGHT, 0, value);
+    setNthBitIfButtonIsReleased(isAction ? InputController::Button::B : InputController::Button::LEFT, 1, value);
+    setNthBitIfButtonIsReleased(isAction ? InputController::Button::SELECT : InputController::Button::UP, 2, value);
+    setNthBitIfButtonIsReleased(isAction ? InputController::Button::START : InputController::Button::DOWN, 3, value);
 
-	return value;
+    return value;
 }
 
 void MMU::setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value)
 {
-	utils::setNthBit(value, bitPosition, inputController->isButtonReleased(button));
+    utils::setNthBit(value, bitPosition, inputController->isButtonReleased(button));
 }
 
 uint16_t MMU::readWord(const uint16_t& addr)
 {
-	if (addr >= MEMORY_SIZE_IN_BYTES - 1)
-	{
-		throw InvalidMemoryAccessException();
-	}
+    if (addr >= MEMORY_SIZE_IN_BYTES - 1)
+    {
+        throw InvalidMemoryAccessException();
+    }
 
-	return uint16_t(read(addr + 1) << 8u) | read(addr);
+    return uint16_t(read(addr + 1) << 8u) | read(addr);
 }
 
 void MMU::write(const uint16_t& addr, const byte& value)
 {
-	if (addr >= MEMORY_SIZE_IN_BYTES)
-	{
-		throw InvalidMemoryAccessException();
-	}
+    if (addr >= MEMORY_SIZE_IN_BYTES)
+    {
+        throw InvalidMemoryAccessException();
+    }
 
-	// TODO: Check if it's normal to write to ROM section
-	if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
-	{
-		cartridge->getData()[addr] = value;
-	}
-	else
-	{
-		memory[addr] = value;
-	}
+    // TODO: Check if it's normal to write to ROM section
+    if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
+    {
+        cartridge->getData()[addr] = value;
+    }
+    else
+    {
+        memory[addr] = value;
+    }
 }
 
 void MMU::writeWord(const uint16_t& addr, const uint16_t& value)
 {
-	if (addr >= MEMORY_SIZE_IN_BYTES - 1)
-	{
-		throw InvalidMemoryAccessException();
-	}
+    if (addr >= MEMORY_SIZE_IN_BYTES - 1)
+    {
+        throw InvalidMemoryAccessException();
+    }
 
-	write(addr, value & 0x00FFu);
-	write(addr + 1, value >> 8u);
+    write(addr, value & 0x00FFu);
+    write(addr + 1, value >> 8u);
 }
 
 bool MMU::loadCartridge(const std::string& filepath)
 {
-	std::ifstream input(filepath, std::ios::binary);
-	bool ret = false;
-	if (input.good())
-	{
-		std::vector<byte> data((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-		cartridge = std::make_unique<Cartridge>(data);
-		ret = true;
-	}
+    std::ifstream input(filepath, std::ios::binary);
+    bool ret = false;
+    if (input.good())
+    {
+        std::vector<byte> data((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+        cartridge = std::make_unique<Cartridge>(data);
+        ret = true;
+    }
 
-	input.close();
-	return ret;
+    input.close();
+    return ret;
 }
 
 Cartridge* MMU::getCartridge()
 {
-	return cartridge.get();
+    return cartridge.get();
 }
 
 bool MMU::isBootRomActive()
 {
-	return read(BOOT_ROM_UNMAPPED_FLAG_ADDR) != 1;
+    return read(BOOT_ROM_UNMAPPED_FLAG_ADDR) != 1;
 }
 
 void MMU::setInputController(InputController* controller)
 {
-	inputController = controller;
+    inputController = controller;
 }
