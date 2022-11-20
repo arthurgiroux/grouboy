@@ -3,71 +3,71 @@
 
 TEST(TileTest, AllZeroTileShouldBeAllWhite)
 {
-	Tile::TileDataArray data = {};
-	Tile tile(data);
-	const std::vector<byte>& pixels = tile.getImage().getData();
+    Tile::TileDataArray data = {};
+    Tile tile(data);
+    const std::vector<byte>& pixels = tile.getImage().getData();
 
-	for (size_t i = 0; i < pixels.size(); i++)
-	{
-		ASSERT_EQ(pixels[i], Tile::COLOR_WHITE);
-	}
+    for (size_t i = 0; i < pixels.size(); i++)
+    {
+        ASSERT_EQ(pixels[i], Tile::COLOR_WHITE);
+    }
 }
 
 TEST(TileTest, FilledTileShouldBeAllBlack)
 {
-	Tile::TileDataArray data = {};
-	data.fill(0xFF);
-	Tile tile(data);
-	const std::vector<byte>& pixels = tile.getImage().getData();
+    Tile::TileDataArray data = {};
+    data.fill(0xFF);
+    Tile tile(data);
+    const std::vector<byte>& pixels = tile.getImage().getData();
 
-	for (size_t i = 0; i < pixels.size(); i++)
-	{
-		ASSERT_EQ(pixels[i], Tile::COLOR_BLACK);
-	}
+    for (size_t i = 0; i < pixels.size(); i++)
+    {
+        ASSERT_EQ(pixels[i], Tile::COLOR_BLACK);
+    }
 }
 
 TEST(TileTest, LSBTileShouldBeAllLightGray)
 {
-	Tile::TileDataArray data = {};
-	for (size_t i = 0; i < data.size(); ++i)
-	{
-		if (i % 2 == 0)
-		{
-			data[i] = 0xFF;
-		}
-		else
-		{
-			data[i] = 0;
-		}
-	}
-	Tile tile(data);
-	const std::vector<byte>& pixels = tile.getImage().getData();
+    Tile::TileDataArray data = {};
+    for (size_t i = 0; i < data.size(); ++i)
+    {
+        if (i % 2 == 0)
+        {
+            data[i] = 0xFF;
+        }
+        else
+        {
+            data[i] = 0;
+        }
+    }
+    Tile tile(data);
+    const std::vector<byte>& pixels = tile.getImage().getData();
 
-	for (size_t i = 0; i < pixels.size(); i++)
-	{
-		ASSERT_EQ(pixels[i], Tile::COLOR_LIGHT_GRAY);
-	}
+    for (size_t i = 0; i < pixels.size(); i++)
+    {
+        ASSERT_EQ(pixels[i], Tile::COLOR_LIGHT_GRAY);
+    }
 }
 
 TEST(TileTest, MSBTileShouldBeAllDarkGray)
 {
-	Tile::TileDataArray data = {};
-	for (size_t i = 0; i < data.size(); ++i)
-	{
-		if (i % 2 == 1)
-		{
-			data[i] = 0xFF;
-		}
-		else
-		{
-			data[i] = 0;
-		}
-	}
-	Tile tile(data);
-	const std::vector<byte>& pixels = tile.getImage().getData();
+    Tile::TileDataArray data = {};
+    for (size_t i = 0; i < data.size(); ++i)
+    {
+        if (i % 2 == 1)
+        {
+            data[i] = 0xFF;
+        }
+        else
+        {
+            data[i] = 0;
+        }
+    }
+    Tile tile(data);
+    const std::vector<byte>& pixels = tile.getImage().getData();
 
-	for (size_t i = 0; i < pixels.size(); i++)
-	{
-		ASSERT_EQ(pixels[i], Tile::COLOR_DARK_GRAY);
-	}
+    for (size_t i = 0; i < pixels.size(); i++)
+    {
+        ASSERT_EQ(pixels[i], Tile::COLOR_DARK_GRAY);
+    }
 }
