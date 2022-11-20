@@ -1,11 +1,11 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include "../common/types.hpp"
+#include "../common/utils.hpp"
+#include "../memory/mmu.hpp"
 #include "instructions.hpp"
 #include "interrupt_handler.hpp"
-#include "mmu.hpp"
-#include "types.hpp"
-#include "utils.hpp"
 #include <map>
 
 /**

@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_RGB_IMAGE_HPP
 #define GBEMULATOR_RGB_IMAGE_HPP
 
-#include "utils.hpp"
+#include "../common/utils.hpp"
 #include <vector>
 
 /**

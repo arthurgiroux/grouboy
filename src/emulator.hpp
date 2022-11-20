@@ -1,10 +1,10 @@
 #ifndef EMULATOR_H
 #define EMULATOR_H
 
-#include "cpu.hpp"
-#include "input_controller.hpp"
-#include "mmu.hpp"
-#include "ppu.hpp"
+#include "cpu/cpu.hpp"
+#include "cpu/input_controller.hpp"
+#include "graphics/ppu.hpp"
+#include "memory/mmu.hpp"
 
 /**
  * Emulator class that wraps up all the different components of the system.

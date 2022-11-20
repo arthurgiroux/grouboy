@@ -1,6 +1,6 @@
-#include "cpu.hpp"
-#include "instructions.hpp"
-#include "utils.hpp"
+#include "common/utils.hpp"
+#include "cpu/cpu.hpp"
+#include "cpu/instructions.hpp"
 
 #include <gtest/gtest.h>
 

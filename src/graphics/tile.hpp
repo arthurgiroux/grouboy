@@ -1,8 +1,8 @@
 #ifndef GBEMULATOR_TILE_H
 #define GBEMULATOR_TILE_H
 
+#include "../common/types.hpp"
 #include "rgb_image.hpp"
-#include "types.hpp"
 #include <array>
 
 class Tile
@@ -23,7 +23,7 @@ class Tile
 	static const int COLOR_WHITE;
 	static const int COLOR_DARK_GRAY;
 	static const int COLOR_LIGHT_GRAY;
-	
+
   private:
 	byte paletteValueToGrayscale(byte value) const;
 	void convertToPixels();

@@ -1,4 +1,4 @@
-#include "mmu.hpp"
+#include "memory/mmu.hpp"
 #include <gtest/gtest.h>
 
 TEST(MMU, ByteReadingWritingValidMemoryShouldSucceed)

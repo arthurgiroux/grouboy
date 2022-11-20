@@ -1,4 +1,4 @@
-#include "tile.hpp"
+#include "graphics/tile.hpp"
 #include <gtest/gtest.h>
 
 TEST(TileTest, AllZeroTileShouldBeAllWhite)

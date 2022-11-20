@@ -5,9 +5,9 @@
 #include <memory>
 #include <stdexcept>
 
+#include "../common/types.hpp"
+#include "../cpu/input_controller.hpp"
 #include "cartridge.hpp"
-#include "input_controller.hpp"
-#include "types.hpp"
 
 // Forward declaration
 class InputController;
