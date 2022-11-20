@@ -17,7 +17,7 @@ void CPU::rotateRegisterLeftCircular(byte& reg)
 
 void CPU::rotateValueInMemoryLeftCircular(byte addrMsb, byte addrLsb)
 {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    word addr = createWordFromBytes(addrMsb, addrLsb);
     byte value = mmu.read(addr);
     rotateRegisterLeftCircular(value);
     mmu.write(addr, value);
@@ -40,7 +40,7 @@ void CPU::rotateRegisterRightCircular(byte& reg)
 
 void CPU::rotateValueInMemoryRightCircular(byte addrMsb, byte addrLsb)
 {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    word addr = createWordFromBytes(addrMsb, addrLsb);
     byte value = mmu.read(addr);
     rotateRegisterRightCircular(value);
     mmu.write(addr, value);
@@ -71,7 +71,7 @@ void CPU::rotateRegisterLeftExtended(byte& reg)
 
 void CPU::rotateValueInMemoryLeft(byte addrMsb, byte addrLsb)
 {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    word addr = createWordFromBytes(addrMsb, addrLsb);
     byte value = mmu.read(addr);
     rotateRegisterLeftExtended(value);
     mmu.write(addr, value);
@@ -101,7 +101,7 @@ void CPU::rotateRegisterRightExtended(byte& reg)
 
 void CPU::rotateValueInMemoryRight(byte addrMsb, byte addrLsb)
 {
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    word addr = createWordFromBytes(addrMsb, addrLsb);
     byte value = mmu.read(addr);
     rotateRegisterRightExtended(value);
     mmu.write(addr, value);
@@ -133,7 +133,7 @@ void CPU::shiftLeftArithmeticRegister(byte& reg)
     lastInstructionTicks = 2;
 }
 
-void CPU::shiftLeftArithmeticMemory(uint16_t memoryAddr)
+void CPU::shiftLeftArithmeticMemory(word memoryAddr)
 {
     byte value = mmu.read(memoryAddr);
     shiftLeftArithmeticRegister(value);
@@ -151,7 +151,7 @@ void CPU::shiftRightArithmeticRegister(byte& reg)
     lastInstructionTicks = 2;
 }
 
-void CPU::shiftRightArithmeticMemory(uint16_t memoryAddr)
+void CPU::shiftRightArithmeticMemory(word memoryAddr)
 {
     byte value = mmu.read(memoryAddr);
     shiftRightArithmeticRegister(value);
@@ -169,7 +169,7 @@ void CPU::shiftRightLogicalRegister(byte& reg)
     lastInstructionTicks = 2;
 }
 
-void CPU::shiftRightLogicalMemory(uint16_t memoryAddr)
+void CPU::shiftRightLogicalMemory(word memoryAddr)
 {
     byte value = mmu.read(memoryAddr);
     shiftRightLogicalRegister(value);
@@ -189,7 +189,7 @@ void CPU::swapNibblesInRegister(byte& reg)
     lastInstructionTicks = 2;
 }
 
-void CPU::swapNibblesInMemory(uint16_t memoryAddr)
+void CPU::swapNibblesInMemory(word memoryAddr)
 {
     byte value = mmu.read(memoryAddr);
     swapNibblesInRegister(value);
@@ -206,7 +206,7 @@ void CPU::isBitSetForValue(byte value, byte bitPosition)
     lastInstructionTicks = 2;
 }
 
-void CPU::isBitSetInMemory(uint16_t memoryAddr, byte bitPosition)
+void CPU::isBitSetInMemory(word memoryAddr, byte bitPosition)
 {
     isBitSetForValue(mmu.read(memoryAddr), bitPosition);
     lastInstructionTicks = 4;
@@ -218,7 +218,7 @@ void CPU::resetBitForValue(byte& value, byte bitPosition)
     lastInstructionTicks = 2;
 }
 
-void CPU::resetBitInMemory(uint16_t memoryAddr, byte bitPosition)
+void CPU::resetBitInMemory(word memoryAddr, byte bitPosition)
 {
     byte value = mmu.read(memoryAddr);
     resetBitForValue(value, bitPosition);
@@ -232,7 +232,7 @@ void CPU::setBitForValue(byte& value, byte bitPosition)
     lastInstructionTicks = 2;
 }
 
-void CPU::setBitInMemory(uint16_t memoryAddr, byte bitPosition)
+void CPU::setBitInMemory(word memoryAddr, byte bitPosition)
 {
     byte value = mmu.read(memoryAddr);
     setBitForValue(value, bitPosition);

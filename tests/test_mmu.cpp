@@ -19,7 +19,7 @@ TEST(MMU, WordReadingWritingValidMemoryShouldSucceed)
     for (int i = 0; i < MMU::MEMORY_SIZE_IN_BYTES - 1; i += 2)
     {
         mmu.writeWord(i, i);
-        ASSERT_EQ(static_cast<uint16_t>(i), mmu.readWord(i));
+        ASSERT_EQ(static_cast<word>(i), mmu.readWord(i));
     }
 }
 

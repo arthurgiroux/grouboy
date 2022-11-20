@@ -13,8 +13,8 @@ bool InterruptHandler::handle()
 
     if (isNthBitSet(IE, interruptFlagBit) && isNthBitSet(IF, interruptFlagBit))
     {
-        uint16_t pc = cpu->getProgramCounter();
-        uint16_t sp = cpu->getStackPointer();
+        word pc = cpu->getProgramCounter();
+        word sp = cpu->getStackPointer();
         sp -= 2;
         cpu->setStackPointer(sp);
         mmu->writeWord(sp, pc);

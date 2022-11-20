@@ -144,7 +144,7 @@ TEST_F(CpuInstructionTest, InstructionNoop)
 
 TEST_F(CpuTest, GetSetStackPointerShouldChangeValue)
 {
-    uint16_t value = 0xCAFE;
+    word value = 0xCAFE;
     ASSERT_EQ(cpu.getStackPointer(), 0x00);
     cpu.setStackPointer(value);
     ASSERT_EQ(cpu.getStackPointer(), value);
@@ -152,7 +152,7 @@ TEST_F(CpuTest, GetSetStackPointerShouldChangeValue)
 
 TEST_F(CpuTest, GetSetProgramCounterShouldChangeValue)
 {
-    uint16_t value = 0xCAFE;
+    word value = 0xCAFE;
     ASSERT_EQ(cpu.getProgramCounter(), 0x00);
     cpu.setProgramCounter(value);
     ASSERT_EQ(cpu.getProgramCounter(), value);

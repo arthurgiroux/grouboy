@@ -14,7 +14,7 @@ class InterruptHandler
     virtual bool handle();
 
   protected:
-    uint16_t interruptRoutineAddr;
+    word interruptRoutineAddr;
     int interruptFlagBit;
 
   private:

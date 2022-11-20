@@ -226,7 +226,7 @@ Tile PPU::getTileById(byte tileId, int8_t tileSetId)
         tileIdCorrected = static_cast<sbyte>(tileId);
     }
 
-    uint16_t tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileIdCorrected;
+    word tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileIdCorrected;
     Tile::TileDataArray dataArray = {};
     // TODO: Read word
     for (int i = 0; i < Tile::BYTES_PER_TILE; ++i)

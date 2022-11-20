@@ -401,7 +401,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftLeftArithmeticRegisterLSh
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftLeftArithmeticMemoryHLForZeroShouldDoNothing)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x00);
@@ -413,7 +413,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftLeftArithmeticMemoryHLFor
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftLeftArithmeticMemoryHLShouldShiftByOne)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x01);
@@ -425,7 +425,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftLeftArithmeticMemoryHLSho
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftLeftArithmeticMemoryHLShouldCarryLastBit)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0xFF);
@@ -629,7 +629,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightLogicalRegisterLShou
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightLogicalMemoryHLForZeroShouldDoNothing)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x00);
@@ -641,7 +641,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightLogicalMemoryHLForZe
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightLogicalMemoryHLShouldShiftByOne)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x82);
@@ -653,7 +653,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightLogicalMemoryHLShoul
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightLogicalMemoryHLShouldCarryFirstBit)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0xF1);
@@ -857,7 +857,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticRegisterLS
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLForZeroShouldDoNothing)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x00);
@@ -869,7 +869,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLFo
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLShouldShiftByOne)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x82);
@@ -881,7 +881,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLSh
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ShiftRightArithmeticMemoryHLShouldCarryFirstBit)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0xF1);
@@ -1008,7 +1008,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesRegisterLShouldSwap
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesInMemoryHLForZeroShouldDoNothing)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x00);
@@ -1019,7 +1019,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesInMemoryHLForZeroSh
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, SwapNibblesInMemoryHLShouldSwapCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0x56);
@@ -1816,7 +1816,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForRegLBit7WhenSetShou
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit0WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1826,7 +1826,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit0WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit0WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000001);
@@ -1836,7 +1836,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit0WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit1WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1846,7 +1846,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit1WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit1WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000010);
@@ -1856,7 +1856,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit1WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit2WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1866,7 +1866,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit2WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit2WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000100);
@@ -1876,7 +1876,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit2WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit3WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1886,7 +1886,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit3WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit3WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00001000);
@@ -1896,7 +1896,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit3WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit4WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1906,7 +1906,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit4WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit4WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00010000);
@@ -1916,7 +1916,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit4WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit5WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1926,7 +1926,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit5WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit5WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00100000);
@@ -1936,7 +1936,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit5WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit6WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1946,7 +1946,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit6WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit6WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b01000000);
@@ -1956,7 +1956,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit6WhenSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit7WhenUnsetShouldRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -1966,7 +1966,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit7WhenUns
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, IsBitSetForMemoryHLBit7WhenSetShouldNotRaiseZeroFlag)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b10000000);
@@ -2762,7 +2762,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForRegLBit7ShouldReset
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit0ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111110);
@@ -2772,7 +2772,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit0ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit0ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2782,7 +2782,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit0ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit1ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111101);
@@ -2792,7 +2792,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit1ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit1ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2802,7 +2802,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit1ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit2ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111011);
@@ -2812,7 +2812,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit2ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit2ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2822,7 +2822,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit2ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit3ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11110111);
@@ -2832,7 +2832,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit3ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit3ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2842,7 +2842,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit3ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit4ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11101111);
@@ -2852,7 +2852,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit4ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit4ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2862,7 +2862,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit4ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit5ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11011111);
@@ -2872,7 +2872,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit5ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit5ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2882,7 +2882,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit5ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit6ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b10111111);
@@ -2892,7 +2892,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit6ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit6ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -2902,7 +2902,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit6ShouldR
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit7ShouldNotChangeBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b01111111);
@@ -2912,7 +2912,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit7ShouldN
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitResetForMemoryHLBit7ShouldResetWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b11111111);
@@ -3708,7 +3708,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForRegLBit7ShouldSetBitW
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit0ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000001);
@@ -3718,7 +3718,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit0ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit0ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3728,7 +3728,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit0ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit1ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000010);
@@ -3738,7 +3738,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit1ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit1ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3748,7 +3748,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit1ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit2ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000100);
@@ -3758,7 +3758,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit2ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit2ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3768,7 +3768,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit2ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit3ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00001000);
@@ -3778,7 +3778,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit3ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit3ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3788,7 +3788,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit3ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit4ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00010000);
@@ -3798,7 +3798,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit4ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit4ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3808,7 +3808,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit4ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit5ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00100000);
@@ -3818,7 +3818,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit5ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit5ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3828,7 +3828,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit5ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit6ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b01000000);
@@ -3838,7 +3838,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit6ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit6ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -3848,7 +3848,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit6ShouldSet
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit7ShouldNotChangeBitWhenSet)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b10000000);
@@ -3858,7 +3858,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit7ShouldNot
 
 TEST_F(CpuInstructions8BitsRotationShiftsBitTest, BitSetForMemoryHLBit7ShouldSetBitWhenUnset)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, 0b00000000);
@@ -4095,7 +4095,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftCircularInMe
 {
     byte startValue = 0x00;
     byte expectedValue = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4109,7 +4109,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftCircularInMe
 {
     byte startValue = 0b00000001;
     byte expectedValue = 0b00000010;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4124,7 +4124,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
 {
     byte startValue = 0b10000000;
     byte expectedValue = 0b00000001;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4356,7 +4356,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftInMemoryForV
 {
     byte startValue = 0x00;
     byte expectedValue = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4370,7 +4370,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftInMemoryForV
 {
     byte startValue = 0b00000001;
     byte expectedValue = 0b00000010;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4384,7 +4384,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateLeftInMemoryForM
 {
     byte startValue = 0b10000000;
     byte expectedValue = 0b00000000;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4623,7 +4623,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularInM
 {
     byte startValue = 0x00;
     byte expectedValue = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4637,7 +4637,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightCircularInM
 {
     byte startValue = 0b10000000;
     byte expectedValue = 0b01000000;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4652,7 +4652,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest,
 {
     byte startValue = 0b000000001;
     byte expectedValue = 0b10000000;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4884,7 +4884,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightInMemoryFor
 {
     byte startValue = 0x00;
     byte expectedValue = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4898,7 +4898,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightInMemoryFor
 {
     byte startValue = 0b00000001;
     byte expectedValue = 0b00000000;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -4912,7 +4912,7 @@ TEST_F(CpuInstructions8BitsRotationShiftsBitTest, ExtendedRotateRightInMemoryFor
 {
     byte startValue = 0b10000000;
     byte expectedValue = 0b01000000;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));

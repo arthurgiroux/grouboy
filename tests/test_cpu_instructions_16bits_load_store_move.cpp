@@ -11,7 +11,7 @@ class CpuInstructions16BitsLoadStoreMoveTest : public ::testing::Test
   protected:
     void assertPopIntoMemoryIsPerformed(int instruction, byte msbValue, byte lsbValue)
     {
-        uint16_t startSp = 0xFFFC;
+        word startSp = 0xFFFC;
         cpu.setStackPointer(startSp);
         mmu.write(cpu.getStackPointer(), lsbValue);
         mmu.write(cpu.getStackPointer() + 1, msbValue);
@@ -24,7 +24,7 @@ class CpuInstructions16BitsLoadStoreMoveTest : public ::testing::Test
 
     void assertPushChangedStackPointerValue(int instruction, byte expectedMsbValue, byte expectedLsbValue)
     {
-        uint16_t startSp = 0x1234;
+        word startSp = 0x1234;
         cpu.setStackPointer(startSp);
         mmu.write(cpu.getProgramCounter(), instruction);
         int ticks = cpu.fetchDecodeAndExecute();
@@ -36,7 +36,7 @@ class CpuInstructions16BitsLoadStoreMoveTest : public ::testing::Test
         ASSERT_EQ(mmu.read(cpu.getStackPointer() + 1), expectedMsbValue);
     }
 
-    void assertloadSPAndOffsetInHLGivesExpectedResult(uint16_t spValue, sbyte offset, uint16_t expectedResult)
+    void assertloadSPAndOffsetInHLGivesExpectedResult(word spValue, sbyte offset, word expectedResult)
     {
         cpu.setStackPointer(spValue);
         mmu.write(cpu.getProgramCounter(), standardInstructions::LDHL_SP_d);
@@ -196,7 +196,7 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, BlarggTestSpecial05PopAF)
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInBCShouldLoadMSBInBAndLSBInC)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     byte msb = 0x12;
     byte lsb = 0x34;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_BC_nn);
@@ -211,7 +211,7 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInBCShouldLoadMSBIn
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInDEShouldLoadMSBInDAndLSBInE)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     byte msb = 0x12;
     byte lsb = 0x34;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_DE_nn);
@@ -226,7 +226,7 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInDEShouldLoadMSBIn
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInHLShouldLoadMSBInHAndLSBInL)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     byte msb = 0x12;
     byte lsb = 0x34;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_HL_nn);
@@ -241,7 +241,7 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInHLShouldLoadMSBIn
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInSPShouldLoadInSP)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_SP_nn);
     mmu.writeWord(cpu.getProgramCounter() + 1, value);
     int ticks = cpu.fetchDecodeAndExecute();
@@ -253,22 +253,22 @@ TEST_F(CpuInstructions16BitsLoadStoreMoveTest, LoadFromMemoryInSPShouldLoadInSP)
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, Load16BitsRegisterAtImmediateAddrShouldWriteValueToMemory)
 {
-    uint16_t expectedValue = 0x559A;
+    word expectedValue = 0x559A;
     cpu.setStackPointer(expectedValue);
-    uint16_t addr = 0x5C8;
+    word addr = 0x5C8;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_nnm_SP);
     mmu.writeWord(cpu.getProgramCounter() + 1, addr);
     int ticks = cpu.fetchDecodeAndExecute();
     ASSERT_EQ(ticks, 5);
     ASSERT_EQ(cpu.getFlag(), CPU::CpuFlags::NONE);
-    uint16_t value = mmu.readWord(addr);
+    word value = mmu.readWord(addr);
     ASSERT_EQ(value, expectedValue);
     ASSERT_EQ(cpu.getProgramCounter(), 3);
 }
 
 TEST_F(CpuInstructions16BitsLoadStoreMoveTest, Load16BitsImmediateValueInRegisterShouldChangeRegister)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_SP_nn);
     mmu.writeWord(cpu.getProgramCounter() + 1, value);
     int ticks = cpu.fetchDecodeAndExecute();

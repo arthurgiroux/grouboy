@@ -2,7 +2,7 @@
 
 using namespace utils;
 
-void CPU::incrementRegisterValue(uint16_t& reg)
+void CPU::incrementRegisterValue(word& reg)
 {
     reg++;
     lastInstructionTicks = 2;
@@ -11,7 +11,7 @@ void CPU::incrementRegisterValue(uint16_t& reg)
 void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    word addr = createWordFromBytes(addrMsb, addrLsb);
     byte oldvalue = mmu.read(addr);
     byte value = oldvalue + 1;
     mmu.write(addr, value);
@@ -24,7 +24,7 @@ void CPU::incrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
 void CPU::decrementValueInMemoryAtAddr(byte addrMsb, byte addrLsb)
 {
     setFlag(CpuFlags::SUBSTRACTION);
-    uint16_t addr = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    word addr = createWordFromBytes(addrMsb, addrLsb);
     byte oldvalue = mmu.read(addr);
     byte value = oldvalue - 1;
     mmu.write(addr, value);
@@ -53,7 +53,7 @@ void CPU::decrementRegisterValue(byte& reg)
     lastInstructionTicks = 1;
 }
 
-void CPU::decrementRegisterValue(uint16_t& reg)
+void CPU::decrementRegisterValue(word& reg)
 {
     reg--;
     lastInstructionTicks = 2;
@@ -125,7 +125,7 @@ void CPU::addImmediateValueTo8BitsRegister(byte& reg)
 void CPU::add8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
-    uint16_t result = reg + value;
+    word result = reg + value;
     int offset = isFlagSet(CpuFlags::CARRY) ? 1 : 0;
     result += offset;
     setCarryFlag(result > 0xFF);
@@ -143,20 +143,20 @@ void CPU::addImmediateValueAndCarryTo8BitsRegister(byte& reg)
 
 void CPU::addValueFromMemoryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
 {
-    add8BitsValueTo8BitsRegister(reg, mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    add8BitsValueTo8BitsRegister(reg, mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
 void CPU::addValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
 {
-    add8BitsValueAndCarryTo8BitsRegister(reg, mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    add8BitsValueAndCarryTo8BitsRegister(reg, mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
 void CPU::substract8BitsValueFrom8BitsRegister(byte& reg, byte value)
 {
     setFlag(CpuFlags::SUBSTRACTION);
-    uint16_t result = reg - value;
+    word result = reg - value;
     setCarryFlag(result > 0xFF);
     setHalfCarryFlag(((reg & 0xF) - (value & 0xF)) < 0);
     reg = static_cast<byte>(result);
@@ -172,14 +172,14 @@ void CPU::substractImmediateValueFrom8BitsRegister(byte& reg)
 
 void CPU::substractValueInMemoryFrom8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
 {
-    substract8BitsValueFrom8BitsRegister(reg, mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    substract8BitsValueFrom8BitsRegister(reg, mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
 void CPU::sub8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
     setFlag(CpuFlags::SUBSTRACTION);
-    uint16_t result = reg - value;
+    word result = reg - value;
     int offset = isFlagSet(CpuFlags::CARRY) ? 1 : 0;
     result -= offset;
     setCarryFlag(result > 0xFF);
@@ -197,7 +197,7 @@ void CPU::subImmediateValueAndCarryTo8BitsRegister(byte& reg)
 
 void CPU::subValueFromMemoryAndCarryTo8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
 {
-    sub8BitsValueAndCarryTo8BitsRegister(reg, mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    sub8BitsValueAndCarryTo8BitsRegister(reg, mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
@@ -213,7 +213,7 @@ void CPU::logicalAndBetweenAccumulatorAnd8BitsRegister(byte value)
 
 void CPU::logicalAndBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    logicalAndBetweenAccumulatorAnd8BitsRegister(mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
@@ -235,7 +235,7 @@ void CPU::logicalXorBetweenAccumulatorAnd8BitsRegister(byte value)
 
 void CPU::logicalXorBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    logicalXorBetweenAccumulatorAnd8BitsRegister(mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
@@ -257,7 +257,7 @@ void CPU::logicalOrBetweenAccumulatorAnd8BitsRegister(byte value)
 
 void CPU::logicalOrBetweenAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    logicalOrBetweenAccumulatorAnd8BitsRegister(mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 
@@ -278,7 +278,7 @@ void CPU::compareAccumulatorAndRegister(byte value)
 
 void CPU::compareAccumulatorAndValueInMemory(byte addrMsb, byte addrLsb)
 {
-    compareAccumulatorAndRegister(mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb)));
+    compareAccumulatorAndRegister(mmu.read(createWordFromBytes(addrMsb, addrLsb)));
     lastInstructionTicks = 2;
 }
 

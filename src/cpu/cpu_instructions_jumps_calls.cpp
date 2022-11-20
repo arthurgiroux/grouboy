@@ -4,7 +4,7 @@ using namespace utils;
 
 void CPU::jumpConditional(bool condition)
 {
-    uint16_t addr = mmu.readWord(pc);
+    word addr = mmu.readWord(pc);
     pc += 2;
     if (condition)
     {
@@ -19,14 +19,14 @@ void CPU::jumpConditional(bool condition)
 
 void CPU::jump()
 {
-    uint16_t addr = mmu.readWord(pc);
+    word addr = mmu.readWord(pc);
     pc = addr;
     lastInstructionTicks = 4;
 }
 
 void CPU::jumpToAddrIn16BitsRegister(byte addrMsb, byte addrLsb)
 {
-    pc = createAddrFromHighAndLowBytes(addrMsb, addrLsb);
+    pc = createWordFromBytes(addrMsb, addrLsb);
     lastInstructionTicks = 1;
 }
 
@@ -57,7 +57,7 @@ void CPU::returnInstruction()
 {
     // We unpop the address of the caller
     // From the stack and set the pc to the value
-    uint16_t addr = mmu.readWord(sp);
+    word addr = mmu.readWord(sp);
     sp += 2;
     pc = addr;
     lastInstructionTicks = 4;

@@ -46,7 +46,7 @@ void MMU::reset()
 
     ***********************************/
 
-byte MMU::read(const uint16_t& addr)
+byte MMU::read(const word& addr)
 {
     if (addr >= MEMORY_SIZE_IN_BYTES)
     {
@@ -102,17 +102,17 @@ void MMU::setNthBitIfButtonIsReleased(InputController::Button button, int bitPos
     utils::setNthBit(value, bitPosition, inputController->isButtonReleased(button));
 }
 
-uint16_t MMU::readWord(const uint16_t& addr)
+word MMU::readWord(const word& addr)
 {
     if (addr >= MEMORY_SIZE_IN_BYTES - 1)
     {
         throw InvalidMemoryAccessException();
     }
 
-    return uint16_t(read(addr + 1) << 8u) | read(addr);
+    return utils::createWordFromBytes(read(addr + 1), read(addr));
 }
 
-void MMU::write(const uint16_t& addr, const byte& value)
+void MMU::write(const word& addr, const byte& value)
 {
     if (addr >= MEMORY_SIZE_IN_BYTES)
     {
@@ -130,15 +130,15 @@ void MMU::write(const uint16_t& addr, const byte& value)
     }
 }
 
-void MMU::writeWord(const uint16_t& addr, const uint16_t& value)
+void MMU::writeWord(const word& addr, const word& value)
 {
     if (addr >= MEMORY_SIZE_IN_BYTES - 1)
     {
         throw InvalidMemoryAccessException();
     }
 
-    write(addr, value & 0x00FFu);
-    write(addr + 1, value >> 8u);
+    write(addr, utils::getLsbFromWord(value));
+    write(addr + 1, utils::getMsbFromWord(value));
 }
 
 bool MMU::loadCartridge(const std::string& filepath)
