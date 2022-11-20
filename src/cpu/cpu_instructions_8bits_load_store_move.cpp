@@ -4,7 +4,7 @@ using namespace utils;
 
 void CPU::loadValueToMemoryAtAddr(byte addrMsb, byte addrLsb, byte value)
 {
-    mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+    mmu.write(createWordFromBytes(addrMsb, addrLsb), value);
     lastInstructionTicks = 2;
 }
 
@@ -12,7 +12,7 @@ void CPU::load8BitsImmediateValueAtMemoryAddress(byte addrMsb, byte addrLsb)
 {
     byte value = mmu.read(pc);
     pc++;
-    mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+    mmu.write(createWordFromBytes(addrMsb, addrLsb), value);
     lastInstructionTicks = 3;
 }
 
@@ -25,35 +25,35 @@ void CPU::loadImmediateValueInRegister(byte& reg)
 
 void CPU::loadValueToMemoryAndIncrementAddr(byte& addrMsb, byte& addrLsb, byte value)
 {
-    mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+    mmu.write(createWordFromBytes(addrMsb, addrLsb), value);
     increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
     lastInstructionTicks = 2;
 }
 
 void CPU::loadValueFromMemoryAndIncrementAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
-    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+    reg = mmu.read(createWordFromBytes(addrMsb, addrLsb));
     increment16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
     lastInstructionTicks = 2;
 }
 
 void CPU::loadValueFromMemoryAndDecreaseAddr(byte& reg, byte& addrMsb, byte& addrLsb)
 {
-    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+    reg = mmu.read(createWordFromBytes(addrMsb, addrLsb));
     decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
     lastInstructionTicks = 2;
 }
 
 void CPU::loadValueToMemoryAndDecreaseAddr(byte& addrMsb, byte& addrLsb, byte value)
 {
-    mmu.write(createAddrFromHighAndLowBytes(addrMsb, addrLsb), value);
+    mmu.write(createWordFromBytes(addrMsb, addrLsb), value);
     decrement16BitsValueStoredIn8BitsValues(addrMsb, addrLsb);
     lastInstructionTicks = 2;
 }
 
 void CPU::loadValueFromMemoryInto8BitsRegister(byte& reg, byte addrMsb, byte addrLsb)
 {
-    reg = mmu.read(createAddrFromHighAndLowBytes(addrMsb, addrLsb));
+    reg = mmu.read(createWordFromBytes(addrMsb, addrLsb));
     lastInstructionTicks = 2;
 }
 
@@ -73,7 +73,7 @@ void CPU::load8BitsRegisterAtImmediateAddress(byte reg)
 void CPU::add8BitsValueTo8BitsRegister(byte& reg, byte value)
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
-    uint16_t result = reg + value;
+    word result = reg + value;
     setCarryFlag(result > 0xFF);
     setHalfCarryFlag((((reg & 0xF) + (value & 0xF)) & 0x10) == 0x10);
     reg = static_cast<byte>(result);

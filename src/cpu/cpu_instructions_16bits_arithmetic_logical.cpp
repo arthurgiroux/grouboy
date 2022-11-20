@@ -6,9 +6,9 @@ void CPU::addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resu
                                                   byte valueRegLsb)
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
-    uint16_t origValue = (resultRegMsb << 8) | resultRegLsb;
+    word origValue = createWordFromBytes(resultRegMsb, resultRegLsb);
     uint32_t result = origValue;
-    uint16_t addValue = (valueRegMsb << 8) | valueRegLsb;
+    word addValue = createWordFromBytes(valueRegMsb, valueRegLsb);
     result += addValue;
     setCarryFlag(result > 0xFFFF);
     setHalfCarryFlag(((origValue & 0xFFF) + (addValue & 0xFFF)) > 0xFFF);
@@ -19,10 +19,10 @@ void CPU::addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resu
 
 void CPU::decrementRegistersValue(byte& msgRegister, byte& lsbRegister)
 {
-    uint16_t xy = (msgRegister << 8) | lsbRegister;
+    word xy = createWordFromBytes(msgRegister, lsbRegister);
     xy--;
-    msgRegister = (xy >> 8);
-    lsbRegister = (xy & 0x00FF);
+    msgRegister = getMsbFromWord(xy);
+    lsbRegister = getLsbFromWord(xy);
     lastInstructionTicks = 2;
 }
 
@@ -41,7 +41,7 @@ void CPU::addImmediateValueToStackPointer()
 {
     unsetFlag(CpuFlags::SUBSTRACTION);
     unsetFlag(CpuFlags::ZERO);
-    uint16_t initialValue = sp;
+    word initialValue = sp;
     sbyte addValue = static_cast<sbyte>(mmu.read(pc));
     sp += addValue;
     pc++;

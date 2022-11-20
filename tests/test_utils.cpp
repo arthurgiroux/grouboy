@@ -3,7 +3,7 @@
 
 using namespace utils;
 
-void assertIncrement16BitsValueStoredIn8BitsValues(uint16_t value, uint16_t expectedValue)
+void assertIncrement16BitsValueStoredIn8BitsValues(word value, word expectedValue)
 {
     byte msb = getMsbFromWord(value);
     byte lsb = getLsbFromWord(value);
@@ -12,7 +12,7 @@ void assertIncrement16BitsValueStoredIn8BitsValues(uint16_t value, uint16_t expe
     ASSERT_EQ(lsb, getLsbFromWord(expectedValue));
 }
 
-void assertDecrement16BitsValueStoredIn8BitsValues(uint16_t value, uint16_t expectedValue)
+void assertDecrement16BitsValueStoredIn8BitsValues(word value, word expectedValue)
 {
     byte msb = getMsbFromWord(value);
     byte lsb = getLsbFromWord(value);
@@ -53,13 +53,13 @@ TEST(UtilsTest, Decrement16BitsValueStoredIn8BitsValuesForValueMaxShouldGiveMaxM
 
 TEST(UtilsTest, GetMsbFromWordShouldGiveMsbValue)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     ASSERT_EQ(getMsbFromWord(value), 0x12);
 }
 
 TEST(UtilsTest, GetLsbFromWordShouldGiveLsbValue)
 {
-    uint16_t value = 0x1234;
+    word value = 0x1234;
     ASSERT_EQ(getLsbFromWord(value), 0x34);
 }
 
@@ -67,8 +67,8 @@ TEST(UtilsTest, CreateAddrFromHighAndLowBytesShouldPutBytesInCorrectPlace)
 {
     byte msb = 0x12;
     byte lsb = 0x34;
-    uint16_t value = 0x1234;
-    ASSERT_EQ(createAddrFromHighAndLowBytes(msb, lsb), value);
+    word value = 0x1234;
+    ASSERT_EQ(createWordFromBytes(msb, lsb), value);
 }
 
 TEST(UtilsTest, TestBitForValue0ShouldReturnFalseForAllBits)

@@ -200,7 +200,7 @@ class CPU
      *
      * @return the 16 bits value of the program counter.
      */
-    uint16_t getProgramCounter() const
+    word getProgramCounter() const
     {
         return pc;
     }
@@ -210,7 +210,7 @@ class CPU
      *
      * @param value The value to set.
      */
-    void setProgramCounter(uint16_t value)
+    void setProgramCounter(word value)
     {
         pc = value;
     }
@@ -222,7 +222,7 @@ class CPU
      *
      * @return the 16 bits value of the stack pointer.
      */
-    uint16_t getStackPointer() const
+    word getStackPointer() const
     {
         return sp;
     }
@@ -232,7 +232,7 @@ class CPU
      *
      * @param value The value to set.
      */
-    void setStackPointer(uint16_t value)
+    void setStackPointer(word value)
     {
         sp = value;
     }
@@ -420,7 +420,7 @@ class CPU
      * @flags_affected: Zero, Substraction, Half-carry, Carry
      * @number_of_ticks: 3
      */
-    void load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister, byte& lsbRegister, uint16_t otherReg);
+    void load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister, byte& lsbRegister, word otherReg);
 
     /**
      * Load two 8 bits register into a 16 bits register.
@@ -434,7 +434,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 2
      */
-    void loadTwo8BitsRegisterIn16BitsRegister(uint16_t& reg, byte msbValue, byte lsbValue);
+    void loadTwo8BitsRegisterIn16BitsRegister(word& reg, byte msbValue, byte lsbValue);
 
     /**
      * Load the 16 bits immediate value into the given register.
@@ -445,7 +445,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 3
      */
-    void load16BitsImmediateValueIntoRegister(uint16_t& reg);
+    void load16BitsImmediateValueIntoRegister(word& reg);
 
     /**
      * Load the 16 bits value of the given register to the immediate address.
@@ -456,7 +456,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 5
      */
-    void load16BitsRegisterAtImmediateAddress(uint16_t reg);
+    void load16BitsRegisterAtImmediateAddress(word reg);
 
     /**
      * Load the 8 bits value of the given register to the immediate address.
@@ -621,7 +621,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 2
      */
-    void incrementRegisterValue(uint16_t& reg);
+    void incrementRegisterValue(word& reg);
 
     /**
      * Increment the value in memory pointed by the given address.
@@ -690,7 +690,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 2
      */
-    void decrementRegisterValue(uint16_t& reg);
+    void decrementRegisterValue(word& reg);
 
     /**
      * Rotate circularly the value inside the given register to the
@@ -911,7 +911,7 @@ class CPU
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 4
      */
-    void shiftLeftArithmeticMemory(uint16_t memoryAddr);
+    void shiftLeftArithmeticMemory(word memoryAddr);
 
     /**
      * Shift right arithmetic of a register.
@@ -941,7 +941,7 @@ class CPU
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 4
      */
-    void shiftRightArithmeticMemory(uint16_t memoryAddr);
+    void shiftRightArithmeticMemory(word memoryAddr);
 
     /**
      * Shift right logical of a register.
@@ -969,7 +969,7 @@ class CPU
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 4
      */
-    void shiftRightLogicalMemory(uint16_t memoryAddr);
+    void shiftRightLogicalMemory(word memoryAddr);
 
     /**
      * Swap the two nibbles of a register value.
@@ -995,7 +995,7 @@ class CPU
      * @flags_affected: Zero, Carry, Half-carry, Substraction
      * @number_of_ticks: 4
      */
-    void swapNibblesInMemory(uint16_t memoryAddr);
+    void swapNibblesInMemory(word memoryAddr);
 
     /**
      * Test if the bit at "bitPosition" is set for the given value.
@@ -1028,7 +1028,7 @@ class CPU
      * @flags_affected: Zero, Half-carry, Substraction
      * @number_of_ticks: 4
      */
-    void isBitSetInMemory(uint16_t memoryAddr, byte bitPosition);
+    void isBitSetInMemory(word memoryAddr, byte bitPosition);
 
     /**
      * Reset the bit at "bitPosition" for the given value.
@@ -1059,7 +1059,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 4
      */
-    void resetBitInMemory(uint16_t memoryAddr, byte bitPosition);
+    void resetBitInMemory(word memoryAddr, byte bitPosition);
 
     /**
      * Set the bit at "bitPosition" for the given value.
@@ -1090,7 +1090,7 @@ class CPU
      * @flags_affected: N/A
      * @number_of_ticks: 4
      */
-    void setBitInMemory(uint16_t memoryAddr, byte bitPosition);
+    void setBitInMemory(word memoryAddr, byte bitPosition);
 
     /**
      * Arithmetic operation of adding the 16 bits value made from two
@@ -1699,10 +1699,10 @@ class CPU
     int lastInstructionTicks;
 
     // program counter
-    uint16_t pc;
+    word pc;
 
     // stack pointer
-    uint16_t sp;
+    word sp;
 
     // Memory management unit
     MMU& mmu;

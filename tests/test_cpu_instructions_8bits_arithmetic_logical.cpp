@@ -301,7 +301,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementInMemoryFrom0ShouldGi
 {
     byte startValue = 0x00;
     byte expected = 0x01;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -314,7 +314,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementInMemoryFromMaxShould
 {
     byte startValue = 0xFF;
     byte expected = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -327,7 +327,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, IncrementInMemoryFromMidShould
 {
     byte startValue = 0x0F;
     byte expected = 0x10;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -594,7 +594,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DecrementInMemoryFromMaxShould
 {
     byte startValue = 0xFF;
     byte expected = 0xFE;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -607,7 +607,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DecrementInMemoryFrom1ShouldGi
 {
     byte startValue = 0x01;
     byte expected = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -620,7 +620,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DecrementInMemoryFrom0ShouldGi
 {
     byte startValue = 0x00;
     byte expected = 0xFF;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -633,7 +633,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, DecrementInMemoryFromMidShould
 {
     byte startValue = 0x10;
     byte expected = 0x0F;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, startValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -1203,7 +1203,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithAccuShou
 {
     byte accuValue = 0x00;
     byte registerValue = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, registerValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -1216,7 +1216,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithBiggerAc
 {
     byte accuValue = 0xF0;
     byte registerValue = 0x00;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, registerValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -1229,7 +1229,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithSmallerA
 {
     byte accuValue = 0x00;
     byte registerValue = 0xF0;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, registerValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -1242,7 +1242,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, CompareMemoryValueWithSmallerV
 {
     byte accuValue = 0x00;
     byte registerValue = 0x0F;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, registerValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -1479,7 +1479,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, OrBetweenAccuAndValueInMemoryG
     byte value = 0x34;
     byte expectedValue = 0x36;
     int expectedFlags = CPU::NONE;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, value);
@@ -1496,7 +1496,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, OrBetweenAccuAndValueInMemoryF
     byte value = 0x00;
     byte expectedValue = 0x00;
     int expectedFlags = CPU::ZERO;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, value);
@@ -1735,7 +1735,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndValueInMemory
     byte value = 0x34;
     byte expectedValue = 0x26;
     int expectedFlags = CPU::NONE;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, value);
@@ -1752,7 +1752,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, XorBetweenAccuAndValueInMemory
     byte value = 0x00;
     byte expectedValue = 0x00;
     int expectedFlags = CPU::ZERO;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, value);
@@ -1991,7 +1991,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AndBetweenAccuAndValueInMemory
     byte value = 0x34;
     byte expectedValue = 0x10;
     int expectedFlags = CPU::CpuFlags::HALF_CARRY;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, value);
@@ -2008,7 +2008,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AndBetweenAccuAndValueInMemory
     byte value = 0x00;
     byte expectedValue = 0x00;
     int expectedFlags = CPU::CpuFlags::ZERO | CPU::CpuFlags::HALF_CARRY;
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, value);
@@ -2468,7 +2468,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddValueInMemorytoARaisesZeroF
     byte expectedValue = 0x00;
     int expectedFlags = CPU::CpuFlags::ZERO;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -2485,7 +2485,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddValueInMemorytoAGivesExpect
     byte expectedValue = 0x05;
     int expectedFlags = CPU::CpuFlags::NONE;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -2502,7 +2502,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddValueInMemorytoAGivesExpect
     byte expectedValue = 0x14;
     int expectedFlags = CPU::CpuFlags::HALF_CARRY;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -2519,7 +2519,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddValueInMemorytoAGivesExpect
     byte expectedValue = 0x07;
     int expectedFlags = CPU::CpuFlags::CARRY;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -3120,7 +3120,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToARaise
     byte expectedValue = 0x00;
     int expectedFlags = CPU::CpuFlags::ZERO;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -3138,7 +3138,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAWhenC
     int expectedFlags = CPU::CpuFlags::NONE;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -3156,7 +3156,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAGives
     int expectedFlags = CPU::CpuFlags::NONE;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -3174,7 +3174,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAGives
     int expectedFlags = CPU::CpuFlags::HALF_CARRY;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -3192,7 +3192,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, AddWithCarryFromMemoryToAGives
     int expectedFlags = CPU::CpuFlags::CARRY;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(addr, addValue);
@@ -3529,7 +3529,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, SubMemoryValueFromARaisesZeroF
     byte expectedValue = 0x00;
     int expectedFlags = CPU::CpuFlags::ZERO | CPU::CpuFlags::SUBSTRACTION;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, subValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -3546,7 +3546,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, SubMemoryValueFromAGivesExpect
     byte expectedValue = 0x20;
     int expectedFlags = CPU::CpuFlags::SUBSTRACTION;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, subValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -3563,7 +3563,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, SubMemoryValueFromAGivesExpect
     byte expectedValue = 0xFB;
     int expectedFlags = CPU::CpuFlags::SUBSTRACTION | CPU::CpuFlags::HALF_CARRY | CPU::CpuFlags::CARRY;
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, subValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -3930,7 +3930,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, SubWithCarryMemoryValueFromADo
     int expectedFlags = CPU::CpuFlags::CARRY | CPU::CpuFlags::SUBSTRACTION | CPU::CpuFlags::HALF_CARRY;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, subValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -3948,7 +3948,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest, SubWithCarryMemoryValueFromAGi
     int expectedFlags = CPU::CpuFlags::SUBSTRACTION | CPU::CpuFlags::HALF_CARRY;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, subValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
@@ -3967,7 +3967,7 @@ TEST_F(CpuInstructions8BitsArithmeticLogicalTest,
     int expectedFlags = CPU::CpuFlags::SUBSTRACTION | CPU::CpuFlags::HALF_CARRY | CPU::CpuFlags::CARRY;
     cpu.setFlag(CPU::CpuFlags::CARRY);
     cpu.setRegisterA(value);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(addr, subValue);
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));

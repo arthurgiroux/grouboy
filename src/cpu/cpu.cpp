@@ -1337,7 +1337,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SLA_HLm:
-        shiftLeftArithmeticMemory(createAddrFromHighAndLowBytes(h, l));
+        shiftLeftArithmeticMemory(createWordFromBytes(h, l));
         break;
 
     case SLA_A:
@@ -1369,7 +1369,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SRA_HLm:
-        shiftRightArithmeticMemory(createAddrFromHighAndLowBytes(h, l));
+        shiftRightArithmeticMemory(createWordFromBytes(h, l));
         break;
 
     case SRA_A:
@@ -1405,7 +1405,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SWAP_HLm:
-        swapNibblesInMemory(createAddrFromHighAndLowBytes(h, l));
+        swapNibblesInMemory(createWordFromBytes(h, l));
         break;
 
     case SWAP_A:
@@ -1437,7 +1437,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SRL_HLm:
-        shiftRightLogicalMemory(createAddrFromHighAndLowBytes(h, l));
+        shiftRightLogicalMemory(createWordFromBytes(h, l));
         break;
 
     case SRL_A:
@@ -1473,7 +1473,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_0_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 0);
+        isBitSetInMemory(createWordFromBytes(h, l), 0);
         break;
 
     case BIT_0_A:
@@ -1505,7 +1505,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_1_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 1);
+        isBitSetInMemory(createWordFromBytes(h, l), 1);
         break;
 
     case BIT_1_A:
@@ -1541,7 +1541,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_2_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 2);
+        isBitSetInMemory(createWordFromBytes(h, l), 2);
         break;
 
     case BIT_2_A:
@@ -1573,7 +1573,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_3_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 3);
+        isBitSetInMemory(createWordFromBytes(h, l), 3);
         break;
 
     case BIT_3_A:
@@ -1609,7 +1609,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_4_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 4);
+        isBitSetInMemory(createWordFromBytes(h, l), 4);
         break;
 
     case BIT_4_A:
@@ -1641,7 +1641,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_5_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 5);
+        isBitSetInMemory(createWordFromBytes(h, l), 5);
         break;
 
     case BIT_5_A:
@@ -1677,7 +1677,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_6_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 6);
+        isBitSetInMemory(createWordFromBytes(h, l), 6);
         break;
 
     case BIT_6_A:
@@ -1709,7 +1709,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case BIT_7_HLm:
-        isBitSetInMemory(createAddrFromHighAndLowBytes(h, l), 7);
+        isBitSetInMemory(createWordFromBytes(h, l), 7);
         break;
 
     case BIT_7_A:
@@ -1745,7 +1745,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_0_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 0);
+        resetBitInMemory(createWordFromBytes(h, l), 0);
         break;
 
     case RES_0_A:
@@ -1777,7 +1777,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_1_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 1);
+        resetBitInMemory(createWordFromBytes(h, l), 1);
         break;
 
     case RES_1_A:
@@ -1813,7 +1813,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_2_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 2);
+        resetBitInMemory(createWordFromBytes(h, l), 2);
         break;
 
     case RES_2_A:
@@ -1845,7 +1845,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_3_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 3);
+        resetBitInMemory(createWordFromBytes(h, l), 3);
         break;
 
     case RES_3_A:
@@ -1881,7 +1881,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_4_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 4);
+        resetBitInMemory(createWordFromBytes(h, l), 4);
         break;
 
     case RES_4_A:
@@ -1913,7 +1913,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_5_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 5);
+        resetBitInMemory(createWordFromBytes(h, l), 5);
         break;
 
     case RES_5_A:
@@ -1949,7 +1949,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_6_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 6);
+        resetBitInMemory(createWordFromBytes(h, l), 6);
         break;
 
     case RES_6_A:
@@ -1981,7 +1981,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case RES_7_HLm:
-        resetBitInMemory(createAddrFromHighAndLowBytes(h, l), 7);
+        resetBitInMemory(createWordFromBytes(h, l), 7);
         break;
 
     case RES_7_A:
@@ -2017,7 +2017,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_0_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 0);
+        setBitInMemory(createWordFromBytes(h, l), 0);
         break;
 
     case SET_0_A:
@@ -2049,7 +2049,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_1_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 1);
+        setBitInMemory(createWordFromBytes(h, l), 1);
         break;
 
     case SET_1_A:
@@ -2085,7 +2085,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_2_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 2);
+        setBitInMemory(createWordFromBytes(h, l), 2);
         break;
 
     case SET_2_A:
@@ -2117,7 +2117,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_3_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 3);
+        setBitInMemory(createWordFromBytes(h, l), 3);
         break;
 
     case SET_3_A:
@@ -2153,7 +2153,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_4_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 4);
+        setBitInMemory(createWordFromBytes(h, l), 4);
         break;
 
     case SET_4_A:
@@ -2185,7 +2185,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_5_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 5);
+        setBitInMemory(createWordFromBytes(h, l), 5);
         break;
 
     case SET_5_A:
@@ -2221,7 +2221,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_6_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 6);
+        setBitInMemory(createWordFromBytes(h, l), 6);
         break;
 
     case SET_6_A:
@@ -2253,7 +2253,7 @@ void CPU::executeExtendedInstruction(const byte& opCode)
         break;
 
     case SET_7_HLm:
-        setBitInMemory(createAddrFromHighAndLowBytes(h, l), 7);
+        setBitInMemory(createWordFromBytes(h, l), 7);
         break;
 
     case SET_7_A:

@@ -28,10 +28,10 @@ class CpuInstructions8BitsLoadStoreMoveTest : public ::testing::Test
         ASSERT_EQ(cpu.getProgramCounter(), 2);
     }
 
-    void assertLoadValueToMemoryAndIncreaseAddr(byte loadValue, uint16_t expectedAddr)
+    void assertLoadValueToMemoryAndIncreaseAddr(byte loadValue, word expectedAddr)
     {
         cpu.setRegisterA(loadValue);
-        uint16_t addr = createAddrFromHighAndLowBytes(cpu.getRegisterH(), cpu.getRegisterL());
+        word addr = createWordFromBytes(cpu.getRegisterH(), cpu.getRegisterL());
         mmu.write(cpu.getProgramCounter(), standardInstructions::LD_HLm_I_A);
         int ticks = cpu.fetchDecodeAndExecute();
         ASSERT_EQ(ticks, 2);
@@ -42,10 +42,10 @@ class CpuInstructions8BitsLoadStoreMoveTest : public ::testing::Test
         ASSERT_EQ(getLsbFromWord(expectedAddr), cpu.getRegisterL());
     }
 
-    void assertLoadValueToMemoryAndDecreaseAddr(byte loadValue, uint16_t expectedAddr)
+    void assertLoadValueToMemoryAndDecreaseAddr(byte loadValue, word expectedAddr)
     {
         cpu.setRegisterA(loadValue);
-        uint16_t addr = createAddrFromHighAndLowBytes(cpu.getRegisterH(), cpu.getRegisterL());
+        word addr = createWordFromBytes(cpu.getRegisterH(), cpu.getRegisterL());
         mmu.write(cpu.getProgramCounter(), standardInstructions::LD_HLm_D_A);
         int ticks = cpu.fetchDecodeAndExecute();
         ASSERT_EQ(ticks, 2);
@@ -87,7 +87,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_BCm_A_ShouldLoadValueInMemory
     cpu.setRegisterB(msb);
     cpu.setRegisterC(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_BCm_A);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_DEm_A_ShouldLoadValueInMemory)
@@ -99,7 +99,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_DEm_A_ShouldLoadValueInMemory
     cpu.setRegisterD(msb);
     cpu.setRegisterE(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_DEm_A);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_B_ShouldLoadValueInMemory)
@@ -111,7 +111,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_B_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_B);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_C_ShouldLoadValueInMemory)
@@ -123,7 +123,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_C_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_C);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_D_ShouldLoadValueInMemory)
@@ -135,7 +135,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_D_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_D);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_E_ShouldLoadValueInMemory)
@@ -147,7 +147,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_E_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_E);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_H_ShouldLoadValueInMemory)
@@ -157,7 +157,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_H_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_H);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), msb);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), msb);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_L_ShouldLoadValueInMemory)
@@ -167,7 +167,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_L_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_L);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), lsb);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), lsb);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_A_ShouldLoadValueInMemory)
@@ -179,7 +179,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load_HLm_A_ShouldLoadValueInMemory
     cpu.setRegisterH(msb);
     cpu.setRegisterL(lsb);
     assertLoadInMemoryWasPerformed(standardInstructions::LD_HLm_A);
-    ASSERT_EQ(mmu.read(createAddrFromHighAndLowBytes(msb, lsb)), value);
+    ASSERT_EQ(mmu.read(createWordFromBytes(msb, lsb)), value);
 }
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadImmediateValueInRegAShouldLoadValue)
@@ -282,7 +282,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueAndDecreaseForZeroValueSh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterAShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterH(getMsbFromWord(addr));
@@ -295,7 +295,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterASh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterBShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterH(getMsbFromWord(addr));
@@ -308,7 +308,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterBSh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterCShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterH(getMsbFromWord(addr));
@@ -321,7 +321,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterCSh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterDShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterH(getMsbFromWord(addr));
@@ -334,7 +334,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterDSh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterHShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterH(getMsbFromWord(addr));
@@ -347,7 +347,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterHSh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterLShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterH(getMsbFromWord(addr));
@@ -360,7 +360,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryHLInRegisterLSh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryBCInRegisterAShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterB(getMsbFromWord(addr));
@@ -373,7 +373,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryBCInRegisterASh
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadValueFromMemoryDEInRegisterAShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x62;
 
     cpu.setRegisterD(getMsbFromWord(addr));
@@ -808,13 +808,13 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load8BitsRegisterAtImmediateAddrSh
 {
     byte expectedValue = 0x9A;
     cpu.setRegisterA(expectedValue);
-    uint16_t addr = 0x5C8;
+    word addr = 0x5C8;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_nnm_A);
     mmu.writeWord(cpu.getProgramCounter() + 1, addr);
     int ticks = cpu.fetchDecodeAndExecute();
     ASSERT_EQ(ticks, 4);
     ASSERT_EQ(cpu.getFlag(), 0x00);
-    uint16_t value = mmu.readWord(addr);
+    word value = mmu.readWord(addr);
     ASSERT_EQ(value, expectedValue);
     ASSERT_EQ(cpu.getProgramCounter(), 3);
 }
@@ -822,7 +822,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load8BitsRegisterAtImmediateAddrSh
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load8BitsImmediateValueInMemoryShouldLoadValue)
 {
     byte value = 0x12;
-    uint16_t addr = 0x3456;
+    word addr = 0x3456;
     cpu.setRegisterH(getMsbFromWord(addr));
     cpu.setRegisterL(getLsbFromWord(addr));
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_HLm_n);
@@ -838,7 +838,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadAccummulatorInHighMemoryShould
 {
     byte addrOffset = 0x12;
     byte value = 0x42;
-    uint16_t expectedAddr = 0xFF12;
+    word expectedAddr = 0xFF12;
     cpu.setRegisterA(value);
     mmu.write(cpu.getProgramCounter(), standardInstructions::LDH_nm_A);
     mmu.writeWord(cpu.getProgramCounter() + 1, addrOffset);
@@ -852,7 +852,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadAccummulatorInHighMemoryShould
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadHighMemoryInAccumulatorShouldLoadCorrectly)
 {
     byte addrOffset = 0x12;
-    uint16_t expectedAddr = 0xFF12;
+    word expectedAddr = 0xFF12;
     byte value = 0x42;
     mmu.write(expectedAddr, value);
     mmu.write(cpu.getProgramCounter(), standardInstructions::LDH_A_nm);
@@ -868,7 +868,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadAccummulatorInHighMemoryPointe
 {
     byte addrOffset = 0x12;
     byte value = 0x42;
-    uint16_t expectedAddr = 0xFF12;
+    word expectedAddr = 0xFF12;
     cpu.setRegisterA(value);
     cpu.setRegisterC(addrOffset);
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_Cm_A);
@@ -882,7 +882,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadAccummulatorInHighMemoryPointe
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadHighMemoryPointedByCInAccumulatorShouldLoadCorrectly)
 {
     byte addrOffset = 0x12;
-    uint16_t expectedAddr = 0xFF12;
+    word expectedAddr = 0xFF12;
     byte value = 0x42;
     cpu.setRegisterC(addrOffset);
     mmu.write(expectedAddr, value);
@@ -896,7 +896,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadHighMemoryPointedByCInAccumula
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadRegisterAAtImmediate16BitsAddressShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x42;
     cpu.setRegisterA(value);
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_nnm_A);
@@ -910,7 +910,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadRegisterAAtImmediate16BitsAddr
 
 TEST_F(CpuInstructions8BitsLoadStoreMoveTest, LoadImmediate16BitsAddressInRegisterAShouldLoadCorrectly)
 {
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     byte value = 0x42;
     mmu.write(addr, value);
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_A_nnm);

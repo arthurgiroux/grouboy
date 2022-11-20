@@ -13,7 +13,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
     {
         auto flag = cpu.getFlag();
         cpu.setProgramCounter(0x00);
-        uint16_t addr = 0x1234;
+        word addr = 0x1234;
         mmu.write(cpu.getProgramCounter(), instruction);
         mmu.writeWord(cpu.getProgramCounter() + 1, addr);
         int ticks = cpu.fetchDecodeAndExecute();
@@ -32,7 +32,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
 
     void assertJumpRelativeJumpedToCorrectOffset(int8_t offset)
     {
-        uint16_t startAddr = 0x1234;
+        word startAddr = 0x1234;
         cpu.setProgramCounter(startAddr);
         mmu.write(cpu.getProgramCounter(), standardInstructions::JR_n);
         mmu.write(cpu.getProgramCounter() + 1, offset);
@@ -45,7 +45,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
     void assertInstructionPerformedJumpAtOffset(byte instruction, int8_t offset, bool expected)
     {
         auto flag = cpu.getFlag();
-        uint16_t startAddr = 0x1234;
+        word startAddr = 0x1234;
         cpu.setProgramCounter(startAddr);
         mmu.write(cpu.getProgramCounter(), instruction);
         mmu.writeWord(cpu.getProgramCounter() + 1, offset);
@@ -75,8 +75,8 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
          *                return
          *
          */
-        uint16_t startPc = 0x1234;
-        uint16_t routineAddr = 0x4321;
+        word startPc = 0x1234;
+        word routineAddr = 0x4321;
         cpu.setProgramCounter(startPc);
         mmu.write(cpu.getProgramCounter(), instruction);
         mmu.writeWord(cpu.getProgramCounter() + 1, routineAddr);
@@ -91,8 +91,8 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
 
     void assertSubroutineIsNotCalled(int instruction)
     {
-        uint16_t startPc = 0x1234;
-        uint16_t routineAddr = 0x4321;
+        word startPc = 0x1234;
+        word routineAddr = 0x4321;
         cpu.setProgramCounter(startPc);
         mmu.write(cpu.getProgramCounter(), instruction);
         mmu.writeWord(cpu.getProgramCounter() + 1, routineAddr);
@@ -102,10 +102,10 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
         ASSERT_EQ(cpu.getProgramCounter(), startPc + 3);
     }
 
-    void assertRestartRoutineIsCalled(int instruction, uint16_t expectedAddr)
+    void assertRestartRoutineIsCalled(int instruction, word expectedAddr)
     {
-        uint16_t startPc = 0x1234;
-        uint16_t startSp = 0x4321;
+        word startPc = 0x1234;
+        word startSp = 0x4321;
         cpu.setProgramCounter(startPc);
         cpu.setStackPointer(startSp);
         mmu.write(cpu.getProgramCounter(), instruction);
@@ -118,7 +118,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
 
     void testReturnConditional(int instruction, bool expectReturn)
     {
-        uint16_t callerAddr = 0x1234;
+        word callerAddr = 0x1234;
         mmu.writeWord(cpu.getProgramCounter(), callerAddr);
         cpu.setProgramCounter(cpu.getProgramCounter() + 2);
         mmu.write(cpu.getProgramCounter(), instruction);
@@ -142,7 +142,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
 TEST_F(CpuInstructionsJumpsCallsTest, JumpShouldGoToImmediateMemoryAddr)
 {
     cpu.setProgramCounter(0x00);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(cpu.getProgramCounter(), standardInstructions::JP_nn);
     mmu.writeWord(cpu.getProgramCounter() + 1, addr);
     int ticks = cpu.fetchDecodeAndExecute();
@@ -200,7 +200,7 @@ TEST_F(CpuInstructionsJumpsCallsTest, JumpShouldGoToHLMemoryAddr)
     cpu.setProgramCounter(0x00);
     cpu.setRegisterH(0x12);
     cpu.setRegisterL(0x34);
-    uint16_t addr = 0x1234;
+    word addr = 0x1234;
     mmu.write(cpu.getProgramCounter(), standardInstructions::JP_HLm);
     int ticks = cpu.fetchDecodeAndExecute();
     ASSERT_EQ(ticks, 1);
@@ -458,7 +458,7 @@ TEST_F(CpuInstructionsJumpsCallsTest, CallRestartRoutine0x38ShouldGoToAddr0x38)
 
 TEST_F(CpuInstructionsJumpsCallsTest, InstructionReturn)
 {
-    uint16_t callerAddr = 0x1234;
+    word callerAddr = 0x1234;
     mmu.writeWord(cpu.getProgramCounter(), callerAddr);
     cpu.setProgramCounter(cpu.getProgramCounter() + 2);
     mmu.write(cpu.getProgramCounter(), standardInstructions::RET);
@@ -523,7 +523,7 @@ TEST_F(CpuInstructionsJumpsCallsTest, InstructionReturnConditionalNotZeroFalse)
 TEST_F(CpuInstructionsJumpsCallsTest, InstructionReturnAfterInterrupt)
 {
     cpu.enableInterrupts();
-    uint16_t callerAddr = 0x1234;
+    word callerAddr = 0x1234;
     mmu.writeWord(cpu.getProgramCounter(), callerAddr);
     cpu.setProgramCounter(cpu.getProgramCounter() + 2);
     mmu.write(cpu.getProgramCounter(), standardInstructions::RETI);

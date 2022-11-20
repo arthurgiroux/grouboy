@@ -7,13 +7,13 @@
 namespace utils
 {
 /**
- * Create a 16 bits address from an MSB and an LSB.
+ * Create a 16 bits word from an MSB and an LSB.
  *
  * @param msb   the high byte
  * @param lsb   the low byte
- * @return      a 16 bits unsigned address
+ * @return      a 16 bits unsigned value
  */
-uint16_t createAddrFromHighAndLowBytes(byte msb, byte lsb);
+word createWordFromBytes(byte msb, byte lsb);
 
 /**
  * Get the Most significant Bit of a word (16 bits value).
@@ -21,7 +21,7 @@ uint16_t createAddrFromHighAndLowBytes(byte msb, byte lsb);
  * @param value     The word to split
  * @return      The msb of the word
  */
-byte getMsbFromWord(uint16_t value);
+byte getMsbFromWord(word value);
 
 /**
  * Get the Least significant Bit of a word (16 bits value).
@@ -29,7 +29,7 @@ byte getMsbFromWord(uint16_t value);
  * @param value     The word to split
  * @return      The lsb of the word
  */
-byte getLsbFromWord(uint16_t value);
+byte getLsbFromWord(word value);
 
 /**
  * Format a string using a "printf"-style format.

@@ -3,35 +3,35 @@
 namespace utils
 {
 
-uint16_t createAddrFromHighAndLowBytes(byte msb, byte lsb)
+word createWordFromBytes(byte msb, byte lsb)
 {
     return (msb << 8u) | lsb;
 }
 
-byte getMsbFromWord(uint16_t value)
+byte getMsbFromWord(word value)
 {
     return value >> 8;
 }
 
-byte getLsbFromWord(uint16_t value)
+byte getLsbFromWord(word value)
 {
     return static_cast<byte>(value);
 }
 
 void increment16BitsValueStoredIn8BitsValues(byte& msb, byte& lsb)
 {
-    uint16_t value = (msb << 8) | lsb;
+    word value = createWordFromBytes(msb, lsb);
     value++;
-    msb = (value >> 8);
-    lsb = value & 0xFF;
+    msb = getMsbFromWord(value);
+    lsb = getLsbFromWord(value);
 }
 
 void decrement16BitsValueStoredIn8BitsValues(byte& msb, byte& lsb)
 {
-    uint16_t value = (msb << 8) | lsb;
+    word value = createWordFromBytes(msb, lsb);
     value--;
-    msb = (value >> 8);
-    lsb = value & 0xFF;
+    msb = getMsbFromWord(value);
+    lsb = getLsbFromWord(value);
 }
 
 bool isNthBitSet(int value, int bitPosition)

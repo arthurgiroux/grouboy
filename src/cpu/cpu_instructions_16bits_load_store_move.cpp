@@ -10,14 +10,14 @@ void CPU::load16BitsValueInRegisters(byte& msbRegister, byte& lsbRegister)
     lastInstructionTicks = 3;
 }
 
-void CPU::load16BitsImmediateValueIntoRegister(uint16_t& reg)
+void CPU::load16BitsImmediateValueIntoRegister(word& reg)
 {
     reg = mmu.readWord(pc);
     pc += 2;
     lastInstructionTicks = 3;
 }
 
-void CPU::load16BitsRegisterAtImmediateAddress(uint16_t reg)
+void CPU::load16BitsRegisterAtImmediateAddress(word reg)
 {
     mmu.writeWord(mmu.readWord(pc), reg);
     pc += 2;
@@ -40,7 +40,7 @@ void CPU::push16BitsOntoStackPointer(byte regMsb, byte regLsb)
     mmu.write(sp + 1, regMsb);
 }
 
-void CPU::load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister, byte& lsbRegister, uint16_t otherReg)
+void CPU::load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister, byte& lsbRegister, word otherReg)
 {
     unsetFlag(CpuFlags::ZERO);
     unsetFlag(CpuFlags::SUBSTRACTION);
@@ -54,8 +54,8 @@ void CPU::load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister
     lastInstructionTicks = 3;
 }
 
-void CPU::loadTwo8BitsRegisterIn16BitsRegister(uint16_t& reg, byte msbValue, byte lsbValue)
+void CPU::loadTwo8BitsRegisterIn16BitsRegister(word& reg, byte msbValue, byte lsbValue)
 {
-    reg = (msbValue << 8) | lsbValue;
+    reg = createWordFromBytes(msbValue, lsbValue);
     lastInstructionTicks = 2;
 }

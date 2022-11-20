@@ -27,10 +27,10 @@ class MMU
     MMU();
     ~MMU() = default;
 
-    byte read(const uint16_t& addr);
-    uint16_t readWord(const uint16_t& addr);
-    void write(const uint16_t& addr, const byte& value);
-    void writeWord(const uint16_t& addr, const uint16_t& value);
+    byte read(const word& addr);
+    word readWord(const word& addr);
+    void write(const word& addr, const byte& value);
+    void writeWord(const word& addr, const word& value);
     bool loadCartridge(const std::string& filepath);
     bool isBootRomActive();
     Cartridge* getCartridge();
