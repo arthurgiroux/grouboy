@@ -1,4 +1,4 @@
-#include "sprite.hpp"
+#include "graphics/sprite.hpp"
 #include <gtest/gtest.h>
 
 class SpriteTest : public ::testing::Test

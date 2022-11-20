@@ -1,4 +1,4 @@
-#include "ppu.hpp"
+#include "graphics/ppu.hpp"
 #include <gtest/gtest.h>
 
 class PpuTest : public ::testing::Test

@@ -1,5 +1,5 @@
-#include "GUI.hpp"
 #include "emulator.hpp"
+#include "gui/GUI.hpp"
 #include <iostream>
 
 int main(int argc, char** argv)

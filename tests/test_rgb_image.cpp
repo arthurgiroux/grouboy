@@ -1,4 +1,4 @@
-#include "rgb_image.hpp"
+#include "graphics/rgb_image.hpp"
 #include <gtest/gtest.h>
 
 TEST(RGBImage, ConstructorSetsHeightAndWidthCorrectly)

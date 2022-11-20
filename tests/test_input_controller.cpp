@@ -1,4 +1,4 @@
-#include "input_controller.hpp"
+#include "cpu/input_controller.hpp"
 #include <gtest/gtest.h>
 
 class InputControllerTest : public ::testing::Test
