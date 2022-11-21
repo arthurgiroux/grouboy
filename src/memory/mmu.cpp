@@ -48,11 +48,6 @@ void MMU::reset()
 
 byte MMU::read(const word& addr)
 {
-    if (addr >= MEMORY_SIZE_IN_BYTES)
-    {
-        throw InvalidMemoryAccessException();
-    }
-
     if (addr < BIOS.size() && isBootRomActive())
     {
         return memory[addr];
@@ -114,11 +109,6 @@ word MMU::readWord(const word& addr)
 
 void MMU::write(const word& addr, const byte& value)
 {
-    if (addr >= MEMORY_SIZE_IN_BYTES)
-    {
-        throw InvalidMemoryAccessException();
-    }
-
     // TODO: Check if it's normal to write to ROM section
     if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
     {
