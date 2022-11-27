@@ -75,7 +75,9 @@ set(SOURCE_FILES
         src/graphics/rgb_image.cpp
         src/graphics/rgb_image.hpp
         src/graphics/sprite.cpp
-        src/graphics/sprite.hpp)
+        src/graphics/sprite.hpp
+        src/serial/serial_transfer_manager.cpp
+        src/serial/serial_transfer_manager.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_link_libraries(gbemulator_core IMGUI)

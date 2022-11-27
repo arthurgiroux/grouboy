@@ -5,6 +5,7 @@
 #include "cpu/input_controller.hpp"
 #include "graphics/ppu.hpp"
 #include "memory/mmu.hpp"
+#include "serial/serial_transfer_manager.hpp"
 
 /**
  * Emulator class that wraps up all the different components of the system.
@@ -80,6 +81,7 @@ class Emulator
     MMU mmu;
     CPU cpu;
     PPU ppu;
+    SerialTransferManager serialTransferManager;
     InputController inputController;
     int currentTicks = 0;
 };
