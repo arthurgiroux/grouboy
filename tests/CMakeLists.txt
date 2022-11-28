@@ -30,7 +30,10 @@ add_executable(
         test_cpu_instructions_misc_control.cpp
         test_cpu_instructions_16bits_arithmetic_logical.cpp
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-)
+        test_blargg.cpp)
+
+# TODO: Set this using environment variable, CMake seems to have issues with this right now
+target_compile_definitions(cpu_tests PRIVATE -DDATADIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 target_link_libraries(
         cpu_tests
@@ -78,7 +81,7 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
-gtest_discover_tests(cpu_tests)
+gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 10)
 gtest_discover_tests(ppu_tests)
 gtest_discover_tests(mmu_tests)
 gtest_discover_tests(serial_tests)

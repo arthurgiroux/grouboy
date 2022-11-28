@@ -81,7 +81,6 @@ class Emulator
     MMU mmu;
     CPU cpu;
     PPU ppu;
-    SerialTransferManager serialTransferManager;
     InputController inputController;
     int currentTicks = 0;
 };

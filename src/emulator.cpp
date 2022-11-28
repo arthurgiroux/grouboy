@@ -1,7 +1,7 @@
 #include "emulator.hpp"
 #include <iostream>
 
-Emulator::Emulator() : cpu(mmu), ppu(mmu), serialTransferManager(&mmu)
+Emulator::Emulator() : cpu(mmu), ppu(mmu)
 {
     mmu.setInputController(&inputController);
 }
@@ -16,15 +16,6 @@ void Emulator::exec()
     ppu.step(lastInstructionTicks);
 
     currentTicks += lastInstructionTicks;
-
-    if (serialTransferManager.isTransferRequestedOrInProgress())
-    {
-        byte serialData = serialTransferManager.getTransferData();
-        serialTransferManager.finalizeTransfer();
-
-        // TODO: Make this a CLI option
-        std::cout << static_cast<char>(serialData);
-    }
 }
 
 void Emulator::reset()
