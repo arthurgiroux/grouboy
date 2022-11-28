@@ -65,8 +65,20 @@ target_link_libraries(
         gtest_main
 )
 
+add_executable(
+        serial_tests
+        test_serial.cpp
+)
+
+target_link_libraries(
+        serial_tests
+        gbemulator_core
+        gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
 gtest_discover_tests(cpu_tests)
 gtest_discover_tests(ppu_tests)
 gtest_discover_tests(mmu_tests)
+gtest_discover_tests(serial_tests)
