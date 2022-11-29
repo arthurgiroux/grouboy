@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#include "../common/types.hpp"
+#include "common/types.hpp"
 #include <string>
 
 namespace standardInstructions

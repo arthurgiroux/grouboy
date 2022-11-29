@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_TILE_H
 #define GBEMULATOR_TILE_H
 
-#include "../common/types.hpp"
+#include "common/types.hpp"
 #include "rgb_image.hpp"
 #include <array>
 

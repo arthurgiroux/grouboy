@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_INTERRUPT_HANDLER_HPP
 #define GBEMULATOR_INTERRUPT_HANDLER_HPP
 
-#include "../common/types.hpp"
+#include "common/types.hpp"
 
 class CPU;
 class MMU;

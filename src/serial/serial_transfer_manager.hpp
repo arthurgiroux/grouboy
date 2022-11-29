@@ -1,8 +1,8 @@
 #ifndef GBEMULATOR_SERIAL_TRANSFER_MANAGER_HPP
 #define GBEMULATOR_SERIAL_TRANSFER_MANAGER_HPP
 
-#include "../common/types.hpp"
-#include "../memory/mmu.hpp"
+#include "common/types.hpp"
+#include "memory/mmu.hpp"
 
 /**
  * This class is responsible for managing outgoing serial transfer.

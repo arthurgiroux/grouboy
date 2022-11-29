@@ -12,7 +12,7 @@
 #include "SDL_opengl.h"
 #endif
 
-#include "../emulator.hpp"
+#include "emulator.hpp"
 
 /**
  * Graphical User Interface around the emulator.

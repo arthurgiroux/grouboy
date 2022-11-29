@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_CARTRIDGE_HPP
 #define GBEMULATOR_CARTRIDGE_HPP
 
-#include "../common/utils.hpp"
+#include "common/utils.hpp"
 #include <string>
 #include <vector>
 

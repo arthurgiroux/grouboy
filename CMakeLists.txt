@@ -80,10 +80,11 @@ set(SOURCE_FILES
         src/serial/serial_transfer_manager.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
+target_include_directories(gbemulator_core PRIVATE src/)
 target_link_libraries(gbemulator_core IMGUI)
 
 add_executable(gbemulator src/main.cpp)
-
+target_include_directories(gbemulator PRIVATE src/)
 target_link_libraries(gbemulator gbemulator_core)
 
 enable_testing()

@@ -1,8 +1,8 @@
 #include "interrupt_handler.hpp"
 
-#include "../common/utils.hpp"
-#include "../memory/mmu.hpp"
+#include "common/utils.hpp"
 #include "cpu.hpp"
+#include "memory/mmu.hpp"
 
 using namespace utils;
 
