@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_PPU_HPP
 #define GBEMULATOR_PPU_HPP
 
-#include "../memory/mmu.hpp"
+#include "memory/mmu.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
 #include "tile.hpp"

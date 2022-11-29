@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_SPRITE_HPP
 #define GBEMULATOR_SPRITE_HPP
 
-#include "../memory/mmu.hpp"
+#include "memory/mmu.hpp"
 
 /**
  * Represents a graphical sprite, sprites are displayed on top of the background,

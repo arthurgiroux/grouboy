@@ -7,7 +7,6 @@
 #include <memory>
 #include <vector>
 
-#include "../cpu/input_controller.hpp"
 #include "cartridge.hpp"
 
 const std::array<byte, 256> MMU::BIOS = {
