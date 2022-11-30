@@ -6,6 +6,7 @@
 #include "graphics/ppu.hpp"
 #include "memory/mmu.hpp"
 #include "serial/serial_transfer_manager.hpp"
+#include "timer/timer.hpp"
 
 /**
  * Emulator class that wraps up all the different components of the system.
@@ -82,6 +83,7 @@ class Emulator
     CPU cpu;
     PPU ppu;
     InputController inputController;
+    Timer timer;
     int currentTicks = 0;
 };
 
