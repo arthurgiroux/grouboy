@@ -77,7 +77,7 @@ set(SOURCE_FILES
         src/graphics/sprite.cpp
         src/graphics/sprite.hpp
         src/serial/serial_transfer_manager.cpp
-        src/serial/serial_transfer_manager.hpp)
+        src/serial/serial_transfer_manager.hpp src/timer/timer.cpp src/timer/timer.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/)

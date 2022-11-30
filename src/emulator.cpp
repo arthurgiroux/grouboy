@@ -1,7 +1,7 @@
 #include "emulator.hpp"
 #include <iostream>
 
-Emulator::Emulator() : cpu(mmu), ppu(mmu)
+Emulator::Emulator() : cpu(mmu), ppu(mmu), timer(&mmu)
 {
     mmu.setInputController(&inputController);
 }
@@ -13,6 +13,8 @@ void Emulator::exec()
     // Execute current cpu instruction and retrieve the number of ticks
     int lastInstructionTicks = cpu.fetchDecodeAndExecute();
 
+    timer.tick(lastInstructionTicks);
+    
     ppu.step(lastInstructionTicks);
 
     currentTicks += lastInstructionTicks;
