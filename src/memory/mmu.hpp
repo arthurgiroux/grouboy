@@ -8,6 +8,7 @@
 #include "cartridge.hpp"
 #include "common/types.hpp"
 #include "cpu/input_controller.hpp"
+#include "timer/timer.hpp"
 
 // Forward declaration
 class InputController;
@@ -58,6 +59,11 @@ class MMU
     static const int JOYPAD_MAP_ADDR = 0xFF00;
     byte getJoypadMemoryRepresentation();
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
+
+    // The Timer class is allowed to directly access the internal memory representation.
+    // This is so that they can circumvent the check when writing to the timer divider register.
+    // TODO: Expose an "unsafe write" function to better encapsulate this.
+    friend class Timer;
 };
 
 #endif

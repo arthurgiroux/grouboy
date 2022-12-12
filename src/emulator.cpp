@@ -14,7 +14,7 @@ void Emulator::exec()
     int lastInstructionTicks = cpu.fetchDecodeAndExecute();
 
     timer.tick(lastInstructionTicks);
-    
+
     ppu.step(lastInstructionTicks);
 
     currentTicks += lastInstructionTicks;
