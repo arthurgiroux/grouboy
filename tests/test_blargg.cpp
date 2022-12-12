@@ -13,7 +13,6 @@ class BlarggTest : public ::testing::Test
     {
         std::string rom = std::string(DATADIR) + "/roms/" + romName;
         ASSERT_TRUE(emulator.getMMU().loadCartridge(rom));
-        SerialTransferManager serialTransferManager(&emulator.getMMU());
         bool infiniteJRDetected = false;
         while (!infiniteJRDetected)
         {
@@ -109,4 +108,9 @@ TEST_F(BlarggTest, TestForBitOperationsShouldBeSuccessful)
 TEST_F(BlarggTest, TestForBitOperationsAHLShouldBeSuccessful)
 {
     assertTestForRomArePassing("11-op a,(hl).gb");
+}
+
+TEST_F(BlarggTest, TestForInstrTimingShouldBeSuccessful)
+{
+    assertTestForRomArePassing("instr_timing.gb");
 }

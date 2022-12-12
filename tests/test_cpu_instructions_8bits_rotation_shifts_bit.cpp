@@ -116,7 +116,7 @@ class CpuInstructions8BitsRotationShiftsBitTest : public ::testing::Test
         mmu.write(cpu.getProgramCounter(), standardInstructions::EXT_OPS);
         mmu.write(cpu.getProgramCounter() + 1, instruction);
         int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 4);
+        ASSERT_EQ(ticks, 3);
         ASSERT_FALSE(cpu.isFlagSet(CPU::SUBSTRACTION));
         ASSERT_TRUE(cpu.isFlagSet(CPU::HALF_CARRY));
         ASSERT_FALSE(cpu.isFlagSet(CPU::CARRY));
