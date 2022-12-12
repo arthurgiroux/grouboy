@@ -24,12 +24,12 @@ void CPU::stopInstruction()
 
     // Stop instruction is always followed by a 0 that we need to swallow
     pc++;
-    lastInstructionTicks = 1;
+    lastInstructionTicks = 0;
 }
 
 void CPU::haltInstruction()
 {
     // TODO: Halt CPU properly
     halted = true;
-    lastInstructionTicks = 1;
+    lastInstructionTicks = 0;
 }

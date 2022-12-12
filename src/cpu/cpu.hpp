@@ -1026,7 +1026,7 @@ class CPU
      *     0x46 0x56 0x66 0x76 0x4E 0x5E 0x6E 0x7E
      *
      * @flags_affected: Zero, Half-carry, Substraction
-     * @number_of_ticks: 4
+     * @number_of_ticks: 3
      */
     void isBitSetInMemory(word memoryAddr, byte bitPosition);
 
@@ -1418,7 +1418,7 @@ class CPU
      * @opcodes:
      *     0x10
      * @flags_affected: N/A
-     * @number_of_ticks: 1
+     * @number_of_ticks: 0
      */
     void stopInstruction();
 
@@ -1429,7 +1429,7 @@ class CPU
      * @opcodes:
      *     0x76
      * @flags_affected: N/A
-     * @number_of_ticks: 1
+     * @number_of_ticks: 0
      */
     void haltInstruction();
 

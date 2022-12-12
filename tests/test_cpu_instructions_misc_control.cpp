@@ -56,7 +56,7 @@ TEST_F(CpuInstructionsMiscControlTest, StopInstructionShouldStopCPU)
 {
     mmu.write(cpu.getProgramCounter(), standardInstructions::STOP);
     int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 1);
+    ASSERT_EQ(ticks, 0);
     ASSERT_EQ(cpu.getProgramCounter(), 2);
 
     // TODO: Check that CPU is stopped
@@ -66,7 +66,7 @@ TEST_F(CpuInstructionsMiscControlTest, HaltInstructionShouldHaltCPU)
 {
     mmu.write(cpu.getProgramCounter(), standardInstructions::HALT);
     int ticks = cpu.fetchDecodeAndExecute();
-    ASSERT_EQ(ticks, 1);
+    ASSERT_EQ(ticks, 0);
     ASSERT_EQ(cpu.getProgramCounter(), 1);
 
     // TODO: Check that CPU is halted

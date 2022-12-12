@@ -83,7 +83,7 @@ class CpuInstructionsJumpsCallsTest : public ::testing::Test
         mmu.write(routineAddr, standardInstructions::RET);
 
         int ticks = cpu.fetchDecodeAndExecute();
-        ASSERT_EQ(ticks, 5);
+        ASSERT_EQ(ticks, 6);
         ASSERT_EQ(cpu.getProgramCounter(), routineAddr);
         cpu.fetchDecodeAndExecute();
         ASSERT_EQ(cpu.getProgramCounter(), startPc + 3);
@@ -531,5 +531,5 @@ TEST_F(CpuInstructionsJumpsCallsTest, InstructionReturnAfterInterrupt)
     ASSERT_EQ(ticks, 4);
     ASSERT_EQ(cpu.getFlag(), 0x00);
     ASSERT_EQ(cpu.getProgramCounter(), callerAddr);
-    ASSERT_FALSE(cpu.areInterruptsEnabled());
+    ASSERT_TRUE(cpu.areInterruptsEnabled());
 }

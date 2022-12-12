@@ -209,7 +209,7 @@ void CPU::isBitSetForValue(byte value, byte bitPosition)
 void CPU::isBitSetInMemory(word memoryAddr, byte bitPosition)
 {
     isBitSetForValue(mmu.read(memoryAddr), bitPosition);
-    lastInstructionTicks = 4;
+    lastInstructionTicks = 3;
 }
 
 void CPU::resetBitForValue(byte& value, byte bitPosition)

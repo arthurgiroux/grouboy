@@ -249,6 +249,7 @@ enum OpCode : byte
     LDH_nm_A = 0xE0,
     POP_HL = 0xE1,
     LD_Cm_A = 0xE2,
+    /* NOT IMPLEMENTED		0xE3*/
     /* NOT IMPLEMENTED		0xE4*/
     PUSH_HL = 0xE5,
     AND_n = 0xE6,
