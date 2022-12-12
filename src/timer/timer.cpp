@@ -1,26 +1,38 @@
 #include "timer.hpp"
 #include <iostream>
 
-void Timer::tick(int cycles)
+void Timer::tick(int ticks)
 {
+    int cycles = ticks * TICKS_TO_CPU_CYCLES;
     currentDivValue += cycles;
-    if (currentDivValue >= 256)
+    if (currentDivValue >= DIV_TIMER_CLOCK_DIVIDER)
     {
-        currentDivValue -= 256;
-        _mmu->write(DIVIDER_REGISTER_ADDR, _mmu->read(DIVIDER_REGISTER_ADDR) + 1);
+        // TODO: Check
+        currentDivValue = 0;
+        _mmu->memory[DIVIDER_REGISTER_ADDR] = _mmu->read(DIVIDER_REGISTER_ADDR) + 1;
     }
 
     if (isTimerEnabled())
     {
+        int divider = getClockDivider();
+        if (currentClockDivider != divider)
+        {
+            currentTimerValue = 0;
+            currentClockDivider = divider;
+        }
+
         currentTimerValue += cycles;
 
-        if (currentTimerValue >= getClockDivider())
+        while (currentTimerValue >= currentClockDivider)
         {
-            currentTimerValue -= getClockDivider();
+            currentTimerValue -= currentClockDivider;
             int value = _mmu->read(TIMER_COUNTER_ADDR);
-            if (value == 0xFF)
+            int maxTimerValue = 0xFF;
+            if (value == maxTimerValue)
             {
                 _mmu->write(TIMER_COUNTER_ADDR, _mmu->read(TIMER_MODULO_ADDR));
+
+                // TODO: Move that logic to interrupt handler
                 int interruptValue = _mmu->read(0xFF0F);
                 utils::setNthBit(interruptValue, 2, true);
                 _mmu->write(0xFF0F, interruptValue);
@@ -40,18 +52,13 @@ bool Timer::isTimerEnabled()
 
 int Timer::getClockDivider()
 {
-    int clockSelected = _mmu->read(TIMER_CONTROL_ADDR) & 0x03;
-    switch (clockSelected)
+    int clockSelected = _mmu->read(TIMER_CONTROL_ADDR) & 0b00000011;
+    if (clockSelected < CLOCK_DIVIDER_VALUES.size())
     {
-    case 0:
-        return 1024;
-    case 1:
-        return 16;
-    case 2:
-        return 64;
-    case 3:
-        return 256;
-    default:
+        return CLOCK_DIVIDER_VALUES[clockSelected];
+    }
+    else
+    {
         throw std::runtime_error("Unhandled clock select value");
     }
 }

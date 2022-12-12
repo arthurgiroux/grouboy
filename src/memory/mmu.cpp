@@ -115,7 +115,16 @@ void MMU::write(const word& addr, const byte& value)
     }
     else
     {
-        memory[addr] = value;
+        // Special behavior: when trying to write to the divider register
+        // of the timer, it resets the value to 0.
+        if (addr == Timer::DIVIDER_REGISTER_ADDR)
+        {
+            memory[addr] = 0;
+        }
+        else
+        {
+            memory[addr] = value;
+        }
     }
 }
 

@@ -8,7 +8,14 @@ TEST(MMU, ByteReadingWritingValidMemoryShouldSucceed)
     for (int i = 0; i < MMU::MEMORY_SIZE_IN_BYTES; i++)
     {
         mmu.write(i, i);
-        ASSERT_EQ(static_cast<uint8_t>(i), mmu.read(i));
+        int expectedValue = i;
+        // Special case, writing to timer register address resets value to 0
+        int timerRegisterAddr = 0xFF04;
+        if (i == timerRegisterAddr)
+        {
+            expectedValue = 0;
+        }
+        ASSERT_EQ(static_cast<uint8_t>(expectedValue), mmu.read(i));
     }
 }
 
@@ -19,7 +26,14 @@ TEST(MMU, WordReadingWritingValidMemoryShouldSucceed)
     for (int i = 0; i < MMU::MEMORY_SIZE_IN_BYTES - 1; i += 2)
     {
         mmu.writeWord(i, i);
-        ASSERT_EQ(static_cast<word>(i), mmu.readWord(i));
+        int expectedValue = i;
+        // Special case, writing to timer register address resets value to 0
+        int timerRegisterAddr = 0xFF04;
+        if (i == timerRegisterAddr)
+        {
+            expectedValue = 0xFF00;
+        }
+        ASSERT_EQ(static_cast<word>(expectedValue), mmu.readWord(i));
     }
 }
 
