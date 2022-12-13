@@ -22,7 +22,17 @@ int CPU::fetchDecodeAndExecute()
 
     if (halted)
     {
-        return 1;
+        // TODO: Clean-up and refactor in an interruptManager
+        // If an interrupt is pending and the CPU is halted,
+        // we need to wake it up.
+        if (mmu.read(0xFFFF) > 0 && mmu.read(0xFF0F) > 0)
+        {
+            halted = false;
+        }
+        else
+        {
+            return 1;
+        }
     }
 
     if (interruptsEnabledRequested)
@@ -75,6 +85,7 @@ void CPU::handleInterrupts()
     {
         if (handler->handle())
         {
+            halted = false;
             interruptsEnabled = false;
             break;
         }
