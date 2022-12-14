@@ -1,31 +1,36 @@
 #include "timer.hpp"
-#include <iostream>
+
+void Timer::updateTimerCounterClockDivider()
+{
+    int divider = getClockDivider();
+    if (timerCounterClockDivider != divider)
+    {
+        // When there's a change of divider, the internal counting needs to be reset.
+        timerCounterCycles = 0;
+        timerCounterClockDivider = divider;
+    }
+}
 
 void Timer::tick(int ticks)
 {
     int cycles = ticks * TICKS_TO_CPU_CYCLES;
-    currentDivValue += cycles;
-    if (currentDivValue >= DIV_TIMER_CLOCK_DIVIDER)
+    dividerRegisterCycles += cycles;
+    if (dividerRegisterCycles >= DIV_TIMER_CLOCK_DIVIDER)
     {
-        // TODO: Check
-        currentDivValue = 0;
+        // TODO: Check if we need to reset to 0
+        dividerRegisterCycles -= DIV_TIMER_CLOCK_DIVIDER;
         _mmu->memory[DIVIDER_REGISTER_ADDR] = _mmu->read(DIVIDER_REGISTER_ADDR) + 1;
     }
 
-    if (isTimerEnabled())
+    if (isTimerCounterEnabled())
     {
-        int divider = getClockDivider();
-        if (currentClockDivider != divider)
-        {
-            currentTimerValue = 0;
-            currentClockDivider = divider;
-        }
+        updateTimerCounterClockDivider();
 
-        currentTimerValue += cycles;
+        timerCounterCycles += cycles;
 
-        while (currentTimerValue >= currentClockDivider)
+        while (timerCounterCycles >= timerCounterClockDivider)
         {
-            currentTimerValue -= currentClockDivider;
+            timerCounterCycles -= timerCounterClockDivider;
             int value = _mmu->read(TIMER_COUNTER_ADDR);
             int maxTimerValue = 0xFF;
             if (value == maxTimerValue)
@@ -45,7 +50,7 @@ void Timer::tick(int ticks)
     }
 }
 
-bool Timer::isTimerEnabled()
+bool Timer::isTimerCounterEnabled()
 {
     return utils::isNthBitSet(_mmu->read(TIMER_CONTROL_ADDR), 2);
 }
