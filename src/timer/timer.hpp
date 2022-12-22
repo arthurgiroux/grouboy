@@ -44,9 +44,21 @@ class Timer
     void tick(int ticks);
 
     /**
+     * Get the current value of the divider register.
+     *
+     * @return The byte value of the divider register.
+     */
+    int getDividerRegisterValue() const;
+
+    /**
      * The address where the value of the Divider Register is stored.
      */
     static const int DIVIDER_REGISTER_ADDR = 0xFF04;
+
+    /**
+     * The frequency in Hz of the divider register timer.
+     */
+    static const int DIV_REGISTER_FREQUENCY_HZ = 16384;
 
   private:
     /**
@@ -94,7 +106,7 @@ class Timer
     /**
      * The clock divider for the Divider Register.
      */
-    static const int DIV_TIMER_CLOCK_DIVIDER = 256;
+    static const int DIV_TIMER_CLOCK_DIVIDER;
 
     /**
      * The different values for the clock divider that can be set in the Timer Control Register.

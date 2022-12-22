@@ -1,4 +1,7 @@
 #include "timer.hpp"
+#include "cpu/cpu.hpp"
+
+const int Timer::DIV_TIMER_CLOCK_DIVIDER = CPU::CLOCK_FREQUENCY_HZ / DIV_REGISTER_FREQUENCY_HZ;
 
 void Timer::updateTimerCounterClockDivider()
 {
@@ -66,4 +69,9 @@ int Timer::getClockDivider()
     {
         throw std::runtime_error("Unhandled clock select value");
     }
+}
+
+int Timer::getDividerRegisterValue() const
+{
+    return _mmu->read(DIVIDER_REGISTER_ADDR);
 }

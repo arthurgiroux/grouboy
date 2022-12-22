@@ -79,9 +79,21 @@ target_link_libraries(
         gtest_main
 )
 
+add_executable(
+        timer_tests
+        test_timer.cpp
+)
+
+target_link_libraries(
+        timer_tests
+        gbemulator_core
+        gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
 gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 30)
 gtest_discover_tests(ppu_tests)
 gtest_discover_tests(mmu_tests)
 gtest_discover_tests(serial_tests)
+gtest_discover_tests(timer_tests)

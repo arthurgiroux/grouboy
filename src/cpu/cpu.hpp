@@ -370,6 +370,11 @@ class CPU
      */
     void enableInterrupts();
 
+    /**
+     * The frequency of the CPU Clock in Hz
+     */
+    static const int CLOCK_FREQUENCY_HZ = 4194304;
+
   private:
     /**
      * Execute an instruction that is part of the standard instruction set.
