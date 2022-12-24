@@ -110,3 +110,10 @@ void CPU::callRestartRoutine(byte memoryAddr)
     pc = memoryAddr;
     lastInstructionTicks = 4;
 }
+
+void CPU::callInterruptRoutine(word routineAddr)
+{
+    sp -= 2;
+    mmu.writeWord(sp, pc);
+    pc = routineAddr;
+}

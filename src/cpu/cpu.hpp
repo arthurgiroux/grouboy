@@ -313,6 +313,19 @@ class CPU
     bool isHalted() const;
 
     /**
+     * Call the interrupt routine, stored at a specific address.
+     *
+     * @param routineAddr The memory address of the routine
+     */
+    void callInterruptRoutine(word routineAddr);
+
+    /**
+     * Get the interrupt manager used by the CPU.
+     * @return A pointer to the interrupt manager instance.
+     */
+    InterruptManager* getInterruptManager();
+
+    /**
      * Exception raised when an instruction parsed by the CPU is not handled.
      */
     class UnhandledInstructionException : public std::exception
@@ -1720,7 +1733,10 @@ class CPU
 
     bool interruptsEnabledRequested;
 
-    std::vector<std::unique_ptr<InterruptHandler>> interruptHandlers = {};
+    /**
+     * The interrupt manager used by the CPU.
+     */
+    InterruptManager _interruptManager;
 };
 
 #endif
