@@ -2,76 +2,99 @@
 #define GBEMULATOR_INTERRUPT_HANDLER_HPP
 
 #include "common/types.hpp"
+#include "cpu/interrupt_manager.hpp"
 
+// Forward declaration
 class CPU;
-class MMU;
 
+/**
+ * Class responsible for handling a specific interrupt type.
+ * If the interrupt is enabled and pending, it will call the interrupt routine and clear it.
+ */
 class InterruptHandler
 {
   public:
-    InterruptHandler(CPU* cpu, MMU* mmu) : cpu(cpu), mmu(mmu){};
+    InterruptHandler(CPU* cpu, InterruptManager* interruptManager) : cpu(cpu), _interruptManager(interruptManager){};
     virtual ~InterruptHandler() = default;
+
+    /**
+     * Handle the interrupt, this will check if the interrupt is enabled and pending.
+     * If it is, it will call the interrupt routine and clear the interrupt.
+     *
+     * @return true if the interrupt was treated, false otherwise
+     */
     virtual bool handle();
 
   protected:
+    /**
+     * The memory address of the interrupt routine to call.
+     */
     word interruptRoutineAddr;
-    int interruptFlagBit;
+
+    /**
+     * The type of the interrupt to treat.
+     */
+    InterruptType _interruptType;
 
   private:
+    /**
+     * Pointer towards the CPU, to call the interrupt routine.
+     */
     CPU* cpu;
-    MMU* mmu;
 
-    static const int INTERRUPT_ENABLE_ADDR = 0xFFFF;
-    static const int INTERRUPT_FLAG_ADDR = 0xFF0F;
+    /**
+     * Pointer towards the interrupt manager, to retrieve information about interrupts.
+     */
+    InterruptManager* _interruptManager;
 };
 
 class InterruptHandlerVBlank : public InterruptHandler
 {
   public:
-    InterruptHandlerVBlank(CPU* cpu, MMU* mmu) : InterruptHandler(cpu, mmu)
+    InterruptHandlerVBlank(CPU* cpu, InterruptManager* interruptManager) : InterruptHandler(cpu, interruptManager)
     {
         interruptRoutineAddr = 0x40;
-        interruptFlagBit = 0;
+        _interruptType = InterruptType::VBLANK;
     }
 };
 
 class InterruptHandlerLCDStat : public InterruptHandler
 {
   public:
-    InterruptHandlerLCDStat(CPU* cpu, MMU* mmu) : InterruptHandler(cpu, mmu)
+    InterruptHandlerLCDStat(CPU* cpu, InterruptManager* interruptManager) : InterruptHandler(cpu, interruptManager)
     {
         interruptRoutineAddr = 0x48;
-        interruptFlagBit = 1;
+        _interruptType = InterruptType::LCD_STAT;
     }
 };
 
 class InterruptHandlerTimer : public InterruptHandler
 {
   public:
-    InterruptHandlerTimer(CPU* cpu, MMU* mmu) : InterruptHandler(cpu, mmu)
+    InterruptHandlerTimer(CPU* cpu, InterruptManager* interruptManager) : InterruptHandler(cpu, interruptManager)
     {
         interruptRoutineAddr = 0x50;
-        interruptFlagBit = 2;
+        _interruptType = InterruptType::TIMER;
     }
 };
 
 class InterruptHandlerSerial : public InterruptHandler
 {
   public:
-    InterruptHandlerSerial(CPU* cpu, MMU* mmu) : InterruptHandler(cpu, mmu)
+    InterruptHandlerSerial(CPU* cpu, InterruptManager* interruptManager) : InterruptHandler(cpu, interruptManager)
     {
         interruptRoutineAddr = 0x58;
-        interruptFlagBit = 3;
+        _interruptType = InterruptType::SERIAL;
     }
 };
 
 class InterruptHandlerJoypad : public InterruptHandler
 {
   public:
-    InterruptHandlerJoypad(CPU* cpu, MMU* mmu) : InterruptHandler(cpu, mmu)
+    InterruptHandlerJoypad(CPU* cpu, InterruptManager* interruptManager) : InterruptHandler(cpu, interruptManager)
     {
         interruptRoutineAddr = 0x60;
-        interruptFlagBit = 4;
+        _interruptType = InterruptType::JOYPAD;
     }
 };
 #endif // GBEMULATOR_INTERRUPT_HANDLER_HPP

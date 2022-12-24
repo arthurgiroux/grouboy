@@ -1,19 +1,11 @@
 #include "cpu.hpp"
 #include <iostream>
 
-#include <memory>
-
 using namespace utils;
 
-CPU::CPU(MMU& mmu_) : mmu(mmu_)
+CPU::CPU(MMU& mmu_) : mmu(mmu_), _interruptManager(this, &mmu)
 {
     reset();
-
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerVBlank>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerLCDStat>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerTimer>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerSerial>(this, &mmu));
-    interruptHandlers.push_back(std::make_unique<InterruptHandlerJoypad>(this, &mmu));
 }
 
 int CPU::fetchDecodeAndExecute()
@@ -22,10 +14,9 @@ int CPU::fetchDecodeAndExecute()
 
     if (halted)
     {
-        // TODO: Clean-up and refactor in an interruptManager
         // If an interrupt is pending and the CPU is halted,
         // we need to wake it up.
-        if (mmu.read(0xFFFF) > 0 && mmu.read(0xFF0F) > 0)
+        if (_interruptManager.isAnyInterruptEnabled() && _interruptManager.isAnyInterruptPending())
         {
             halted = false;
         }
@@ -81,14 +72,10 @@ void CPU::handleInterrupts()
         return;
     }
 
-    for (auto& handler : interruptHandlers)
+    if (_interruptManager.handleInterrupts())
     {
-        if (handler->handle())
-        {
-            halted = false;
-            interruptsEnabled = false;
-            break;
-        }
+        halted = false;
+        interruptsEnabled = false;
     }
 }
 
@@ -116,6 +103,11 @@ int CPU::getCurrentTick() const
 }
 
 CPU::~CPU() = default;
+
+InterruptManager* CPU::getInterruptManager()
+{
+    return &_interruptManager;
+}
 
 void CPU::executeInstruction(const byte& opCode)
 {

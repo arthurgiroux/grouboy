@@ -1,3 +1,4 @@
+#include "cpu/cpu.hpp"
 #include "memory/mmu.hpp"
 #include "timer/timer.hpp"
 
@@ -8,10 +9,14 @@ class TimerTest : public ::testing::Test
   protected:
     virtual void SetUp() override
     {
-        timer = std::make_unique<Timer>(&mmu);
+        cpu = std::make_unique<CPU>(mmu);
+        interruptManager = std::make_unique<InterruptManager>(cpu.get(), &mmu);
+        timer = std::make_unique<Timer>(&mmu, interruptManager.get());
     }
 
     MMU mmu;
+    std::unique_ptr<CPU> cpu;
+    std::unique_ptr<InterruptManager> interruptManager;
     std::unique_ptr<Timer> timer;
     /*
      * The div register runs at 16384Hz.

@@ -1,7 +1,7 @@
 #include "emulator.hpp"
 #include <iostream>
 
-Emulator::Emulator() : cpu(mmu), ppu(mmu), timer(&mmu)
+Emulator::Emulator() : cpu(mmu), ppu(mmu), timer(&mmu, cpu.getInterruptManager())
 {
     mmu.setInputController(&inputController);
 }

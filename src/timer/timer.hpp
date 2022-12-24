@@ -4,6 +4,7 @@
 #include "memory/mmu.hpp"
 
 class MMU;
+class InterruptManager;
 
 /**
  * Abstraction class for the GameBoy internal timers.
@@ -32,7 +33,7 @@ class Timer
      *
      * @param mmu   The MMU to use.
      */
-    explicit Timer(MMU* mmu) : _mmu(mmu){};
+    explicit Timer(MMU* mmu, InterruptManager* interruptManager) : _mmu(mmu), _interruptManager(interruptManager){};
     ~Timer() = default;
 
     /**
@@ -141,6 +142,11 @@ class Timer
      * The MMU to use for accessing the register and incrementing counters.
      */
     MMU* _mmu = nullptr;
+
+    /**
+     * The interrupt manager that will be used to retrieve information about interrupts.
+     */
+    InterruptManager* _interruptManager = nullptr;
 };
 
 #endif // GBEMULATOR_TIMER_HPP

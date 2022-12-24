@@ -39,11 +39,7 @@ void Timer::tick(int ticks)
             if (value == maxTimerValue)
             {
                 _mmu->write(TIMER_COUNTER_ADDR, _mmu->read(TIMER_MODULO_ADDR));
-
-                // TODO: Move that logic to interrupt handler
-                int interruptValue = _mmu->read(0xFF0F);
-                utils::setNthBit(interruptValue, 2, true);
-                _mmu->write(0xFF0F, interruptValue);
+                _interruptManager->raiseInterrupt(InterruptType::TIMER);
             }
             else
             {
