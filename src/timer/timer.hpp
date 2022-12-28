@@ -52,16 +52,37 @@ class Timer
     int getDividerRegisterValue() const;
 
     /**
-     * The address where the value of the Divider Register is stored.
+     * Get the current value of the timer counter.
+     * This value is incremented by during by the timer counter logic.
+     *
+     * @return timer counter value
      */
-    static const int DIVIDER_REGISTER_ADDR = 0xFF04;
+    int getTimerCounterValue() const;
 
     /**
-     * The frequency in Hz of the divider register timer.
+     * Get the value that the counter will be set to when overflowing.
+     *
+     * @return the timer modulo value
      */
-    static const int DIV_REGISTER_FREQUENCY_HZ = 16384;
+    int getTimerModuloValue() const;
 
-  private:
+    /**
+     * Set the value that the counter will be set to when overflowing.
+     *
+     * @param value The new timer modulo value
+     */
+    void setTimerModuloValue(int value);
+
+    /**
+     * Enable the timer counter.
+     */
+    void enableTimerCounter();
+
+    /**
+     * Disable the timer counter.
+     */
+    void disableTimerCounter();
+
     /**
      * Return if the Timer Counter is enabled or not.
      *
@@ -78,6 +99,24 @@ class Timer
      */
     int getClockDivider();
 
+    /**
+     * Set the clock divider to be used by the timer counter.
+     *
+     * @param value Possible values are: 16, 64, 256, 1024
+     */
+    void setClockDivider(int value);
+
+    /**
+     * The address where the value of the Divider Register is stored.
+     */
+    static const int DIVIDER_REGISTER_ADDR = 0xFF04;
+
+    /**
+     * The frequency in Hz of the divider register timer.
+     */
+    static const int DIV_REGISTER_FREQUENCY_HZ = 16384;
+
+  private:
     /**
      * Update the stored value of the clock divider based on the selected clock divider
      * in the Timer Control register.
