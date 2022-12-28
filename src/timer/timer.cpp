@@ -22,7 +22,7 @@ void Timer::tick(int ticks)
     {
         // TODO: Check if we need to reset to 0
         dividerRegisterCycles -= DIV_TIMER_CLOCK_DIVIDER;
-        _mmu->memory[DIVIDER_REGISTER_ADDR] = _mmu->read(DIVIDER_REGISTER_ADDR) + 1;
+        _mmu->memory[DIVIDER_REGISTER_ADDR] = getDividerRegisterValue() + 1;
     }
 
     if (isTimerCounterEnabled())
@@ -34,11 +34,11 @@ void Timer::tick(int ticks)
         while (timerCounterCycles >= timerCounterClockDivider)
         {
             timerCounterCycles -= timerCounterClockDivider;
-            int value = _mmu->read(TIMER_COUNTER_ADDR);
+            int value = getTimerCounterValue();
             int maxTimerValue = 0xFF;
             if (value == maxTimerValue)
             {
-                _mmu->write(TIMER_COUNTER_ADDR, _mmu->read(TIMER_MODULO_ADDR));
+                _mmu->write(TIMER_COUNTER_ADDR, getTimerModuloValue());
                 _interruptManager->raiseInterrupt(InterruptType::TIMER);
             }
             else
@@ -70,4 +70,49 @@ int Timer::getClockDivider()
 int Timer::getDividerRegisterValue() const
 {
     return _mmu->read(DIVIDER_REGISTER_ADDR);
+}
+
+int Timer::getTimerCounterValue() const
+{
+    return _mmu->read(TIMER_COUNTER_ADDR);
+}
+
+int Timer::getTimerModuloValue() const
+{
+    return _mmu->read(TIMER_MODULO_ADDR);
+}
+
+void Timer::setTimerModuloValue(int value)
+{
+    _mmu->write(TIMER_MODULO_ADDR, value);
+}
+
+void Timer::enableTimerCounter()
+{
+    int timerControlValue = _mmu->read(TIMER_CONTROL_ADDR);
+    utils::setNthBit(timerControlValue, 2, true);
+    _mmu->write(TIMER_CONTROL_ADDR, timerControlValue);
+}
+
+void Timer::disableTimerCounter()
+{
+    int timerControlValue = _mmu->read(TIMER_CONTROL_ADDR);
+    utils::setNthBit(timerControlValue, 2, false);
+    _mmu->write(TIMER_CONTROL_ADDR, timerControlValue);
+}
+
+void Timer::setClockDivider(int value)
+{
+    auto it = std::find(CLOCK_DIVIDER_VALUES.begin(), CLOCK_DIVIDER_VALUES.end(), value);
+    if (it == CLOCK_DIVIDER_VALUES.end())
+    {
+        throw std::runtime_error("Unhandled clock select value");
+    }
+    else
+    {
+        int timerControlValue = _mmu->read(TIMER_CONTROL_ADDR);
+        timerControlValue &= 0b11111100;
+        timerControlValue |= std::distance(CLOCK_DIVIDER_VALUES.begin(), it);
+        _mmu->write(TIMER_CONTROL_ADDR, timerControlValue);
+    }
 }
