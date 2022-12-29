@@ -92,7 +92,7 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
-gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 30)
+gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 60)
 gtest_discover_tests(ppu_tests)
 gtest_discover_tests(mmu_tests)
 gtest_discover_tests(serial_tests)
