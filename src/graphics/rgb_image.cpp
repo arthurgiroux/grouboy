@@ -1,4 +1,5 @@
 #include "rgb_image.hpp"
+#include <cassert>
 
 RGBImage::RGBImage(int height, int width) : _height(height), _width(width)
 {
