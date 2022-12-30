@@ -14,7 +14,7 @@ TEST(RGBImage, ConstructorSetsHeightAndWidthCorrectly)
 
 TEST(RGBImage, SetPixelWithGrayscaleValueChangesRGBValueToGivenValue)
 {
-    RGBImage image(250, 480);
+    RGBImage image(480, 250);
     int x = 128;
     int y = 300;
     int value = 42;
@@ -26,7 +26,7 @@ TEST(RGBImage, SetPixelWithGrayscaleValueChangesRGBValueToGivenValue)
 
 TEST(RGBImage, SetPixelWithRGBValueChangesRGBValueToGivenValue)
 {
-    RGBImage image(250, 480);
+    RGBImage image(480, 250);
     int x = 128;
     int y = 300;
     int valueR = 42;
@@ -40,8 +40,8 @@ TEST(RGBImage, SetPixelWithRGBValueChangesRGBValueToGivenValue)
 
 TEST(RGBImage, CopyPixelFromOtherPixelShouldSetPixelFromSource)
 {
-    RGBImage targetImage(250, 480);
-    RGBImage sourceImage(250, 480);
+    RGBImage targetImage(480, 250);
+    RGBImage sourceImage(480, 250);
 
     int x = 128;
     int y = 300;
@@ -61,7 +61,7 @@ TEST(RGBImage, CopyPixelFromOtherPixelShouldSetPixelFromSource)
 
 TEST(RGBImage, IsPixelWhiteShouldReturnTrueForWhitePixel)
 {
-    RGBImage image(250, 480);
+    RGBImage image(480, 250);
     int x = 128;
     int y = 300;
     int value = 255;
@@ -71,7 +71,7 @@ TEST(RGBImage, IsPixelWhiteShouldReturnTrueForWhitePixel)
 
 TEST(RGBImage, IsPixelWhiteShouldReturnFalseForBlackPixel)
 {
-    RGBImage image(250, 480);
+    RGBImage image(480, 250);
     int x = 128;
     int y = 300;
     int value = 0;
