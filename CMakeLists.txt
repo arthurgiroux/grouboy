@@ -55,8 +55,6 @@ set(SOURCE_FILES
         src/emulator.hpp
         src/emulator.cpp
         src/cpu/instructions.hpp
-        src/memory/mmu.cpp
-        src/memory/mmu.hpp
         src/common/types.hpp
         src/graphics/ppu.cpp
         src/graphics/ppu.hpp
@@ -66,8 +64,14 @@ set(SOURCE_FILES
         src/common/utils.cpp
         src/gui/GUI.cpp
         src/gui/GUI.hpp
+        src/memory/mmu.cpp
+        src/memory/mmu.hpp
         src/memory/cartridge.cpp
         src/memory/cartridge.hpp
+        src/memory/mbc/memory_bank_controller.cpp
+        src/memory/mbc/memory_bank_controller.hpp
+        src/memory/mbc/mbc_rom_only.hpp
+        src/memory/mbc/mbc_rom_only.cpp
         src/cpu/interrupt_handler.cpp
         src/cpu/interrupt_handler.hpp
         src/cpu/input_controller.cpp
