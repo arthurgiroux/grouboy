@@ -11,7 +11,7 @@ int main(int argc, char** argv)
         bool cartridgeLoaded = emulator.getMMU().loadCartridge(argv[1]);
         if (!cartridgeLoaded)
         {
-            std::cerr << "Couldn't load cartridge" << std::endl;
+            std::cerr << "Couldn't load cartridge " << argv[1] << std::endl;
             return EXIT_FAILURE;
         }
     }
