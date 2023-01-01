@@ -113,7 +113,6 @@ word MMU::readWord(const word& addr)
 
 void MMU::write(const word& addr, const byte& value)
 {
-    // TODO: Check if it's normal to write to ROM section
     if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
         memoryBankController->writeROM(addr, value);
