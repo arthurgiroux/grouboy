@@ -72,6 +72,8 @@ set(SOURCE_FILES
         src/memory/mbc/memory_bank_controller.hpp
         src/memory/mbc/mbc_rom_only.hpp
         src/memory/mbc/mbc_rom_only.cpp
+        src/memory/mbc/mbc1.hpp
+        src/memory/mbc/mbc1.cpp
         src/cpu/interrupt_handler.cpp
         src/cpu/interrupt_handler.hpp
         src/cpu/input_controller.cpp
