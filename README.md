@@ -59,7 +59,7 @@ cmake --build .
 
 ## Dependencies
 
-This project relies on ImGUI and SDL for the display and GoogleTest for the testing suite.
+This project relies on ImGUI and SDL for the display, GoogleTest for the testing suite, and sdplog for logging.
 
 ## Contributing
 

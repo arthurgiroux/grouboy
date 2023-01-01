@@ -40,6 +40,8 @@ endif ()
 
 target_link_libraries(IMGUI PUBLIC SDL2main SDL2 ${CMAKE_DL_LIBS})
 
+add_subdirectory(libs/spdlog-1.11.0)
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES
@@ -90,8 +92,8 @@ set(SOURCE_FILES
         src/cpu/interrupt_manager.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
-target_include_directories(gbemulator_core PRIVATE src/)
-target_link_libraries(gbemulator_core IMGUI)
+target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
+target_link_libraries(gbemulator_core IMGUI spdlog::spdlog)
 
 add_executable(gbemulator src/main.cpp)
 target_include_directories(gbemulator PRIVATE src/)
