@@ -136,7 +136,7 @@ class InterruptManager
      * The order of the handlers in the list represents their priorities:
      * _interruptHandlers[0] has a higher priority than _interruptHandlers[1]
      */
-    std::vector<std::unique_ptr<InterruptHandler>> _interruptHandlers = {};
+    std::vector<std::unique_ptr<InterruptHandler>> _interruptHandlers;
 
     /**
      * The MMU to use for memory operations.
