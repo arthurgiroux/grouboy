@@ -52,9 +52,14 @@ byte MMU::read(const word& addr)
         return memory[addr];
     }
 
-    else if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
+    else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
-        return cartridge->getData()[addr];
+        return memoryBankController->readROM(addr);
+    }
+
+    else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
+    {
+        return memoryBankController->readRAM(addr - EXTERNAL_RAM_START_ADDR);
     }
 
     else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
@@ -109,9 +114,14 @@ word MMU::readWord(const word& addr)
 void MMU::write(const word& addr, const byte& value)
 {
     // TODO: Check if it's normal to write to ROM section
-    if (addr < ROM_BANK_1_END_ADDR && cartridge != nullptr)
+    if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
-        cartridge->getData()[addr] = value;
+        memoryBankController->writeROM(addr, value);
+    }
+
+    else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
+    {
+        memoryBankController->writeRAM(addr - EXTERNAL_RAM_START_ADDR, value);
     }
     else
     {
@@ -147,6 +157,7 @@ bool MMU::loadCartridge(const std::string& filepath)
     {
         std::vector<byte> data((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
         cartridge = std::make_unique<Cartridge>(data);
+        memoryBankController = MemoryBankController::createMemoryBankControllerFromCartridge(cartridge.get());
         ret = true;
     }
 

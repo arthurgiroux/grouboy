@@ -8,6 +8,7 @@
 #include "cartridge.hpp"
 #include "common/types.hpp"
 #include "cpu/input_controller.hpp"
+#include "memory/mbc/memory_bank_controller.hpp"
 #include "timer/timer.hpp"
 
 // Forward declaration
@@ -53,6 +54,9 @@ class MMU
   private:
     std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
     std::unique_ptr<Cartridge> cartridge = nullptr;
+    std::unique_ptr<MemoryBankController> memoryBankController = nullptr;
+    static const int EXTERNAL_RAM_START_ADDR = 0xA000;
+    static const int EXTERNAL_RAM_END_ADDR = 0xC000;
     static const int ROM_BANK_1_END_ADDR = 0x8000;
     static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
     InputController* inputController = nullptr;
