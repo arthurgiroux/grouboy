@@ -1,47 +1,48 @@
 
 #include "ppu.hpp"
+#include "cpu/interrupt_manager.hpp"
+#include "spdlog/spdlog.h"
 #include <bitset>
 #include <cassert>
-#include <iostream>
 
 void PPU::step(int nbrTicks)
 {
-    ticksSpentInCurrentMode += nbrTicks;
+    _ticksSpentInCurrentMode += nbrTicks;
 
-    if (currentMode == OAM_ACCESS && ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
+    if (_currentMode == OAM_ACCESS && _ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
     {
         setMode(VRAM_ACCESS);
     }
-    else if (currentMode == VRAM_ACCESS && ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
+    else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
     {
         setMode(HBLANK);
-        renderScanline(currentScanline);
+        renderScanline(_currentScanline);
     }
-    else if (currentMode == HBLANK && ticksSpentInCurrentMode >= HBLANK_TICKS)
+    else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= HBLANK_TICKS)
     {
-        currentScanline++;
+        _currentScanline++;
 
-        if (currentScanline == SCREEN_HEIGHT)
+        if (_currentScanline == SCREEN_HEIGHT)
         {
             setMode(VBLANK);
-            renderFrame();
+            swapFrameBuffers();
         }
         else
         {
             setMode(OAM_ACCESS);
         }
     }
-    else if (currentMode == VBLANK && ticksSpentInCurrentMode >= VBLANK_TICKS)
+    else if (_currentMode == VBLANK && _ticksSpentInCurrentMode >= VBLANK_TICKS)
     {
-        currentScanline++;
-        ticksSpentInCurrentMode = 0;
-        if (currentScanline > MAX_SCANLINE_VALUE)
+        _currentScanline++;
+        _ticksSpentInCurrentMode = 0;
+        if (_currentScanline > MAX_SCANLINE_VALUE)
         {
             setMode(OAM_ACCESS);
-            currentScanline = 0;
+            _currentScanline = 0;
         }
     }
-    mmu.write(ADDR_SCANLINE, currentScanline);
+    _mmu.write(ADDR_SCANLINE, _currentScanline);
 }
 
 void PPU::renderScanline(int scanline)
@@ -69,8 +70,8 @@ void PPU::renderScanline(int scanline)
 
 void PPU::renderScanlineBackground(int scanline)
 {
-    byte scrollX = mmu.read(ADDR_SCROLL_X);
-    byte scrollY = mmu.read(ADDR_SCROLL_Y);
+    byte scrollX = _mmu.read(ADDR_SCROLL_X);
+    byte scrollY = _mmu.read(ADDR_SCROLL_Y);
 
     // Retrieve the tilemap we are going to use
     TileMap background = getTileMap(backgroundTileMapIndex());
@@ -88,7 +89,7 @@ void PPU::renderScanlineBackground(int scanline)
     int offsetInTileMap = lineInTileMap * TILEMAP_WIDTH;
 
     /*
-     * For each pixels in the line, we are going to retrieve the corresponding tile and copy the
+     * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
      * pixels that corresponds in the current frame buffer.
      */
     for (int x = 0; x < SCREEN_WIDTH; ++x)
@@ -116,7 +117,7 @@ void PPU::renderScanlineBackground(int scanline)
         int yOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
 
         // Finally we copy the correct pixel in our temporary frame.
-        temporaryFrame.copyPixel(x, scanline, tileImage, xOffsetTile, yOffsetTile);
+        _temporaryFrame.copyPixel(x, scanline, tileImage, xOffsetTile, yOffsetTile);
     }
 }
 
@@ -131,7 +132,7 @@ void PPU::renderScanlineSprite(int scanline)
 
     std::vector<Sprite*> spritesToRender = {};
     /*
-     * In order to find which sprites to render, we need to check the coordinate of every sprites.
+     * In order to find which sprites to render, we need to check the coordinate of every sprite.
      * There's a maximum number of sprites that can be rendered per scanline.
      */
     for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
@@ -145,7 +146,7 @@ void PPU::renderScanlineSprite(int scanline)
             nbrSpritesInScanline++;
             /*
              * If the sprite is outside the screen bound then it's not going to be effectively rendered
-             * but it still counts as if it was rendered.
+             * but it still counts as if it was rendered and should increment the number of sprites rendered.
              */
             if (sprite->getXPositionOnScreen() < 0 || sprite->getXPositionOnScreen() >= PPU::SCREEN_WIDTH)
             {
@@ -154,6 +155,11 @@ void PPU::renderScanlineSprite(int scanline)
 
             spritesToRender.push_back(sprite.get());
         }
+    }
+
+    if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
+    {
+        spdlog::info("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
     }
 
     // TODO: Implement sprite ordering
@@ -193,26 +199,26 @@ void PPU::renderScanlineSprite(int scanline)
             // We are copying the pixel if it's not white, white is treated as transparent
             if (!tileImage.isPixelWhite(xCoordinateInTile, yCoordinateInTile))
             {
-                temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xCoordinateInTile,
-                                         yCoordinateInTile);
+                _temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xCoordinateInTile,
+                                          yCoordinateInTile);
             }
         }
     }
 }
 
-void PPU::renderFrame()
+void PPU::swapFrameBuffers()
 {
-    currentFrame = temporaryFrame;
-    frameId++;
+    _lastRenderedFrame = _temporaryFrame;
+    _frameId++;
 }
 
-PPU::PPU(MMU& mmu_) : mmu(mmu_)
+PPU::PPU(MMU& mmu_) : _mmu(mmu_)
 {
     reset();
 
     for (int i = 0; i < _sprites.size(); ++i)
     {
-        _sprites[i] = std::make_unique<Sprite>(mmu, i);
+        _sprites[i] = std::make_unique<Sprite>(_mmu, i);
     }
 }
 
@@ -228,10 +234,9 @@ Tile PPU::getTileById(byte tileId, int8_t tileSetId)
 
     word tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileIdCorrected;
     Tile::TileDataArray dataArray = {};
-    // TODO: Read word
     for (int i = 0; i < Tile::BYTES_PER_TILE; ++i)
     {
-        dataArray[i] = mmu.read(tileBaseAddr + i);
+        dataArray[i] = _mmu.read(tileBaseAddr + i);
     }
 
     return Tile(dataArray);
@@ -244,7 +249,7 @@ PPU::TileMap PPU::getTileMap(int index)
 
     for (int i = 0; i < TILEMAP_WIDTH * TILEMAP_HEIGHT; ++i)
     {
-        sbyte tileId = mmu.read(tileMapAddr + i);
+        sbyte tileId = _mmu.read(tileMapAddr + i);
         map.push_back(getTileById(tileId, index));
     }
 
@@ -253,50 +258,50 @@ PPU::TileMap PPU::getTileMap(int index)
 
 bool PPU::isDisplayEnabled() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 7);
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 7);
 }
 
 int PPU::tileMapIndexForWindow() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 6);
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 6);
 }
 
 bool PPU::isWindowEnabled() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 5);
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 5);
 }
 
 int PPU::backgroundAndWindowTileDataAreaIndex() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 4);
+    return !utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 4);
 }
 
 int PPU::backgroundTileMapIndex() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 3);
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 3);
 }
 
 int PPU::spriteSize() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 2) ? 16 : 8;
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 2) ? 16 : 8;
 }
 
 bool PPU::areSpritesEnabled() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 1);
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 1);
 }
 
 bool PPU::areBackgroundAndWindowEnabled() const
 {
-    return utils::isNthBitSet(mmu.read(ADDR_LCD_PPU_CONTROL), 0);
+    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
 }
 
 void PPU::reset()
 {
-    frameId = 0;
-    ticksSpentInCurrentMode = 0;
-    currentMode = OAM_ACCESS;
-    currentScanline = 0;
-    temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
-    currentFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
+    _frameId = 0;
+    _ticksSpentInCurrentMode = 0;
+    _currentMode = OAM_ACCESS;
+    _currentScanline = 0;
+    _temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
+    _lastRenderedFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
 }

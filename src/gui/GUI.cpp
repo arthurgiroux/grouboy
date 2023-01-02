@@ -214,7 +214,7 @@ void GUI::displayTileView()
 void GUI::displayGameView()
 {
     ImGui::Begin("Game");
-    loadRGBImageInTexture(gameRenderTexture, emulator.getPPU().getCurrentFrame());
+    loadRGBImageInTexture(gameRenderTexture, emulator.getPPU().getLastRenderedFrame());
     ImGui::BeginGroup();
 
     ImGui::Image((void*)(intptr_t)gameRenderTexture,
