@@ -145,6 +145,7 @@ class GUI
     bool frameByFrameEnabled = false;
     bool goToNextFrame = true;
     int tileMapId = 0;
+    int tileSetId = 0;
     int lastFrameId = 0;
     ImVec2 windowSize = ImVec2(1280, 720);
     ImVec2 tileMapSize = ImVec2(PPU::TILEMAP_WIDTH * Tile::TILE_WIDTH, PPU::TILEMAP_HEIGHT* Tile::TILE_HEIGHT);
