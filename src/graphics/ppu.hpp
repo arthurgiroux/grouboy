@@ -39,8 +39,9 @@ class PPU
     /**
      * Create a new PPU object.
      * @param mmu the MMU to use to access VRAM and OAM.
+     * @param interruptManager the interrupt manager to use to raise graphical interrupts
      */
-    PPU(MMU& mmu);
+    PPU(MMU& mmu, InterruptManager* interruptManager);
     ~PPU() = default;
 
     /**
@@ -231,6 +232,75 @@ class PPU
     static const int MAX_SCANLINE_VALUE = 153;
 
   private:
+    class LCDStatusRegister
+    {
+      public:
+        LCDStatusRegister(MMU& mmu) : _mmu(mmu){};
+        void updateFlagMode(Mode value)
+        {
+            int status = _mmu.read(ADDR_LCD_STATUS) & 0x11111100;
+            if (value == HBLANK)
+            {
+                status |= 0x00;
+            }
+            else if (value == VBLANK)
+            {
+                status |= 0x01;
+            }
+            else if (value == OAM_ACCESS)
+            {
+                status |= 0x02;
+            }
+
+            else if (value == VRAM_ACCESS)
+            {
+                status |= 0x03;
+            }
+
+            _mmu.write(ADDR_LCD_STATUS, status);
+        }
+
+        bool areLYCAndLYEqual()
+        {
+            return _mmu.read(LY_COMPARE_ADDR) == _mmu.read(ADDR_SCANLINE);
+        }
+
+        void setLYCompareFlag(bool value)
+        {
+            int status = _mmu.read(ADDR_LCD_STATUS);
+            utils::setNthBit(status, 2, value);
+            _mmu.write(ADDR_LCD_STATUS, status);
+        }
+
+        bool isLYCompareStatInterruptEnabled()
+        {
+            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 6);
+        }
+
+        bool isOAMStatInterruptEnabled()
+        {
+            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 5);
+        }
+
+        bool isVBLANKStatInterruptEnabled()
+        {
+            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 4);
+        }
+
+        bool isHBLANKStatInterruptEnabled()
+        {
+            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 3);
+        }
+
+      private:
+        MMU& _mmu;
+        static const int LY_COMPARE_ADDR = 0xFF45;
+
+        /**
+         * The address of the LCD status register.
+         */
+        static const int ADDR_LCD_STATUS = 0xFF41;
+    };
     /**
      * Set the mode that the PPU is currently in.
      *
@@ -372,6 +442,11 @@ class PPU
      * The sprites in the OAM.
      */
     std::array<std::unique_ptr<Sprite>, NBR_SPRITES> _sprites;
+
+    /**
+     * The interrupt manager to use to raise graphical interrupts.
+     */
+    InterruptManager* _interruptManager = nullptr;
 };
 
 #endif // GBEMULATOR_PPU_HPP
