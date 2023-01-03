@@ -8,13 +8,29 @@
 void PPU::step(int nbrTicks)
 {
     _ticksSpentInCurrentMode += nbrTicks;
+    
+    LCDStatusRegister lcdStatusRegister(_mmu);
+
+    bool areLYCAndLYEqual = lcdStatusRegister.areLYCAndLYEqual();
+    lcdStatusRegister.setLYCompareFlag(areLYCAndLYEqual);
+
+    if (areLYCAndLYEqual && lcdStatusRegister.isLYCompareStatInterruptEnabled())
+    {
+        _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+    }
 
     if (_currentMode == OAM_ACCESS && _ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
     {
+        lcdStatusRegister.updateFlagMode(VRAM_ACCESS);
         setMode(VRAM_ACCESS);
     }
     else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
     {
+        lcdStatusRegister.updateFlagMode(HBLANK);
+        if (lcdStatusRegister.isHBLANKStatInterruptEnabled())
+        {
+            _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+        }
         setMode(HBLANK);
         renderScanline(_currentScanline);
     }
@@ -24,11 +40,24 @@ void PPU::step(int nbrTicks)
 
         if (_currentScanline == SCREEN_HEIGHT)
         {
+            lcdStatusRegister.updateFlagMode(VBLANK);
+            if (lcdStatusRegister.isVBLANKStatInterruptEnabled())
+            {
+                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            }
+
+            _interruptManager->raiseInterrupt(InterruptType::VBLANK);
             setMode(VBLANK);
             swapFrameBuffers();
         }
         else
         {
+            lcdStatusRegister.updateFlagMode(OAM_ACCESS);
+            if (lcdStatusRegister.isOAMStatInterruptEnabled())
+            {
+                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            }
+
             setMode(OAM_ACCESS);
         }
     }
@@ -38,10 +67,17 @@ void PPU::step(int nbrTicks)
         _ticksSpentInCurrentMode = 0;
         if (_currentScanline > MAX_SCANLINE_VALUE)
         {
+            lcdStatusRegister.updateFlagMode(OAM_ACCESS);
+            if (lcdStatusRegister.isOAMStatInterruptEnabled())
+            {
+                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            }
+
             setMode(OAM_ACCESS);
             _currentScanline = 0;
         }
     }
+
     _mmu.write(ADDR_SCANLINE, _currentScanline);
 }
 
@@ -212,7 +248,7 @@ void PPU::swapFrameBuffers()
     _frameId++;
 }
 
-PPU::PPU(MMU& mmu_) : _mmu(mmu_)
+PPU::PPU(MMU& mmu_, InterruptManager* interruptManager) : _mmu(mmu_), _interruptManager(interruptManager)
 {
     reset();
 
