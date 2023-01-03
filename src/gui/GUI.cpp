@@ -142,7 +142,19 @@ void GUI::displayTileMapView()
         tileMapId = 1;
     }
 
-    PPU::TileMap map = emulator.getPPU().getTileMap(tileMapId);
+    if (ImGui::Button("Tile Set 0"))
+    {
+        tileSetId = 0;
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Tile Set 1"))
+    {
+        tileSetId = 1;
+    }
+
+    PPU::TileMap map = emulator.getPPU().getTileMap(tileMapId, tileSetId);
     for (int y = 0; y < PPU::TILEMAP_HEIGHT; y++)
     {
         for (int x = 0; x < PPU::TILEMAP_WIDTH; x++)

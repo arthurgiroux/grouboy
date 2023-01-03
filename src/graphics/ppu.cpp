@@ -74,7 +74,7 @@ void PPU::renderScanlineBackground(int scanline)
     byte scrollY = _mmu.read(ADDR_SCROLL_Y);
 
     // Retrieve the tilemap we are going to use
-    TileMap background = getTileMap(backgroundTileMapIndex());
+    TileMap background = getTileMap(backgroundTileMapIndex(), backgroundAndWindowTileDataAreaIndex());
 
     /*
      * The tilemap is a 32x32 map of tiles of 8x8 pixels.
@@ -242,7 +242,7 @@ Tile PPU::getTileById(byte tileId, int8_t tileSetId)
     return Tile(dataArray);
 }
 
-PPU::TileMap PPU::getTileMap(int index)
+PPU::TileMap PPU::getTileMap(int index, int tileSetId)
 {
     int tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
     TileMap map = {};
@@ -250,7 +250,7 @@ PPU::TileMap PPU::getTileMap(int index)
     for (int i = 0; i < TILEMAP_WIDTH * TILEMAP_HEIGHT; ++i)
     {
         sbyte tileId = _mmu.read(tileMapAddr + i);
-        map.push_back(getTileById(tileId, index));
+        map.push_back(getTileById(tileId, tileSetId));
     }
 
     return map;

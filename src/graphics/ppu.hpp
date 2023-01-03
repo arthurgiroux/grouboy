@@ -30,10 +30,11 @@ class PPU
 
     /**
      * Retrieve the tile map with the given index
-     * @param index possible values [0, 1]
+     * @param index the id of the tilemap to use, possible values [0, 1]
+     * @param tileSetId the id of the tile set to use, possible values [0, 1]
      * @return  the Tile map
      */
-    TileMap getTileMap(int index);
+    TileMap getTileMap(int index, int tileSetId);
 
     /**
      * Create a new PPU object.
