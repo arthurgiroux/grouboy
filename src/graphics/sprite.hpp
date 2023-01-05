@@ -69,6 +69,21 @@ class Sprite
      */
     bool isFlippedHorizontally() const;
 
+    /**
+     * Should the opaque pixels of the tile be rendered over the background and window.
+     *
+     * @return True if tile should be rendered over the other layers, false otherwise.
+     */
+    bool isRenderedOverBackgroundAndWindow() const;
+
+    /**
+     * Compare the render priority of the current sprite with another one.
+     *
+     * @param other the sprite priority to compare it
+     * @return True if the sprite priority is bigger than the other one, false otherwise
+     */
+    bool isPriorityBiggerThanOtherSprite(const Sprite& other) const;
+
   private:
     /**
      * Read a certain data from the payload containing sprite information.
@@ -86,6 +101,7 @@ class Sprite
     static const int PAYLOAD_DATA_FLAG_ATTR_IDX = 3;
     static const int Y_SCREEN_OFFSET = 16;
     static const int X_SCREEN_OFFSET = 8;
+    static const int DATA_FLAG_BIT_BGWINDOW_OVER_OBJ = 7;
     static const int DATA_FLAG_BIT_VFLIP = 6;
     static const int DATA_FLAG_BIT_HFLIP = 5;
     MMU& _mmu;

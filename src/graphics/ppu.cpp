@@ -4,6 +4,7 @@
 #include "spdlog/spdlog.h"
 #include <bitset>
 #include <cassert>
+#include <set>
 
 void PPU::step(int nbrTicks)
 {
@@ -177,6 +178,7 @@ void PPU::renderScanlineSprite(int scanline)
         int spriteSz = spriteSize();
         int spriteStartVerticalPos = sprite->getYPositionOnScreen();
         int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
+
         if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
         {
             nbrSpritesInScanline++;
@@ -198,8 +200,12 @@ void PPU::renderScanlineSprite(int scanline)
         spdlog::info("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
     }
 
-    // TODO: Implement sprite ordering
+    // Sort sprite by priority
+    std::sort(spritesToRender.begin(), spritesToRender.end(),
+              [](Sprite* l, Sprite* r) { return l->isPriorityBiggerThanOtherSprite(*r); });
 
+    // Keeping track of which pixel were rendered
+    std::set<int> renderedPixels = {};
     for (auto* sprite : spritesToRender)
     {
         Tile tile = getTileById(sprite->getTileId(), 0);
@@ -226,6 +232,12 @@ void PPU::renderScanlineSprite(int scanline)
                 break;
             }
 
+            // If the pixel was already rendered by another sprite with higher priority, we are not rendering it again.
+            if (renderedPixels.count(xCoordinateOnScreen))
+            {
+                continue;
+            }
+
             int xCoordinateInTile = xOffset;
             if (sprite->isFlippedHorizontally())
             {
@@ -233,7 +245,16 @@ void PPU::renderScanlineSprite(int scanline)
             }
 
             // We are copying the pixel if it's not white, white is treated as transparent
-            if (!tileImage.isPixelWhite(xCoordinateInTile, yCoordinateInTile))
+            bool isPixelOpaque = !tileImage.isPixelWhite(xCoordinateInTile, yCoordinateInTile);
+
+            /*
+             * The pixel should only be rendered if it's over background/window or if
+             * the background/window didn't render to this pixel.
+             */
+            bool pixelShouldBeRendered = sprite->isRenderedOverBackgroundAndWindow() ||
+                                         _temporaryFrame.isPixelWhite(xCoordinateOnScreen, scanline);
+
+            if (isPixelOpaque && pixelShouldBeRendered)
             {
                 _temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xCoordinateInTile,
                                           yCoordinateInTile);
