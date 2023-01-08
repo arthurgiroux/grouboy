@@ -239,7 +239,7 @@ class PPU
         LCDStatusRegister(MMU& mmu) : _mmu(mmu){};
         void updateFlagMode(Mode value)
         {
-            int status = _mmu.read(ADDR_LCD_STATUS) & 0x11111100;
+            int status = _mmu.read(ADDR_LCD_STATUS) & 0b11111100;
             if (value == HBLANK)
             {
                 status |= 0x00;
