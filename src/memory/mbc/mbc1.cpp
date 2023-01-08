@@ -1,5 +1,6 @@
 #include "mbc1.hpp"
 #include <iostream>
+#include <stdexcept>
 
 MBC1::MBC1(Cartridge* cartridge) : MemoryBankController(cartridge)
 {

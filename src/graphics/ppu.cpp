@@ -2,6 +2,7 @@
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
 #include "spdlog/spdlog.h"
+#include <algorithm>
 #include <cassert>
 #include <set>
 
