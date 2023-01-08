@@ -232,6 +232,7 @@ class PPU
     static const int MAX_SCANLINE_VALUE = 153;
 
   private:
+    // TODO: Clean-up and document
     class LCDStatusRegister
     {
       public:
@@ -308,6 +309,7 @@ class PPU
      */
     void setMode(Mode value)
     {
+        _lcdStatusRegister.updateFlagMode(value);
         _currentMode = value;
         // TODO: Check if we should take into account modulo of ticks
         _ticksSpentInCurrentMode = 0;
@@ -447,6 +449,11 @@ class PPU
      * The interrupt manager to use to raise graphical interrupts.
      */
     InterruptManager* _interruptManager = nullptr;
+
+    /**
+     * LCD Status register, used to exposed PPU state via memory.
+     */
+    LCDStatusRegister _lcdStatusRegister = LCDStatusRegister(_mmu);
 };
 
 #endif // GBEMULATOR_PPU_HPP

@@ -9,7 +9,7 @@
 void PPU::step(int nbrTicks)
 {
     _ticksSpentInCurrentMode += nbrTicks;
-    
+
     LCDStatusRegister lcdStatusRegister(_mmu);
 
     bool areLYCAndLYEqual = lcdStatusRegister.areLYCAndLYEqual();
@@ -22,12 +22,10 @@ void PPU::step(int nbrTicks)
 
     if (_currentMode == OAM_ACCESS && _ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
     {
-        lcdStatusRegister.updateFlagMode(VRAM_ACCESS);
         setMode(VRAM_ACCESS);
     }
     else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
     {
-        lcdStatusRegister.updateFlagMode(HBLANK);
         if (lcdStatusRegister.isHBLANKStatInterruptEnabled())
         {
             _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
@@ -41,7 +39,6 @@ void PPU::step(int nbrTicks)
 
         if (_currentScanline == SCREEN_HEIGHT)
         {
-            lcdStatusRegister.updateFlagMode(VBLANK);
             if (lcdStatusRegister.isVBLANKStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
@@ -53,7 +50,6 @@ void PPU::step(int nbrTicks)
         }
         else
         {
-            lcdStatusRegister.updateFlagMode(OAM_ACCESS);
             if (lcdStatusRegister.isOAMStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
@@ -68,7 +64,6 @@ void PPU::step(int nbrTicks)
         _ticksSpentInCurrentMode = 0;
         if (_currentScanline > MAX_SCANLINE_VALUE)
         {
-            lcdStatusRegister.updateFlagMode(OAM_ACCESS);
             if (lcdStatusRegister.isOAMStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
@@ -357,7 +352,7 @@ void PPU::reset()
 {
     _frameId = 0;
     _ticksSpentInCurrentMode = 0;
-    _currentMode = OAM_ACCESS;
+    setMode(OAM_ACCESS);
     _currentScanline = 0;
     _temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
     _lastRenderedFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
