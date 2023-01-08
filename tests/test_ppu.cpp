@@ -198,3 +198,30 @@ TEST_F(PpuTest, LCDStatModeFlagShouldBeSetToCorrectPPUMode)
         }
     }
 }
+
+TEST_F(PpuTest, LCDStatLYCCompareShouldOnlyBeSetWhenLYIsTheSameAsLCY)
+{
+    int expectedLine = 25;
+    mmu.write(ADDR_LYC, expectedLine);
+
+    for (int scanlineId = 0; scanlineId < PPU::SCREEN_HEIGHT; ++scanlineId)
+    {
+        ppu.step(1);
+        ASSERT_EQ(utils::isNthBitSet(mmu.read(ADDR_LCD_STATUS), 2), scanlineId == expectedLine);
+        ppu.step(PPU::OAM_ACCESS_TICKS - 1);
+        ppu.step(PPU::VRAM_ACCESS_TICKS);
+        ppu.step(PPU::HBLANK_TICKS);
+        ppu.step(PPU::HBLANK_TICKS);
+    }
+
+    // Let's check that it also works during VBLANK
+    expectedLine = 155;
+    mmu.write(ADDR_LYC, expectedLine);
+
+    for (int scanlineId = PPU::SCREEN_HEIGHT; scanlineId < PPU::MAX_SCANLINE_VALUE; ++scanlineId)
+    {
+        ppu.step(1);
+        ASSERT_EQ(utils::isNthBitSet(mmu.read(ADDR_LCD_STATUS), 2), scanlineId == expectedLine);
+        ppu.step(PPU::VBLANK_TICKS - 1);
+    }
+}
