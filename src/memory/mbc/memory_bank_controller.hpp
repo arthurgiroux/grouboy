@@ -2,6 +2,7 @@
 #define GBEMULATOR_MEMORY_BANK_CONTROLLER_HPP
 
 #include "memory/cartridge.hpp"
+#include <memory>
 
 class MemoryBankController
 {
