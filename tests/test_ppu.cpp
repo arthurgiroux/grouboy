@@ -225,3 +225,22 @@ TEST_F(PpuTest, LCDStatLYCCompareShouldOnlyBeSetWhenLYIsTheSameAsLCY)
         ppu.step(PPU::VBLANK_TICKS - 1);
     }
 }
+
+TEST_F(PpuTest, LCDStatLYCCompareShouldRaiseInterruptWhenLYIsTheSameAsLCY)
+{
+    int expectedLine = 25;
+    mmu.write(ADDR_LYC, expectedLine);
+    mmu.write(ADDR_LCD_STATUS, 0x40);
+
+    ASSERT_FALSE(interruptManager.isInterruptPending(InterruptType::LCD_STAT));
+
+    for (int scanlineId = 0; scanlineId < PPU::SCREEN_HEIGHT; ++scanlineId)
+    {
+        ppu.step(1);
+        ASSERT_EQ(interruptManager.isInterruptPending(InterruptType::LCD_STAT), scanlineId == expectedLine);
+        ppu.step(PPU::OAM_ACCESS_TICKS - 1);
+        ppu.step(PPU::VRAM_ACCESS_TICKS);
+        ppu.step(PPU::HBLANK_TICKS);
+        interruptManager.clearInterrupt(InterruptType::LCD_STAT);
+    }
+}
