@@ -454,6 +454,11 @@ class PPU
      * LCD Status register, used to exposed PPU state via memory.
      */
     LCDStatusRegister _lcdStatusRegister = LCDStatusRegister(_mmu);
+
+    /**
+     * Was a LCD_STAT, LCY=LY interrupt already fired for this scanline
+     */
+    bool _LYCInterruptRaisedDuringScanline = false;
 };
 
 #endif // GBEMULATOR_PPU_HPP

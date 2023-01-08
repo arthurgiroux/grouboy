@@ -2,7 +2,6 @@
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
 #include "spdlog/spdlog.h"
-#include <bitset>
 #include <cassert>
 #include <set>
 
@@ -15,9 +14,10 @@ void PPU::step(int nbrTicks)
     bool areLYCAndLYEqual = lcdStatusRegister.areLYCAndLYEqual();
     lcdStatusRegister.setLYCompareFlag(areLYCAndLYEqual);
 
-    if (areLYCAndLYEqual && lcdStatusRegister.isLYCompareStatInterruptEnabled())
+    if (areLYCAndLYEqual && lcdStatusRegister.isLYCompareStatInterruptEnabled() && !_LYCInterruptRaisedDuringScanline)
     {
         _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+        _LYCInterruptRaisedDuringScanline = true;
     }
 
     if (_currentMode == OAM_ACCESS && _ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
@@ -36,6 +36,7 @@ void PPU::step(int nbrTicks)
     else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= HBLANK_TICKS)
     {
         _currentScanline++;
+        _LYCInterruptRaisedDuringScanline = false;
 
         if (_currentScanline == SCREEN_HEIGHT)
         {
@@ -72,6 +73,7 @@ void PPU::step(int nbrTicks)
             setMode(OAM_ACCESS);
             _currentScanline = 0;
         }
+        _LYCInterruptRaisedDuringScanline = false;
     }
 
     _mmu.write(ADDR_SCANLINE, _currentScanline);
@@ -354,6 +356,7 @@ void PPU::reset()
     _ticksSpentInCurrentMode = 0;
     setMode(OAM_ACCESS);
     _currentScanline = 0;
+    _LYCInterruptRaisedDuringScanline = false;
     _temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
     _lastRenderedFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
 }
