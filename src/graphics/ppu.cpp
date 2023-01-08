@@ -200,7 +200,7 @@ void PPU::renderScanlineSprite(int scanline)
 
     // Sort sprite by priority
     std::sort(spritesToRender.begin(), spritesToRender.end(),
-              [](Sprite* l, Sprite* r) { return l->isPriorityBiggerThanOtherSprite(*r); });
+              [](Sprite* l, Sprite* r) { return !l->isPriorityBiggerThanOtherSprite(*r); });
 
     // Keeping track of which pixel were rendered
     std::set<int> renderedPixels = {};
