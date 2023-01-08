@@ -198,12 +198,13 @@ void PPU::renderScanlineSprite(int scanline)
         spdlog::info("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
     }
 
-    // Sort sprite by priority
+    /*
+     * Sort sprite by priority, from lowest to highest.
+     * We will render first the lowest priority sprite so that they can be overridden by a sprite with higher priority.
+     */
     std::sort(spritesToRender.begin(), spritesToRender.end(),
               [](Sprite* l, Sprite* r) { return !l->isPriorityBiggerThanOtherSprite(*r); });
 
-    // Keeping track of which pixel were rendered
-    std::set<int> renderedPixels = {};
     for (auto* sprite : spritesToRender)
     {
         Tile tile = getTileById(sprite->getTileId(), 0);
@@ -228,12 +229,6 @@ void PPU::renderScanlineSprite(int scanline)
             if (xCoordinateOnScreen > SCREEN_WIDTH)
             {
                 break;
-            }
-
-            // If the pixel was already rendered by another sprite with higher priority, we are not rendering it again.
-            if (renderedPixels.count(xCoordinateOnScreen))
-            {
-                continue;
             }
 
             int xCoordinateInTile = xOffset;
