@@ -1,4 +1,5 @@
 #include "mbc_rom_only.hpp"
+#include <stdexcept>
 
 MBCRomOnly::MBCRomOnly(Cartridge* cartridge) : MemoryBankController(cartridge)
 {
