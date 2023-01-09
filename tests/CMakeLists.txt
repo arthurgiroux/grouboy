@@ -30,7 +30,8 @@ add_executable(
         test_cpu_instructions_misc_control.cpp
         test_cpu_instructions_16bits_arithmetic_logical.cpp
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        test_blargg.cpp)
+        test_blargg.cpp
+        test_palette.cpp)
 
 # TODO: Set this using environment variable, CMake seems to have issues with this right now
 target_compile_definitions(cpu_tests PRIVATE -DDATADIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
