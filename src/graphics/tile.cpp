@@ -6,7 +6,7 @@ const int Tile::COLOR_WHITE = 255;
 const int Tile::COLOR_DARK_GRAY = 192;
 const int Tile::COLOR_LIGHT_GRAY = 96;
 
-byte Tile::paletteValueToGrayscale(byte value) const
+byte Tile::paletteValueToGrayscale(byte value)
 {
     if (value == 0)
     {
@@ -45,8 +45,9 @@ void Tile::convertToPixels()
         for (int x = 0; x < TILE_WIDTH; x++)
         {
             // The pixels are ordered from left to right, the highest bit is the leftmost pixel.
-            byte tileData = (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
-            byte grayscaleValue = paletteValueToGrayscale(tileData);
+            byte colorData = (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
+            _colorData[line * TILE_WIDTH + x] = colorData;
+            byte grayscaleValue = paletteValueToGrayscale(colorData);
 
             image.setPixel(x, line, grayscaleValue);
         }
@@ -61,4 +62,9 @@ Tile::Tile(const Tile::TileDataArray& data_) : data(data_)
 const RGBImage& Tile::getImage() const
 {
     return image;
+}
+
+const Tile::ColorDataArray& Tile::getColorData() const
+{
+    return _colorData;
 }
