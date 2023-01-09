@@ -14,10 +14,13 @@ class Tile
     static const int TILE_HEIGHT = 8;
 
     using TileDataArray = std::array<byte, BYTES_PER_TILE>;
+    using ColorDataArray = std::array<byte, TILE_HEIGHT * TILE_WIDTH>;
 
     Tile(const TileDataArray& data);
 
     const RGBImage& getImage() const;
+    const ColorDataArray& getColorData() const;
+    static byte paletteValueToGrayscale(byte value);
 
     static const int COLOR_BLACK;
     static const int COLOR_WHITE;
@@ -25,10 +28,10 @@ class Tile
     static const int COLOR_LIGHT_GRAY;
 
   private:
-    byte paletteValueToGrayscale(byte value) const;
     void convertToPixels();
 
     TileDataArray data = {};
+    ColorDataArray _colorData = {};
     RGBImage image = RGBImage(TILE_HEIGHT, TILE_WIDTH);
 };
 
