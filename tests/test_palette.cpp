@@ -43,3 +43,23 @@ TEST_F(PaletteTest, MultiplePaletteShouldWorkIndependently)
     ASSERT_EQ(palette2.convertColorId(2), 2);
     ASSERT_EQ(palette2.convertColorId(3), 3);
 }
+
+TEST_F(PaletteTest, ConvertingColor0ToGrayscaleShouldGiveWhite)
+{
+    ASSERT_EQ(Palette::convertColorToGrayscale(0), Palette::COLOR_WHITE);
+}
+
+TEST_F(PaletteTest, ConvertingColor1ToGrayscaleShouldGiveLightGray)
+{
+    ASSERT_EQ(Palette::convertColorToGrayscale(1), Palette::COLOR_LIGHT_GRAY);
+}
+
+TEST_F(PaletteTest, ConvertingColor2ToGrayscaleShouldGiveDarkGray)
+{
+    ASSERT_EQ(Palette::convertColorToGrayscale(2), Palette::COLOR_DARK_GRAY);
+}
+
+TEST_F(PaletteTest, ConvertingColor2ToGrayscaleShouldGiveBlack)
+{
+    ASSERT_EQ(Palette::convertColorToGrayscale(3), Palette::COLOR_BLACK);
+}

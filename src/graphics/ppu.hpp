@@ -2,6 +2,7 @@
 #define GBEMULATOR_PPU_HPP
 
 #include "memory/mmu.hpp"
+#include "palette.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
 #include "tile.hpp"
@@ -389,7 +390,6 @@ class PPU
      * The address where we store the information of the scanline being rendered.
      */
     static const int ADDR_SCANLINE = 0xFF44;
-    static const int ADDR_BG_PALETTE = 0xFF47;
     static const int TILES_PER_LINE = 20;
     static const int TILE_MAP_SIZE = 32;
     static const int WINDOW_ADDR_SCROLL_Y = 0xFF4A;
@@ -459,6 +459,36 @@ class PPU
      * Was a LCD_STAT, LCY=LY interrupt already fired for this scanline
      */
     bool _LYCInterruptRaisedDuringScanline = false;
+
+    /**
+     * The address of the palette to use for background sprites.
+     */
+    static const int ADDR_PALETTE_BG = 0xFF47;
+
+    /**
+     * The address of the palette with index 0 to use for sprites (object rendering).
+     */
+    static const int ADDR_PALETTE_OBJ0 = 0x0FF48;
+
+    /**
+     * The address of the palette with index 1 to use for sprites (object rendering).
+     */
+    static const int ADDR_PALETTE_OBJ1 = 0x0FF49;
+
+    /**
+     * The palette to use for background sprites.
+     */
+    Palette _paletteBackground;
+
+    /**
+     * The palette with index 0 to use for sprites (object rendering).
+     */
+    Palette _paletteObj0;
+
+    /**
+     * The palette with index 1 to use for sprites (object rendering).
+     */
+    Palette _paletteObj1;
 };
 
 #endif // GBEMULATOR_PPU_HPP

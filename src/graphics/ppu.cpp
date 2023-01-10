@@ -1,6 +1,7 @@
 
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
+#include "graphics/palette.hpp"
 #include "spdlog/spdlog.h"
 #include <algorithm>
 #include <cassert>
@@ -151,8 +152,13 @@ void PPU::renderScanlineBackground(int scanline)
         int xOffsetTile = xIndexOffset % Tile::TILE_WIDTH;
         int yOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
 
-        // Finally we copy the correct pixel in our temporary frame.
-        _temporaryFrame.copyPixel(x, scanline, tileImage, xOffsetTile, yOffsetTile);
+        /*
+         * We retrieve the pixel color by getting the original sprite color,
+         * converting using the palette and converting it to a grayscale value.
+         */
+        int colorValue = background[tileIndex].getColorData(xOffsetTile, yOffsetTile);
+        int convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
+        _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
 }
 
@@ -237,8 +243,12 @@ void PPU::renderScanlineSprite(int scanline)
                 xCoordinateInTile = Tile::TILE_WIDTH - 1 - xCoordinateInTile;
             }
 
+            Palette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
+            int colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
+            int convertedPaletteColor = palette.convertColorId(colorId);
+
             // We are copying the pixel if it's not white, white is treated as transparent
-            bool isPixelOpaque = !tileImage.isPixelWhite(xCoordinateInTile, yCoordinateInTile);
+            bool isPixelOpaque = colorId != 0;
 
             /*
              * The pixel should only be rendered if it's over background/window or if
@@ -249,8 +259,8 @@ void PPU::renderScanlineSprite(int scanline)
 
             if (isPixelOpaque && pixelShouldBeRendered)
             {
-                _temporaryFrame.copyPixel(xCoordinateOnScreen, scanline, tileImage, xCoordinateInTile,
-                                          yCoordinateInTile);
+                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline,
+                                         Palette::convertColorToGrayscale(convertedPaletteColor));
             }
         }
     }
@@ -262,7 +272,9 @@ void PPU::swapFrameBuffers()
     _frameId++;
 }
 
-PPU::PPU(MMU& mmu_, InterruptManager* interruptManager) : _mmu(mmu_), _interruptManager(interruptManager)
+PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
+    : _mmu(mmu_), _interruptManager(interruptManager), _paletteBackground(_mmu, ADDR_PALETTE_BG),
+      _paletteObj0(_mmu, ADDR_PALETTE_OBJ0), _paletteObj1(_mmu, ADDR_PALETTE_OBJ1)
 {
     reset();
 
