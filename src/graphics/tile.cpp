@@ -1,30 +1,6 @@
 #include "tile.hpp"
+#include "palette.hpp"
 #include <bitset>
-
-const int Tile::COLOR_BLACK = 0;
-const int Tile::COLOR_WHITE = 255;
-const int Tile::COLOR_DARK_GRAY = 192;
-const int Tile::COLOR_LIGHT_GRAY = 96;
-
-byte Tile::paletteValueToGrayscale(byte value)
-{
-    if (value == 0)
-    {
-        return COLOR_WHITE;
-    }
-    else if (value == 1)
-    {
-        return COLOR_LIGHT_GRAY;
-    }
-    else if (value == 2)
-    {
-        return COLOR_DARK_GRAY;
-    }
-    else
-    {
-        return COLOR_BLACK;
-    }
-}
 
 void Tile::convertToPixels()
 {
@@ -47,7 +23,7 @@ void Tile::convertToPixels()
             // The pixels are ordered from left to right, the highest bit is the leftmost pixel.
             byte colorData = (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
             _colorData[line * TILE_WIDTH + x] = colorData;
-            byte grayscaleValue = paletteValueToGrayscale(colorData);
+            byte grayscaleValue = Palette::convertColorToGrayscale(colorData);
 
             image.setPixel(x, line, grayscaleValue);
         }
@@ -64,7 +40,7 @@ const RGBImage& Tile::getImage() const
     return image;
 }
 
-const Tile::ColorDataArray& Tile::getColorData() const
+byte Tile::getColorData(int x, int y) const
 {
-    return _colorData;
+    return _colorData[y * TILE_WIDTH + x];
 }

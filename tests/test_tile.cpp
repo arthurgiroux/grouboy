@@ -1,3 +1,4 @@
+#include "graphics/palette.hpp"
 #include "graphics/tile.hpp"
 #include <gtest/gtest.h>
 
@@ -9,7 +10,7 @@ TEST(TileTest, AllZeroTileShouldBeAllWhite)
 
     for (size_t i = 0; i < pixels.size(); i++)
     {
-        ASSERT_EQ(pixels[i], Tile::COLOR_WHITE);
+        ASSERT_EQ(pixels[i], Palette::COLOR_WHITE);
     }
 }
 
@@ -22,7 +23,7 @@ TEST(TileTest, FilledTileShouldBeAllBlack)
 
     for (size_t i = 0; i < pixels.size(); i++)
     {
-        ASSERT_EQ(pixels[i], Tile::COLOR_BLACK);
+        ASSERT_EQ(pixels[i], Palette::COLOR_BLACK);
     }
 }
 
@@ -45,7 +46,7 @@ TEST(TileTest, LSBTileShouldBeAllLightGray)
 
     for (size_t i = 0; i < pixels.size(); i++)
     {
-        ASSERT_EQ(pixels[i], Tile::COLOR_LIGHT_GRAY);
+        ASSERT_EQ(pixels[i], Palette::COLOR_LIGHT_GRAY);
     }
 }
 
@@ -68,6 +69,6 @@ TEST(TileTest, MSBTileShouldBeAllDarkGray)
 
     for (size_t i = 0; i < pixels.size(); i++)
     {
-        ASSERT_EQ(pixels[i], Tile::COLOR_DARK_GRAY);
+        ASSERT_EQ(pixels[i], Palette::COLOR_DARK_GRAY);
     }
 }

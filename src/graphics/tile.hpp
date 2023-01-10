@@ -19,13 +19,7 @@ class Tile
     Tile(const TileDataArray& data);
 
     const RGBImage& getImage() const;
-    const ColorDataArray& getColorData() const;
-    static byte paletteValueToGrayscale(byte value);
-
-    static const int COLOR_BLACK;
-    static const int COLOR_WHITE;
-    static const int COLOR_DARK_GRAY;
-    static const int COLOR_LIGHT_GRAY;
+    byte getColorData(int x, int y) const;
 
   private:
     void convertToPixels();
