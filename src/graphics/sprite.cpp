@@ -16,7 +16,7 @@ int Sprite::getTileId() const
 
 int Sprite::getPaletteId() const
 {
-    return readDataFromPayload(PAYLOAD_PALETTE_ID_IDX);
+    return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_PALETTEID);
 }
 
 bool Sprite::isFlippedVertically() const
