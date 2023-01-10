@@ -106,12 +106,13 @@ class Sprite
     static const int PAYLOAD_DATA_X_IDX = 1;
     static const int PAYLOAD_DATA_TILEID_IDX = 2;
     static const int PAYLOAD_DATA_FLAG_ATTR_IDX = 3;
-    static const int PAYLOAD_PALETTE_ID_IDX = 4;
     static const int Y_SCREEN_OFFSET = 16;
     static const int X_SCREEN_OFFSET = 8;
     static const int DATA_FLAG_BIT_BGWINDOW_OVER_OBJ = 7;
     static const int DATA_FLAG_BIT_VFLIP = 6;
     static const int DATA_FLAG_BIT_HFLIP = 5;
+    static const int DATA_FLAG_BIT_PALETTEID = 4;
+
     MMU& _mmu;
     int _id;
 };
