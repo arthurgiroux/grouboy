@@ -84,6 +84,13 @@ class Sprite
      */
     bool isPriorityBiggerThanOtherSprite(const Sprite& other) const;
 
+    /**
+     * Get the id of the palette to use to render the Sprite.
+     *
+     * @return  either 0 or 1, for the palette id.
+     */
+    int getPaletteId() const;
+
   private:
     /**
      * Read a certain data from the payload containing sprite information.
@@ -99,6 +106,7 @@ class Sprite
     static const int PAYLOAD_DATA_X_IDX = 1;
     static const int PAYLOAD_DATA_TILEID_IDX = 2;
     static const int PAYLOAD_DATA_FLAG_ATTR_IDX = 3;
+    static const int PAYLOAD_PALETTE_ID_IDX = 4;
     static const int Y_SCREEN_OFFSET = 16;
     static const int X_SCREEN_OFFSET = 8;
     static const int DATA_FLAG_BIT_BGWINDOW_OVER_OBJ = 7;

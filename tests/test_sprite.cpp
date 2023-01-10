@@ -103,3 +103,14 @@ TEST_F(SpriteTest, isFlippedHorizontallyShouldReturnTrueIfFlagIsSetInMemory)
     setDataFlagInMemory(spriteId, 0b00100000);
     ASSERT_TRUE(sprite.isFlippedHorizontally());
 }
+
+TEST_F(SpriteTest, getPaletteIdShouldReturnThePaletteIdSetInMemory)
+{
+    int spriteId = 20;
+    int startAddr = SPRITE_ATTR_TABLE_ADDR + BYTE_PER_TILE * spriteId;
+    int paletteIdOffset = 4;
+    int expectedPaletteId = 1;
+    mmu.write(startAddr + paletteIdOffset, expectedPaletteId);
+    Sprite sprite(mmu, spriteId);
+    ASSERT_EQ(sprite.getPaletteId(), 1);
+}
