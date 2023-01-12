@@ -160,7 +160,7 @@ void GUI::displayTileMapView()
         for (int x = 0; x < PPU::TILEMAP_WIDTH; x++)
         {
             Tile tile = map[y * PPU::TILEMAP_WIDTH + x];
-            loadRGBImageInSubTexture(tileMapRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT,
+            loadRGBImageInSubTexture(tileMapRenderTexture, x * SingleTile::TILE_WIDTH, y * SingleTile::TILE_HEIGHT,
                                      tile.getImage());
         }
     }
@@ -176,11 +176,12 @@ void GUI::displayTileView()
         {
             int tileId = y * numberOfTileToDisplayPerLine + x;
             Tile tile = emulator.getPPU().getTileById(tileId, 0);
-            loadRGBImageInSubTexture(tileRenderTexture, x * Tile::TILE_WIDTH, y * Tile::TILE_HEIGHT, tile.getImage());
+            loadRGBImageInSubTexture(tileRenderTexture, x * SingleTile::TILE_WIDTH, y * SingleTile::TILE_HEIGHT,
+                                     tile.getImage());
 
             Tile tile2 = emulator.getPPU().getTileById(tileId, 1);
-            loadRGBImageInSubTexture(tileRenderTexture, xoffsetForTileSet2 + x * Tile::TILE_WIDTH,
-                                     y * Tile::TILE_HEIGHT, tile2.getImage());
+            loadRGBImageInSubTexture(tileRenderTexture, xoffsetForTileSet2 + x * SingleTile::TILE_WIDTH,
+                                     y * SingleTile::TILE_HEIGHT, tile2.getImage());
         }
     }
     {
@@ -194,7 +195,7 @@ void GUI::displayTileView()
         if (ImGui::IsItemHovered())
         {
             ImGui::BeginTooltip();
-            float region_sz = Tile::TILE_HEIGHT;
+            float region_sz = SingleTile::TILE_HEIGHT;
             int region_x = static_cast<int>((io.MousePos.x - pos.x) / region_sz) * region_sz;
             int region_y = static_cast<int>((io.MousePos.y - pos.y) / region_sz) * region_sz;
             float zoom = 8.0f;

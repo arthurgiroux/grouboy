@@ -5,7 +5,8 @@
 TEST(TileTest, AllZeroTileShouldBeAllWhite)
 {
     Tile::TileDataArray data = {};
-    Tile tile(data);
+    data.resize(SingleTile::BYTES_PER_TILE);
+    SingleTile tile(data);
     const std::vector<byte>& pixels = tile.getImage().getData();
 
     for (size_t i = 0; i < pixels.size(); i++)
@@ -17,8 +18,12 @@ TEST(TileTest, AllZeroTileShouldBeAllWhite)
 TEST(TileTest, FilledTileShouldBeAllBlack)
 {
     Tile::TileDataArray data = {};
-    data.fill(0xFF);
-    Tile tile(data);
+    data.resize(SingleTile::BYTES_PER_TILE);
+    for (int i = 0; i < data.size(); ++i)
+    {
+        data[i] = 0xFF;
+    }
+    SingleTile tile(data);
     const std::vector<byte>& pixels = tile.getImage().getData();
 
     for (size_t i = 0; i < pixels.size(); i++)
@@ -30,6 +35,7 @@ TEST(TileTest, FilledTileShouldBeAllBlack)
 TEST(TileTest, LSBTileShouldBeAllLightGray)
 {
     Tile::TileDataArray data = {};
+    data.resize(SingleTile::BYTES_PER_TILE);
     for (size_t i = 0; i < data.size(); ++i)
     {
         if (i % 2 == 0)
@@ -41,7 +47,7 @@ TEST(TileTest, LSBTileShouldBeAllLightGray)
             data[i] = 0;
         }
     }
-    Tile tile(data);
+    SingleTile tile(data);
     const std::vector<byte>& pixels = tile.getImage().getData();
 
     for (size_t i = 0; i < pixels.size(); i++)
@@ -53,6 +59,7 @@ TEST(TileTest, LSBTileShouldBeAllLightGray)
 TEST(TileTest, MSBTileShouldBeAllDarkGray)
 {
     Tile::TileDataArray data = {};
+    data.resize(SingleTile::BYTES_PER_TILE);
     for (size_t i = 0; i < data.size(); ++i)
     {
         if (i % 2 == 1)
@@ -64,7 +71,7 @@ TEST(TileTest, MSBTileShouldBeAllDarkGray)
             data[i] = 0;
         }
     }
-    Tile tile(data);
+    SingleTile tile(data);
     const std::vector<byte>& pixels = tile.getImage().getData();
 
     for (size_t i = 0; i < pixels.size(); i++)
