@@ -102,7 +102,7 @@ class PPU
      * @param tileSetId The tile set to use
      * @return The requested tile
      */
-    Tile getTileById(byte tileId, int8_t tileSetId);
+    Tile getTileById(byte tileId, int8_t tileSetId, bool isStacked = false);
 
     /**
      * Get a reference to the last rendered frame.
@@ -390,8 +390,6 @@ class PPU
      * The address where we store the information of the scanline being rendered.
      */
     static const int ADDR_SCANLINE = 0xFF44;
-    static const int TILES_PER_LINE = 20;
-    static const int TILE_MAP_SIZE = 32;
     static const int WINDOW_ADDR_SCROLL_Y = 0xFF4A;
     static const int WINDOW_ADDR_SCROLL_X = 0xFF4B;
 

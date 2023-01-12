@@ -118,7 +118,7 @@ void PPU::renderScanlineBackground(int scanline)
      * line of the tilemap we are going to render.
      * We can compute the line by seeing how many tiles we span vertically.
      */
-    int lineInTileMap = (scanline + scrollY) / Tile::TILE_HEIGHT;
+    int lineInTileMap = (scanline + scrollY) / SingleTile::TILE_HEIGHT;
     lineInTileMap %= TILEMAP_HEIGHT;
     assert(lineInTileMap < TILEMAP_HEIGHT);
 
@@ -134,14 +134,14 @@ void PPU::renderScanlineBackground(int scanline)
 
         // The background map is not clamped, if we go "too far right",
         // it should display tiles that are on the left.
-        if (xIndexOffset > TILEMAP_WIDTH * Tile::TILE_WIDTH)
+        if (xIndexOffset > TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
         {
-            xIndexOffset %= TILEMAP_WIDTH * Tile::TILE_WIDTH;
+            xIndexOffset %= TILEMAP_WIDTH * SingleTile::TILE_WIDTH;
         }
-        assert(xIndexOffset < TILEMAP_WIDTH * Tile::TILE_WIDTH);
+        assert(xIndexOffset < TILEMAP_WIDTH * SingleTile::TILE_WIDTH);
 
         // We see how many tiles we span horizontally and add it to our offset to find the tile index
-        int tileIndex = offsetInTileMap + (xIndexOffset / Tile::TILE_WIDTH);
+        int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
         const RGBImage& tileImage = background[tileIndex].getImage();
 
         /*
@@ -149,8 +149,8 @@ void PPU::renderScanlineBackground(int scanline)
          * that corresponds to the one we are rendering.
          * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
          */
-        int xOffsetTile = xIndexOffset % Tile::TILE_WIDTH;
-        int yOffsetTile = (scanline + scrollY) % Tile::TILE_HEIGHT;
+        int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
+        int yOffsetTile = (scanline + scrollY) % SingleTile::TILE_HEIGHT;
 
         /*
          * We retrieve the pixel color by getting the original sprite color,
@@ -213,16 +213,21 @@ void PPU::renderScanlineSprite(int scanline)
 
     for (auto* sprite : spritesToRender)
     {
-        Tile tile = getTileById(sprite->getTileId(), 0);
-        auto tileImage = tile.getImage();
+        int tileId = sprite->getTileId();
+        bool isStackedTile = spriteSize() > SingleTile::TILE_HEIGHT;
+        if (isStackedTile)
+        {
+            tileId &= 0xFE;
+        }
+        Tile tile = getTileById(tileId, 0, isStackedTile);
 
         int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
         if (sprite->isFlippedVertically())
         {
-            yCoordinateInTile = Tile::TILE_HEIGHT - 1 - yCoordinateInTile;
+            yCoordinateInTile = tile.getHeight() - 1 - yCoordinateInTile;
         }
 
-        for (int xOffset = 0; xOffset < Tile::TILE_WIDTH; xOffset++)
+        for (int xOffset = 0; xOffset < tile.getWidth(); xOffset++)
         {
             int xCoordinateOnScreen = sprite->getXPositionOnScreen() + xOffset;
             // If we are outside the screen on the left we just skip the current pixel
@@ -240,7 +245,7 @@ void PPU::renderScanlineSprite(int scanline)
             int xCoordinateInTile = xOffset;
             if (sprite->isFlippedHorizontally())
             {
-                xCoordinateInTile = Tile::TILE_WIDTH - 1 - xCoordinateInTile;
+                xCoordinateInTile = tile.getWidth() - 1 - xCoordinateInTile;
             }
 
             Palette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
@@ -284,7 +289,7 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     }
 }
 
-Tile PPU::getTileById(byte tileId, int8_t tileSetId)
+Tile PPU::getTileById(byte tileId, int8_t tileSetId, bool isStacked)
 {
     int tileSetOffset = ADDR_TILE_SET_0;
     int tileIdCorrected = tileId;
@@ -294,14 +299,25 @@ Tile PPU::getTileById(byte tileId, int8_t tileSetId)
         tileIdCorrected = static_cast<sbyte>(tileId);
     }
 
-    word tileBaseAddr = tileSetOffset + Tile::BYTES_PER_TILE * tileIdCorrected;
+    word tileBaseAddr = tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected;
+
+    int tileBytesPerTile = isStacked ? StackedTile::BYTES_PER_TILE : SingleTile::BYTES_PER_TILE;
     Tile::TileDataArray dataArray = {};
-    for (int i = 0; i < Tile::BYTES_PER_TILE; ++i)
+    dataArray.resize(tileBytesPerTile);
+
+    for (int i = 0; i < tileBytesPerTile; ++i)
     {
         dataArray[i] = _mmu.read(tileBaseAddr + i);
     }
 
-    return Tile(dataArray);
+    if (isStacked)
+    {
+        return StackedTile(dataArray);
+    }
+    else
+    {
+        return SingleTile(dataArray);
+    }
 }
 
 PPU::TileMap PPU::getTileMap(int index, int tileSetId)

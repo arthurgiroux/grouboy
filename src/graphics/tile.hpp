@@ -8,25 +8,47 @@
 class Tile
 {
   public:
-    static const int BYTES_PER_TILE = 16;
     static const int BYTES_PER_TILE_VALUE = 2;
-    static const int TILE_WIDTH = 8;
-    static const int TILE_HEIGHT = 8;
 
-    using TileDataArray = std::array<byte, BYTES_PER_TILE>;
-    using ColorDataArray = std::array<byte, TILE_HEIGHT * TILE_WIDTH>;
+    using TileDataArray = std::vector<byte>;
+    using ColorDataArray = std::vector<byte>;
 
-    Tile(const TileDataArray& data);
+    Tile(const TileDataArray& data, int height, int width);
 
     const RGBImage& getImage() const;
     byte getColorData(int x, int y) const;
 
-  private:
+    int getHeight() const;
+    int getWidth() const;
+
+  protected:
     void convertToPixels();
 
-    TileDataArray data = {};
+    TileDataArray _data = {};
     ColorDataArray _colorData = {};
-    RGBImage image = RGBImage(TILE_HEIGHT, TILE_WIDTH);
+    int _height;
+    int _width;
+    RGBImage _image;
+};
+
+class SingleTile : public Tile
+{
+  public:
+    static const int BYTES_PER_TILE = 16;
+    static const int TILE_WIDTH = 8;
+    static const int TILE_HEIGHT = 8;
+
+    SingleTile(const TileDataArray& data);
+};
+
+class StackedTile : public Tile
+{
+  public:
+    static const int BYTES_PER_TILE = 32;
+    static const int TILE_WIDTH = 8;
+    static const int TILE_HEIGHT = 16;
+
+    StackedTile(const TileDataArray& data);
 };
 
 #endif // GBEMULATOR_TILE_H
