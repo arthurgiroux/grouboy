@@ -100,6 +100,7 @@ class PPU
      *
      * @param tileId The index of the tile to retrieve
      * @param tileSetId The tile set to use
+     * @param isStacked Is the tile we want to retrieve a stacked 8x16 tile
      * @return The requested tile
      */
     Tile getTileById(byte tileId, int8_t tileSetId, bool isStacked = false);

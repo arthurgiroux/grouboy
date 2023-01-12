@@ -217,8 +217,13 @@ void PPU::renderScanlineSprite(int scanline)
         bool isStackedTile = spriteSize() > SingleTile::TILE_HEIGHT;
         if (isStackedTile)
         {
+            /*
+             * If the sprite is made of two vertically stacked tiles,
+             * the id of the tile should be masked to retrieve the id of the top tile.
+             */
             tileId &= 0xFE;
         }
+
         Tile tile = getTileById(tileId, 0, isStackedTile);
 
         int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
