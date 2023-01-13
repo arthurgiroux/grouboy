@@ -1,9 +1,9 @@
 #include "palette.hpp"
 
-const int Palette::COLOR_BLACK = 0;
 const int Palette::COLOR_WHITE = 255;
-const int Palette::COLOR_DARK_GRAY = 192;
-const int Palette::COLOR_LIGHT_GRAY = 96;
+const int Palette::COLOR_LIGHT_GRAY = 192;
+const int Palette::COLOR_DARK_GRAY = 96;
+const int Palette::COLOR_BLACK = 0;
 
 byte Palette::convertColorToGrayscale(byte value)
 {
@@ -42,6 +42,6 @@ byte Palette::convertColorId(byte colorId)
      */
     int bitsPerMapping = 2;
     int bitMask = 0x03;
-    
+
     return (paletteData >> (colorId * bitsPerMapping)) & bitMask;
 }
