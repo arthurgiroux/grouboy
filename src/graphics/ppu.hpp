@@ -137,7 +137,7 @@ class PPU
      *
      * @return index of the tilemap to use
      */
-    int tileMapIndexForWindow() const;
+    int windowTileMapIndex() const;
 
     /**
      * Return if the "window" is enabled in the LCD control
@@ -423,6 +423,13 @@ class PPU
      * Scanline currently being rendered.
      */
     int _currentScanline = 0;
+
+    /**
+     * An internal line counter used to render the window.
+     * It's incremented only when the window is rendered for a scanline and reset on VBLANK.
+     * It's used instead of the scanlineId to access the tilemap while rendering the window.
+     */
+    int _windowLineCounter = 0;
 
     /**
      * The MMU to use to access VRAM and OAM.

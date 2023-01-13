@@ -5,7 +5,6 @@
 #include "spdlog/spdlog.h"
 #include <algorithm>
 #include <cassert>
-#include <set>
 
 void PPU::step(int nbrTicks)
 {
@@ -38,6 +37,7 @@ void PPU::step(int nbrTicks)
     else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= HBLANK_TICKS)
     {
         _currentScanline++;
+
         _LYCInterruptRaisedDuringScanline = false;
 
         if (_currentScanline == SCREEN_HEIGHT)
@@ -64,6 +64,7 @@ void PPU::step(int nbrTicks)
     else if (_currentMode == VBLANK && _ticksSpentInCurrentMode >= VBLANK_TICKS)
     {
         _currentScanline++;
+
         _ticksSpentInCurrentMode = 0;
         if (_currentScanline > MAX_SCANLINE_VALUE)
         {
@@ -74,6 +75,7 @@ void PPU::step(int nbrTicks)
 
             setMode(OAM_ACCESS);
             _currentScanline = 0;
+            _windowLineCounter = 0;
         }
         _LYCInterruptRaisedDuringScanline = false;
     }
@@ -142,7 +144,6 @@ void PPU::renderScanlineBackground(int scanline)
 
         // We see how many tiles we span horizontally and add it to our offset to find the tile index
         int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
-        const RGBImage& tileImage = background[tileIndex].getImage();
 
         /*
          * Now that we retrieve the tile corresponding to the pixel, we need to copy the pixel
@@ -164,7 +165,68 @@ void PPU::renderScanlineBackground(int scanline)
 
 void PPU::renderScanlineWindow(int scanline)
 {
-    // TODO: render window
+    // Window SCX value is shifted by 7 in the register
+    byte scrollX = _mmu.read(WINDOW_ADDR_SCROLL_X) - 7;
+    byte scrollY = _mmu.read(WINDOW_ADDR_SCROLL_Y);
+
+    // If the window doesn't cover the current line or is outside of the screen we can skip the rendering
+    if (scrollY > scanline || scrollX > SCREEN_WIDTH)
+    {
+        return;
+    }
+
+    // Retrieve the tilemap we are going to use
+    TileMap tilemap = getTileMap(windowTileMapIndex(), backgroundAndWindowTileDataAreaIndex());
+
+    /*
+     * The tilemap is a 32x32 map of tiles of 8x8 pixels.
+     * Since we are rendering only a line here, we can already compute which
+     * line of the tilemap we are going to render.
+     * We can compute the line by seeing how many tiles we span vertically.
+     */
+    int lineInTileMap = _windowLineCounter / SingleTile::TILE_HEIGHT;
+    lineInTileMap %= TILEMAP_HEIGHT;
+    assert(lineInTileMap < TILEMAP_HEIGHT);
+
+    int offsetInTileMap = lineInTileMap * TILEMAP_WIDTH;
+
+    /*
+     * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
+     * pixels that corresponds in the current frame buffer.
+     */
+    for (int x = scrollX; x < SCREEN_WIDTH; ++x)
+    {
+        int xIndexOffset = x - scrollX;
+
+        // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
+        if (xIndexOffset > TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
+        {
+            break;
+        }
+        assert(xIndexOffset < TILEMAP_WIDTH * SingleTile::TILE_WIDTH);
+
+        // We see how many tiles we span horizontally and add it to our offset to find the tile index
+        int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
+
+        /*
+         * Now that we retrieve the tile corresponding to the pixel, we need to copy the pixel
+         * that corresponds to the one we are rendering.
+         * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
+         */
+        int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
+        int yOffsetTile = _windowLineCounter % SingleTile::TILE_HEIGHT;
+
+        /*
+         * We retrieve the pixel color by getting the original sprite color,
+         * converting using the palette and converting it to a grayscale value.
+         */
+        int colorValue = tilemap[tileIndex].getColorData(xOffsetTile, yOffsetTile);
+        int convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
+        _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
+    }
+
+    // We increment the window line counter only when a scanline window is rendered
+    _windowLineCounter++;
 }
 
 void PPU::renderScanlineSprite(int scanline)
@@ -344,7 +406,7 @@ bool PPU::isDisplayEnabled() const
     return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 7);
 }
 
-int PPU::tileMapIndexForWindow() const
+int PPU::windowTileMapIndex() const
 {
     return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 6);
 }
@@ -385,6 +447,7 @@ void PPU::reset()
     _ticksSpentInCurrentMode = 0;
     setMode(OAM_ACCESS);
     _currentScanline = 0;
+    _windowLineCounter = 0;
     _LYCInterruptRaisedDuringScanline = false;
     _temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
     _lastRenderedFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
