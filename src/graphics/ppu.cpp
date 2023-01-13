@@ -136,7 +136,7 @@ void PPU::renderScanlineBackground(int scanline)
 
         // The background map is not clamped, if we go "too far right",
         // it should display tiles that are on the left.
-        if (xIndexOffset > TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
+        if (xIndexOffset >= TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
         {
             xIndexOffset %= TILEMAP_WIDTH * SingleTile::TILE_WIDTH;
         }
@@ -199,7 +199,7 @@ void PPU::renderScanlineWindow(int scanline)
         int xIndexOffset = x - scrollX;
 
         // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
-        if (xIndexOffset > TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
+        if (xIndexOffset >= TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
         {
             break;
         }
