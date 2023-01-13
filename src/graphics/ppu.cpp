@@ -263,7 +263,7 @@ void PPU::renderScanlineSprite(int scanline)
 
     if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
     {
-        spdlog::info("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
+        spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
     }
 
     /*
