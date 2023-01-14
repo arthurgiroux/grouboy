@@ -22,7 +22,7 @@ Future work:
 
 ## Tests
 
-The emulator is tested using Blargg's tests and various automated test cases for all components.
+The emulator is tested using various test suites and automated test cases for all components.
 You can find the test report in the Github actions.
 
 Blaarg's test coverage:
@@ -42,6 +42,12 @@ Blaarg's test coverage:
 | CPU Instructions    | 11 - Op a,(hl)          | :white_check_mark:	 |
 | CPU Instructions    | 07 - JR,JP,Call,RET,RST | :white_check_mark:	 |
 | Instructions Timing | Instr Timing            | :white_check_mark:	 |
+
+[Acid2 test](https://github.com/mattcurrie/dmg-acid2):
+
+| Reference image                                      | Pass/Fail          |
+|------------------------------------------------------|--------------------|
+| ![Demo](tests/data/reference/acid-reference-dmg.bmp) | :white_check_mark: |
 
 ## Demo
 
