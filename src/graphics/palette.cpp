@@ -1,8 +1,8 @@
 #include "palette.hpp"
 
 const int Palette::COLOR_WHITE = 255;
-const int Palette::COLOR_LIGHT_GRAY = 192;
-const int Palette::COLOR_DARK_GRAY = 96;
+const int Palette::COLOR_LIGHT_GRAY = 170;
+const int Palette::COLOR_DARK_GRAY = 85;
 const int Palette::COLOR_BLACK = 0;
 
 byte Palette::convertColorToGrayscale(byte value)
