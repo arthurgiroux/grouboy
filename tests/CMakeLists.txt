@@ -8,6 +8,10 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 include_directories(../src)
+include_directories(../libs)
+
+# TODO: Set this using environment variable, CMake seems to have issues with this right now
+add_compile_definitions(DATADIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 add_executable(
         utils_tests
@@ -32,9 +36,6 @@ add_executable(
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
         test_blargg.cpp
         test_palette.cpp)
-
-# TODO: Set this using environment variable, CMake seems to have issues with this right now
-target_compile_definitions(cpu_tests PRIVATE -DDATADIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 target_link_libraries(
         cpu_tests
@@ -91,6 +92,17 @@ target_link_libraries(
         gtest_main
 )
 
+add_executable(
+        acid_tests
+        test_acid.cpp
+)
+
+target_link_libraries(
+        acid_tests
+        gbemulator_core
+        gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
 gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 60)
@@ -98,3 +110,4 @@ gtest_discover_tests(ppu_tests)
 gtest_discover_tests(mmu_tests)
 gtest_discover_tests(serial_tests)
 gtest_discover_tests(timer_tests)
+gtest_discover_tests(acid_tests)

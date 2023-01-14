@@ -6,6 +6,9 @@
 #include <algorithm>
 #include <cassert>
 
+const int PPU::SCREEN_WIDTH = 160;
+const int PPU::SCREEN_HEIGHT = 144;
+
 void PPU::step(int nbrTicks)
 {
     _ticksSpentInCurrentMode += nbrTicks;
