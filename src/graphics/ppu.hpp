@@ -189,12 +189,12 @@ class PPU
     /**
      * The screen width in pixels.
      */
-    static const int SCREEN_WIDTH = 160;
+    static const int SCREEN_WIDTH;
 
     /**
      * The screen height in pixels.
      */
-    static const int SCREEN_HEIGHT = 144;
+    static const int SCREEN_HEIGHT;
 
     /**
      * The tile map height in pixels.
