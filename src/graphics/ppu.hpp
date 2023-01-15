@@ -6,6 +6,7 @@
 #include "rgb_image.hpp"
 #include "sprite.hpp"
 #include "tile.hpp"
+#include "tilemap.hpp"
 #include <array>
 #include <vector>
 
@@ -25,17 +26,11 @@ class PPU
 {
   public:
     /**
-     * A tile map is a 32x32 map of tiles.
-     */
-    using TileMap = std::vector<Tile>;
-
-    /**
      * Retrieve the tile map with the given index
      * @param index the id of the tilemap to use, possible values [0, 1]
-     * @param tileSetId the id of the tile set to use, possible values [0, 1]
      * @return  the Tile map
      */
-    TileMap getTileMap(int index, int tileSetId);
+    Tilemap getTileMap(int index);
 
     /**
      * Create a new PPU object.
@@ -195,18 +190,6 @@ class PPU
      * The screen height in pixels.
      */
     static const int SCREEN_HEIGHT;
-
-    /**
-     * The tile map height in pixels.
-     */
-    // TODO: Move this to tilemap class
-    static const int TILEMAP_HEIGHT = 32;
-
-    /**
-     * The tile map width in pixels.
-     */
-    // TODO: Move this to tilemap class
-    static const int TILEMAP_WIDTH = 32;
 
     /**
      * Number of ticks to spend in OAM Access mode.

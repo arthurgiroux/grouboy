@@ -3,6 +3,7 @@
 #include "cpu/interrupt_manager.hpp"
 #include "graphics/palette.hpp"
 #include "spdlog/spdlog.h"
+#include "tilemap.hpp"
 #include <algorithm>
 #include <cassert>
 
@@ -115,7 +116,7 @@ void PPU::renderScanlineBackground(int scanline)
     byte scrollY = _mmu.read(ADDR_SCROLL_Y);
 
     // Retrieve the tilemap we are going to use
-    TileMap background = getTileMap(backgroundTileMapIndex(), backgroundAndWindowTileDataAreaIndex());
+    Tilemap background = getTileMap(backgroundTileMapIndex());
 
     /*
      * The tilemap is a 32x32 map of tiles of 8x8 pixels.
@@ -124,10 +125,10 @@ void PPU::renderScanlineBackground(int scanline)
      * We can compute the line by seeing how many tiles we span vertically.
      */
     int lineInTileMap = (scanline + scrollY) / SingleTile::TILE_HEIGHT;
-    lineInTileMap %= TILEMAP_HEIGHT;
-    assert(lineInTileMap < TILEMAP_HEIGHT);
+    lineInTileMap %= Tilemap::HEIGHT;
+    assert(lineInTileMap < Tilemap::HEIGHT);
 
-    int offsetInTileMap = lineInTileMap * TILEMAP_WIDTH;
+    int offsetInTileMap = lineInTileMap * Tilemap::WIDTH;
 
     /*
      * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
@@ -139,11 +140,11 @@ void PPU::renderScanlineBackground(int scanline)
 
         // The background map is not clamped, if we go "too far right",
         // it should display tiles that are on the left.
-        if (xIndexOffset >= TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
+        if (xIndexOffset >= Tilemap::WIDTH * SingleTile::TILE_WIDTH)
         {
-            xIndexOffset %= TILEMAP_WIDTH * SingleTile::TILE_WIDTH;
+            xIndexOffset %= Tilemap::WIDTH * SingleTile::TILE_WIDTH;
         }
-        assert(xIndexOffset < TILEMAP_WIDTH * SingleTile::TILE_WIDTH);
+        assert(xIndexOffset < Tilemap::WIDTH * SingleTile::TILE_WIDTH);
 
         // We see how many tiles we span horizontally and add it to our offset to find the tile index
         int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
@@ -160,7 +161,8 @@ void PPU::renderScanlineBackground(int scanline)
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
-        int colorValue = background[tileIndex].getColorData(xOffsetTile, yOffsetTile);
+        int colorValue = getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+                             .getColorData(xOffsetTile, yOffsetTile);
         int convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
@@ -179,7 +181,7 @@ void PPU::renderScanlineWindow(int scanline)
     }
 
     // Retrieve the tilemap we are going to use
-    TileMap tilemap = getTileMap(windowTileMapIndex(), backgroundAndWindowTileDataAreaIndex());
+    Tilemap tilemap = getTileMap(windowTileMapIndex());
 
     /*
      * The tilemap is a 32x32 map of tiles of 8x8 pixels.
@@ -188,10 +190,10 @@ void PPU::renderScanlineWindow(int scanline)
      * We can compute the line by seeing how many tiles we span vertically.
      */
     int lineInTileMap = _windowLineCounter / SingleTile::TILE_HEIGHT;
-    lineInTileMap %= TILEMAP_HEIGHT;
-    assert(lineInTileMap < TILEMAP_HEIGHT);
+    lineInTileMap %= Tilemap::HEIGHT;
+    assert(lineInTileMap < Tilemap::HEIGHT);
 
-    int offsetInTileMap = lineInTileMap * TILEMAP_WIDTH;
+    int offsetInTileMap = lineInTileMap * Tilemap::WIDTH;
 
     /*
      * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
@@ -202,11 +204,11 @@ void PPU::renderScanlineWindow(int scanline)
         int xIndexOffset = x - scrollX;
 
         // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
-        if (xIndexOffset >= TILEMAP_WIDTH * SingleTile::TILE_WIDTH)
+        if (xIndexOffset >= Tilemap::WIDTH * SingleTile::TILE_WIDTH)
         {
             break;
         }
-        assert(xIndexOffset < TILEMAP_WIDTH * SingleTile::TILE_WIDTH);
+        assert(xIndexOffset < Tilemap::WIDTH * SingleTile::TILE_WIDTH);
 
         // We see how many tiles we span horizontally and add it to our offset to find the tile index
         int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
@@ -223,7 +225,9 @@ void PPU::renderScanlineWindow(int scanline)
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
-        int colorValue = tilemap[tileIndex].getColorData(xOffsetTile, yOffsetTile);
+        int colorValue = getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+                             .getColorData(xOffsetTile, yOffsetTile);
+        // int colorValue = tilemap[tileIndex].getColorData(xOffsetTile, yOffsetTile);
         int convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
@@ -390,18 +394,10 @@ Tile PPU::getTileById(byte tileId, int8_t tileSetId, bool isStacked)
     }
 }
 
-PPU::TileMap PPU::getTileMap(int index, int tileSetId)
+Tilemap PPU::getTileMap(int index)
 {
     int tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
-    TileMap map = {};
-
-    for (int i = 0; i < TILEMAP_WIDTH * TILEMAP_HEIGHT; ++i)
-    {
-        sbyte tileId = _mmu.read(tileMapAddr + i);
-        map.push_back(getTileById(tileId, tileSetId));
-    }
-
-    return map;
+    return Tilemap(&_mmu, tileMapAddr);
 }
 
 bool PPU::isDisplayEnabled() const

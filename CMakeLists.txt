@@ -91,7 +91,9 @@ set(SOURCE_FILES
         src/timer/timer.cpp
         src/timer/timer.hpp
         src/cpu/interrupt_manager.cpp
-        src/cpu/interrupt_manager.hpp)
+        src/cpu/interrupt_manager.hpp
+        src/graphics/tilemap.cpp
+        src/graphics/tilemap.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
