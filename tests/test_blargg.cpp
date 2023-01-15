@@ -11,7 +11,7 @@ class BlarggTest : public ::testing::Test
 
     void assertTestForRomArePassing(const std::string& romName)
     {
-        std::string rom = std::string(DATADIR) + "/roms/" + romName;
+        std::string rom = std::string(DATADIR) + "/roms/blargg/" + romName;
         ASSERT_TRUE(emulator.getMMU().loadCartridge(rom));
         bool infiniteJRDetected = false;
         while (!infiniteJRDetected)
