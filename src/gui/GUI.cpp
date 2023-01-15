@@ -154,12 +154,12 @@ void GUI::displayTileMapView()
         tileSetId = 1;
     }
 
-    PPU::TileMap map = emulator.getPPU().getTileMap(tileMapId, tileSetId);
-    for (int y = 0; y < PPU::TILEMAP_HEIGHT; y++)
+    Tilemap map = emulator.getPPU().getTileMap(tileMapId);
+    for (int y = 0; y < Tilemap::HEIGHT; y++)
     {
-        for (int x = 0; x < PPU::TILEMAP_WIDTH; x++)
+        for (int x = 0; x < Tilemap::WIDTH; x++)
         {
-            Tile tile = map[y * PPU::TILEMAP_WIDTH + x];
+            Tile tile = emulator.getPPU().getTileById(map.getTileIdForCoord(x, y), tileSetId);
             loadRGBImageInSubTexture(tileMapRenderTexture, x * SingleTile::TILE_WIDTH, y * SingleTile::TILE_HEIGHT,
                                      tile.getImage());
         }

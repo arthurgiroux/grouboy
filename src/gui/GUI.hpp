@@ -148,8 +148,7 @@ class GUI
     int tileSetId = 0;
     int lastFrameId = 0;
     ImVec2 windowSize = ImVec2(1280, 720);
-    ImVec2 tileMapSize =
-        ImVec2(PPU::TILEMAP_WIDTH * SingleTile::TILE_WIDTH, PPU::TILEMAP_HEIGHT* SingleTile::TILE_HEIGHT);
+    ImVec2 tileMapSize = ImVec2(Tilemap::WIDTH * SingleTile::TILE_WIDTH, Tilemap::HEIGHT* SingleTile::TILE_HEIGHT);
     ImVec2 tileViewSize = ImVec2(256, 128);
     int numberOfTileToDisplayPerLine = 16;
     static const int GAMEVIEW_UPSCALE_RATIO = 2;
