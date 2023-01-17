@@ -52,6 +52,7 @@ class MMU
     };
 
   private:
+    void performDMATransfer(word sourceAddr);
     std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
     std::unique_ptr<Cartridge> cartridge = nullptr;
     std::unique_ptr<MemoryBankController> memoryBankController = nullptr;
@@ -61,6 +62,10 @@ class MMU
     static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
     InputController* inputController = nullptr;
     static const int JOYPAD_MAP_ADDR = 0xFF00;
+    static const int DMA_TRANSFER_ADDR = 0xFF46;
+    static const int DMA_TRANSFER_LENGTH = 160;
+    static const int DMA_TRANSFER_TARGET_ADDR = 0xFE00;
+
     byte getJoypadMemoryRepresentation();
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
 
