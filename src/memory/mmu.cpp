@@ -113,7 +113,14 @@ word MMU::readWord(const word& addr)
 
 void MMU::write(const word& addr, const byte& value)
 {
-    if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
+    if (addr == DMA_TRANSFER_ADDR)
+    {
+        word sourceAddr = value << 8;
+        performDMATransfer(sourceAddr);
+        return;
+    }
+
+    else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
         memoryBankController->writeROM(addr, value);
     }
@@ -177,4 +184,12 @@ bool MMU::isBootRomActive()
 void MMU::setInputController(InputController* controller)
 {
     inputController = controller;
+}
+
+void MMU::performDMATransfer(word sourceAddr)
+{
+    for (int i = 0; i < DMA_TRANSFER_LENGTH; ++i)
+    {
+        write(DMA_TRANSFER_TARGET_ADDR + i, read(sourceAddr + i));
+    }
 }
