@@ -74,6 +74,51 @@ bool isNthBitSet(int value, int bitPosition);
 
 void setNthBit(int& value, int bitPosition, bool state);
 
+/**
+ * Represents a memory range between two addresses.
+ */
+class AddressRange
+{
+  public:
+    /**
+     * Create a new range of address
+     * @param start The start address (inclusive)
+     * @param end   The end address (inclusive)
+     */
+    AddressRange(word start, word end);
+
+    /**
+     * Checks if a given address is in the range
+     *
+     * @param address The address to check
+     * @return True is the address in is range, false otherwise
+     */
+    bool contains(word address) const;
+
+    /**
+     * Return the start address
+     * @return The start address in range
+     */
+    word start() const;
+
+    /**
+     * Return the end address
+     * @return The end address in range
+     */
+    word end() const;
+
+  private:
+    /**
+     * The start address in the range (inclusive)
+     */
+    word _startAddr;
+
+    /**
+     * The end address in the range (inclusive)
+     */
+    word _endAddr;
+};
+
 } // namespace utils
 
 #endif // GBEMULATOR_UTILS_HPP
