@@ -110,3 +110,31 @@ TEST(UtilsTest, TestBitForGivenValueShouldGivesExpectedResult)
     ASSERT_EQ(utils::isNthBitSet(value, 14), false);
     ASSERT_EQ(utils::isNthBitSet(value, 15), true);
 }
+
+TEST(UtilsTest, AddressRangeShouldSetStartAndEndAddrCorrectly)
+{
+    word startAddr = 0x1234;
+    word endAddr = 0x4321;
+    auto range = AddressRange(startAddr, endAddr);
+    ASSERT_EQ(range.start(), startAddr);
+    ASSERT_EQ(range.end(), endAddr);
+}
+
+TEST(UtilsTest, AddressRangeContainsShouldReturnTrueIfAddressBetweenStartAndEnd)
+{
+    word startAddr = 0x1234;
+    word endAddr = 0x1236;
+    auto range = AddressRange(startAddr, endAddr);
+    ASSERT_TRUE(range.contains(startAddr));
+    ASSERT_TRUE(range.contains(endAddr));
+    ASSERT_TRUE(range.contains(0x1235));
+}
+
+TEST(UtilsTest, AddressRangeContainsShouldReturnFalseIfAddressOutOfRange)
+{
+    word startAddr = 0x1234;
+    word endAddr = 0x1236;
+    auto range = AddressRange(startAddr, endAddr);
+    ASSERT_FALSE(range.contains(startAddr - 1));
+    ASSERT_FALSE(range.contains(endAddr + 1));
+}

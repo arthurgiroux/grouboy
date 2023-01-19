@@ -50,4 +50,23 @@ void setNthBit(int& value, int bitPosition, bool state)
         value &= ~(1 << bitPosition);
     }
 }
+
+AddressRange::AddressRange(word start, word end) : _startAddr(start), _endAddr(end)
+{
+}
+
+bool AddressRange::contains(word address) const
+{
+    return address >= _startAddr && address <= _endAddr;
+}
+
+word AddressRange::start() const
+{
+    return _startAddr;
+}
+
+word AddressRange::end() const
+{
+    return _endAddr;
+}
 } // namespace utils
