@@ -11,7 +11,9 @@ TEST(MMU, ByteReadingWritingValidMemoryShouldSucceed)
         int expectedValue = i;
         // Special case, writing to timer register address resets value to 0
         int timerRegisterAddr = 0xFF04;
-        if (i == timerRegisterAddr)
+        // Special case, writing to DMA transfer address doesn't affect direct value
+        int dmaRegisterAddr = 0xFF46;
+        if (i == timerRegisterAddr || i == dmaRegisterAddr)
         {
             expectedValue = 0;
         }
@@ -29,7 +31,9 @@ TEST(MMU, WordReadingWritingValidMemoryShouldSucceed)
         int expectedValue = i;
         // Special case, writing to timer register address resets value to 0
         int timerRegisterAddr = 0xFF04;
-        if (i == timerRegisterAddr)
+        // Special case, writing to DMA transfer address doesn't affect direct value
+        int dmaRegisterAddr = 0xFF46;
+        if (i == timerRegisterAddr || i == dmaRegisterAddr)
         {
             expectedValue = 0xFF00;
         }
