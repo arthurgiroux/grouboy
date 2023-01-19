@@ -60,3 +60,34 @@ TEST(MMU, MemoryShouldContainBios)
         ASSERT_EQ(MMU::BIOS[i], mmu.read(i));
     }
 }
+
+TEST(MMU, DMATransferShouldCopyDataToOAM)
+{
+    auto mmu = MMU();
+    word startOAMAddr = 0xFE00;
+    word endOAMAddr = 0xFE9F;
+
+    for (int addr = startOAMAddr; addr <= endOAMAddr; addr++)
+    {
+        ASSERT_EQ(mmu.read(addr), 0);
+    }
+
+    word dmaTransferSourceAddrStart = 0x1200;
+    word dmaTransferSourceAddrEnd = 0x12EF;
+    int value = 1;
+    for (int addr = dmaTransferSourceAddrStart; addr <= dmaTransferSourceAddrEnd; addr++)
+    {
+        mmu.write(addr, value);
+        value++;
+    }
+
+    // Start DMA transfer
+    mmu.write(0xFF46, dmaTransferSourceAddrStart >> 8);
+
+    int expectedValue = 1;
+    for (int addr = startOAMAddr; addr <= endOAMAddr; addr++)
+    {
+        ASSERT_EQ(mmu.read(addr), expectedValue) << addr;
+        expectedValue++;
+    }
+}
