@@ -31,7 +31,7 @@ class MBCRomOnly : public MemoryBankController
     /**
      * Optional RAM can be up to 8KiB
      */
-    static const int RAM_SIZE_IN_KB = 8 * 1024;
+    static const int RAM_SIZE_IN_KB = 8_KiB;
     std::array<byte, RAM_SIZE_IN_KB> _ram = {};
 };
 

@@ -1,5 +1,5 @@
 #include "mbc1.hpp"
-#include <iostream>
+#include "spdlog/spdlog.h"
 #include <stdexcept>
 
 MBC1::MBC1(Cartridge* cartridge) : MemoryBankController(cartridge)
@@ -8,44 +8,57 @@ MBC1::MBC1(Cartridge* cartridge) : MemoryBankController(cartridge)
 
 byte MBC1::readROM(const word& addr)
 {
-    if (addr >= ROM_BANK0_START_ADDR && addr <= ROM_BANK0_END_ADDR)
+    if (fixedRomAddrRange.contains(addr))
     {
-        return _cartridge->getData()[addr - ROM_BANK0_START_ADDR];
+        return _cartridge->getData()[fixedRomAddrRange.relative(addr)];
     }
 
-    else if (addr >= ROM_BANK_SWAP_START_ADDR && addr <= ROM_BANK_SWAP_END_ADDR)
+    else if (swappableRomAddrRange.contains(addr))
     {
-        int addrOffset = addr - ROM_BANK_SWAP_START_ADDR;
-        return _cartridge->getData()[_selectedROMBankId * ROM_BANK_SIZE_IN_BYTES + addrOffset];
+        return _cartridge
+            ->getData()[_selectedROMBankId * ROM_BANK_SIZE_IN_BYTES + swappableRomAddrRange.relative(addr)];
     }
 
-    throw std::runtime_error("Error, trying to read from bad memory.");
+    throw std::runtime_error("Error, trying to read from bad memory location.");
 }
 
 void MBC1::writeROM(const word& addr, const byte& value)
 {
-    if (addr >= 0x0000 && addr <= 0x1FFF)
+    if (ramEnableAddrRange.contains(addr))
     {
-        _isRAMEnabled = ((value & 0x0A) == 0x0A);
-        std::cout << "Enabling RAM " << _isRAMEnabled << std::endl;
+        // RAM is enabled only if value 0xA is written in lower 4 bits
+        int bitMask = 0x0A;
+        _isRAMEnabled = ((value & bitMask) == bitMask);
+        if (_isRAMEnabled)
+        {
+            spdlog::debug("RAM was enabled for MBC.");
+        }
+        else
+        {
+            spdlog::debug("RAM was disabled for MBC.");
+        }
     }
-    else if (addr >= 0x2000 && addr <= 0x3FFF)
+    else if (selectRomBankAddrRange.contains(addr))
     {
-        int selectedBankValue = value & 0x1F;
+        // ROM selection is only made using the 5 lowest bits
+        int bitMask = 0x1F;
+
+        int selectedBankValue = value & bitMask;
         if (selectedBankValue == 0)
         {
             selectedBankValue = 1;
         }
         _selectedROMBankId = selectedBankValue;
-
-        std::cout << "SWITCHING TO ROM BANK " << _selectedROMBankId
-                  << ", max=" << (_cartridge->getData().size() / ROM_BANK_SIZE_IN_BYTES) << std::endl;
+        spdlog::debug("MBC: Switching to ROM bank {}", _selectedROMBankId);
         // TODO: Mask depending on number of available banks
     }
 
-    else if (addr >= 0x4000 && addr <= 0x5FFF)
+    else if (selectRamBankAddrRange.contains(addr))
     {
-        std::cout << "SWITCHING TO RAM BANK " << _selectedROMBankId << std::endl;
+        // RAM selection is only made using the 2 lowest bits
+        int bitMask = 0x02;
+        _selectedRAMBankId = (value & bitMask);
+        spdlog::debug("MBC: Switching to RAM bank {}", _selectedRAMBankId);
     }
 }
 
@@ -53,6 +66,8 @@ byte MBC1::readRAM(const word& addr)
 {
     if (!_isRAMEnabled)
     {
+        // If the RAM is disabled it will read open bus values
+        // In reality value is often 0xFF
         return 0xFF;
     }
 
