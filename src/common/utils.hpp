@@ -4,6 +4,16 @@
 #include "types.hpp"
 #include <string>
 
+constexpr std::size_t operator""_KiB(unsigned long long int x)
+{
+    return 1024ULL * x;
+}
+
+constexpr std::size_t operator""_MiB(unsigned long long int x)
+{
+    return 1024_KiB * x;
+}
+
 namespace utils
 {
 /**
@@ -126,7 +136,6 @@ class AddressRange
      */
     word _endAddr;
 };
-
 } // namespace utils
 
 #endif // GBEMULATOR_UTILS_HPP
