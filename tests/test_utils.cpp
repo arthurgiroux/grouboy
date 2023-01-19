@@ -138,3 +138,13 @@ TEST(UtilsTest, AddressRangeContainsShouldReturnFalseIfAddressOutOfRange)
     ASSERT_FALSE(range.contains(startAddr - 1));
     ASSERT_FALSE(range.contains(endAddr + 1));
 }
+
+TEST(UtilsTest, AddressRangeRelativeShouldReturnTheAddressRelativeToTheStartAddress)
+{
+    word startAddr = 0x1234;
+    word endAddr = 0x1236;
+    auto range = AddressRange(startAddr, endAddr);
+    ASSERT_EQ(range.relative(startAddr), 0);
+    ASSERT_EQ(range.relative(0x1235), 1);
+    ASSERT_EQ(range.relative(endAddr), 2);
+}
