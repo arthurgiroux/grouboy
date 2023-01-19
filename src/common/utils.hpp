@@ -107,6 +107,14 @@ class AddressRange
      */
     word end() const;
 
+    /**
+     * Convert the given absolute address to a relative address in the range
+     *
+     * @param address the absolute address to convert
+     * @return The relative address in the range
+     */
+    word relative(word address) const;
+
   private:
     /**
      * The start address in the range (inclusive)

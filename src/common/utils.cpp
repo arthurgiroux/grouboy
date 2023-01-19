@@ -69,4 +69,9 @@ word AddressRange::end() const
 {
     return _endAddr;
 }
+
+word AddressRange::relative(word address) const
+{
+    return address - _startAddr;
+}
 } // namespace utils
