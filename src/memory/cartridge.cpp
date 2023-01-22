@@ -1,7 +1,9 @@
 #include "cartridge.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cstring>
+#include <set>
 #include <utility>
 
 Cartridge::Cartridge(std::vector<byte> binaryData) : data(std::move(binaryData))
@@ -119,4 +121,50 @@ Cartridge::CartridgeType Cartridge::getType() const
 void Cartridge::readType()
 {
     type = static_cast<CartridgeType>(data[CARTRIDGE_TYPE_ADDR]);
+}
+
+int Cartridge::getROMSize() const
+{
+    return 32_KiB * (1 << data[CARTRIDGE_ROM_SIZE_ADDR]);
+}
+
+int Cartridge::getRAMSize() const
+{
+    int ramSizeValue = data[CARTRIDGE_RAM_SIZE_ADDR];
+
+    if (!hasRAM())
+    {
+        return 0_KiB;
+    }
+
+    // Values taken from: https://gbdev.io/pandocs/The_Cartridge_Header.html#0149--ram-size
+    std::array<int, 6> ramSizeValueToBytes = {0_KiB, 0_KiB, 8_KiB, 32_KiB, 128_KiB, 64_KiB};
+
+    if (ramSizeValue >= ramSizeValueToBytes.size())
+    {
+        throw std::runtime_error(utils::string_format("Unexpected RAM size value %d", ramSizeValue));
+    }
+
+    return ramSizeValueToBytes[ramSizeValue];
+}
+
+bool Cartridge::hasRAM() const
+{
+    std::set<CartridgeType> typesWithRAM = {MBC1_RAM,
+                                            MBC1_RAM_BATTERY,
+                                            ROM_RAM_1,
+                                            ROM_RAM_BATTERY_1,
+                                            MMM01_RAM,
+                                            MMM01_RAM_BATTERY,
+                                            MBC3_TIMER_RAM_BATTERY_2,
+                                            MBC3_RAM_2,
+                                            MBC3_RAM_BATTERY_2,
+                                            MBC5_RAM,
+                                            MBC5_RAM_BATTERY,
+                                            MBC5_RUMBLE_RAM,
+                                            MBC5_RUMBLE_RAM_BATTERY,
+                                            MBC7_SENSOR_RUMBLE_RAM_BATTERY,
+                                            HUC1_RAM_BATTERY};
+
+    return typesWithRAM.count(type) > 0;
 }
