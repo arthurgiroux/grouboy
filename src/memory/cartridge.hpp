@@ -39,6 +39,20 @@ class Cartridge
     std::vector<byte>& getData();
 
     /**
+     * Get the size of the ROM in bytes
+     *
+     * @return  the size of the ROM in bytes
+     */
+    int getROMSize() const;
+
+    /**
+     * Get the size of the RAM in bytes
+     *
+     * @return  the size of the ROM in bytes
+     */
+    int getRAMSize() const;
+
+    /**
      * Represents the type of hardware presents on the cartridge
      */
     enum CartridgeType
@@ -105,6 +119,13 @@ class Cartridge
     void readType();
 
     /**
+     * Does the cartridge include RAM
+     *
+     * @return True if the cartridge has RAM, false otherwise
+     */
+    bool hasRAM() const;
+
+    /**
      * The binary data of the cartridge (ROM/RAM etc.)
      */
     std::vector<byte> data;
@@ -143,6 +164,16 @@ class Cartridge
      * The address of the cartridge type in the binary data
      */
     static const int CARTRIDGE_TYPE_ADDR = 0x0147;
+
+    /**
+     * The address of the rom size in the binary data
+     */
+    static const int CARTRIDGE_ROM_SIZE_ADDR = 0x0148;
+
+    /**
+     * The address of the ram size in the binary data
+     */
+    static const int CARTRIDGE_RAM_SIZE_ADDR = 0x0149;
 
     /**
      * The cartridge type read from the header
