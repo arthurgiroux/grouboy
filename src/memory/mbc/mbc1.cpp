@@ -4,6 +4,7 @@
 
 MBC1::MBC1(Cartridge* cartridge) : MemoryBankController(cartridge)
 {
+    _ram.resize(cartridge->getRAMSize());
 }
 
 byte MBC1::readROM(const word& addr)
