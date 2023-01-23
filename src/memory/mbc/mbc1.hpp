@@ -80,9 +80,9 @@ class MBC1 : public MemoryBankController
     int _selectedRAMBankId = 0;
 
     /**
-     * Maximum optional RAM bank.
+     * Optional RAM bank.
      */
-    std::array<byte, 32_KiB> _ram = {};
+    std::vector<byte> _ram = {};
 };
 
 #endif // GBEMULATOR_MBC1_HPP
