@@ -20,6 +20,48 @@ class CartridgeTest : public ::testing::Test
             EXPECT_EQ(cartridgeTitle[i], title[i]);
         }
     }
+
+    void assertCartridgeTypeIsReadSuccessfully(int cartridgeTypeValue, Cartridge::CartridgeType expectedValue)
+    {
+        std::vector<byte> data;
+        data.resize(0x200);
+        int typeAddr = 0x147;
+        data[typeAddr] = cartridgeTypeValue;
+
+        auto cartridge = Cartridge(data);
+        int cartridgeType = cartridge.getType();
+
+        ASSERT_EQ(cartridgeType, expectedValue);
+    }
+
+    void assertROMSizeValueGivesExpectedResult(int romSizeValue, int expectedROMSize)
+    {
+        std::vector<byte> data;
+        data.resize(0x200);
+        int romSizeAddr = 0x148;
+        data[romSizeAddr] = romSizeValue;
+
+        auto cartridge = Cartridge(data);
+        int romSize = cartridge.getROMSize();
+
+        ASSERT_EQ(romSize, expectedROMSize);
+    }
+
+    void assertRAMSizeValueGivesExpectedResult(Cartridge::CartridgeType cartridgeType, int ramSizeValue,
+                                               int expectedRAMSize)
+    {
+        std::vector<byte> data;
+        data.resize(0x200);
+        int ramSizeAddr = 0x149;
+        data[ramSizeAddr] = ramSizeValue;
+        int typeAddr = 0x147;
+        data[typeAddr] = static_cast<int>(cartridgeType);
+
+        auto cartridge = Cartridge(data);
+        int ramSize = cartridge.getRAMSize();
+
+        ASSERT_EQ(ramSize, expectedRAMSize);
+    }
 };
 
 TEST(Cartridge, CartridgeDataIsLoadedCorrectly)
@@ -59,4 +101,89 @@ TEST(Cartridge, CartridgeManufacturerCodeIsReadCorrectly)
     {
         EXPECT_EQ(cartridgeCode[i], code[i]);
     }
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn32KiBForValue0)
+{
+    assertROMSizeValueGivesExpectedResult(0x00, 32_KiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn64KiBForValue1)
+{
+    assertROMSizeValueGivesExpectedResult(0x01, 64_KiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn128KiBForValue2)
+{
+    assertROMSizeValueGivesExpectedResult(0x02, 128_KiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn256KiBForValue3)
+{
+    assertROMSizeValueGivesExpectedResult(0x03, 256_KiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn512KiBForValue4)
+{
+    assertROMSizeValueGivesExpectedResult(0x04, 512_KiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn1MiBForValue5)
+{
+    assertROMSizeValueGivesExpectedResult(0x05, 1_MiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn2MiBForValue6)
+{
+    assertROMSizeValueGivesExpectedResult(0x06, 2_MiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn4MiBForValue7)
+{
+    assertROMSizeValueGivesExpectedResult(0x07, 4_MiB);
+}
+
+TEST_F(CartridgeTest, ROMSizeValueShouldReturn8MiBForValue8)
+{
+    assertROMSizeValueGivesExpectedResult(0x08, 8_MiB);
+}
+
+TEST_F(CartridgeTest, RAMSizeValueShouldReturn0WhenTheresNoRAM)
+{
+    assertRAMSizeValueGivesExpectedResult(Cartridge::CartridgeType::MBC1, 2, 0_KiB);
+}
+
+TEST_F(CartridgeTest, RAMSizeValueShouldReturn8KiBWhenTheresRAMAndValueIs2)
+{
+    assertRAMSizeValueGivesExpectedResult(Cartridge::CartridgeType::MBC1_RAM, 2, 8_KiB);
+}
+
+TEST_F(CartridgeTest, RAMSizeValueShouldReturn32KiBWhenTheresRAMAndValueIs3)
+{
+    assertRAMSizeValueGivesExpectedResult(Cartridge::CartridgeType::MBC1_RAM, 3, 32_KiB);
+}
+
+TEST_F(CartridgeTest, RAMSizeValueShouldReturn128KiBWhenTheresRAMAndValueIs4)
+{
+    assertRAMSizeValueGivesExpectedResult(Cartridge::CartridgeType::MBC1_RAM, 4, 128_KiB);
+}
+
+TEST_F(CartridgeTest, RAMSizeValueShouldReturn64KiBWhenTheresRAMAndValueIs5)
+{
+    assertRAMSizeValueGivesExpectedResult(Cartridge::CartridgeType::MBC1_RAM, 5, 64_KiB);
+}
+
+TEST_F(CartridgeTest, CartridgeTypeShouldBeROMOnlyForValue0)
+{
+    assertCartridgeTypeIsReadSuccessfully(0x00, Cartridge::CartridgeType::ROM_ONLY);
+}
+
+TEST_F(CartridgeTest, CartridgeTypeShouldBeMMM01ForValue11)
+{
+    assertCartridgeTypeIsReadSuccessfully(0x0B, Cartridge::CartridgeType::MMM01);
+}
+
+TEST_F(CartridgeTest, CartridgeTypeShouldBeMBC6ForValue32)
+{
+    assertCartridgeTypeIsReadSuccessfully(0x20, Cartridge::CartridgeType::MBC6);
 }
