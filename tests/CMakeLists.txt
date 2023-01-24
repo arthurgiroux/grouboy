@@ -62,7 +62,7 @@ add_executable(
         test_mmu.cpp
         test_cartridge.cpp
         test_input_controller.cpp
-)
+        test_mbc.cpp)
 
 target_link_libraries(
         mmu_tests
