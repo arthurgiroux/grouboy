@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include "cartridge.hpp"
@@ -164,6 +165,12 @@ bool MMU::loadCartridge(const std::string& filepath)
         std::vector<byte> data((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
         cartridge = std::make_unique<Cartridge>(data);
         memoryBankController = MemoryBankController::createMemoryBankControllerFromCartridge(cartridge.get());
+        if (memoryBankController == nullptr)
+        {
+            throw std::runtime_error(
+                utils::string_format("Memory Bus Controller '%s' is not implemented.",
+                                     Cartridge::cartridgeTypeToString(cartridge->getType()).c_str()));
+        }
         ret = true;
     }
 
