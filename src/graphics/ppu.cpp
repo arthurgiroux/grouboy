@@ -259,7 +259,8 @@ void PPU::renderScanlineSprite(int scanline)
              * If the sprite is outside the screen bound then it's not going to be effectively rendered
              * but it still counts as if it was rendered and should increment the number of sprites rendered.
              */
-            if (sprite->getXPositionOnScreen() < 0 || sprite->getXPositionOnScreen() >= PPU::SCREEN_WIDTH)
+            if ((sprite->getXPositionOnScreen() + SingleTile::TILE_WIDTH) < 0 ||
+                sprite->getXPositionOnScreen() >= PPU::SCREEN_WIDTH)
             {
                 continue;
             }
