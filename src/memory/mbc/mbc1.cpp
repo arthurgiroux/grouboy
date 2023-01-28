@@ -25,6 +25,7 @@ byte MBC1::readROM(const word& addr)
 
 void MBC1::writeROM(const word& addr, const byte& value)
 {
+    // TODO: Handle addressing for ROM >= 1MiB
     if (ramEnableAddrRange.contains(addr))
     {
         // RAM is enabled only if value 0xA is written in lower 4 bits
@@ -43,15 +44,21 @@ void MBC1::writeROM(const word& addr, const byte& value)
     {
         // ROM selection is only made using the 5 lowest bits
         int bitMask = 0x1F;
-
         int selectedBankValue = value & bitMask;
+
         if (selectedBankValue == 0)
         {
             selectedBankValue = 1;
         }
+
+        // We also mask the selected bank with the number of available banks
+        int nbrBanks = _cartridge->getROMSize() / ROM_BANK_SIZE_IN_BYTES;
+        // Retrieve the number of bits needed to encode the bank number
+        int nbrBitsNeeded = log2(nbrBanks);
+        selectedBankValue &= (1 << nbrBitsNeeded) - 1;
+
         _selectedROMBankId = selectedBankValue;
         spdlog::debug("MBC: Switching to ROM bank {}", _selectedROMBankId);
-        // TODO: Mask depending on number of available banks
     }
 
     else if (selectRamBankAddrRange.contains(addr))
