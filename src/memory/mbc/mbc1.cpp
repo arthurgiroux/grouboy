@@ -57,7 +57,7 @@ void MBC1::writeROM(const word& addr, const byte& value)
     else if (selectRamBankAddrRange.contains(addr))
     {
         // RAM selection is only made using the 2 lowest bits
-        int bitMask = 0x02;
+        int bitMask = 0b00000011;
         _selectedRAMBankId = (value & bitMask);
         spdlog::debug("MBC: Switching to RAM bank {}", _selectedRAMBankId);
     }
