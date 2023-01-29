@@ -4,6 +4,7 @@
 #include <array>
 #include <cstring>
 #include <set>
+#include <stdexcept>
 #include <utility>
 
 Cartridge::Cartridge(std::vector<byte> binaryData) : data(std::move(binaryData))
