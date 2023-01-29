@@ -1,4 +1,5 @@
 #include "memory/mbc/mbc1.hpp"
+#include "memory/mbc/mbc2.hpp"
 #include "memory/mbc/mbc_rom_only.hpp"
 #include "memory/mbc/memory_bank_controller.hpp"
 #include <gtest/gtest.h>
@@ -103,9 +104,7 @@ class MBC1Test : public ::testing::Test
     }
 
     int romSize = 128_KiB;
-    int ramSize = 32_KiB;
     int romBankSize = 16_KiB;
-    int ramBankSize = 8_KiB;
     std::unique_ptr<Cartridge> cartridge = nullptr;
     std::unique_ptr<MBC1> mbc = nullptr;
 };
@@ -205,4 +204,133 @@ TEST_F(MBC1Test, ForROMSmallerThan256KiBSwitchingBankOutsideOfPossibleValueShoul
     int value = 0x00;
     switchROMBank(0b00010000);
     ASSERT_EQ(mbc->readROM(addr), value);
+}
+
+class MBC2Test : public ::testing::Test
+{
+  protected:
+    void SetUp() override
+    {
+        std::vector<byte> data{};
+        data.resize(romSize);
+        for (int i = 0; i < romSize; ++i)
+        {
+            // We set value of the ROM to its bank rom id
+            data[i] = (i / romBankSize);
+        }
+
+        int cartridgeTypeAddr = 0x0147;
+        data[cartridgeTypeAddr] = Cartridge::CartridgeType::MBC2;
+        int cartridgeSizeAddr = 0x0148;
+        // Value 2 corresponds to 128KiB
+        int cartridgeSizeValue = 2;
+        data[cartridgeSizeAddr] = cartridgeSizeValue;
+
+        cartridge = std::make_unique<Cartridge>(data);
+        mbc = std::make_unique<MBC2>(cartridge.get());
+    }
+
+    void switchROMBank(int bankId)
+    {
+        mbc->writeROM(0x100, bankId);
+    }
+
+    void enableRam()
+    {
+        mbc->writeROM(0x0000, 0x0A);
+    }
+
+    void disableRam()
+    {
+        mbc->writeROM(0x0000, 0x00);
+    }
+
+    int romSize = 128_KiB;
+    int romBankSize = 16_KiB;
+    std::unique_ptr<Cartridge> cartridge = nullptr;
+    std::unique_ptr<MBC2> mbc = nullptr;
+};
+
+TEST_F(MBC2Test, ReadROMInFixedBankShouldReturnBank0)
+{
+    word addr = 0x0001;
+    int value = 0x00;
+    ASSERT_EQ(mbc->readROM(addr), value);
+}
+
+TEST_F(MBC2Test, ReadROMInSwappableBankShouldReturnBank1ByDefault)
+{
+    word addr = 0x4001;
+    int value = 0x01;
+    ASSERT_EQ(mbc->readROM(addr), value);
+}
+
+TEST_F(MBC2Test, ReadROMInSwappableBankAfterSwappedToBank2ShouldReturnBank2)
+{
+    word addr = 0x4001;
+    int value = 0x02;
+    switchROMBank(2);
+    ASSERT_EQ(mbc->readROM(addr), value);
+}
+
+TEST_F(MBC2Test, ReadROMInFixedBankAfterSwappedToBank2ShouldReturnBank0)
+{
+    word addr = 0x0001;
+    int value = 0x00;
+    switchROMBank(2);
+    ASSERT_EQ(mbc->readROM(addr), value);
+}
+
+TEST_F(MBC2Test, ReadROMInSwappableBankAfterSwappedToBank0ShouldReturnBank1)
+{
+    word addr = 0x4001;
+    int value = 0x01;
+    switchROMBank(0);
+    ASSERT_EQ(mbc->readROM(addr), value);
+}
+
+TEST_F(MBC2Test, ReadRAMWhenRAMIsDisabledShouldReturnFF)
+{
+    word addr = 0x0001;
+    int value = 0xFF;
+    ASSERT_EQ(mbc->readRAM(addr), value);
+    enableRam();
+    ASSERT_EQ(mbc->readRAM(addr), 0x00);
+    disableRam();
+    ASSERT_EQ(mbc->readRAM(addr), value);
+}
+
+TEST_F(MBC2Test, ReadRAMWhenRAMIsEnabledShouldReturnValue)
+{
+    word addr = 0x0001;
+    int value = 0x00;
+    enableRam();
+    ASSERT_EQ(mbc->readRAM(addr), value);
+}
+
+TEST_F(MBC2Test, WriteRAMWhenRAMIsDisabledShouldNotSetValue)
+{
+    word addr = 0x0001;
+    int value = 0xFF;
+    mbc->writeRAM(addr, 0x00);
+    ASSERT_EQ(mbc->readRAM(addr), value);
+}
+
+TEST_F(MBC2Test, WriteRAMWhenRAMIsEnabledShouldSetValue)
+{
+    word addr = 0x0001;
+    int value = 0x01;
+    enableRam();
+    mbc->writeRAM(addr, value);
+    ASSERT_EQ(mbc->readRAM(addr), value);
+}
+
+TEST_F(MBC2Test, WriteRAMShouldOnlyWriteHalfByteValue)
+{
+    word addr = 0x0001;
+    int value = 0xFF;
+    int expectedValue = 0x0F;
+    enableRam();
+    mbc->writeRAM(addr, value);
+    ASSERT_EQ(mbc->readRAM(addr), expectedValue);
 }
