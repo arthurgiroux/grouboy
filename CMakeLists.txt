@@ -78,6 +78,8 @@ set(SOURCE_FILES
         src/memory/mbc/mbc1.cpp
         src/memory/mbc/mbc2.cpp
         src/memory/mbc/mbc2.hpp
+        src/memory/mbc/mbc3.cpp
+        src/memory/mbc/mbc3.hpp
         src/cpu/interrupt_handler.cpp
         src/cpu/interrupt_handler.hpp
         src/cpu/input_controller.cpp
