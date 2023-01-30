@@ -64,8 +64,6 @@ set(SOURCE_FILES
         src/graphics/tile.hpp
         src/common/utils.hpp
         src/common/utils.cpp
-        src/gui/GUI.cpp
-        src/gui/GUI.hpp
         src/memory/mmu.cpp
         src/memory/mmu.hpp
         src/memory/cartridge.cpp
@@ -101,11 +99,9 @@ set(SOURCE_FILES
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
-target_link_libraries(gbemulator_core IMGUI spdlog::spdlog)
+target_link_libraries(gbemulator_core spdlog::spdlog)
 
-add_executable(gbemulator src/main.cpp)
-target_include_directories(gbemulator PRIVATE src/)
-target_link_libraries(gbemulator gbemulator_core)
+add_subdirectory(src/gui/)
 
 enable_testing()
 add_subdirectory(tests/)
