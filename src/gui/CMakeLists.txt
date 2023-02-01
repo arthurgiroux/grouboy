@@ -13,10 +13,11 @@ qt_add_qml_module(gbemulator
         VERSION 1.0
         QML_FILES
         qml/main.qml
-        qml/EmulatorView.qml
         SOURCES
         QGBEmulator.hpp
         QGBEmulator.cpp
+        ImageItem.cpp
+        ImageItem.hpp
         )
 
 target_include_directories(gbemulator PRIVATE ${CMAKE_SOURCE_DIR}/src/)

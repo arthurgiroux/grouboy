@@ -2,10 +2,11 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import GBQml 1.0
+import gbemu 1.0
 
 ApplicationWindow {
-    width: 400
-    height: 400
+    width: 600
+    height: 800
     visible: true
     id: app
     property bool isSetup
@@ -33,6 +34,13 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
+        ImageItem {
+            id: gbRender
+            width: 160 * 3
+            height: 144 * 3
+            image: QGBEmulator.renderedImage
+        }
+
         Button {
             text: "Load cartridge"
             width: 150
@@ -45,6 +53,13 @@ ApplicationWindow {
         }
         Text {
             text: "Frame id: " + QGBEmulator.frameId
+        }
+    }
+
+    Connections {
+        target: QGBEmulator
+        function onRenderedImageChanged() {
+            gbRender.image = QGBEmulator.renderedImage;
         }
     }
 }
