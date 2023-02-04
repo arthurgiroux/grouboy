@@ -13,6 +13,7 @@ qt_add_qml_module(gbemulator
         VERSION 1.0
         QML_FILES
         qml/main.qml
+        qml/DropFileArea.qml
         SOURCES
         QGBEmulator.hpp
         QGBEmulator.cpp
