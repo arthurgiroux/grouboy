@@ -29,5 +29,5 @@ void QGBEmulator::renderNextFrame()
 
 bool QGBEmulator::loadCartridge(const QString& filepath)
 {
-    return _emulator.getMMU().loadCartridge(filepath.toStdString());
+    return _emulator.getMMU().loadCartridge(QUrl(filepath).toLocalFile().toStdString());
 }

@@ -5,18 +5,18 @@ import GBQml 1.0
 import gbemu 1.0
 
 ApplicationWindow {
-    width: 600
-    height: 800
+    minimumWidth: 500
+    minimumHeight: 300
     visible: true
     id: app
-    property bool isSetup
+    property bool cartridgeLoaded
 
     Timer {
-        interval: 16;
-        running: true;
+        interval: 16
+        running: true
         repeat: true
         onTriggered: {
-            if (app.isSetup) {
+            if (app.cartridgeLoaded) {
                 QGBEmulator.renderNextFrame();
             }
         }
@@ -36,23 +36,25 @@ ApplicationWindow {
         anchors.fill: parent
         ImageItem {
             id: gbRender
-            width: 160 * 3
-            height: 144 * 3
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 144
+            Layout.minimumWidth: 160
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             image: QGBEmulator.renderedImage
+            visible: app.cartridgeLoaded
         }
+    }
 
-        Button {
-            text: "Load cartridge"
-            width: 150
-            height: 50
-            onClicked: {
-                var cartridgeLoaded = QGBEmulator.loadCartridge('/Users/tutur/Downloads/loz.gb');
-                console.log("cartridge loaded = " + cartridgeLoaded);
-                app.isSetup = true;
-            }
-        }
-        Text {
-            text: "Frame id: " + QGBEmulator.frameId
+    DropFileArea {
+        anchors.fill: parent
+        anchors.margins: 20
+        visible: !app.cartridgeLoaded
+        text: "Drag & Drop a cartridge"
+        onFileDropped: function (filepath) {
+            var cartridgeLoaded = QGBEmulator.loadCartridge(filepath);
+            console.log("cartridge loaded = " + cartridgeLoaded);
+            app.cartridgeLoaded = cartridgeLoaded;
         }
     }
 
