@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import GBQml 1.0
 import gbemu 1.0
 
@@ -10,6 +11,13 @@ ApplicationWindow {
     visible: true
     id: app
     property bool cartridgeLoaded
+    signal cartridgeSelected(filepath: string)
+
+    onCartridgeSelected: function (filepath) {
+        var cartridgeLoaded = QGBEmulator.loadCartridge(filepath);
+        console.log("cartridge loaded = " + cartridgeLoaded);
+        app.cartridgeLoaded = cartridgeLoaded;
+    }
 
     Timer {
         interval: 16
@@ -25,12 +33,29 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
-            Action {text: qsTr("&Open...")
+            Action {
+                text: qsTr("&Open...")
+                onTriggered: {
+                    romSelectionDialog.open()
+                }
             }
             MenuSeparator { }
-            Action { text: qsTr("&Quit") }
+            Action {
+                text: qsTr("&Quit")
+                onTriggered: {
+                    Qt.quit()
+                }
+            }
         }
     }
+
+   FileDialog {
+        id: romSelectionDialog
+        title: "Please choose a rom file"
+        onAccepted: {
+            app.cartridgeSelected(selectedFile)
+        }
+   }
 
     ColumnLayout {
         anchors.fill: parent
@@ -50,11 +75,15 @@ ApplicationWindow {
         anchors.fill: parent
         anchors.margins: 20
         visible: !app.cartridgeLoaded
-        text: "Drag & Drop a cartridge"
-        onFileDropped: function (filepath) {
-            var cartridgeLoaded = QGBEmulator.loadCartridge(filepath);
-            console.log("cartridge loaded = " + cartridgeLoaded);
-            app.cartridgeLoaded = cartridgeLoaded;
+        text: "Drag & Drop a file"
+        buttonText: "Select from the explorer"
+
+        onFileSelectionButtonClicked: {
+            romSelectionDialog.open()
+        }
+
+        Component.onCompleted: {
+            fileDropped.connect(app.cartridgeSelected)
         }
     }
 

@@ -5,8 +5,10 @@ import QtQuick.Layouts
 Canvas {
     id: dropFileArea
     signal fileDropped(filepath: string)
+    signal fileSelectionButtonClicked()
     property bool isFileBeingDropped
     property string text
+    property string buttonText
     Layout.fillHeight: true
     Layout.fillWidth: true
     Layout.margins: 20
@@ -16,7 +18,7 @@ Canvas {
         colorGroup: SystemPalette.Active
     }
 
-    DropArea {
+   DropArea {
         anchors.fill: parent
 
         onEntered: function(drag) {
@@ -35,13 +37,33 @@ Canvas {
             dropFileArea.isFileBeingDropped = false
             dropFileArea.requestPaint()
         }
-    }
+   }
 
-    Text {
+    ColumnLayout {
+        spacing: 2
         anchors.centerIn: parent
-        text: dropFileArea.text
-        color: colorPalette.text
-        font.pointSize: 30
+
+        Text {
+            text: dropFileArea.text
+            color: colorPalette.text
+            font.pointSize: 30
+        }
+
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "or"
+            color: colorPalette.text
+            font.pointSize: 20
+        }
+
+        Button {
+            text: dropFileArea.buttonText
+            Layout.alignment: Qt.AlignHCenter
+
+            Component.onCompleted: {
+                clicked.connect(dropFileArea.fileSelectionButtonClicked)
+            }
+        }
     }
 
     onPaint: {
