@@ -25,7 +25,8 @@ class QGBEmulator : public QObject
 
   public slots:
     void renderNextFrame();
-    bool loadCartridge(const QString& filepath);
+    bool loadCartridgeFromLocalFile(const QString& filepath);
+    bool loadCartridgeFromUrl(const QString& url);
     void onKeyPressed(Qt::Key key);
     void onKeyReleased(Qt::Key key);
 
