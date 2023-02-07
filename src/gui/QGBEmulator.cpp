@@ -27,9 +27,14 @@ void QGBEmulator::renderNextFrame()
     emit renderedImageChanged();
 }
 
-bool QGBEmulator::loadCartridge(const QString& filepath)
+bool QGBEmulator::loadCartridgeFromLocalFile(const QString& filepath)
 {
-    return _emulator.getMMU().loadCartridge(QUrl(filepath).toLocalFile().toStdString());
+    return _emulator.getMMU().loadCartridge(filepath.toStdString());
+}
+
+bool QGBEmulator::loadCartridgeFromUrl(const QString& url)
+{
+    return loadCartridgeFromLocalFile(QUrl(url).toLocalFile());
 }
 
 void QGBEmulator::onKeyPressed(Qt::Key key)

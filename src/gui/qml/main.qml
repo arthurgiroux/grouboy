@@ -13,10 +13,14 @@ ApplicationWindow {
     property bool cartridgeLoaded
     signal cartridgeSelected(filepath: string)
 
+    Component.onCompleted: {
+        if (applicationData.romFile) {
+            app.cartridgeLoaded = QGBEmulator.loadCartridgeFromLocalFile(applicationData.romFile);
+        }
+    }
+
     onCartridgeSelected: function (filepath) {
-        var cartridgeLoaded = QGBEmulator.loadCartridge(filepath);
-        console.log("cartridge loaded = " + cartridgeLoaded);
-        app.cartridgeLoaded = cartridgeLoaded;
+        app.cartridgeLoaded = QGBEmulator.loadCartridgeFromUrl(filepath);
     }
 
     Timer {
