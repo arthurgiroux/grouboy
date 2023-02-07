@@ -31,3 +31,19 @@ bool QGBEmulator::loadCartridge(const QString& filepath)
 {
     return _emulator.getMMU().loadCartridge(QUrl(filepath).toLocalFile().toStdString());
 }
+
+void QGBEmulator::onKeyPressed(Qt::Key key)
+{
+    if (_buttonMapping.count(key))
+    {
+        _emulator.getInputController().setButtonPressed(_buttonMapping[key]);
+    }
+}
+
+void QGBEmulator::onKeyReleased(Qt::Key key)
+{
+    if (_buttonMapping.count(key))
+    {
+        _emulator.getInputController().setButtonReleased(_buttonMapping[key]);
+    }
+}

@@ -68,6 +68,17 @@ ApplicationWindow {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             image: QGBEmulator.renderedImage
             visible: app.cartridgeLoaded
+
+            focus: true
+            Keys.onPressed: (event) => {
+                QGBEmulator.onKeyPressed(event.key);
+                event.accepted = true;
+            }
+
+            Keys.onReleased: (event) => {
+                QGBEmulator.onKeyReleased(event.key);
+                event.accepted = true;
+            }
         }
     }
 

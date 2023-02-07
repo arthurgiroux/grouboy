@@ -26,11 +26,19 @@ class QGBEmulator : public QObject
   public slots:
     void renderNextFrame();
     bool loadCartridge(const QString& filepath);
+    void onKeyPressed(Qt::Key key);
+    void onKeyReleased(Qt::Key key);
 
   private:
     Emulator _emulator;
     int _frameId = 0;
     QImage _renderedImage = QImage(PPU::SCREEN_WIDTH, PPU::SCREEN_HEIGHT, QImage::Format_RGB888);
+    std::map<Qt::Key, InputController::Button> _buttonMapping = {
+        {Qt::Key_Up, InputController::Button::UP},       {Qt::Key_Down, InputController::Button::DOWN},
+        {Qt::Key_Left, InputController::Button::LEFT},   {Qt::Key_Right, InputController::Button::RIGHT},
+        {Qt::Key_Enter, InputController::Button::START}, {Qt::Key_Space, InputController::Button::SELECT},
+        {Qt::Key_A, InputController::Button::A},         {Qt::Key_B, InputController::Button::B},
+        {Qt::Key_Return, InputController::Button::START}};
 };
 
 #endif // GBEMULATOR_QGBEMULATOR_HPP
