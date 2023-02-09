@@ -52,3 +52,8 @@ void QGBEmulator::onKeyReleased(Qt::Key key)
         _emulator.getInputController().setButtonReleased(_buttonMapping[key]);
     }
 }
+
+Emulator& QGBEmulator::getEmulator()
+{
+    return _emulator;
+}

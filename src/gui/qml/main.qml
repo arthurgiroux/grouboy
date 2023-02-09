@@ -23,6 +23,11 @@ ApplicationWindow {
         app.cartridgeLoaded = QGBEmulator.loadCartridgeFromUrl(filepath);
     }
 
+    DebugTileWindow {
+        id: debugTileWindow
+        visible: false
+    }
+
     Timer {
         interval: 16
         running: true
@@ -48,6 +53,16 @@ ApplicationWindow {
                 text: qsTr("&Quit")
                 onTriggered: {
                     Qt.quit()
+                }
+            }
+        }
+
+        Menu {
+            title: qsTr("&Debug")
+            Action {
+                text: qsTr("&Tiles")
+                onTriggered: {
+                    debugTileWindow.visible = true
                 }
             }
         }

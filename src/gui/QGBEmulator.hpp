@@ -18,6 +18,7 @@ class QGBEmulator : public QObject
   public:
     int getFrameId();
     QImage getRenderedImage();
+    Emulator& getEmulator();
 
   signals:
     void frameIdChanged();

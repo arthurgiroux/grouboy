@@ -14,9 +14,12 @@ qt_add_qml_module(gbemulator
         QML_FILES
         qml/main.qml
         qml/DropFileArea.qml
+        qml/DebugTileWindow.qml
         SOURCES
         QGBEmulator.hpp
         QGBEmulator.cpp
+        QTileMap.cpp
+        QTileMap.hpp
         ImageItem.cpp
         ImageItem.hpp
         ApplicationData.hpp
