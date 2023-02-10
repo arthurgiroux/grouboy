@@ -1,6 +1,6 @@
 #include "ApplicationData.hpp"
+#include "DebugTileWindow.hpp"
 #include "ImageItem.hpp"
-#include "QTileMap.hpp"
 #include <QCommandLineParser>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("applicationData", &appData);
 
     qmlRegisterType<ImageItem>("gbemu", 1, 0, "ImageItem");
-    qmlRegisterType<QTileMap>("gbemu", 1, 0, "QTileMap");
+    qmlRegisterType<DebugTileWindow>("gbemu", 1, 0, "DebugTileWindow");
     engine.load(QUrl("qrc:/GBQml/qml/main.qml"));
 
     if (engine.rootObjects().isEmpty())
