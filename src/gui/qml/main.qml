@@ -26,6 +26,22 @@ ApplicationWindow {
     DebugTileWindow {
         id: debugTileWindow
         visible: false
+        width: 200
+        height: 200
+        emulator: QGBEmulator
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            ImageItem {
+                image: debugTileWindow.tileSetImage
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                height: 128
+                width: 128
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+        }
     }
 
     Timer {

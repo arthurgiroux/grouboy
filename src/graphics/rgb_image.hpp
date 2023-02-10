@@ -73,6 +73,20 @@ class RGBImage
     void copyPixel(int x, int y, const RGBImage& source, int sourceX, int sourceY);
 
     /**
+     * Copy a region from another image into this image.
+     *
+     * @param x 		the x coordinate where to copy the pixel
+     * @param y 		the y coordinate where to copy the pixel
+     * @param source 	the source image to use for the copy
+     * @param sourceX 	the x coordinate to copy from
+     * @param sourceY 	the y coordinate to copy from
+     * @param height    the height of the region to copy
+     * @param width     the width of the region to copy
+     */
+    void copyRegion(int x, int y, const RGBImage& source, int sourceX, int sourceY, int height, int width);
+
+
+    /**
      * Get the red component of a given pixel
      *
      * @param x 	the x coordinate of the pixel
