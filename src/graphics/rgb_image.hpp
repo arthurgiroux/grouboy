@@ -42,6 +42,13 @@ class RGBImage
     const std::vector<byte>& getData() const;
 
     /**
+     * Fill the image with specific grayscale color
+     *
+     * @param value 	the grayscale value of the pixels [0;255]
+     */
+    void fill(byte value);
+
+    /**
      * Set a given pixel to a specific color
      *
      * @param x 	the x coordinate in pixel
@@ -75,8 +82,8 @@ class RGBImage
     /**
      * Copy a region from another image into this image.
      *
-     * @param x 		the x coordinate where to copy the pixel
-     * @param y 		the y coordinate where to copy the pixel
+     * @param x         the x coordinate where to copy the pixels
+     * @param y 	the y coordinate where to copy the pixels
      * @param source 	the source image to use for the copy
      * @param sourceX 	the x coordinate to copy from
      * @param sourceY 	the y coordinate to copy from
@@ -85,6 +92,14 @@ class RGBImage
      */
     void copyRegion(int x, int y, const RGBImage& source, int sourceX, int sourceY, int height, int width);
 
+    /**
+     * Copy another image into this image.
+     *
+     * @param x 	the x coordinate where to copy the pixels
+     * @param y 	the y coordinate where to copy the pixels
+     * @param source 	the source image to use for the copy
+     */
+    void copyImage(int x, int y, const RGBImage& source);
 
     /**
      * Get the red component of a given pixel

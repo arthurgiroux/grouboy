@@ -68,13 +68,23 @@ bool RGBImage::isPixelWhite(int x, int y) const
     return r == 255 && g == 255 && b == 255;
 }
 
+void RGBImage::fill(byte value)
+{
+    std::fill(_data.begin(), _data.end(), value);
+}
+
 void RGBImage::copyRegion(int x, int y, const RGBImage& source, int sourceX, int sourceY, int height, int width)
 {
-    for (int offsetY = 0; offsetY < height; ++offsetY)
+    for (int offsetY = 0; (offsetY < height) && ((y + offsetY) < _height); ++offsetY)
     {
-        for (int offsetX = 0; offsetX < width; ++offsetX)
+        for (int offsetX = 0; (offsetX < width) && ((x + offsetX) < _width); ++offsetX)
         {
             copyPixel(x + offsetX, y + offsetY, source, sourceX + offsetX, sourceY + offsetY);
         }
     }
+}
+
+void RGBImage::copyImage(int x, int y, const RGBImage& source)
+{
+    copyRegion(x, y, source, 0, 0, source.getHeight(), source.getWidth());
 }
