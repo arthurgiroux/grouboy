@@ -42,8 +42,7 @@ void DebugTileWindow::onFrameIdChanged()
             Tile tile = _emulator->getEmulator().getPPU().getTileById(tileId, _tileSetId);
             auto& tileImage = tile.getImage();
             int xOffset = (tileId % NBR_TILE_DISPLAY_PER_LINE) * SingleTile::TILE_WIDTH;
-            _tileSetImageBuffer.copyRegion(xOffset, lineOffset, tileImage, 0, 0, tileImage.getHeight(),
-                                           tileImage.getWidth());
+            _tileSetImageBuffer.copyImage(xOffset, lineOffset, tileImage);
         }
 
         emit tileSetImageChanged();
