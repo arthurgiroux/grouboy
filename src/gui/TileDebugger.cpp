@@ -1,27 +1,27 @@
-#include "DebugTileWindow.hpp"
+#include "TileDebugger.hpp"
 
-QGBEmulator* DebugTileWindow::getEmulator() const
+QGBEmulator* TileDebugger::getEmulator() const
 {
     return _emulator;
 }
 
-void DebugTileWindow::setEmulator(QGBEmulator* emulator)
+void TileDebugger::setEmulator(QGBEmulator* emulator)
 {
     _emulator = emulator;
-    connect(_emulator, &QGBEmulator::frameIdChanged, this, &DebugTileWindow::onFrameIdChanged);
+    connect(_emulator, &QGBEmulator::frameIdChanged, this, &TileDebugger::onFrameIdChanged);
 }
 
-QImage& DebugTileWindow::getTileSetImage()
+QImage& TileDebugger::getTileSetImage()
 {
     return _image;
 }
 
-int DebugTileWindow::getTileSetId() const
+int TileDebugger::getTileSetId() const
 {
     return _tileSetId;
 }
 
-void DebugTileWindow::setTileSetId(int value)
+void TileDebugger::setTileSetId(int value)
 {
     if (_tileSetId == value)
     {
@@ -32,7 +32,7 @@ void DebugTileWindow::setTileSetId(int value)
     emit tileSetIdChanged();
 }
 
-void DebugTileWindow::onFrameIdChanged()
+void TileDebugger::onFrameIdChanged()
 {
     if (_emulator != nullptr)
     {
@@ -49,7 +49,7 @@ void DebugTileWindow::onFrameIdChanged()
     }
 }
 
-DebugTileWindow::DebugTileWindow(QWindow* parent) : QQuickWindow(parent)
+TileDebugger::TileDebugger(QQuickItem* parent) : QQuickItem(parent)
 {
     _image = QImage(_tileSetImageBuffer.getData().data(), _tileSetImageBuffer.getWidth(),
                     _tileSetImageBuffer.getHeight(), QImage::Format::Format_RGB888);

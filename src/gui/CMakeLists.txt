@@ -17,8 +17,8 @@ qt_add_qml_module(gbemulator
         SOURCES
         QGBEmulator.hpp
         QGBEmulator.cpp
-        DebugTileWindow.cpp
-        DebugTileWindow.hpp
+        TileDebugger.cpp
+        TileDebugger.hpp
         ImageItem.cpp
         ImageItem.hpp
         ApplicationData.hpp
