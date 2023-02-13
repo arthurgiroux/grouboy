@@ -6,8 +6,8 @@ import GBQml 1.0
 import gbemu 1.0
 
 ApplicationWindow {
-    minimumWidth: 500
-    minimumHeight: 300
+    minimumWidth: 1024
+    minimumHeight: 768
     visible: true
     id: app
     property bool cartridgeLoaded
@@ -23,26 +23,46 @@ ApplicationWindow {
         app.cartridgeLoaded = QGBEmulator.loadCartridgeFromUrl(filepath);
     }
 
-    DebugTileWindow {
+    ApplicationWindow {
         id: debugTileWindow
         visible: false
-        width: 200
-        height: 200
-        emulator: QGBEmulator
+        width: 400
+        height: 350
 
-        ColumnLayout {
-            anchors.fill: parent
+        TileDebugger {
+            id: tileDebugger
+            emulator: QGBEmulator
 
-            ImageItem {
-                image: debugTileWindow.tileSetImage
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                height: 128
-                width: 128
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            RowLayout {
+                anchors.fill: parent
+
+                ColumnLayout {
+                    RowLayout {
+                        RadioButton {
+                            text: "Tileset 0"
+                            onClicked: {
+                                tileDebugger.tileSetId = 0
+                            }
+                            checked: true
+                        }
+                        RadioButton {
+                            text: "Tileset 1"
+                            onClicked: {
+                                tileDebugger.tileSetId = 1
+                            }
+                        }
+                    }
+
+                    ImageItem {
+                        image: tileDebugger.tileSetImage
+                        height: 128 * 2
+                        width: 128 * 2
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    }
+                }
             }
-        }
-    }
+       }
+   }
 
     Timer {
         interval: 16

@@ -1,12 +1,12 @@
-#ifndef GBEMULATOR_DEBUGTILEWINDOW_HPP
-#define GBEMULATOR_DEBUGTILEWINDOW_HPP
+#ifndef GBEMULATOR_TILEDEBUGGER_HPP
+#define GBEMULATOR_TILEDEBUGGER_HPP
 
 #include <QGBEmulator.hpp>
-#include <QObject>
-#include <QQuickWindow.h>
+#include <QGuiApplication.h>
+#include <QQuickItem>
 #include <qqml.h>
 
-class DebugTileWindow : public QQuickWindow
+class TileDebugger : public QQuickItem
 {
     Q_OBJECT
     QML_ELEMENT
@@ -15,7 +15,7 @@ class DebugTileWindow : public QQuickWindow
     Q_PROPERTY(QImage tileSetImage READ getTileSetImage NOTIFY tileSetImageChanged)
 
   public:
-    DebugTileWindow(QWindow* parent = nullptr);
+    TileDebugger(QQuickItem* parent = nullptr);
 
     QGBEmulator* getEmulator() const;
 
@@ -43,4 +43,4 @@ class DebugTileWindow : public QQuickWindow
     int _tileSetId = 0;
 };
 
-#endif // GBEMULATOR_DEBUGTILEWINDOW_HPP
+#endif // GBEMULATOR_TILEDEBUGGER_HPP
