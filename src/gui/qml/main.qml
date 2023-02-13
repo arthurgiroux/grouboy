@@ -54,11 +54,35 @@ ApplicationWindow {
                     }
 
                     ImageItem {
+                        id: selectedTileImage
                         image: tileDebugger.tileSetImage
-                        height: 128 * 2
-                        width: 128 * 2
+                        property int imageHeight: 128
+                        property int imageWidth: 128
+                        property int scale: 2
+                        property int itemSize: 8
+                        property int nbrItemsPerRow: 16
+                        height: imageHeight * scale
+                        width: imageWidth * scale
                         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onPositionChanged: {
+                                var selectedRow = Math.floor(mouseY / selectedTileImage.scale / selectedTileImage.itemSize);
+                                var selectedCol = Math.floor(mouseX / selectedTileImage.scale / selectedTileImage.itemSize);
+                                var tileId = (selectedRow * selectedTileImage.nbrItemsPerRow + selectedCol);
+                                tileDebugger.selectedTileId = tileId;
+                            }
+                        }
                     }
+                }
+
+                ImageItem {
+                    image: tileDebugger.selectedTileImage
+                    height: 128
+                    width: 128
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
        }
