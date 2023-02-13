@@ -13,7 +13,7 @@ void TileDebugger::setEmulator(QGBEmulator* emulator)
 
 QImage& TileDebugger::getTileSetImage()
 {
-    return _image;
+    return _tileSetImage;
 }
 
 int TileDebugger::getTileSetId() const
@@ -43,14 +43,42 @@ void TileDebugger::onFrameIdChanged()
             auto& tileImage = tile.getImage();
             int xOffset = (tileId % NBR_TILE_DISPLAY_PER_LINE) * SingleTile::TILE_WIDTH;
             _tileSetImageBuffer.copyImage(xOffset, lineOffset, tileImage);
+            if (tileId == _selectedTileId)
+            {
+                _selectedTileImageBuffer.copyImage(0, 0, tileImage);
+            }
         }
 
         emit tileSetImageChanged();
+        emit selectedTileImageChanged();
     }
 }
 
 TileDebugger::TileDebugger(QQuickItem* parent) : QQuickItem(parent)
 {
-    _image = QImage(_tileSetImageBuffer.getData().data(), _tileSetImageBuffer.getWidth(),
-                    _tileSetImageBuffer.getHeight(), QImage::Format::Format_RGB888);
+    _tileSetImage = QImage(_tileSetImageBuffer.getData().data(), _tileSetImageBuffer.getWidth(),
+                           _tileSetImageBuffer.getHeight(), QImage::Format::Format_RGB888);
+    _selectedTileImage = QImage(_selectedTileImageBuffer.getData().data(), _selectedTileImageBuffer.getWidth(),
+                                _selectedTileImageBuffer.getHeight(), QImage::Format::Format_RGB888);
+}
+
+QImage& TileDebugger::getSelectedTileImage()
+{
+    return _selectedTileImage;
+}
+
+int TileDebugger::getSelectedTileId() const
+{
+    return _selectedTileId;
+}
+
+void TileDebugger::setSelectedTileId(int value)
+{
+    if (_selectedTileId == value)
+    {
+        return;
+    }
+
+    _selectedTileId = value;
+    emit selectedTileIdChanged();
 }
