@@ -123,6 +123,9 @@ ApplicationWindow {
                 text: qsTr("&Tiles")
                 onTriggered: {
                     debugTileWindow.visible = true
+                    // We force the focus back to the render
+                    // So that keyboard events can still be received
+                    gbRender.forceActiveFocus()
                 }
             }
         }
@@ -138,6 +141,11 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
+        /*
+        FocusScope {
+            x: gbRender.x; y: gbRender.y
+            width: gbRender.width; height: gbRender.height
+            */
         ImageItem {
             id: gbRender
             Layout.fillWidth: true
@@ -159,6 +167,7 @@ ApplicationWindow {
                 event.accepted = true;
             }
         }
+        //}
     }
 
     DropFileArea {
