@@ -53,19 +53,22 @@ Blaarg's test coverage:
 
 ![Demo](demo_image/emulator_demo.gif)
 
+## Dependencies
+
+This project relies on Qt 6.4 for the GUI, GoogleTest for the testing suite, and sdplog for logging.
+
 ## Compilation
 
-The project can be compiled using CMake, it will automatically retrieve its dependencies.
+In order to compile the project, you will need
+to [download and install Qt 6.4](https://doc.qt.io/qt-6/get-and-install-qt.html).
+
+The project can be compiled using CMake, it will automatically retrieve some dependencies like GoogleTest.
 
 ```
 mkdir -p build && cd build/
 cmake ..
 cmake --build .
 ```
-
-## Dependencies
-
-This project relies on ImGUI and SDL for the display, GoogleTest for the testing suite, and sdplog for logging.
 
 ## Contributing
 
