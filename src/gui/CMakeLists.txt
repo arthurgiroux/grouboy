@@ -2,7 +2,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.2 COMPONENTS Quick Gui Qml REQUIRED)
+find_package(Qt6 6.1 COMPONENTS Quick Gui Qml REQUIRED)
 
 qt_add_executable(gbemulator
         main.cpp
