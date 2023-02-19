@@ -38,9 +38,11 @@ install(TARGETS gbemulator
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         )
 
-qt_generate_deploy_qml_app_script(
-        TARGET gbemulator
-        FILENAME_VARIABLE deploy_script
-)
+if (NOT UNIX OR APPLE)
+    qt_generate_deploy_qml_app_script(
+            TARGET gbemulator
+            FILENAME_VARIABLE deploy_script
+    )
 
-install(SCRIPT ${deploy_script})
+    install(SCRIPT ${deploy_script})
+endif ()
