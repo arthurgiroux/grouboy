@@ -15,11 +15,13 @@ ApplicationWindow {
     Component.onCompleted: {
         if (applicationData.romFile) {
             app.cartridgeLoaded = QGBEmulator.loadCartridgeFromLocalFile(applicationData.romFile);
+            gbRender.forceActiveFocus();
         }
     }
 
     onCartridgeSelected: function (filepath) {
         app.cartridgeLoaded = QGBEmulator.loadCartridgeFromUrl(filepath);
+        gbRender.forceActiveFocus();
     }
 
     ApplicationWindow {
@@ -140,11 +142,7 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
-        /*
-        FocusScope {
-            x: gbRender.x; y: gbRender.y
-            width: gbRender.width; height: gbRender.height
-            */
+
         ImageItem {
             id: gbRender
             Layout.fillWidth: true
@@ -166,7 +164,6 @@ ApplicationWindow {
                 event.accepted = true;
             }
         }
-        //}
     }
 
     DropFileArea {
