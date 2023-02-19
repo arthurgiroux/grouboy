@@ -27,3 +27,15 @@ qt_add_qml_module(gbemulator
 target_include_directories(gbemulator PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
 target_link_libraries(gbemulator PRIVATE gbemulator_core Qt6::Gui Qt6::Quick Qt6::Qml)
+
+install(TARGETS gbemulator
+    BUNDLE  DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+qt_generate_deploy_qml_app_script(
+    TARGET gbemulator
+    FILENAME_VARIABLE deploy_script
+)
+
+install(SCRIPT ${deploy_script})
