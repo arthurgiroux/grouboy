@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import GBQml 1.0
-import gbemu 1.0
 
 ApplicationWindow {
     minimumWidth: 1024

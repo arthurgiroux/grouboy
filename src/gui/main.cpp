@@ -23,8 +23,6 @@ int main(int argc, char* argv[])
     appData.setRomFile(parser.value(romFileOption));
     engine.rootContext()->setContextProperty("applicationData", &appData);
 
-    qmlRegisterType<ImageItem>("gbemu", 1, 0, "ImageItem");
-    qmlRegisterType<TileDebugger>("gbemu", 1, 0, "TileDebugger");
     engine.load(QUrl("qrc:/GBQml/qml/main.qml"));
 
     if (engine.rootObjects().isEmpty())
