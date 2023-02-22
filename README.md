@@ -14,11 +14,49 @@ Here's what's implemented so far:
 * Inputs
 * Timer
 * Serial
+* Memory Bus Controller
+    * MBC1
+    * MBC2
+    * MBC3
 
 Future work:
 
-* Memory Bus Controller
+* Other MBCs
 * Sound
+
+## Input mapping
+
+| Keyboard input | Gameboy input |
+|----------------|---------------|
+| Up Arrow       | Up            |
+| Down Arrow     | Down          |
+| Left Arrow     | Left          |
+| Right Arrow    | Right         |
+| Enter          | Start         |
+| Space bar      | Select        |
+| A              | A             |
+| B              | B             |
+
+## Demo
+
+![Demo](demo_image/emulator_demo.gif)
+
+## Dependencies
+
+This project relies on Qt 6.4 for the GUI, GoogleTest for the testing suite, and sdplog for logging.
+
+## Compilation
+
+In order to compile the project, you will need
+to [download and install Qt 6.4](https://doc.qt.io/qt-6/get-and-install-qt.html).
+
+The project can be compiled using CMake, it will automatically retrieve some dependencies like GoogleTest.
+
+```
+mkdir -p build && cd build/
+cmake ..
+cmake --build .
+```
 
 ## Tests
 
@@ -48,27 +86,6 @@ Blaarg's test coverage:
 | Reference image                                      | Pass/Fail          |
 |------------------------------------------------------|--------------------|
 | ![Demo](tests/data/reference/acid-reference-dmg.bmp) | :white_check_mark: |
-
-## Demo
-
-![Demo](demo_image/emulator_demo.gif)
-
-## Dependencies
-
-This project relies on Qt 6.4 for the GUI, GoogleTest for the testing suite, and sdplog for logging.
-
-## Compilation
-
-In order to compile the project, you will need
-to [download and install Qt 6.4](https://doc.qt.io/qt-6/get-and-install-qt.html).
-
-The project can be compiled using CMake, it will automatically retrieve some dependencies like GoogleTest.
-
-```
-mkdir -p build && cd build/
-cmake ..
-cmake --build .
-```
 
 ## Contributing
 
