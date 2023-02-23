@@ -35,7 +35,8 @@ add_executable(
         test_cpu_instructions_16bits_arithmetic_logical.cpp
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
         test_blargg.cpp
-        test_palette.cpp)
+        test_palette.cpp
+        test_mooneye.cpp)
 
 target_link_libraries(
         cpu_tests
