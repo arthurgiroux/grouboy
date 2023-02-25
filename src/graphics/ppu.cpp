@@ -1,6 +1,7 @@
 
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
+#include "graphics/lcd_status_register.hpp"
 #include "graphics/palette.hpp"
 #include "spdlog/spdlog.h"
 #include "tilemap.hpp"
@@ -10,16 +11,16 @@
 const int PPU::SCREEN_WIDTH = 160;
 const int PPU::SCREEN_HEIGHT = 144;
 
+PPU::~PPU() = default;
+
 void PPU::step(int nbrTicks)
 {
     _ticksSpentInCurrentMode += nbrTicks;
 
-    LCDStatusRegister lcdStatusRegister(_mmu);
+    bool areLYCAndLYEqual = _lcdStatusRegister->areLYCAndLYEqual();
+    _lcdStatusRegister->setLYCompareFlag(areLYCAndLYEqual);
 
-    bool areLYCAndLYEqual = lcdStatusRegister.areLYCAndLYEqual();
-    lcdStatusRegister.setLYCompareFlag(areLYCAndLYEqual);
-
-    if (areLYCAndLYEqual && lcdStatusRegister.isLYCompareStatInterruptEnabled() && !_LYCInterruptRaisedDuringScanline)
+    if (areLYCAndLYEqual && _lcdStatusRegister->isLYCompareStatInterruptEnabled() && !_LYCInterruptRaisedDuringScanline)
     {
         _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
         _LYCInterruptRaisedDuringScanline = true;
@@ -31,7 +32,7 @@ void PPU::step(int nbrTicks)
     }
     else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
     {
-        if (lcdStatusRegister.isHBLANKStatInterruptEnabled())
+        if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
         {
             _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
         }
@@ -46,7 +47,7 @@ void PPU::step(int nbrTicks)
 
         if (_currentScanline == SCREEN_HEIGHT)
         {
-            if (lcdStatusRegister.isVBLANKStatInterruptEnabled())
+            if (_lcdStatusRegister->isVBLANKStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
             }
@@ -57,7 +58,7 @@ void PPU::step(int nbrTicks)
         }
         else
         {
-            if (lcdStatusRegister.isOAMStatInterruptEnabled())
+            if (_lcdStatusRegister->isOAMStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
             }
@@ -72,7 +73,7 @@ void PPU::step(int nbrTicks)
         _ticksSpentInCurrentMode = 0;
         if (_currentScanline > MAX_SCANLINE_VALUE)
         {
-            if (lcdStatusRegister.isOAMStatInterruptEnabled())
+            if (_lcdStatusRegister->isOAMStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
             }
@@ -354,7 +355,8 @@ void PPU::swapFrameBuffers()
 
 PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     : _mmu(mmu_), _interruptManager(interruptManager), _paletteBackground(_mmu, ADDR_PALETTE_BG),
-      _paletteObj0(_mmu, ADDR_PALETTE_OBJ0), _paletteObj1(_mmu, ADDR_PALETTE_OBJ1)
+      _paletteObj0(_mmu, ADDR_PALETTE_OBJ0), _paletteObj1(_mmu, ADDR_PALETTE_OBJ1),
+      _lcdStatusRegister(std::make_unique<LCDStatusRegister>(_mmu))
 {
     reset();
 
@@ -451,4 +453,12 @@ void PPU::reset()
     _LYCInterruptRaisedDuringScanline = false;
     _temporaryFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
     _lastRenderedFrame = RGBImage(SCREEN_HEIGHT, SCREEN_WIDTH);
+}
+
+void PPU::setMode(PPU::Mode value)
+{
+    _lcdStatusRegister->updateFlagMode(value);
+    _currentMode = value;
+    // TODO: Check if we should take into account modulo of ticks
+    _ticksSpentInCurrentMode = 0;
 }

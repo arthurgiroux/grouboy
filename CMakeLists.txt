@@ -22,6 +22,8 @@ set(SOURCE_FILES
         src/graphics/ppu.hpp
         src/graphics/tile.cpp
         src/graphics/tile.hpp
+        src/graphics/lcd_status_register.hpp
+        src/graphics/lcd_status_register.cpp
         src/common/utils.hpp
         src/common/utils.cpp
         src/memory/mmu.cpp
