@@ -11,6 +11,7 @@
 #include <vector>
 
 class InterruptManager;
+class LCDStatusRegister;
 
 /**
  * This class is responsible for rendering the frame that will be displayed by the screen.
@@ -38,7 +39,7 @@ class PPU
      * @param interruptManager the interrupt manager to use to raise graphical interrupts
      */
     PPU(MMU& mmu, InterruptManager* interruptManager);
-    ~PPU() = default;
+    ~PPU();
 
     /**
      * The different modes that the PPU can be in.
@@ -217,88 +218,13 @@ class PPU
     static const int MAX_SCANLINE_VALUE = 153;
 
   private:
-    // TODO: Clean-up and document
-    class LCDStatusRegister
-    {
-      public:
-        LCDStatusRegister(MMU& mmu) : _mmu(mmu){};
-        void updateFlagMode(Mode value)
-        {
-            int status = _mmu.read(ADDR_LCD_STATUS) & 0b11111100;
-            if (value == HBLANK)
-            {
-                status |= 0x00;
-            }
-            else if (value == VBLANK)
-            {
-                status |= 0x01;
-            }
-            else if (value == OAM_ACCESS)
-            {
-                status |= 0x02;
-            }
-
-            else if (value == VRAM_ACCESS)
-            {
-                status |= 0x03;
-            }
-
-            _mmu.write(ADDR_LCD_STATUS, status);
-        }
-
-        bool areLYCAndLYEqual()
-        {
-            return _mmu.read(LY_COMPARE_ADDR) == _mmu.read(ADDR_SCANLINE);
-        }
-
-        void setLYCompareFlag(bool value)
-        {
-            int status = _mmu.read(ADDR_LCD_STATUS);
-            utils::setNthBit(status, 2, value);
-            _mmu.write(ADDR_LCD_STATUS, status);
-        }
-
-        bool isLYCompareStatInterruptEnabled()
-        {
-            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 6);
-        }
-
-        bool isOAMStatInterruptEnabled()
-        {
-            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 5);
-        }
-
-        bool isVBLANKStatInterruptEnabled()
-        {
-            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 4);
-        }
-
-        bool isHBLANKStatInterruptEnabled()
-        {
-            return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 3);
-        }
-
-      private:
-        MMU& _mmu;
-        static const int LY_COMPARE_ADDR = 0xFF45;
-
-        /**
-         * The address of the LCD status register.
-         */
-        static const int ADDR_LCD_STATUS = 0xFF41;
-    };
     /**
      * Set the mode that the PPU is currently in.
      *
      * @param value the new mode of the PPU.
      */
-    void setMode(Mode value)
-    {
-        _lcdStatusRegister.updateFlagMode(value);
-        _currentMode = value;
-        // TODO: Check if we should take into account modulo of ticks
-        _ticksSpentInCurrentMode = 0;
-    };
+    void setMode(Mode value);
+    ;
 
     /**
      * Render the given scanline.
@@ -442,7 +368,7 @@ class PPU
     /**
      * LCD Status register, used to exposed PPU state via memory.
      */
-    LCDStatusRegister _lcdStatusRegister = LCDStatusRegister(_mmu);
+    std::unique_ptr<LCDStatusRegister> _lcdStatusRegister;
 
     /**
      * Was a LCD_STAT, LCY=LY interrupt already fired for this scanline
