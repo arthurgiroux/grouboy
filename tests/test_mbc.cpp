@@ -56,6 +56,14 @@ TEST_F(MBCROMOnlyTest, WriteRAMShouldThrowException)
     ASSERT_THROW(mbc->writeRAM(0x00, 0x00), std::runtime_error);
 }
 
+TEST_F(MBCROMOnlyTest, SerializeUnserializedRAMShouldLoadStateCorrectly)
+{
+    auto serialized = mbc->serializeRAM();
+    // No RAM to serialize
+    ASSERT_EQ(serialized.size(), 0);
+    ASSERT_TRUE(mbc->unserializeRAM(serialized));
+}
+
 class MBC1Test : public ::testing::Test
 {
   protected:
@@ -207,6 +215,58 @@ TEST_F(MBC1Test, ForROMSmallerThan256KiBSwitchingBankOutsideOfPossibleValueShoul
     ASSERT_EQ(mbc->readROM(addr), value);
 }
 
+TEST_F(MBC1Test, SerializeUnserializedRAMShouldLoadStateCorrectly)
+{
+    // Set the RAM to a determined state
+    enableRam();
+    switchRAMBank(0);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i));
+    }
+    switchRAMBank(1);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i + 1);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i + 1));
+    }
+
+    // Serialize current state
+    auto serialized = mbc->serializeRAM();
+
+    // Reset RAM
+    switchRAMBank(0);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, 0);
+        ASSERT_EQ(mbc->readRAM(i), 0);
+    }
+    switchRAMBank(1);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, 0);
+        ASSERT_EQ(mbc->readRAM(i), 0);
+    }
+
+    // Load serialize state
+    ASSERT_TRUE(mbc->unserializeRAM(serialized));
+
+    // Check that state was correctly restored
+    switchRAMBank(0);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i));
+    }
+    switchRAMBank(1);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i + 1);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i + 1));
+    }
+}
+
 class MBC2Test : public ::testing::Test
 {
   protected:
@@ -334,6 +394,37 @@ TEST_F(MBC2Test, WriteRAMShouldOnlyWriteHalfByteValue)
     enableRam();
     mbc->writeRAM(addr, value);
     ASSERT_EQ(mbc->readRAM(addr), expectedValue);
+}
+
+TEST_F(MBC2Test, SerializeUnserializedRAMShouldLoadStateCorrectly)
+{
+    // Set the RAM to a determined state
+    enableRam();
+    for (int i = 0; i < 512_KiB; ++i)
+    {
+        mbc->writeRAM(i, i);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i & 0xF));
+    }
+
+    // Serialize current state
+    auto serialized = mbc->serializeRAM();
+
+    // Reset RAM
+    for (int i = 0; i < 512_KiB; ++i)
+    {
+        mbc->writeRAM(i, 0);
+        ASSERT_EQ(mbc->readRAM(i), 0);
+    }
+
+    // Load serialize state
+    ASSERT_TRUE(mbc->unserializeRAM(serialized));
+
+    // Check that state was correctly restored
+    for (int i = 0; i < 512_KiB; ++i)
+    {
+        mbc->writeRAM(i, i);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i & 0xF));
+    }
 }
 
 class MBC3Test : public ::testing::Test
@@ -477,4 +568,56 @@ TEST_F(MBC3Test, SwappingRAMBankShouldRetainBankValue)
     ASSERT_EQ(mbc->readRAM(addr), valueBank1);
     switchRAMBank(0);
     ASSERT_EQ(mbc->readRAM(addr), valueBank0);
+}
+
+TEST_F(MBC3Test, SerializeUnserializedRAMShouldLoadStateCorrectly)
+{
+    // Set the RAM to a determined state
+    enableRam();
+    switchRAMBank(0);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i));
+    }
+    switchRAMBank(1);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i + 1);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i + 1));
+    }
+
+    // Serialize current state
+    auto serialized = mbc->serializeRAM();
+
+    // Reset RAM
+    switchRAMBank(0);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, 0);
+        ASSERT_EQ(mbc->readRAM(i), 0);
+    }
+    switchRAMBank(1);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, 0);
+        ASSERT_EQ(mbc->readRAM(i), 0);
+    }
+
+    // Load serialize state
+    ASSERT_TRUE(mbc->unserializeRAM(serialized));
+
+    // Check that state was correctly restored
+    switchRAMBank(0);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i));
+    }
+    switchRAMBank(1);
+    for (int i = 0; i < 8_KiB; ++i)
+    {
+        mbc->writeRAM(i, i + 1);
+        ASSERT_EQ(mbc->readRAM(i), static_cast<byte>(i + 1));
+    }
 }

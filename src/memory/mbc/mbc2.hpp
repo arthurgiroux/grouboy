@@ -26,6 +26,8 @@ class MBC2 : public MemoryBankController
     void writeROM(const word& addr, const byte& value) override;
     byte readRAM(const word& addr) override;
     void writeRAM(const word& addr, const byte& value) override;
+    std::vector<byte> serializeRAM() override;
+    bool unserializeRAM(const std::vector<byte>& data) override;
 
   private:
     /**
@@ -67,7 +69,7 @@ class MBC2 : public MemoryBankController
     /**
      * 4 bits 512KiB RAM.
      */
-    std::array<byte, RAM_SIZE_IN_BYTES> _ram = {};
+    std::vector<byte> _ram = {};
 };
 
 #endif // GBEMULATOR_MBC2_HPP

@@ -49,6 +49,20 @@ class MemoryBankController
     virtual void writeRAM(const word& addr, const byte& value) = 0;
 
     /**
+     * Serialize the current state of the RAM.
+     *
+     * @return  a binary representation of the RAM that can be restored later
+     */
+    virtual std::vector<byte> serializeRAM() = 0;
+
+    /**
+     * Load a state of the RAM that was previously serialized using serializeRAM().
+     *
+     * @param data  the serialized data to load.
+     */
+    virtual bool unserializeRAM(const std::vector<byte>& data) = 0;
+
+    /**
      * Factory function to create a memory controller based on cartridge information.
      *
      * @param cartridge The cartridge object from which we will read the MBC information

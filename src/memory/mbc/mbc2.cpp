@@ -3,6 +3,7 @@
 
 MBC2::MBC2(Cartridge* cartridge) : MemoryBankController(cartridge)
 {
+    _ram.resize(RAM_SIZE_IN_BYTES);
 }
 
 byte MBC2::readROM(const word& addr)
@@ -91,4 +92,20 @@ void MBC2::writeRAM(const word& addr, const byte& value)
     // The RAM of MBC2 is only 4 bits value
     int valueBitMask = 0xF;
     _ram[addr & addrBitMask] = value & valueBitMask;
+}
+
+std::vector<byte> MBC2::serializeRAM()
+{
+    return _ram;
+}
+
+bool MBC2::unserializeRAM(const std::vector<byte>& data)
+{
+    if (data.size() != _ram.size())
+    {
+        return false;
+    }
+
+    _ram = data;
+    return true;
 }
