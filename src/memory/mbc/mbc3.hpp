@@ -27,7 +27,9 @@ class MBC3 : public MemoryBankController
     void writeROM(const word& addr, const byte& value) override;
     byte readRAM(const word& addr) override;
     void writeRAM(const word& addr, const byte& value) override;
-
+    std::vector<byte> serializeRAM() override;
+    bool unserializeRAM(const std::vector<byte>& data) override;
+    
   private:
     /**
      * The address range that corresponds to the fixed ROM bank

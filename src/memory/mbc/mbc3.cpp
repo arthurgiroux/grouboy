@@ -105,3 +105,19 @@ void MBC3::writeRAM(const word& addr, const byte& value)
         // TODO: Implement RTC
     }
 }
+
+std::vector<byte> MBC3::serializeRAM()
+{
+    return _ram;
+}
+
+bool MBC3::unserializeRAM(const std::vector<byte>& data)
+{
+    if (data.size() != _ram.size())
+    {
+        return false;
+    }
+
+    _ram = data;
+    return true;
+}

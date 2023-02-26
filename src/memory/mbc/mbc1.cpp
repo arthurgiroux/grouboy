@@ -91,3 +91,18 @@ void MBC1::writeRAM(const word& addr, const byte& value)
 
     _ram[_selectedRAMBankId * RAM_BANK_SIZE_IN_BYTES + addr] = value;
 }
+
+std::vector<byte> MBC1::serializeRAM()
+{
+    return _ram;
+}
+
+bool MBC1::unserializeRAM(const std::vector<byte>& data)
+{
+    if (data.size() != _ram.size()) {
+        return false;
+    }
+
+    _ram = data;
+    return true;
+}

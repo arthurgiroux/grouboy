@@ -50,3 +50,13 @@ void MBCRomOnly::writeRAM(const word& addr, const byte& value)
             utils::string_format("Trying to write outside of RAM range. Addr=%d, RAM Size=%d", addr, _ram.size()));
     }
 }
+
+std::vector<byte> MBCRomOnly::serializeRAM()
+{
+    return std::vector<byte>();
+}
+
+bool MBCRomOnly::unserializeRAM(const std::vector<byte>& data)
+{
+    return true;
+}

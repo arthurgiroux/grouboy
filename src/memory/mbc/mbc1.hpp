@@ -26,6 +26,8 @@ class MBC1 : public MemoryBankController
     void writeROM(const word& addr, const byte& value) override;
     byte readRAM(const word& addr) override;
     void writeRAM(const word& addr, const byte& value) override;
+    std::vector<byte> serializeRAM() override;
+    bool unserializeRAM(const std::vector<byte>& data) override;
 
   private:
     /**
