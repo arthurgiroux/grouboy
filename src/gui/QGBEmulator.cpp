@@ -1,4 +1,8 @@
 #include "QGBEmulator.hpp"
+#include <QDir>
+#include <QStandardPaths>
+
+const QString QGBEmulator::SAVE_FILENAME = "savestate.bin";
 
 int QGBEmulator::getFrameId()
 {
@@ -56,4 +60,36 @@ void QGBEmulator::onKeyReleased(Qt::Key key)
 Emulator& QGBEmulator::getEmulator()
 {
     return _emulator;
+}
+
+void QGBEmulator::saveToFile()
+{
+    Cartridge* cartridge = _emulator.getMMU().getCartridge();
+    if (cartridge != nullptr)
+    {
+        QDir saveDir = getSaveFolder(cartridge);
+        if (saveDir.mkpath(saveDir.absolutePath()))
+        {
+            _emulator.saveToFile(saveDir.absoluteFilePath(SAVE_FILENAME).toStdString());
+        }
+    }
+}
+QDir QGBEmulator::getSaveFolder(const Cartridge* cartridge) const
+{
+    QString saveFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    saveFolder += QDir::separator() + QString::fromStdString(cartridge->getTitle());
+    return QDir(saveFolder);
+}
+
+void QGBEmulator::loadSaveFromFile()
+{
+    Cartridge* cartridge = _emulator.getMMU().getCartridge();
+    if (cartridge != nullptr)
+    {
+        QDir saveDir = getSaveFolder(cartridge);
+        if (saveDir.exists(SAVE_FILENAME))
+        {
+            _emulator.loadFromFile(saveDir.absoluteFilePath(SAVE_FILENAME).toStdString());
+        }
+    }
 }

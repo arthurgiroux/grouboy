@@ -1,4 +1,6 @@
 #include "utils.hpp"
+#include <fstream>
+#include <vector>
 
 namespace utils
 {
@@ -49,6 +51,20 @@ void setNthBit(int& value, int bitPosition, bool state)
     {
         value &= ~(1 << bitPosition);
     }
+}
+
+bool readBinaryDataFromFile(const std::string& filepath, std::vector<byte>& out)
+{
+    std::ifstream input(filepath, std::ios::binary);
+    if (!input.good())
+    {
+        return false;
+    }
+
+    out = std::vector<byte>((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+    input.close();
+
+    return true;
 }
 
 AddressRange::AddressRange(word start, word end) : _startAddr(start), _endAddr(end)

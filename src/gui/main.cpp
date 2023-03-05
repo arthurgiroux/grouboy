@@ -9,6 +9,8 @@
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
+    app.setOrganizationDomain("giroux");
+    app.setApplicationName("Grouboy");
 
     QCommandLineParser parser;
     QCommandLineOption romFileOption(QStringList() << "rom-file",
