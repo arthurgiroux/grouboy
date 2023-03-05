@@ -39,6 +39,20 @@ class MMU
     void setInputController(InputController* controller);
     void reset();
 
+    /**
+     * Serialize the current state of the cartridge RAM.
+     *
+     * @return  a binary representation of the cartridge RAM that can be restored later
+     */
+    std::vector<byte> serializeCartridgeRAM();
+
+    /**
+     * Load a state of the cartridge RAM that was previously serialized using serializeCartridgeRAM().
+     *
+     * @param data  the serialized data to load.
+     */
+    bool unserializeCartridgeRAM(const std::vector<byte>& data);
+
     static const size_t MEMORY_SIZE_IN_BYTES = 65536;
     static const std::array<byte, 256> BIOS;
 

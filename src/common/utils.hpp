@@ -85,6 +85,15 @@ bool isNthBitSet(int value, int bitPosition);
 void setNthBit(int& value, int bitPosition, bool state);
 
 /**
+ * Read the binary content of a file.
+ *
+ * @param filepath  The binary file to read
+ * @param out       The data that was read in case of success
+ * @return  True if the file was read correctly, false otherwise
+ */
+bool readBinaryDataFromFile(const std::string& filepath, std::vector<byte>& out);
+
+/**
  * Represents a memory range between two addresses.
  */
 class AddressRange

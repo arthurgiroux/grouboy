@@ -158,11 +158,9 @@ void MMU::writeWord(const word& addr, const word& value)
 
 bool MMU::loadCartridge(const std::string& filepath)
 {
-    std::ifstream input(filepath, std::ios::binary);
-    bool ret = false;
-    if (input.good())
+    std::vector<byte> data;
+    if (utils::readBinaryDataFromFile(filepath, data))
     {
-        std::vector<byte> data((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
         cartridge = std::make_unique<Cartridge>(data);
         memoryBankController = MemoryBankController::createMemoryBankControllerFromCartridge(cartridge.get());
         if (memoryBankController == nullptr)
@@ -171,11 +169,11 @@ bool MMU::loadCartridge(const std::string& filepath)
                 utils::string_format("Memory Bus Controller '%s' is not implemented.",
                                      Cartridge::cartridgeTypeToString(cartridge->getType()).c_str()));
         }
-        ret = true;
+
+        return true;
     }
 
-    input.close();
-    return ret;
+    return false;
 }
 
 Cartridge* MMU::getCartridge()
@@ -199,4 +197,24 @@ void MMU::performDMATransfer(word sourceAddr)
     {
         write(DMA_TRANSFER_TARGET_ADDR + i, read(sourceAddr + i));
     }
+}
+
+std::vector<byte> MMU::serializeCartridgeRAM()
+{
+    if (memoryBankController != nullptr)
+    {
+        return memoryBankController->serializeRAM();
+    }
+
+    return std::vector<byte>();
+}
+
+bool MMU::unserializeCartridgeRAM(const std::vector<byte>& data)
+{
+    if (memoryBankController != nullptr)
+    {
+        return memoryBankController->unserializeRAM(data);
+    }
+
+    return false;
 }

@@ -2,6 +2,7 @@
 #define GBEMULATOR_QGBEMULATOR_HPP
 
 #include "emulator.hpp"
+#include <QDir>
 #include <QImage>
 #include <QObject>
 #include <QString>
@@ -30,8 +31,13 @@ class QGBEmulator : public QObject
     bool loadCartridgeFromUrl(const QString& url);
     void onKeyPressed(Qt::Key key);
     void onKeyReleased(Qt::Key key);
+    void saveToFile();
+    void loadSaveFromFile();
 
   private:
+    QDir getSaveFolder(const Cartridge* cartridge) const;
+    static const QString SAVE_FILENAME;
+
     Emulator _emulator;
     int _frameId = 0;
     QImage _renderedImage = QImage(PPU::SCREEN_WIDTH, PPU::SCREEN_HEIGHT, QImage::Format_RGB888);

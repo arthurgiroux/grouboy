@@ -12,16 +12,21 @@ ApplicationWindow {
     property bool cartridgeLoaded
     signal cartridgeSelected(filepath: string)
 
+    function focusRenderAndLoadSave() {
+        gbRender.forceActiveFocus();
+        QGBEmulator.loadSaveFromFile();
+    }
+
     Component.onCompleted: {
         if (applicationData.romFile) {
             app.cartridgeLoaded = QGBEmulator.loadCartridgeFromLocalFile(applicationData.romFile);
-            gbRender.forceActiveFocus();
+            focusRenderAndLoadSave();
         }
     }
 
     onCartridgeSelected: function (filepath) {
         app.cartridgeLoaded = QGBEmulator.loadCartridgeFromUrl(filepath);
-        gbRender.forceActiveFocus();
+        focusRenderAndLoadSave();
     }
 
     ApplicationWindow {
@@ -162,6 +167,13 @@ ApplicationWindow {
             Keys.onReleased: (event) => {
                 QGBEmulator.onKeyReleased(event.key);
                 event.accepted = true;
+            }
+
+            Shortcut {
+                sequences: [StandardKey.Save]
+                onActivated: {
+                    QGBEmulator.saveToFile();
+                }
             }
         }
     }

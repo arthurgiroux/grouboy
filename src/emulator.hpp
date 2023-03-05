@@ -78,6 +78,21 @@ class Emulator
         return currentTicks;
     }
 
+    /**
+     * Save the current game state to a file
+     *
+     * @return true if saving was successful, false otherwise
+     */
+    bool saveToFile(const std::string& filepath);
+
+    /**
+     * Load a save state from a file.
+     *
+     * @param filepath  the path to the save to load
+     * @return True if loading was successful, false otherwise
+     */
+    bool loadFromFile(const std::string& filepath);
+
   private:
     MMU mmu;
     CPU cpu;
