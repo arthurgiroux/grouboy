@@ -2,7 +2,7 @@
 #define GBEMULATOR_TILEDEBUGGER_HPP
 
 #include <QGBEmulator.hpp>
-#include <QGuiApplication.h>
+#include <QGuiApplication>
 #include <QQuickItem>
 #include <qqml.h>
 

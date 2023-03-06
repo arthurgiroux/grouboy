@@ -2,7 +2,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.4 COMPONENTS Quick Gui Qml REQUIRED)
+find_package(Qt6 6.4 COMPONENTS Quick Gui Qml Widgets REQUIRED)
 
 qt_add_executable(gbemulator
         main.cpp
@@ -26,7 +26,7 @@ qt_add_qml_module(gbemulator
 
 target_include_directories(gbemulator PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
-target_link_libraries(gbemulator PRIVATE gbemulator_core Qt6::Gui Qt6::Quick Qt6::Qml)
+target_link_libraries(gbemulator PRIVATE gbemulator_core Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Widgets)
 
 set_target_properties(gbemulator PROPERTIES
         WIN32_EXECUTABLE TRUE
