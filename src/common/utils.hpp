@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include <string>
+#include <vector>
 
 constexpr std::size_t operator""_KiB(unsigned long long int x)
 {

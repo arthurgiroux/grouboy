@@ -1,5 +1,6 @@
 #include "timer.hpp"
 #include "cpu/cpu.hpp"
+#include <algorithm>
 
 const int Timer::DIV_TIMER_CLOCK_DIVIDER = CPU::CLOCK_FREQUENCY_HZ / DIV_REGISTER_FREQUENCY_HZ;
 
