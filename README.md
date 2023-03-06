@@ -87,6 +87,12 @@ Blaarg's test coverage:
 |------------------------------------------------------|--------------------|
 | ![Demo](tests/data/reference/acid-reference-dmg.bmp) | :white_check_mark: |
 
+[Mooneye test suite](https://github.com/Gekkio/mooneye-test-suite):
+
+| Category            | Test Name               | Pass/Fail          |
+|---------------------|-------------------------|--------------------|
+| CPU Instructions    | DAA                     | :white_check_mark: |
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
