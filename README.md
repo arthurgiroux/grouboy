@@ -89,9 +89,10 @@ Blaarg's test coverage:
 
 [Mooneye test suite](https://github.com/Gekkio/mooneye-test-suite):
 
-| Category            | Test Name               | Pass/Fail          |
-|---------------------|-------------------------|--------------------|
-| CPU Instructions    | DAA                     | :white_check_mark: |
+| Category         | Test Name | Pass/Fail          |
+|------------------|-----------|--------------------|
+| CPU Instructions | DAA       | :white_check_mark: |
+| Bits             | MEM OAM   | :white_check_mark: |
 
 ## Contributing
 
