@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(GBEmulator)
+project(Grouboy)
 add_subdirectory(libs/spdlog-1.11.0)
 
 set(CMAKE_CXX_STANDARD 17)
