@@ -1,10 +1,10 @@
-# C++ Gameboy Emulator [![Build Status](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)
+# GrouBoy - a modern C++ Game Boy emulator [![Build Status](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)
 
-This is an educative implementation of a Gameboy Emulator made in C++.
+This is an educative implementation of a Game Boy Emulator made in modern C++.
 
 ## Features
 
-Here's what's implemented so far:
+Here's the list of implemented features:
 
 * Memory abstraction
 * All CPU instructions
