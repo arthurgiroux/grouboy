@@ -56,6 +56,11 @@ class MoonEyeTest : public ::testing::Test
     std::vector<byte> output = {};
 };
 
+TEST_F(MoonEyeTest, TestForBitsMemOamShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/bits/mem_oam.gb");
+}
+
 TEST_F(MoonEyeTest, TestForDaaInstrShouldBeSuccessful)
 {
     assertTestForRomArePassing("acceptance/instr/daa.gb");
