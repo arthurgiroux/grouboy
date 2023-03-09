@@ -26,6 +26,17 @@ const std::array<byte, 256> MMU::BIOS = {
     0xA8, 0x00, 0x1A, 0x13, 0xBE, 0x00, 0x00, 0x23, 0x7D, 0xFE, 0x34, 0x20, 0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05,
     0x20, 0xFB, 0x86, 0x00, 0x00, 0x3E, 0x01, 0xE0, 0x50};
 
+const std::set<word> MMU::unmappedIOAddrs = {0xFF03, 0xFF08, 0xFF09, 0xFF0A, 0xFF0B, 0xFF0C, 0xFF0D,
+                                             0xFF0E, 0xFF15, 0xFF1F, 0xFF27, 0xFF28, 0xFF29};
+
+const std::map<word, int> MMU::mappedIOMask = {
+    {HardwareIOAddr::P1, 0b11000000},   {HardwareIOAddr::SC, 0b01111110},   {HardwareIOAddr::TAC, 0b11111000},
+    {HardwareIOAddr::IF, 0b11100000},   {HardwareIOAddr::STAT, 0b10000000}, {HardwareIOAddr::NR10, 0b10000000},
+    {HardwareIOAddr::NR30, 0b01111111}, {HardwareIOAddr::NR32, 0b10011111}, {HardwareIOAddr::NR41, 0b11000000},
+    {HardwareIOAddr::NR44, 0b00111111}, {HardwareIOAddr::NR52, 0b01110000}};
+
+const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
+
 MMU::MMU()
 {
     reset();
@@ -68,6 +79,17 @@ byte MMU::read(const word& addr)
         return getJoypadMemoryRepresentation();
     }
 
+    else if (mappedIOMask.count(addr))
+    {
+        return memory[addr] | mappedIOMask.at(addr);
+    }
+
+    else if (unmappedIOAddrs.count(addr) || unmappedIOAddrRange.contains(addr))
+    {
+        // For unmapped IO all bits should be set to 1
+        return 0xFF;
+    }
+
     return memory[addr];
 }
 
@@ -94,7 +116,7 @@ byte MMU::getJoypadMemoryRepresentation()
     setNthBitIfButtonIsReleased(isAction ? InputController::Button::SELECT : InputController::Button::UP, 2, value);
     setNthBitIfButtonIsReleased(isAction ? InputController::Button::START : InputController::Button::DOWN, 3, value);
 
-    return value;
+    return value | 0b11000000;
 }
 
 void MMU::setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value)
