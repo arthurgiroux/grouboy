@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include <set>
 #include <stdexcept>
 
 #include "cartridge.hpp"
@@ -66,6 +67,41 @@ class MMU
     };
 
   private:
+    /**
+     * Addresses of Hardware IO that are mapped by the MMU
+     */
+    enum HardwareIOAddr : word
+    {
+        P1 = 0xFF00,
+        SC = 0xFF02,
+        TAC = 0xFF07,
+        IF = 0xFF0F,
+        STAT = 0xFF41,
+        NR10 = 0xFF10,
+        NR30 = 0xFF1A,
+        NR32 = 0xFF1C,
+        NR41 = 0xFF20,
+        NR44 = 0xFF23,
+        NR52 = 0xFF26,
+    };
+
+    /**
+     * bitmask for unused bits for the mapped hardware IO
+     */
+    static const std::map<word, int> mappedIOMask;
+
+    /**
+     * List of non-consecutive unmapped IO addresses
+     */
+    static const std::set<word> unmappedIOAddrs;
+
+    /**
+     * Range of unmapped IO addresses
+     */
+    static const utils::AddressRange unmappedIOAddrRange;
+
+    byte getJoypadMemoryRepresentation();
+
     void performDMATransfer(word sourceAddr);
     std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
     std::unique_ptr<Cartridge> cartridge = nullptr;
@@ -79,8 +115,6 @@ class MMU
     static const int DMA_TRANSFER_ADDR = 0xFF46;
     static const int DMA_TRANSFER_LENGTH = 160;
     static const int DMA_TRANSFER_TARGET_ADDR = 0xFE00;
-
-    byte getJoypadMemoryRepresentation();
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
 
     // The Timer class is allowed to directly access the internal memory representation.
