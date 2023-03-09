@@ -61,6 +61,11 @@ TEST_F(MoonEyeTest, TestForBitsMemOamShouldBeSuccessful)
     assertTestForRomArePassing("acceptance/bits/mem_oam.gb");
 }
 
+TEST_F(MoonEyeTest, TestForBitsRegFShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/bits/reg_f.gb");
+}
+
 TEST_F(MoonEyeTest, TestForDaaInstrShouldBeSuccessful)
 {
     assertTestForRomArePassing("acceptance/instr/daa.gb");
