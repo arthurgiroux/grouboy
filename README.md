@@ -93,6 +93,7 @@ Blaarg's test coverage:
 |------------------|-----------|--------------------|
 | CPU Instructions | DAA       | :white_check_mark: |
 | Bits             | MEM OAM   | :white_check_mark: |
+| Bits             | Reg F     | :white_check_mark: |
 
 ## Contributing
 
