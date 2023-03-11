@@ -95,6 +95,7 @@ Blaarg's test coverage:
 | Bits             | MEM OAM        | :white_check_mark: |
 | Bits             | Reg F          | :white_check_mark: |
 | Bits             | unused_hwio-GS | :white_check_mark: |
+| OAM DMA          | Basic          | :white_check_mark: |
 
 ## Contributing
 
