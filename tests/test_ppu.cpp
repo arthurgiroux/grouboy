@@ -164,7 +164,7 @@ TEST_F(PpuTest, LCDStatModeFlagShouldBeSetToCorrectPPUMode)
     {
         for (int i = 0; i < PPU::OAM_ACCESS_TICKS; ++i)
         {
-            int expectedFlagMode = 0x02;
+            int expectedFlagMode = 0x82;
             ASSERT_EQ(mmu.read(ADDR_LCD_STATUS), expectedFlagMode);
             ASSERT_EQ(ppu.getMode(), PPU::Mode::OAM_ACCESS);
             ppu.step(1);
@@ -172,7 +172,7 @@ TEST_F(PpuTest, LCDStatModeFlagShouldBeSetToCorrectPPUMode)
 
         for (int i = 0; i < PPU::VRAM_ACCESS_TICKS; ++i)
         {
-            int expectedFlagMode = 0x03;
+            int expectedFlagMode = 0x83;
             ASSERT_EQ(mmu.read(ADDR_LCD_STATUS), expectedFlagMode);
             ASSERT_EQ(ppu.getMode(), PPU::Mode::VRAM_ACCESS);
             ppu.step(1);
@@ -180,7 +180,7 @@ TEST_F(PpuTest, LCDStatModeFlagShouldBeSetToCorrectPPUMode)
 
         for (int i = 0; i < PPU::HBLANK_TICKS; ++i)
         {
-            int expectedFlagMode = 0x00;
+            int expectedFlagMode = 0x80;
             ASSERT_EQ(mmu.read(ADDR_LCD_STATUS), expectedFlagMode);
             ASSERT_EQ(ppu.getMode(), PPU::Mode::HBLANK);
             ppu.step(1);
@@ -191,7 +191,7 @@ TEST_F(PpuTest, LCDStatModeFlagShouldBeSetToCorrectPPUMode)
     {
         for (int i = 0; i < PPU::VBLANK_TICKS; ++i)
         {
-            int expectedFlagMode = 0x01;
+            int expectedFlagMode = 0x81;
             ASSERT_EQ(mmu.read(ADDR_LCD_STATUS), expectedFlagMode);
             ASSERT_EQ(ppu.getMode(), PPU::Mode::VBLANK);
             ppu.step(1);
