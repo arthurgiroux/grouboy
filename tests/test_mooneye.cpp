@@ -75,3 +75,8 @@ TEST_F(MoonEyeTest, TestForDaaInstrShouldBeSuccessful)
 {
     assertTestForRomArePassing("acceptance/instr/daa.gb");
 }
+
+TEST_F(MoonEyeTest, TestForDMABasicShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/oam_dma/basic.gb");
+}

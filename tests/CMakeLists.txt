@@ -35,11 +35,20 @@ add_executable(
         test_cpu_instructions_16bits_arithmetic_logical.cpp
         test_cpu_instructions_8bits_rotation_shifts_bit.cpp
         test_blargg.cpp
-        test_palette.cpp
-        test_mooneye.cpp)
+        test_palette.cpp)
 
 target_link_libraries(
         cpu_tests
+        gbemulator_core
+        gtest_main
+)
+
+add_executable(
+        mooneye_tests
+        test_mooneye.cpp)
+
+target_link_libraries(
+        mooneye_tests
         gbemulator_core
         gtest_main
 )
@@ -112,3 +121,4 @@ gtest_discover_tests(mmu_tests)
 gtest_discover_tests(serial_tests)
 gtest_discover_tests(timer_tests)
 gtest_discover_tests(acid_tests)
+gtest_discover_tests(mooneye_tests)
