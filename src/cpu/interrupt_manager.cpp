@@ -32,7 +32,7 @@ bool InterruptManager::isAnyInterruptEnabled()
 
 bool InterruptManager::isAnyInterruptPending()
 {
-    return _mmu->read(INTERRUPT_FLAG_ADDR) > 0;
+    return (_mmu->read(INTERRUPT_FLAG_ADDR) & 0x1F) > 0;
 }
 
 InterruptManager::InterruptManager(CPU* cpu, MMU* mmu) : _mmu(mmu)

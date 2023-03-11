@@ -7,6 +7,12 @@ TEST(MMU, ByteReadingWritingValidMemoryShouldSucceed)
 
     for (int i = 0; i < MMU::MEMORY_SIZE_IN_BYTES; i++)
     {
+        // We skip writing to hardware IO region
+        if (utils::AddressRange(0xFF00, 0xFFFF).contains(i))
+        {
+            continue;
+        }
+
         mmu.write(i, i);
         int expectedValue = i;
         // Special case, writing to timer register address resets value to 0
@@ -27,6 +33,12 @@ TEST(MMU, WordReadingWritingValidMemoryShouldSucceed)
 
     for (int i = 0; i < MMU::MEMORY_SIZE_IN_BYTES - 1; i += 2)
     {
+        // We skip writing to hardware IO region
+        if (utils::AddressRange(0xFF00, 0xFFFF).contains(i))
+        {
+            continue;
+        }
+
         mmu.writeWord(i, i);
         int expectedValue = i;
         // Special case, writing to timer register address resets value to 0

@@ -77,6 +77,7 @@ class MMU
         TAC = 0xFF07,
         IF = 0xFF0F,
         STAT = 0xFF41,
+        BOOT_ROOM_LOCK = 0xFF50,
         NR10 = 0xFF10,
         NR30 = 0xFF1A,
         NR32 = 0xFF1C,
