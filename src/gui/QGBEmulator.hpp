@@ -2,11 +2,32 @@
 #define GBEMULATOR_QGBEMULATOR_HPP
 
 #include "emulator.hpp"
+#include <QAudioSink>
+#include <QBuffer>
 #include <QDir>
 #include <QImage>
 #include <QObject>
 #include <QString>
 #include <qqml.h>
+#include <vector>
+
+class QGBEmulator;
+
+class AudioSyncedEmulator : public QIODevice
+{
+  public:
+    explicit AudioSyncedEmulator(QGBEmulator* emulator, QObject* parent = 0);
+    bool seek(qint64 pos) override;
+
+  protected:
+    qint64 readData(char* data, qint64 maxlen) override;
+    qint64 writeData(const char* data, qint64 len) override;
+
+  private:
+    int _bufferPos = 0;
+    int _minBufferSize = 10 * 48000;
+    QGBEmulator* _emulator;
+};
 
 class QGBEmulator : public QObject
 {
@@ -17,9 +38,12 @@ class QGBEmulator : public QObject
     Q_PROPERTY(QImage renderedImage READ getRenderedImage NOTIFY renderedImageChanged)
 
   public:
+    explicit QGBEmulator(QObject* parent = nullptr);
     int getFrameId();
     QImage getRenderedImage();
     Emulator& getEmulator();
+    std::vector<uint8_t> gatherAudioSamples(int nbrSamples);
+    bool isCartridgeLoaded();
 
   signals:
     void frameIdChanged();
@@ -33,8 +57,11 @@ class QGBEmulator : public QObject
     void onKeyReleased(Qt::Key key);
     void saveToFile();
     void loadSaveFromFile();
+    void handleStateChanged(QAudio::State newState);
+    void onNewFrame();
 
   private:
+    void setFrameId(int frameId);
     QDir getSaveFolder(const Cartridge* cartridge) const;
     static const QString SAVE_FILENAME;
 
@@ -47,6 +74,9 @@ class QGBEmulator : public QObject
         {Qt::Key_Enter, InputController::Button::START}, {Qt::Key_Space, InputController::Button::SELECT},
         {Qt::Key_A, InputController::Button::A},         {Qt::Key_B, InputController::Button::B},
         {Qt::Key_Return, InputController::Button::START}};
+
+    QAudioSink* audio;
+    AudioSyncedEmulator audioBuffer;
 };
 
 #endif // GBEMULATOR_QGBEMULATOR_HPP

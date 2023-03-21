@@ -1,7 +1,9 @@
 #include "emulator.hpp"
 #include <fstream>
 
-Emulator::Emulator() : cpu(mmu), ppu(mmu, cpu.getInterruptManager()), timer(&mmu, cpu.getInterruptManager())
+Emulator::Emulator()
+    : cpu(mmu), ppu(mmu, cpu.getInterruptManager()), apu(&mmu, AUDIO_SAMPLING_FREQ),
+      timer(&mmu, cpu.getInterruptManager())
 {
     mmu.setInputController(&inputController);
 }
@@ -17,6 +19,8 @@ void Emulator::exec()
 
     ppu.step(lastInstructionTicks);
 
+    apu.step(lastInstructionTicks);
+
     currentTicks += lastInstructionTicks;
 }
 
@@ -25,6 +29,7 @@ void Emulator::reset()
     ppu.reset();
     cpu.reset();
     mmu.reset();
+    apu.reset();
     currentTicks = 0;
 }
 
@@ -49,7 +54,8 @@ bool Emulator::saveToFile(const std::string& filepath)
 bool Emulator::loadFromFile(const std::string& filepath)
 {
     std::vector<byte> data;
-    if (!utils::readBinaryDataFromFile(filepath, data)) {
+    if (!utils::readBinaryDataFromFile(filepath, data))
+    {
         return false;
     }
 
