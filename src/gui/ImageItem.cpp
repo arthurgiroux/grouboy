@@ -30,4 +30,5 @@ void ImageItem::setImage(const QImage &image)
 {
     _image = image;
     update();
+    emit imageChanged();
 }

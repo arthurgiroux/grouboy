@@ -1,6 +1,7 @@
 #ifndef EMULATOR_H
 #define EMULATOR_H
 
+#include "apu/apu.hpp"
 #include "cpu/cpu.hpp"
 #include "cpu/input_controller.hpp"
 #include "graphics/ppu.hpp"
@@ -60,6 +61,11 @@ class Emulator
         return cpu;
     }
 
+    APU& getAPU()
+    {
+        return apu;
+    }
+
     /**
      * @return the input controller used by the emulator.
      */
@@ -94,9 +100,11 @@ class Emulator
     bool loadFromFile(const std::string& filepath);
 
   private:
+    static const int AUDIO_SAMPLING_FREQ = 48000;
     MMU mmu;
     CPU cpu;
     PPU ppu;
+    APU apu;
     InputController inputController;
     Timer timer;
     int currentTicks = 0;
