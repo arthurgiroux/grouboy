@@ -47,7 +47,9 @@ void QGBEmulator::onKeyPressed(Qt::Key key)
 {
     if (_buttonMapping.count(key))
     {
-        _emulator.getInputController().setButtonPressed(_buttonMapping[key]);
+        auto button = _buttonMapping[key];
+        _bufferedPressedInputs.emplace(button);
+        _currentlyPressedInputs.emplace(button);
     }
 }
 
@@ -55,7 +57,8 @@ void QGBEmulator::onKeyReleased(Qt::Key key)
 {
     if (_buttonMapping.count(key))
     {
-        _emulator.getInputController().setButtonReleased(_buttonMapping[key]);
+        auto button = _buttonMapping[key];
+        _currentlyPressedInputs.erase(button);
     }
 }
 
@@ -98,7 +101,7 @@ void QGBEmulator::loadSaveFromFile()
 
 QGBEmulator::QGBEmulator(QObject* parent) : QObject(parent), audioBuffer(this, this)
 {
-    // connect(this, SIGNAL(frameIdChanged()), this, SLOT(onNewFrame()));
+    connect(this, SIGNAL(frameIdChanged()), this, SLOT(onNewFrame()));
 
     QAudioFormat format;
     // Set up the format, eg.
@@ -152,22 +155,33 @@ void QGBEmulator::setFrameId(int frameId)
 
 std::vector<uint8_t> QGBEmulator::gatherAudioSamples(int nbrSamples)
 {
+    for (auto button : _buttonMapping)
+    {
+        if (_bufferedPressedInputs.count(button.second))
+        {
+            _emulator.getInputController().setButtonPressed(button.second);
+        }
+        else
+        {
+            _emulator.getInputController().setButtonReleased(button.second);
+        }
+    }
+
     while (_emulator.getAPU().getAudioBuffer().size() < nbrSamples)
     {
         _emulator.exec();
+    }
 
-        int frameId = _emulator.getPPU().getFrameId();
-        if (_frameId != frameId)
+    auto copy = _bufferedPressedInputs;
+    for (auto button : _bufferedPressedInputs)
+    {
+        if (!_currentlyPressedInputs.count(button))
         {
-            setFrameId(frameId);
-
-            const RGBImage& image = _emulator.getPPU().getLastRenderedFrame();
-
-            _renderedImage = QImage(static_cast<const uchar*>(image.getData().data()), image.getWidth(),
-                                    image.getHeight(), QImage::Format::Format_RGB888);
-            emit renderedImageChanged();
+            copy.erase(button);
         }
     }
+
+    _bufferedPressedInputs = copy;
 
     setFrameId(_emulator.getPPU().getFrameId());
 
@@ -178,13 +192,12 @@ std::vector<uint8_t> QGBEmulator::gatherAudioSamples(int nbrSamples)
 
 void QGBEmulator::onNewFrame()
 {
-    //    qDebug() << "new frame " << _frameId;
-    //    const RGBImage& image = _emulator.getPPU().getLastRenderedFrame();
-    //
-    //    _renderedImage = QImage(static_cast<const uchar*>(image.getData().data()), image.getWidth(),
-    //    image.getHeight(),
-    //                            QImage::Format::Format_RGB888);
-    //    emit renderedImageChanged();
+    qDebug() << "new frame " << _frameId;
+    const RGBImage& image = _emulator.getPPU().getLastRenderedFrame();
+
+    _renderedImage = QImage(static_cast<const uchar*>(image.getData().data()), image.getWidth(), image.getHeight(),
+                            QImage::Format::Format_RGB888);
+    emit renderedImageChanged();
 }
 
 bool QGBEmulator::isCartridgeLoaded()
@@ -204,9 +217,11 @@ qint64 AudioSyncedEmulator::readData(char* data, qint64 maxlen)
         return 0;
     }
 
-    if (maxlen > 48)
+    int maxNbrSamples = 480;
+
+    if (maxlen > maxNbrSamples)
     {
-        maxlen = 48;
+        maxlen = maxNbrSamples;
     }
 
     auto buffer = _emulator->gatherAudioSamples(maxlen);

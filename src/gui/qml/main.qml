@@ -94,6 +94,7 @@ ApplicationWindow {
        }
    }
 
+/*
     Timer {
         interval: 16
         running: true
@@ -103,7 +104,7 @@ ApplicationWindow {
                 QGBEmulator.renderNextFrame();
             }
         }
-    }
+    }*/
 
     menuBar: MenuBar {
         Menu {

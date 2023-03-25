@@ -75,6 +75,9 @@ class QGBEmulator : public QObject
         {Qt::Key_A, InputController::Button::A},         {Qt::Key_B, InputController::Button::B},
         {Qt::Key_Return, InputController::Button::START}};
 
+    std::set<InputController::Button> _bufferedPressedInputs = {};
+    std::set<InputController::Button> _currentlyPressedInputs = {};
+
     QAudioSink* audio;
     AudioSyncedEmulator audioBuffer;
 };
