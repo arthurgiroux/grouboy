@@ -68,5 +68,9 @@ target_link_libraries(gbemulator_core spdlog::spdlog)
 
 add_subdirectory(src/gui/)
 
+set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
+add_subdirectory(${SDL3_DIR})
+add_subdirectory(src/gui/SDL)
+
 enable_testing()
 add_subdirectory(tests/)
