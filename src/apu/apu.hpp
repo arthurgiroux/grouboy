@@ -6,7 +6,7 @@
 class APU
 {
   public:
-    using AudioBuffer = std::vector<uint8_t>;
+    using AudioBuffer = std::vector<float>;
 
     explicit APU(MMU* mmu, int samplingFrequency);
     void step(int cycles);
@@ -22,6 +22,7 @@ class APU
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;
     AudioBuffer _audioBuffer = {};
+    float _time = 0.f;
 };
 
 #endif // GROUBOY_APU_HPP

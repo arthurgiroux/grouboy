@@ -24,7 +24,7 @@ int main(int argc, char* args[])
     }
 
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
@@ -38,7 +38,23 @@ int main(int argc, char* args[])
         }
         else
         {
-            renderer = SDL_CreateRenderer(window, nullptr, 0);
+            // the representation of our audio device in SDL:
+            SDL_AudioDeviceID audio_device;
+
+            // opening an audio device:
+            SDL_AudioSpec audio_spec;
+            SDL_zero(audio_spec);
+            audio_spec.freq = 48000;
+            audio_spec.format = AUDIO_F32;
+            audio_spec.channels = 1;
+            audio_spec.samples = 2048;
+            audio_spec.callback = NULL;
+
+            audio_device = SDL_OpenAudioDevice(NULL, 0, &audio_spec, NULL, 0);
+
+            SDL_PlayAudioDevice(audio_device);
+
+            renderer = SDL_CreateRenderer(window, nullptr, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, PPU::SCREEN_WIDTH,
                                         PPU::SCREEN_HEIGHT);
@@ -79,9 +95,24 @@ int main(int argc, char* args[])
                     }
                 }
 
+                int samplesize = 1024;
+
                 while (frameId == emulator.getPPU().getFrameId())
                 {
+
+                    while ((SDL_GetQueuedAudioSize(audio_device)) > samplesize * sizeof(float))
+                    {
+                        SDL_Delay(1);
+                    }
+
                     emulator.exec();
+
+                    auto audioBuffer = emulator.getAPU().getAudioBuffer();
+                    if (audioBuffer.size() > samplesize)
+                    {
+                        SDL_QueueAudio(audio_device, audioBuffer.data(), audioBuffer.size() * sizeof(float));
+                        emulator.getAPU().resetAudioBuffer();
+                    }
                 }
 
                 frameId = emulator.getPPU().getFrameId();
@@ -96,6 +127,8 @@ int main(int argc, char* args[])
                 SDL_RenderTexture(renderer, texture, nullptr, nullptr);
                 SDL_RenderPresent(renderer);
             }
+
+            SDL_CloseAudioDevice(audio_device);
         }
     }
 
