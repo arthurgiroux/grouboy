@@ -1,5 +1,6 @@
 #include "apu.hpp"
 #include "cpu/cpu.hpp"
+#include <cmath>
 
 APU::APU(MMU* mmu, int samplingFrequency) : _mmu(mmu), _samplingFrequency(samplingFrequency)
 {
@@ -18,7 +19,10 @@ void APU::step(int cycles)
 
 void APU::addSampleToAudioBuffer()
 {
-    _audioBuffer.push_back(0);
+    // TODO: Replace with real implementation
+    _time += 0.01f;
+    auto value = sinf(_time);
+    _audioBuffer.push_back(value);
 }
 
 const APU::AudioBuffer& APU::getAudioBuffer()
