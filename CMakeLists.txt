@@ -60,7 +60,12 @@ set(SOURCE_FILES
         src/graphics/tilemap.hpp
         src/apu/apu.cpp
         src/apu/apu.hpp
-        )
+        src/apu/signal/square_wave.cpp
+        src/apu/signal/square_wave.hpp
+        src/apu/channels/channel1.cpp
+        src/apu/channels/channel1.cpp
+        src/apu/channels/wavelength_sweep.cpp
+        src/apu/channels/wavelength_sweep.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
