@@ -16,19 +16,20 @@ void WavelengthSweep::tick()
 
         if (_period > 0)
         {
-            int newFrequency = generateNewFrequency();
+            int newWavelength = generateNewWavelength();
 
-            if (!didFrequencyOverflow(newFrequency) && _shift > 0)
+            bool overflowDetected = didWavelengthOverflow(newWavelength);
+            if (!overflowDetected && _shift > 0)
             {
-                _wavelength = newFrequency;
-                _wavelengthChangedCallback(newFrequency);
-                int nextFrequency = generateNewFrequency();
-                if (didFrequencyOverflow(nextFrequency))
+                _wavelength = newWavelength;
+                _wavelengthChangedCallback(newWavelength);
+                int nextWavelength = generateNewWavelength();
+                if (didWavelengthOverflow(nextWavelength))
                 {
                     _wavelengthOverflowCallback();
                 }
             }
-            else
+            else if (overflowDetected)
             {
                 _wavelengthOverflowCallback();
             }
@@ -36,12 +37,12 @@ void WavelengthSweep::tick()
     }
 }
 
-bool WavelengthSweep::didFrequencyOverflow(int frequency) const
+bool WavelengthSweep::didWavelengthOverflow(int wavelength) const
 {
-    return frequency > 2048;
+    return wavelength > 2048;
 }
 
-int WavelengthSweep::generateNewFrequency() const
+int WavelengthSweep::generateNewWavelength() const
 {
     return _wavelength + _sign * (_wavelength >> _shift);
 }
