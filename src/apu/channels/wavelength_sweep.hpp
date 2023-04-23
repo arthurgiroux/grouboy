@@ -24,8 +24,8 @@ class WavelengthSweep
   private:
     WavelengthChangedCallback _wavelengthChangedCallback;
     WavelengthOverflowCallback _wavelengthOverflowCallback;
-    int generateNewFrequency() const;
-    bool didFrequencyOverflow(int newFrequency) const;
+    int generateNewWavelength() const;
+    bool didWavelengthOverflow(int wavelength) const;
     int _timer = 0;
     int _period = 0;
     int _wavelength = 0;
