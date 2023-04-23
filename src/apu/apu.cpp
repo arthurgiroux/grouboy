@@ -2,13 +2,25 @@
 #include "cpu/cpu.hpp"
 #include <cmath>
 
-APU::APU(MMU* mmu, int samplingFrequency) : _mmu(mmu), _samplingFrequency(samplingFrequency)
+APU::APU(MMU* mmu, Timer* timer, int samplingFrequency)
+    : _mmu(mmu), _timer(timer), _samplingFrequency(samplingFrequency), _channel1(mmu)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
+    _lastDivValue = _timer->getDividerRegisterValue();
 }
 
 void APU::step(int cycles)
 {
+    // TODO: Bit 5 instead of bit 4 in double CG mode
+    // We detect a falling edge on the DIV register
+    if (utils::isNthBitSet(_lastDivValue, 4) && !utils::isNthBitSet(_timer->getDividerRegisterValue(), 4))
+    {
+        // APU
+        _channel1.tickCounter();
+    }
+
+    _lastDivValue = _timer->getDividerRegisterValue();
+
     _cycleCounter += cycles;
     while (_cycleCounter >= _numberOfCyclesPerAudioSample)
     {

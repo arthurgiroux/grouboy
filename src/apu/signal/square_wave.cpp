@@ -15,7 +15,6 @@ void SquareWave::step(int cycles)
     // Timer reached the end
     if (_frequencyTimerValue <= 0)
     {
-
         int value = _frequencyTimerValue;
         resetFrequencyTimer();
 
@@ -32,20 +31,24 @@ void SquareWave::step(int cycles)
 void SquareWave::nextWaveValue()
 {
     _waveDutyPosition++;
-    if (_waveDutyPosition >= 7)
+    if (_waveDutyPosition > 7)
     {
         _waveDutyPosition = 0;
     }
 }
 
-void SquareWave::setFrequency(int pattern)
+void SquareWave::setFrequency(int frequency)
 {
-    _frequency = pattern;
-    resetFrequencyTimer();
+    if (_frequency != frequency)
+    {
+        _frequency = frequency;
+        resetFrequencyTimer();
+    }
 }
 
 void SquareWave::resetFrequencyTimer()
 {
+    // TODO: Document this formula
     _frequencyTimerValue = (2048 - _frequency) * 4;
 }
 
