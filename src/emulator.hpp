@@ -104,9 +104,9 @@ class Emulator
     MMU mmu;
     CPU cpu;
     PPU ppu;
-    APU apu;
     InputController inputController;
     Timer timer;
+    APU apu;
     int currentTicks = 0;
 };
 
