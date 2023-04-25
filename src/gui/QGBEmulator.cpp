@@ -187,7 +187,7 @@ std::vector<uint8_t> QGBEmulator::gatherAudioSamples(int nbrSamples)
 
     auto buffer = _emulator.getAPU().getAudioBuffer();
     _emulator.getAPU().resetAudioBuffer();
-    return buffer;
+    return {};
 }
 
 void QGBEmulator::onNewFrame()
