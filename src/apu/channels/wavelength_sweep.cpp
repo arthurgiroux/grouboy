@@ -1,5 +1,4 @@
 #include "wavelength_sweep.hpp"
-#include <functional>
 
 WavelengthSweep::WavelengthSweep()
 {
@@ -59,6 +58,10 @@ int WavelengthSweep::getPeriod() const
 
 void WavelengthSweep::setPeriod(int period)
 {
+    if (_period == 0)
+    {
+        _timer = period;
+    }
     _period = period;
 }
 
@@ -90,4 +93,9 @@ void WavelengthSweep::setShift(int shift)
 int WavelengthSweep::getShift() const
 {
     return _shift;
+}
+
+int WavelengthSweep::getWavelength() const
+{
+    return _wavelength;
 }

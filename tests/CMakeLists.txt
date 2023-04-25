@@ -113,6 +113,18 @@ target_link_libraries(
         gtest_main
 )
 
+
+add_executable(
+        apu_tests
+        test_wavelength_sweep.cpp
+)
+
+target_link_libraries(
+        apu_tests
+        gbemulator_core
+        gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
 gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 60)
@@ -122,3 +134,4 @@ gtest_discover_tests(serial_tests)
 gtest_discover_tests(timer_tests)
 gtest_discover_tests(acid_tests)
 gtest_discover_tests(mooneye_tests)
+gtest_discover_tests(apu_tests)

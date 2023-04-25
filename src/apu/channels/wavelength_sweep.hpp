@@ -16,6 +16,7 @@ class WavelengthSweep
     int getDirection() const;
     void setDirection(int sign);
     void setWavelength(int wavelength);
+    int getWavelength() const;
     void setShift(int shift);
     int getShift() const;
     void setWavelengthChangedCallback(WavelengthChangedCallback cb);
