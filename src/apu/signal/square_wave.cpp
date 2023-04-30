@@ -31,7 +31,7 @@ void SquareWave::step(int cycles)
 void SquareWave::nextWaveValue()
 {
     _waveDutyPosition++;
-    if (_waveDutyPosition > 7)
+    if (_waveDutyPosition > _wavePatterns[_dutyPattern].size())
     {
         _waveDutyPosition = 0;
     }
@@ -48,8 +48,11 @@ void SquareWave::setFrequency(int frequency)
 
 void SquareWave::resetFrequencyTimer()
 {
-    // TODO: Document this formula
-    _frequencyTimerValue = (2048 - _frequency) * 4;
+    _frequencyTimerValue = _frequency;
+    //    131072 / (2048 - wavelen);
+    //
+    //    // TODO: Document this formula
+    //    _frequencyTimerValue = (2048 - _frequency) * 4;
 }
 
 void SquareWave::setDutyPattern(int index)

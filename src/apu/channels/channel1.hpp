@@ -1,6 +1,7 @@
 #ifndef GROUBOY_CHANNEL1_HPP
 #define GROUBOY_CHANNEL1_HPP
 
+#include "apu/signal/square_wave.hpp"
 #include "memory/mmu.hpp"
 #include "wavelength_sweep.hpp"
 
@@ -8,10 +9,11 @@ class Channel1
 {
   public:
     explicit Channel1(MMU* mmu);
-    byte getAudioSample();
+    float getAudioSample();
     void step(int cycles);
     void tickCounter();
     void trigger();
+    bool isEnabled() const;
 
   private:
     static const int SWEEP_REG_ADDR = 0xFF10;
@@ -25,10 +27,10 @@ class Channel1
     void triggerSweep();
     MMU* _mmu;
     int _tickCounter = 0;
-    bool _isEnabled = false;
+    bool _enable = false;
     int _sweepCounter = 0;
     WavelengthSweep _wavelengthSweep;
-    bool _enable = false;
+    SquareWave _squareWave;
 };
 
 #endif // GROUBOY_CHANNEL1_HPP

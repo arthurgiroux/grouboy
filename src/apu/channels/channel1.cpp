@@ -7,15 +7,15 @@ Channel1::Channel1(MMU* mmu) : _mmu(mmu)
     _wavelengthSweep.setWavelengthOverflowCallback(std::bind(&Channel1::onWavelengthOverflow, this));
 }
 
-byte Channel1::getAudioSample()
+float Channel1::getAudioSample()
 {
-    //
-    return 0;
+    return _squareWave.getAmplitude();
 }
 
 void Channel1::step(int cycles)
 {
     // Sweep -> Timer -> Duty -> Length Counter -> Envelope -> Mixer
+    _squareWave.step(cycles);
 }
 
 void Channel1::tickCounter()
@@ -45,6 +45,7 @@ void Channel1::tickCounter()
 
 void Channel1::trigger()
 {
+    _enable = true;
     triggerSweep();
 }
 
@@ -75,10 +76,18 @@ void Channel1::setWavelength(int wavelength)
     _mmu->write(WAVELENGTH_LOW_REG_ADDR, utils::getLsbFromWord(wavelength));
     int wavelengthControl = _mmu->read(WAVELENGTH_AND_CONTROL_REG_ADDR);
     _mmu->write(WAVELENGTH_AND_CONTROL_REG_ADDR, wavelengthControl & (0b111 & utils::getMsbFromWord(wavelength)));
+
+    int waveFrequency = (2048 - wavelength) * 4;
+    _squareWave.setFrequency(waveFrequency);
 }
 
 int Channel1::getWavelength()
 {
     return utils::createWordFromBytes(_mmu->read(WAVELENGTH_AND_CONTROL_REG_ADDR) & 0b111,
                                       _mmu->read(WAVELENGTH_LOW_REG_ADDR));
+}
+
+bool Channel1::isEnabled() const
+{
+    return _enable;
 }
