@@ -31,9 +31,12 @@ void APU::step(int cycles)
 
 void APU::addSampleToAudioBuffer()
 {
-    // TODO: Replace with real implementation
-    _time += 0.01f;
-    auto value = sinf(_time);
+    float value = 0;
+    if (_channel1.isEnabled())
+    {
+        value += _channel1.getAudioSample();
+    }
+
     _audioBuffer.push_back(value);
 }
 
