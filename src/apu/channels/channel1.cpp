@@ -1,6 +1,6 @@
 #include "channel1.hpp"
 
-Channel1::Channel1(MMU* mmu) : _mmu(mmu)
+Channel1::Channel1()
 {
     using std::placeholders::_1;
     _wavelengthSweep.setWavelengthChangedCallback(std::bind(&Channel1::onWavelengthChanged, this, _1));
@@ -61,21 +61,18 @@ void Channel1::onWavelengthOverflow()
 
 void Channel1::triggerSweep()
 {
-    int sweepControlValue = _mmu->read(SWEEP_REG_ADDR);
-    int sweepDirection = sweepControlValue & 0b00001000;
-    int sweepPeriod = sweepControlValue & 0b01110000;
-    int shift = sweepControlValue & 0b00000111;
+    int sweepDirection = _sweepControlValue & 0b00001000;
+    int sweepPeriod = _sweepControlValue & 0b01110000;
+    int shift = _sweepControlValue & 0b00000111;
     _wavelengthSweep.setDirection(sweepDirection);
     _wavelengthSweep.setPeriod(sweepPeriod);
     _wavelengthSweep.setShift(shift);
-    _wavelengthSweep.setWavelength(getWavelength());
+    _wavelengthSweep.setWavelength(_wavelength);
 }
 
 void Channel1::setWavelength(int wavelength)
 {
-    _mmu->write(WAVELENGTH_LOW_REG_ADDR, utils::getLsbFromWord(wavelength));
-    int wavelengthControl = _mmu->read(WAVELENGTH_AND_CONTROL_REG_ADDR);
-    _mmu->write(WAVELENGTH_AND_CONTROL_REG_ADDR, wavelengthControl & (0b111 & utils::getMsbFromWord(wavelength)));
+    _wavelength = wavelength;
 
     int waveFrequency = (2048 - wavelength) * 4;
     _squareWave.setFrequency(waveFrequency);
@@ -83,11 +80,20 @@ void Channel1::setWavelength(int wavelength)
 
 int Channel1::getWavelength()
 {
-    return utils::createWordFromBytes(_mmu->read(WAVELENGTH_AND_CONTROL_REG_ADDR) & 0b111,
-                                      _mmu->read(WAVELENGTH_LOW_REG_ADDR));
+    return _wavelength;
 }
 
 bool Channel1::isEnabled() const
 {
     return _enable;
+}
+
+void Channel1::setSweepControl(int value)
+{
+    _sweepControlValue = value;
+}
+
+int Channel1::getSweepControl() const
+{
+    return _sweepControlValue;
 }

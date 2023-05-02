@@ -2,7 +2,7 @@
 #define GROUBOY_APU_HPP
 
 #include "apu/channels/channel1.hpp"
-#include "memory/mmu.hpp"
+#include "common/types.hpp"
 #include "timer/timer.hpp"
 
 class APU
@@ -10,18 +10,22 @@ class APU
   public:
     using AudioBuffer = std::vector<float>;
 
-    explicit APU(MMU* mmu, Timer* timer, int samplingFrequency);
+    explicit APU(Timer* timer, int samplingFrequency);
     void step(int cycles);
     const AudioBuffer& getAudioBuffer();
     void resetAudioBuffer();
     void reset();
+    byte readRegister(const word& addr);
+    void writeRegister(const word& addr, const byte& value);
 
   private:
     void addSampleToAudioBuffer();
+    static const int CH1_SWEEP_REG_ADDR = 0xFF10;
+    static const int CH1_WAVELENGTH_LOW_REG_ADDR = 0xFF13;
+    static const int CH1_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF14;
 
-    MMU* _mmu;
     Timer* _timer;
-    Channel1 _channel1;
+    Channel1 _channel1{};
     int _samplingFrequency;
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;

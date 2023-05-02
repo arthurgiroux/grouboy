@@ -13,6 +13,7 @@
 #include "timer/timer.hpp"
 
 // Forward declaration
+class APU;
 class InputController;
 
 /***********************************
@@ -38,6 +39,7 @@ class MMU
     bool isBootRomActive();
     Cartridge* getCartridge();
     void setInputController(InputController* controller);
+    void setAPU(APU* apu);
     void reset();
 
     /**
@@ -101,6 +103,11 @@ class MMU
      */
     static const utils::AddressRange unmappedIOAddrRange;
 
+    /**
+     * Range of APU register addresses
+     */
+    static const utils::AddressRange apuRegisterRange;
+
     byte getJoypadMemoryRepresentation();
 
     void performDMATransfer(word sourceAddr);
@@ -117,6 +124,8 @@ class MMU
     static const int DMA_TRANSFER_LENGTH = 160;
     static const int DMA_TRANSFER_TARGET_ADDR = 0xFE00;
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
+
+    APU* _apu = nullptr;
 
     // The Timer class is allowed to directly access the internal memory representation.
     // This is so that they can circumvent the check when writing to the timer divider register.

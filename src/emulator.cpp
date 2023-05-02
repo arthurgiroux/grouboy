@@ -3,8 +3,9 @@
 
 Emulator::Emulator()
     : cpu(mmu), ppu(mmu, cpu.getInterruptManager()), timer(&mmu, cpu.getInterruptManager()),
-      apu(&mmu, &timer, AUDIO_SAMPLING_FREQ)
+      apu(&timer, AUDIO_SAMPLING_FREQ)
 {
+    mmu.setAPU(&apu);
     mmu.setInputController(&inputController);
 }
 
