@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "apu/apu.hpp"
 #include "cartridge.hpp"
 
 const std::array<byte, 256> MMU::BIOS = {
@@ -38,6 +39,8 @@ const std::map<word, int> MMU::mappedIOMask = {
     {HardwareIOAddr::NR52, 0b01110000}, {HardwareIOAddr::BOOT_ROOM_LOCK, 0b11111110}};
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
+
+const utils::AddressRange MMU::apuRegisterRange = utils::AddressRange(0xFF10, 0xFF26);
 
 MMU::MMU()
 {
@@ -90,6 +93,10 @@ byte MMU::read(const word& addr)
     {
         // For unmapped IO all bits should be set to 1
         return 0xFF;
+    }
+    else if (_apu != nullptr && apuRegisterRange.contains(addr))
+    {
+        return _apu->readRegister(addr);
     }
 
     return memory[addr];
@@ -159,6 +166,10 @@ void MMU::write(const word& addr, const byte& value)
     else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
     {
         memoryBankController->writeRAM(addr - EXTERNAL_RAM_START_ADDR, value);
+    }
+    else if (_apu != nullptr && apuRegisterRange.contains(addr))
+    {
+        _apu->writeRegister(addr, value);
     }
     else
     {
@@ -247,4 +258,9 @@ bool MMU::unserializeCartridgeRAM(const std::vector<byte>& data)
     }
 
     return false;
+}
+
+void MMU::setAPU(APU* apu)
+{
+    _apu = apu;
 }

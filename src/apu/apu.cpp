@@ -1,9 +1,7 @@
 #include "apu.hpp"
 #include "cpu/cpu.hpp"
-#include <cmath>
 
-APU::APU(MMU* mmu, Timer* timer, int samplingFrequency)
-    : _mmu(mmu), _timer(timer), _samplingFrequency(samplingFrequency), _channel1(mmu)
+APU::APU(Timer* timer, int samplingFrequency) : _timer(timer), _samplingFrequency(samplingFrequency)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
     _lastDivValue = _timer->getDividerRegisterValue();
@@ -18,6 +16,8 @@ void APU::step(int cycles)
         // APU
         _channel1.tickCounter();
     }
+
+    _channel1.step(cycles);
 
     _lastDivValue = _timer->getDividerRegisterValue();
 
@@ -54,4 +54,29 @@ void APU::reset()
 {
     _cycleCounter = 0;
     _audioBuffer.clear();
+}
+
+byte APU::readRegister(const word& addr)
+{
+    if (addr == CH1_SWEEP_REG_ADDR)
+    {
+        return _channel1.getSweepControl();
+    }
+
+    return 0;
+}
+
+void APU::writeRegister(const word& addr, const byte& value)
+{
+    if (addr == CH1_SWEEP_REG_ADDR)
+    {
+        _channel1.setSweepControl(value);
+    }
+    else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR)
+    {
+        if ((value & 0b10000000) > 0)
+        {
+            _channel1.trigger();
+        }
+    }
 }

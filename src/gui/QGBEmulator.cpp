@@ -226,7 +226,13 @@ qint64 AudioSyncedEmulator::readData(char* data, qint64 maxlen)
 
     auto buffer = _emulator->gatherAudioSamples(maxlen);
 
-    for (int i = 0; i < maxlen; ++i)
+    int size = maxlen;
+    if (size > buffer.size())
+    {
+        size = buffer.size();
+    }
+
+    for (int i = 0; i < size; ++i)
     {
         data[i] = buffer[i];
     }
