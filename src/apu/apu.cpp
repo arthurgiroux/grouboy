@@ -34,7 +34,7 @@ void APU::addSampleToAudioBuffer()
     float value = 0;
     if (_channel1.isEnabled())
     {
-        value += _channel1.getAudioSample();
+        value += _channel1.getAudioSample() / 8.0f;
     }
 
     _audioBuffer.push_back(value);
@@ -62,6 +62,26 @@ byte APU::readRegister(const word& addr)
     {
         return _channel1.getSweepControl();
     }
+    else if (addr == CH1_LENGTH_TIMER_AND_DUTY)
+    {
+        return _channel1.getWave().getDutyPattern() << 6;
+    }
+    else if (addr == CH1_VOLUME_CTRL_ADDR)
+    {
+        return _channel1.getVolumeControl();
+    }
+    else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR)
+    {
+        return _channel1.getWavelength();
+    }
+    else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR)
+    {
+        return _channel1.isLengthTimerEnabled() << 6;
+    }
+    else if (addr == SOUND_CTRL_ADDR)
+    {
+        return (_enabled << 7) | (_channel1.isEnabled());
+    }
 
     return 0;
 }
@@ -72,11 +92,34 @@ void APU::writeRegister(const word& addr, const byte& value)
     {
         _channel1.setSweepControl(value);
     }
+    else if (addr == CH1_LENGTH_TIMER_AND_DUTY)
+    {
+        _channel1.getWave().setDutyPattern(value >> 6);
+        _channel1.setLengthTimer(value & 0b00111111);
+    }
+    else if (addr == CH1_VOLUME_CTRL_ADDR)
+    {
+        _channel1.setVolumeControl(value);
+    }
+    else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR)
+    {
+        int wavelengthHigh = _channel1.getWavelength() & 0x700;
+        _channel1.setWavelength(wavelengthHigh | value);
+    }
     else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR)
     {
-        if ((value & 0b10000000) > 0)
+        _channel1.enableLengthTimer(utils::isNthBitSet(value, 6));
+
+        int wavelengthLow = _channel1.getWavelength() & 0xFF;
+        _channel1.setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
+
+        if (utils::isNthBitSet(value, 7))
         {
             _channel1.trigger();
         }
+    }
+    else if (addr == SOUND_CTRL_ADDR)
+    {
+        _enabled = value >> 7;
     }
 }

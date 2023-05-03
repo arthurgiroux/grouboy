@@ -7,9 +7,9 @@ Channel1::Channel1()
     _wavelengthSweep.setWavelengthOverflowCallback(std::bind(&Channel1::onWavelengthOverflow, this));
 }
 
-float Channel1::getAudioSample()
+int Channel1::getAudioSample()
 {
-    return _squareWave.getAmplitude();
+    return _squareWave.getAmplitude() * _volumeSweep.getVolume();
 }
 
 void Channel1::step(int cycles)
@@ -20,24 +20,30 @@ void Channel1::step(int cycles)
 
 void Channel1::tickCounter()
 {
+    // TODO: Fix comments
+
+    // This will tick with DIV at 512Hz
     _tickCounter++;
     if (_tickCounter % 8 == 0)
     {
-        // SWEEP
-        _sweepCounter--;
-        if (_sweepCounter <= 0)
-        {
-            _wavelengthSweep.tick();
-        }
+        // volume sweep
+        _volumeSweep.tick();
     }
+
     if (_tickCounter % 4 == 0)
     {
         // Freq sweep
+        _wavelengthSweep.tick();
     }
 
-    if (_tickCounter % 2 == 0)
+    if (_tickCounter % 2 == 0 && _lengthTimerEnabled && _lengthTimer > 0)
     {
         // Sound length
+        _lengthTimerValue--;
+        if (_lengthTimerValue == 64)
+        {
+            _enable = false;
+        }
     }
 
     _tickCounter %= 8;
@@ -47,6 +53,11 @@ void Channel1::trigger()
 {
     _enable = true;
     triggerSweep();
+    _volumeSweep.setPeriod(_volumeCtrl & 0b00000111);
+    int volumeDirection = (utils::isNthBitSet(_volumeCtrl, 3) ? 1 : -1);
+    _volumeSweep.setDirection(volumeDirection);
+    _volumeSweep.setVolume((_volumeCtrl & 0b11110000) >> 4);
+    // TODO: Handle turning channel off
 }
 
 void Channel1::onWavelengthChanged(int wavelength)
@@ -61,13 +72,14 @@ void Channel1::onWavelengthOverflow()
 
 void Channel1::triggerSweep()
 {
-    int sweepDirection = _sweepControlValue & 0b00001000;
-    int sweepPeriod = _sweepControlValue & 0b01110000;
+    int sweepDirection = (_sweepControlValue & 0b00001000) >> 3;
+    int sweepPeriod = (_sweepControlValue & 0b01110000) >> 4;
     int shift = _sweepControlValue & 0b00000111;
     _wavelengthSweep.setDirection(sweepDirection);
     _wavelengthSweep.setPeriod(sweepPeriod);
     _wavelengthSweep.setShift(shift);
     _wavelengthSweep.setWavelength(_wavelength);
+    _lengthTimerValue = _lengthTimer;
 }
 
 void Channel1::setWavelength(int wavelength)
@@ -96,4 +108,34 @@ void Channel1::setSweepControl(int value)
 int Channel1::getSweepControl() const
 {
     return _sweepControlValue;
+}
+
+SquareWave& Channel1::getWave()
+{
+    return _squareWave;
+}
+
+void Channel1::setLengthTimer(int timer)
+{
+    _lengthTimer = timer;
+}
+
+void Channel1::enableLengthTimer(bool value)
+{
+    _lengthTimerEnabled = value;
+}
+
+bool Channel1::isLengthTimerEnabled() const
+{
+    return _lengthTimerEnabled;
+}
+
+void Channel1::setVolumeControl(int value)
+{
+    _volumeCtrl = value;
+}
+
+int Channel1::getVolumeControl() const
+{
+    return _volumeCtrl;
 }

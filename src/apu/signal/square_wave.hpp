@@ -13,6 +13,7 @@ class SquareWave
     int getAmplitude() const;
     void setFrequency(int frequency);
     void setDutyPattern(int pattern);
+    int getDutyPattern() const;
 
   private:
     static constexpr std::array<std::bitset<8>, 4> _wavePatterns = {0b00000001, 0b00000011, 0b00001111, 0b11111100};
