@@ -21,8 +21,12 @@ class APU
   private:
     void addSampleToAudioBuffer();
     static const int CH1_SWEEP_REG_ADDR = 0xFF10;
+    static const int CH1_LENGTH_TIMER_AND_DUTY = 0xFF11;
+    static const int CH1_VOLUME_CTRL_ADDR = 0xFF12;
     static const int CH1_WAVELENGTH_LOW_REG_ADDR = 0xFF13;
     static const int CH1_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF14;
+
+    static const int SOUND_CTRL_ADDR = 0xFF26;
 
     Timer* _timer;
     Channel1 _channel1{};
@@ -30,8 +34,8 @@ class APU
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;
     AudioBuffer _audioBuffer = {};
-    float _time = 0.f;
     int _lastDivValue = 0;
+    bool _enabled = false;
 };
 
 #endif // GROUBOY_APU_HPP

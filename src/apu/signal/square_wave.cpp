@@ -49,13 +49,14 @@ void SquareWave::setFrequency(int frequency)
 void SquareWave::resetFrequencyTimer()
 {
     _frequencyTimerValue = _frequency;
-    //    131072 / (2048 - wavelen);
-    //
-    //    // TODO: Document this formula
-    //    _frequencyTimerValue = (2048 - _frequency) * 4;
 }
 
 void SquareWave::setDutyPattern(int index)
 {
     _dutyPattern = index;
+}
+
+int SquareWave::getDutyPattern() const
+{
+    return _dutyPattern;
 }
