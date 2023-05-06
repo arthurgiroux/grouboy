@@ -7,9 +7,10 @@ Channel1::Channel1()
     _wavelengthSweep.setWavelengthOverflowCallback(std::bind(&Channel1::onWavelengthOverflow, this));
 }
 
-int Channel1::getAudioSample()
+float Channel1::getAudioSample()
 {
-    return _squareWave.getAmplitude() * _volumeSweep.getVolume();
+    float dacIn = (_squareWave.getAmplitude() * _volumeSweep.getVolume()) / 15.f;
+    return (dacIn * 2 - 1);
 }
 
 void Channel1::step(int cycles)

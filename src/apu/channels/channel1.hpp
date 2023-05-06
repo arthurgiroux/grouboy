@@ -9,7 +9,7 @@ class Channel1
 {
   public:
     explicit Channel1();
-    int getAudioSample();
+    float getAudioSample();
     void step(int cycles);
     void tickCounter();
     void trigger();
