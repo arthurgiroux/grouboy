@@ -11,12 +11,12 @@ void VolumeSweep::setVolume(int volume)
 
 int VolumeSweep::setDirection(int sign)
 {
-    return 0;
+    _direction = sign;
 }
 
 int VolumeSweep::setPeriod(int period)
 {
-    return 0;
+    _period = period;
 }
 
 int VolumeSweep::getVolume() const

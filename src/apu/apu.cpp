@@ -34,7 +34,7 @@ void APU::addSampleToAudioBuffer()
     float value = 0;
     if (_channel1.isEnabled())
     {
-        value += _channel1.getAudioSample() / 8.0f;
+        value += (_channel1.getAudioSample());
     }
 
     _audioBuffer.push_back(value);
