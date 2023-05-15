@@ -9,7 +9,7 @@ void VolumeSweep::setVolume(int volume)
     _volume = volume;
 }
 
-int VolumeSweep::setDirection(int sign)
+void VolumeSweep::setDirection(int sign)
 {
     _direction = sign;
 }

@@ -6,7 +6,7 @@ class VolumeSweep
   public:
     explicit VolumeSweep();
     void setVolume(int volume);
-    int setDirection(int sign);
+    void setDirection(int sign);
     int setPeriod(int period);
     int getVolume() const;
     void tick();

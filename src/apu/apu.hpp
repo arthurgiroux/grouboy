@@ -3,6 +3,7 @@
 
 #include "apu/channels/channel1.hpp"
 #include "common/types.hpp"
+#include "gbapu.hpp"
 #include "timer/timer.hpp"
 
 class APU
@@ -17,6 +18,7 @@ class APU
     void reset();
     byte readRegister(const word& addr);
     void writeRegister(const word& addr, const byte& value);
+    gbapu::Apu _apu;
 
   private:
     void addSampleToAudioBuffer();

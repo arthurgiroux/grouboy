@@ -1,4 +1,5 @@
 #include "channel1.hpp"
+#include <spdlog/spdlog.h>
 
 Channel1::Channel1()
 {
@@ -22,7 +23,6 @@ void Channel1::step(int cycles)
 void Channel1::tickCounter()
 {
     // TODO: Fix comments
-
     // This will tick with DIV at 512Hz
     _tickCounter++;
     if (_tickCounter % 8 == 0)
@@ -53,6 +53,7 @@ void Channel1::tickCounter()
 void Channel1::trigger()
 {
     _enable = true;
+    _squareWave.reset();
     triggerSweep();
     _volumeSweep.setPeriod(_volumeCtrl & 0b00000111);
     int volumeDirection = (utils::isNthBitSet(_volumeCtrl, 3) ? 1 : -1);

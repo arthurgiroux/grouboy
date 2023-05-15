@@ -1,7 +1,9 @@
 #include "apu.hpp"
 #include "cpu/cpu.hpp"
+#include <spdlog/spdlog.h>
 
-APU::APU(Timer* timer, int samplingFrequency) : _timer(timer), _samplingFrequency(samplingFrequency)
+APU::APU(Timer* timer, int samplingFrequency)
+    : _timer(timer), _samplingFrequency(samplingFrequency), _apu(samplingFrequency, samplingFrequency / 10)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
     _lastDivValue = _timer->getDividerRegisterValue();
@@ -9,6 +11,8 @@ APU::APU(Timer* timer, int samplingFrequency) : _timer(timer), _samplingFrequenc
 
 void APU::step(int cycles)
 {
+    //_apu.step(cycles);
+    // return;
     // TODO: Bit 5 instead of bit 4 in double CG mode
     // We detect a falling edge on the DIV register
     if (utils::isNthBitSet(_lastDivValue, 4) && !utils::isNthBitSet(_timer->getDividerRegisterValue(), 4))
@@ -58,13 +62,14 @@ void APU::reset()
 
 byte APU::readRegister(const word& addr)
 {
+    // return _apu.readRegister(addr);
     if (addr == CH1_SWEEP_REG_ADDR)
     {
         return _channel1.getSweepControl();
     }
     else if (addr == CH1_LENGTH_TIMER_AND_DUTY)
     {
-        return _channel1.getWave().getDutyPattern() << 6;
+        return 0x3F | _channel1.getWave().getDutyPattern() << 6;
     }
     else if (addr == CH1_VOLUME_CTRL_ADDR)
     {
@@ -72,11 +77,11 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR)
     {
-        return _channel1.getWavelength();
+        return 0xFF;
     }
     else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR)
     {
-        return _channel1.isLengthTimerEnabled() << 6;
+        return _channel1.isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
     else if (addr == SOUND_CTRL_ADDR)
     {
@@ -88,6 +93,8 @@ byte APU::readRegister(const word& addr)
 
 void APU::writeRegister(const word& addr, const byte& value)
 {
+    //    _apu.writeRegister(addr, value);
+    //    return;
     if (addr == CH1_SWEEP_REG_ADDR)
     {
         _channel1.setSweepControl(value);
@@ -103,7 +110,7 @@ void APU::writeRegister(const word& addr, const byte& value)
     }
     else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR)
     {
-        int wavelengthHigh = _channel1.getWavelength() & 0x700;
+        int wavelengthHigh = _channel1.getWavelength() & 0xFF00;
         _channel1.setWavelength(wavelengthHigh | value);
     }
     else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR)
