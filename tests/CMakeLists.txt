@@ -117,6 +117,7 @@ target_link_libraries(
 add_executable(
         apu_tests
         test_wavelength_sweep.cpp
+        test_square_wave.cpp
 )
 
 target_link_libraries(
