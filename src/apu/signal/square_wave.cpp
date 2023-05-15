@@ -60,3 +60,14 @@ int SquareWave::getDutyPattern() const
 {
     return _dutyPattern;
 }
+
+int SquareWave::getFrequency() const
+{
+    return _frequency;
+}
+
+void SquareWave::reset()
+{
+    _waveDutyPosition = 0;
+    resetFrequencyTimer();
+}
