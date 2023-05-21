@@ -22,7 +22,6 @@ byte MBCRomOnly::readROM(const word& addr)
 
 void MBCRomOnly::writeROM(const word& addr, const byte& value)
 {
-    throw std::runtime_error("Writing to ROM is not allowed.");
 }
 
 byte MBCRomOnly::readRAM(const word& addr)
