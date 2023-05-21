@@ -2,7 +2,7 @@
 
 int SquareWave::getAmplitude() const
 {
-    return _wavePatterns[_dutyPattern][_waveDutyPosition];
+    return utils::isNthBitSet(_wavePatterns[_dutyPattern], _waveDutyPosition) ? 1 : 0;
 }
 
 SquareWave::SquareWave()
@@ -30,11 +30,7 @@ void SquareWave::step(int cycles)
 
 void SquareWave::nextWaveValue()
 {
-    _waveDutyPosition++;
-    if (_waveDutyPosition > _wavePatterns[_dutyPattern].size())
-    {
-        _waveDutyPosition = 0;
-    }
+    _waveDutyPosition = (_waveDutyPosition + 1) % 8;
 }
 
 void SquareWave::setFrequency(int frequency)

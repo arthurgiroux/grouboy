@@ -10,7 +10,7 @@ Channel1::Channel1()
 
 float Channel1::getAudioSample()
 {
-    float dacIn = (_squareWave.getAmplitude() * _volumeSweep.getVolume()) / 15.f;
+    float dacIn = static_cast<float>(_squareWave.getAmplitude() * _volumeSweep.getVolume()) / 15.f;
     return (dacIn * 2 - 1);
 }
 

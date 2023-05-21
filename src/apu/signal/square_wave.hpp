@@ -18,7 +18,7 @@ class SquareWave
     int getDutyPattern() const;
 
   private:
-    static constexpr std::array<std::bitset<8>, 4> _wavePatterns = {0b10000000, 0b10000001, 0b11100001, 0b01111110};
+    static constexpr std::array<int, 4> _wavePatterns = {0b00000001, 0b10000001, 0b10000111, 0b01111110};
     void resetFrequencyTimer();
     void nextWaveValue();
     int _waveDutyPosition = 0;
