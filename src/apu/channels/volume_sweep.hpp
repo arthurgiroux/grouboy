@@ -7,7 +7,8 @@ class VolumeSweep
     explicit VolumeSweep();
     void setVolume(int volume);
     void setDirection(int sign);
-    int setPeriod(int period);
+    void setPeriod(int period);
+    int getPeriod() const;
     int getVolume() const;
     void tick();
 

@@ -14,9 +14,10 @@ void VolumeSweep::setDirection(int sign)
     _direction = sign;
 }
 
-int VolumeSweep::setPeriod(int period)
+void VolumeSweep::setPeriod(int period)
 {
     _period = period;
+    _timer = period;
 }
 
 int VolumeSweep::getVolume() const
@@ -45,4 +46,9 @@ void VolumeSweep::tick()
             _volume = 0;
         }
     }
+}
+
+int VolumeSweep::getPeriod() const
+{
+    return _period;
 }
