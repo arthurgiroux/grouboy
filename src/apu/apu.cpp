@@ -10,7 +10,6 @@ APU::APU(Timer* timer, int samplingFrequency)
 
 void APU::step(int cycles)
 {
-    _apu.step(cycles);
     // TODO: Bit 5 instead of bit 4 in double CG mode
     // We detect a falling edge on the DIV register
     if (utils::isNthBitSet(_lastDivValue, 4) && !utils::isNthBitSet(_timer->getDividerRegisterValue(), 4))
@@ -60,7 +59,6 @@ void APU::reset()
 
 byte APU::readRegister(const word& addr)
 {
-    _apu.readRegister(addr);
     if (addr == CH1_SWEEP_REG_ADDR)
     {
         return _channel1.getSweepControl();
@@ -91,7 +89,6 @@ byte APU::readRegister(const word& addr)
 
 void APU::writeRegister(const word& addr, const byte& value)
 {
-    _apu.writeRegister(addr, value);
     if (addr == CH1_SWEEP_REG_ADDR)
     {
         _channel1.setSweepControl(value);
