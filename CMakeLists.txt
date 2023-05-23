@@ -69,7 +69,9 @@ set(SOURCE_FILES
         src/apu/channels/wavelength_sweep.cpp
         src/apu/channels/wavelength_sweep.hpp
         src/apu/channels/volume_sweep.cpp
-        src/apu/channels/volume_sweep.hpp)
+        src/apu/channels/volume_sweep.hpp
+        src/apu/channels/length_timer.cpp
+        src/apu/channels/length_timer.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include gbapu-master/include)

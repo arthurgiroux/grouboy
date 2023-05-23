@@ -1,5 +1,4 @@
 #include "channel1.hpp"
-#include <spdlog/spdlog.h>
 
 Channel1::Channel1()
 {
@@ -37,11 +36,10 @@ void Channel1::tickCounter()
         _wavelengthSweep.tick();
     }
 
-    if (_tickCounter % 2 == 0 && _lengthTimerEnabled && _lengthTimer > 0)
+    if (_tickCounter % 2 == 0 && _lengthTimerEnabled && !_enable)
     {
-        // Sound length
-        _lengthTimerValue--;
-        if (_lengthTimerValue == 64)
+        _lengthTimer.tick();
+        if (_lengthTimer.isTimerElapsed())
         {
             _enable = false;
         }
@@ -81,7 +79,7 @@ void Channel1::triggerSweep()
     _wavelengthSweep.setPeriod(sweepPeriod);
     _wavelengthSweep.setShift(shift);
     _wavelengthSweep.setWavelength(_wavelength);
-    _lengthTimerValue = _lengthTimer;
+    _lengthTimer.restartTimer();
 }
 
 void Channel1::setWavelength(int wavelength)
@@ -119,7 +117,7 @@ SquareWave& Channel1::getWave()
 
 void Channel1::setLengthTimer(int timer)
 {
-    _lengthTimer = timer;
+    _lengthTimer.setStartValue(timer);
 }
 
 void Channel1::enableLengthTimer(bool value)

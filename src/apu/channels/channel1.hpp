@@ -2,6 +2,7 @@
 #define GROUBOY_CHANNEL1_HPP
 
 #include "apu/signal/square_wave.hpp"
+#include "length_timer.hpp"
 #include "volume_sweep.hpp"
 #include "wavelength_sweep.hpp"
 
@@ -34,10 +35,9 @@ class Channel1
     WavelengthSweep _wavelengthSweep;
     VolumeSweep _volumeSweep;
     SquareWave _squareWave;
+    LengthTimer _lengthTimer;
     int _wavelength = 0;
     int _sweepControlValue = 0;
-    int _lengthTimerValue = 0;
-    int _lengthTimer = 0;
     bool _lengthTimerEnabled = false;
     int _volumeCtrl = 0;
 };
