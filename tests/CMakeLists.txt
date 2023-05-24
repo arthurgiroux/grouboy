@@ -119,7 +119,8 @@ add_executable(
         test_wavelength_sweep.cpp
         test_square_wave.cpp
         test_volume_sweep.cpp
-        test_length_timer.cpp)
+        test_length_timer.cpp
+        test_frame_sequencer.cpp)
 
 target_link_libraries(
         apu_tests
