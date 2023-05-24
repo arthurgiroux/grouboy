@@ -1,10 +1,14 @@
 #include "channel1.hpp"
 
-Channel1::Channel1()
+Channel1::Channel1() : _frameSequencer(FRAME_SEQUENCER_FREQ)
 {
     using std::placeholders::_1;
     _wavelengthSweep.setWavelengthChangedCallback(std::bind(&Channel1::onWavelengthChanged, this, _1));
     _wavelengthSweep.setWavelengthOverflowCallback(std::bind(&Channel1::onWavelengthOverflow, this));
+
+    _frameSequencer.addFrame(FrameSequencer::Frame([&] { _volumeSweep.tick(); }, VOLUME_SWEEP_FREQ));
+    _frameSequencer.addFrame(FrameSequencer::Frame([&] { _wavelengthSweep.tick(); }, WAVELENGTH_SWEEP_FREQ));
+    _frameSequencer.addFrame(FrameSequencer::Frame([&] { tickLengthTimer(); }, LENGTH_TIMER_FREQ));
 }
 
 float Channel1::getAudioSample()
@@ -21,31 +25,7 @@ void Channel1::step(int cycles)
 
 void Channel1::tickCounter()
 {
-    // TODO: Fix comments
-    // This will tick with DIV at 512Hz
-    _tickCounter++;
-    if (_tickCounter % 8 == 0)
-    {
-        // volume sweep
-        _volumeSweep.tick();
-    }
-
-    if (_tickCounter % 4 == 0)
-    {
-        // Freq sweep
-        _wavelengthSweep.tick();
-    }
-
-    if (_tickCounter % 2 == 0 && _lengthTimerEnabled && !_enable)
-    {
-        _lengthTimer.tick();
-        if (_lengthTimer.isTimerElapsed())
-        {
-            _enable = false;
-        }
-    }
-
-    _tickCounter %= 8;
+    _frameSequencer.tick();
 }
 
 void Channel1::trigger()
@@ -138,4 +118,16 @@ void Channel1::setVolumeControl(int value)
 int Channel1::getVolumeControl() const
 {
     return _volumeCtrl;
+}
+
+void Channel1::tickLengthTimer()
+{
+    if (_lengthTimerEnabled && !_enable)
+    {
+        _lengthTimer.tick();
+        if (_lengthTimer.isTimerElapsed())
+        {
+            _enable = false;
+        }
+    }
 }
