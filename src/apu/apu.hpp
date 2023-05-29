@@ -4,6 +4,7 @@
 #include "apu/channels/channel1.hpp"
 #include "common/types.hpp"
 #include "gbapu.hpp"
+#include "signal/falling_edge_detector.hpp"
 #include "timer/timer.hpp"
 
 class APU
@@ -36,7 +37,7 @@ class APU
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;
     AudioBuffer _audioBuffer = {};
-    int _lastDivValue = 0;
+    FallingEdgeDetector _fallingEdgeDetector;
     bool _enabled = false;
 };
 
