@@ -5,22 +5,17 @@ APU::APU(Timer* timer, int samplingFrequency)
     : _timer(timer), _samplingFrequency(samplingFrequency), _apu(samplingFrequency, samplingFrequency / 10)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
-    _lastDivValue = _timer->getDividerRegisterValue();
 }
 
 void APU::step(int cycles)
 {
     // TODO: Bit 5 instead of bit 4 in double CG mode
-    // We detect a falling edge on the DIV register
-    if (utils::isNthBitSet(_lastDivValue, 4) && !utils::isNthBitSet(_timer->getDividerRegisterValue(), 4))
+    if (_fallingEdgeDetector.detectFallingEdge(_timer->getDividerRegisterValue() & 0x10))
     {
-        // APU
         _channel1.tickCounter();
     }
 
     _channel1.step(cycles);
-
-    _lastDivValue = _timer->getDividerRegisterValue();
 
     _cycleCounter += cycles;
     while (_cycleCounter >= _numberOfCyclesPerAudioSample)
