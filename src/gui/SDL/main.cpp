@@ -155,7 +155,6 @@ int main(int argc, char* args[])
                         for (int i = 0; i < buffer.size(); ++i)
                         {
                             audioBuffer.push(buffer[i]);
-                            audioBuffer.push(buffer[i]);
                         }
 
                         emulator.getAPU().resetAudioBuffer();

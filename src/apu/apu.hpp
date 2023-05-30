@@ -1,6 +1,7 @@
 #ifndef GROUBOY_APU_HPP
 #define GROUBOY_APU_HPP
 
+#include "apu/channels/audio_mixer.hpp"
 #include "apu/channels/channel1.hpp"
 #include "common/types.hpp"
 #include "gbapu.hpp"
@@ -29,10 +30,13 @@ class APU
     static const int CH1_WAVELENGTH_LOW_REG_ADDR = 0xFF13;
     static const int CH1_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF14;
 
+    static const int MASTER_VOLUME_ADDR = 0xFF24;
+    static const int SOUND_PANNING_ADDR = 0xFF25;
     static const int SOUND_CTRL_ADDR = 0xFF26;
 
     Timer* _timer;
     Channel1 _channel1{};
+    AudioMixer _mixer;
     int _samplingFrequency;
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;

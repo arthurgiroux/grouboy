@@ -2,7 +2,8 @@
 #include "cpu/cpu.hpp"
 
 APU::APU(Timer* timer, int samplingFrequency)
-    : _timer(timer), _samplingFrequency(samplingFrequency), _apu(samplingFrequency, samplingFrequency / 10)
+    : _timer(timer), _samplingFrequency(samplingFrequency), _apu(samplingFrequency, samplingFrequency / 10),
+      _mixer(&_channel1, nullptr, nullptr, nullptr)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
 }
@@ -27,13 +28,9 @@ void APU::step(int cycles)
 
 void APU::addSampleToAudioBuffer()
 {
-    float value = 0;
-    if (_channel1.isEnabled())
-    {
-        value += (_channel1.getAudioSample());
-    }
-
-    _audioBuffer.push_back(value);
+    auto sample = _mixer.getSample();
+    _audioBuffer.push_back(sample.left);
+    _audioBuffer.push_back(sample.right);
 }
 
 const APU::AudioBuffer& APU::getAudioBuffer()
@@ -113,6 +110,16 @@ void APU::writeRegister(const word& addr, const byte& value)
         {
             _channel1.trigger();
         }
+    }
+    else if (addr == MASTER_VOLUME_ADDR)
+    {
+        _mixer.setVolumeScaleRight(value & 0x7);
+        _mixer.setVolumeScaleLeft((value >> 4) & 0x7);
+    }
+    else if (addr == SOUND_PANNING_ADDR)
+    {
+        _mixer.setPanningControlRight(value & 0xF);
+        _mixer.setPanningControlLeft((value >> 4) & 0xF);
     }
     else if (addr == SOUND_CTRL_ADDR)
     {
