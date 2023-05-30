@@ -75,11 +75,6 @@ int Channel1::getWavelength()
     return _wavelength;
 }
 
-bool Channel1::isEnabled() const
-{
-    return _enable;
-}
-
 void Channel1::setSweepControl(int value)
 {
     _sweepControlValue = value;

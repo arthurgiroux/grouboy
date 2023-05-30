@@ -2,20 +2,18 @@
 #define GROUBOY_CHANNEL1_HPP
 
 #include "apu/signal/square_wave.hpp"
+#include "channel.hpp"
 #include "frame_sequencer.hpp"
 #include "length_timer.hpp"
 #include "volume_sweep.hpp"
 #include "wavelength_sweep.hpp"
 
-class Channel1
+class Channel1 : public Channel
 {
   public:
     explicit Channel1();
-    float getAudioSample();
     void step(int cycles);
     void tickCounter();
-    void trigger();
-    bool isEnabled() const;
     int getWavelength();
     void setWavelength(int wavelength);
     void setSweepControl(int value);
@@ -26,6 +24,8 @@ class Channel1
     bool isLengthTimerEnabled() const;
     void setVolumeControl(int value);
     int getVolumeControl() const;
+    virtual float getAudioSample() override;
+    virtual void trigger() override;
 
   private:
     static const int FRAME_SEQUENCER_FREQ = 512;
@@ -36,8 +36,6 @@ class Channel1
     void onWavelengthOverflow();
     void triggerSweep();
     void tickLengthTimer();
-    int _tickCounter = 0;
-    bool _enable = false;
     WavelengthSweep _wavelengthSweep;
     VolumeSweep _volumeSweep;
     SquareWave _squareWave;
