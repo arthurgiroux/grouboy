@@ -75,7 +75,11 @@ set(SOURCE_FILES
         src/apu/channels/frame_sequencer.cpp
         src/apu/channels/frame_sequencer.hpp
         src/apu/signal/falling_edge_detector.cpp
-        src/apu/signal/falling_edge_detector.hpp)
+        src/apu/signal/falling_edge_detector.hpp
+        src/apu/channels/channel.cpp
+        src/apu/channels/channel.hpp
+        src/apu/channels/audio_mixer.cpp
+        src/apu/channels/audio_mixer.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include gbapu-master/include)

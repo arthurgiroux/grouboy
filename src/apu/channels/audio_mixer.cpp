@@ -43,6 +43,7 @@ float AudioMixer::scaleVolume(float amplitude, int scaleValue)
     return amplitude *
            (MIN_VOLUME_FACTOR + (scaleValue / MAX_VOLUME_SCALE_VALUE) * (MAX_VOLUME_FACTOR - MIN_VOLUME_FACTOR));
 }
+
 void AudioMixer::setVolumeScaleLeft(int scale)
 {
     _volumeScaleLeft = scale;
