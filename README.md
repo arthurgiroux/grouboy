@@ -43,14 +43,11 @@ Future work:
 
 ## Dependencies
 
-This project relies on Qt 6.4 for the GUI, GoogleTest for the testing suite, and sdplog for logging.
+This project relies on SDL for the GUI, GoogleTest for the testing suite, and sdplog for logging.
 
 ## Compilation
 
-In order to compile the project, you will need
-to [download and install Qt 6.4](https://doc.qt.io/qt-6/get-and-install-qt.html).
-
-The project can be compiled using CMake, it will automatically retrieve some dependencies like GoogleTest.
+The project can be compiled using CMake, it will automatically retrieve some dependencies like SDL and GoogleTest.
 
 ```
 mkdir -p build && cd build/

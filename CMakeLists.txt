@@ -83,11 +83,15 @@ add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
 target_link_libraries(gbemulator_core spdlog::spdlog)
 
-add_subdirectory(src/gui/)
-
 set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
 add_subdirectory(${SDL3_DIR})
-add_subdirectory(src/gui/SDL)
+
+add_executable(grouboy src/main.cpp)
+
+target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/)
+
+add_dependencies(grouboy gbemulator_core SDL3::SDL3)
+target_link_libraries(grouboy PRIVATE gbemulator_core SDL3::SDL3)
 
 enable_testing()
 add_subdirectory(tests/)
