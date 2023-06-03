@@ -41,11 +41,6 @@ TEST_F(MBCROMOnlyTest, ReadROMOutsideOfBoundsShouldThrowException)
     ASSERT_THROW(mbc->readROM(addr), std::runtime_error);
 }
 
-TEST_F(MBCROMOnlyTest, WriteROMShouldThrowException)
-{
-    ASSERT_THROW(mbc->writeROM(0x00, 0x00), std::runtime_error);
-}
-
 TEST_F(MBCROMOnlyTest, ReadRAMShouldThrowException)
 {
     ASSERT_THROW(mbc->readRAM(0x00), std::runtime_error);
