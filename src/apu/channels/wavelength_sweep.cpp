@@ -38,7 +38,7 @@ void WavelengthSweep::tick()
 
 bool WavelengthSweep::didWavelengthOverflow(int wavelength) const
 {
-    return wavelength > 2048;
+    return wavelength >= 2048;
 }
 
 int WavelengthSweep::generateNewWavelength() const
