@@ -8,9 +8,16 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+// Mutex used to have unique access to audio buffer between main thread and SDL audio thread
 std::mutex soundMutex;
 std::queue<float> audioBuffer = {};
 
+/**
+ * Function called by SDL when it needs more audio data to play
+ * @param userdata user data
+ * @param data The buffer to fill with available data
+ * @param length The number of bytes of the audio buffer to fill
+ */
 void audioBufferCb(void* userdata, unsigned char* data, int length)
 {
     if (length <= 0)
@@ -24,20 +31,18 @@ void audioBufferCb(void* userdata, unsigned char* data, int length)
         int bufferSize = audioBuffer.size();
         if (bufferSize == 0)
         {
-            std::cout << "empty" << std::endl;
             return;
         }
 
-        int maxValue = length / sizeof(float);
-        if (bufferSize < maxValue)
+        int nbrSamplesToWrite = length / sizeof(float);
+        // If we have less data than the audio buffer then we only write that
+        if (bufferSize < nbrSamplesToWrite)
         {
-            maxValue = bufferSize;
+            nbrSamplesToWrite = bufferSize;
         }
 
-        // std::cout << maxValue << std::endl;
-
         float* buffer = reinterpret_cast<float*>(data);
-        for (int i = 0; i < maxValue; ++i)
+        for (int i = 0; i < nbrSamplesToWrite; ++i)
         {
             buffer[i] = audioBuffer.front();
             audioBuffer.pop();
@@ -53,6 +58,7 @@ int main(int argc, char* args[])
 
     if (argc < 2)
     {
+        std::cout << "Please specify a ROM file to load." << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -89,7 +95,7 @@ int main(int argc, char* args[])
             audio_spec.samples = 4800;
             audio_spec.callback = audioBufferCb;
 
-            audio_device = SDL_OpenAudioDevice(NULL, 0, &audio_spec, NULL, 0);
+            audio_device = SDL_OpenAudioDevice(nullptr, 0, &audio_spec, nullptr, 0);
 
             SDL_PlayAudioDevice(audio_device);
 
@@ -134,18 +140,8 @@ int main(int argc, char* args[])
                     }
                 }
 
-                // int samplesize = 1024;
-
                 while (frameId == emulator.getPPU().getFrameId())
                 {
-
-                    //                    while (SDL_GetQueuedAudioSize(audio_device) > 4096 * sizeof(float))
-                    //                    {
-                    //                        int queueSize = SDL_GetQueuedAudioSize(audio_device);
-                    //                        // std::cout << "sleep " << queueSize << std::endl;
-                    //                        SDL_Delay(1);
-                    //                    }
-
                     emulator.exec();
 
                     auto buffer = emulator.getAPU().getAudioBuffer();
@@ -159,41 +155,6 @@ int main(int argc, char* args[])
 
                         emulator.getAPU().resetAudioBuffer();
                     }
-
-                    //
-                    //
-                    //                    emulator.getAPU()._apu.endFrame();
-                    //                    size_t ts = emulator.getAPU()._apu.availableSamples();
-                    //                    if (ts > 0)
-                    //                    {
-                    //                        std::vector<float> s;
-                    //                        s.resize(ts * 2);
-                    //                        emulator.getAPU()._apu.readSamples(s.data(), ts);
-                    //
-                    //                        std::lock_guard<std::mutex> lk(soundMutex);
-                    //                        for (int i = 0; i < s.size(); ++i)
-                    //                        {
-                    //                            audioBuffer.push(s[i]);
-                    //                        }
-                    //                        // std::cout << "samples : " << ts << std::endl;
-                    //                    }
-
-                    //                    emulator.getAPU()._apu.endFrame();
-                    //                    size_t ts = emulator.getAPU()._apu.availableSamples();
-                    //                    if (ts > 0)
-                    //                    {
-                    //                        std::vector<float> s;
-                    //                        s.resize(ts * 2);
-                    //                        emulator.getAPU()._apu.readSamples(s.data(), ts);
-                    //                        SDL_QueueAudio(audio_device, s.data(), s.size() * sizeof(float));
-                    //                        // std::cout << "samples : " << ts << std::endl;
-                    //                    }
-                    /*auto audioBuffer = emulator.getAPU().getAudioBuffer();
-                    if (audioBuffer.size() > samplesize)
-                    {
-                        SDL_QueueAudio(audio_device, audioBuffer.data(), audioBuffer.size() * sizeof(float));
-                        emulator.getAPU().resetAudioBuffer();
-                    }*/
                 }
 
                 frameId = emulator.getPPU().getFrameId();
