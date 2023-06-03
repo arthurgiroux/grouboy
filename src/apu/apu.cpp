@@ -2,8 +2,7 @@
 #include "cpu/cpu.hpp"
 
 APU::APU(Timer* timer, int samplingFrequency)
-    : _timer(timer), _samplingFrequency(samplingFrequency), _apu(samplingFrequency, samplingFrequency / 10),
-      _mixer(&_channel1, nullptr, nullptr, nullptr)
+    : _timer(timer), _samplingFrequency(samplingFrequency), _mixer(&_channel1, nullptr, nullptr, nullptr)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
 }

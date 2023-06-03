@@ -4,8 +4,6 @@ add_subdirectory(libs/spdlog-1.11.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(gbapu-master)
-
 set(SOURCE_FILES
         src/cpu/cpu.cpp
         src/cpu/cpu_instructions_misc_control.cpp
@@ -82,8 +80,8 @@ set(SOURCE_FILES
         src/apu/channels/audio_mixer.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
-target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include gbapu-master/include)
-target_link_libraries(gbemulator_core spdlog::spdlog gbapu)
+target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
+target_link_libraries(gbemulator_core spdlog::spdlog)
 
 add_subdirectory(src/gui/)
 
