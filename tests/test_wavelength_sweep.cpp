@@ -124,7 +124,7 @@ TEST_F(WavelengthSweepTest, TickWhenWavelengthOverflowsShouldNotChangeWavelength
     wavelengthSweep.setShift(shift);
     ASSERT_EQ(wavelengthSweep.getShift(), shift);
 
-    int wavelength = 1024;
+    int wavelength = 1536;
     wavelengthSweep.setWavelength(wavelength);
     ASSERT_EQ(wavelengthSweep.getWavelength(), wavelength);
 
