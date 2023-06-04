@@ -26,16 +26,16 @@ target_link_libraries(
 
 add_executable(
         cpu_tests
-        test_cpu.cpp
-        test_cpu_instructions_jumps_calls.cpp
-        test_cpu_instructions_8bits_load_store_move.cpp
-        test_cpu_instructions_8bits_arithmetic_logical.cpp
-        test_cpu_instructions_16bits_load_store_move.cpp
-        test_cpu_instructions_misc_control.cpp
-        test_cpu_instructions_16bits_arithmetic_logical.cpp
-        test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        test_blargg.cpp
-        test_palette.cpp)
+        cpu/test_cpu.cpp
+        cpu/test_cpu_instructions_jumps_calls.cpp
+        cpu/test_cpu_instructions_8bits_load_store_move.cpp
+        cpu/test_cpu_instructions_8bits_arithmetic_logical.cpp
+        cpu/test_cpu_instructions_16bits_load_store_move.cpp
+        cpu/test_cpu_instructions_misc_control.cpp
+        cpu/test_cpu_instructions_16bits_arithmetic_logical.cpp
+        cpu/test_cpu_instructions_8bits_rotation_shifts_bit.cpp
+        cpu/test_blargg.cpp
+        apu/test_palette.cpp)
 
 target_link_libraries(
         cpu_tests
@@ -45,7 +45,7 @@ target_link_libraries(
 
 add_executable(
         mooneye_tests
-        test_mooneye.cpp)
+        cpu/test_mooneye.cpp)
 
 target_link_libraries(
         mooneye_tests
@@ -55,10 +55,10 @@ target_link_libraries(
 
 add_executable(
         ppu_tests
-        test_ppu.cpp
-        test_tile.cpp
-        test_rgb_image.cpp
-        test_sprite.cpp
+        ppu/test_ppu.cpp
+        ppu/test_tile.cpp
+        ppu/test_rgb_image.cpp
+        ppu/test_sprite.cpp
 )
 
 target_link_libraries(
@@ -69,10 +69,10 @@ target_link_libraries(
 
 add_executable(
         mmu_tests
-        test_mmu.cpp
-        test_cartridge.cpp
+        mmu/test_mmu.cpp
+        cpu/test_cartridge.cpp
         test_input_controller.cpp
-        test_mbc.cpp)
+        mmu/test_mbc.cpp)
 
 target_link_libraries(
         mmu_tests
@@ -82,7 +82,7 @@ target_link_libraries(
 
 add_executable(
         serial_tests
-        test_serial.cpp
+        cpu/test_serial.cpp
 )
 
 target_link_libraries(
@@ -93,7 +93,7 @@ target_link_libraries(
 
 add_executable(
         timer_tests
-        test_timer.cpp
+        mmu/test_timer.cpp
 )
 
 target_link_libraries(
@@ -104,7 +104,7 @@ target_link_libraries(
 
 add_executable(
         acid_tests
-        test_acid.cpp
+        ppu/test_acid.cpp
 )
 
 target_link_libraries(
@@ -116,13 +116,13 @@ target_link_libraries(
 
 add_executable(
         apu_tests
-        test_wavelength_sweep.cpp
-        test_square_wave.cpp
-        test_volume_sweep.cpp
-        test_length_timer.cpp
-        test_frame_sequencer.cpp
-        test_falling_edge_detector.cpp
-        test_audio_mixer.cpp)
+        apu/test_wavelength_sweep.cpp
+        apu/test_square_wave.cpp
+        apu/test_volume_sweep.cpp
+        apu/test_length_timer.cpp
+        apu/test_frame_sequencer.cpp
+        apu/test_falling_edge_detector.cpp
+        apu/test_audio_mixer.cpp)
 
 target_link_libraries(
         apu_tests
