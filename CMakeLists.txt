@@ -62,7 +62,9 @@ set(SOURCE_FILES
         src/apu/apu.hpp
         src/apu/signal/square_wave.cpp
         src/apu/signal/square_wave.hpp
-        src/apu/channels/channel1.cpp
+        src/apu/channels/channel_wave.hpp
+        src/apu/channels/channel_wave.cpp
+        src/apu/channels/channel1.hpp
         src/apu/channels/channel1.cpp
         src/apu/channels/wavelength_sweep.cpp
         src/apu/channels/wavelength_sweep.hpp
