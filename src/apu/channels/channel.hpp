@@ -7,6 +7,7 @@ class Channel
     virtual float getAudioSample() = 0;
     virtual void trigger() = 0;
     bool isEnabled() const;
+    virtual ~Channel() = default;
 
   protected:
     bool _enable = false;
