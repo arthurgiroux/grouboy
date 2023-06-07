@@ -1,6 +1,7 @@
 #include "channel_wave.hpp"
+#include "channel.hpp"
 
-ChannelWave::ChannelWave() : Channel(), _frameSequencer(FRAME_SEQUENCER_FREQ)
+ChannelWave::ChannelWave() : Channel()
 {
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { _volumeSweep.tick(); }, VOLUME_SWEEP_FREQ));
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { tickLengthTimer(); }, LENGTH_TIMER_FREQ));
@@ -15,11 +16,6 @@ float ChannelWave::getAudioSample()
 void ChannelWave::step(int cycles)
 {
     _squareWave.step(cycles);
-}
-
-void ChannelWave::tickCounter()
-{
-    _frameSequencer.tick();
 }
 
 void ChannelWave::trigger()

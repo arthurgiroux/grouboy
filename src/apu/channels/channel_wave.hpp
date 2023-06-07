@@ -3,7 +3,6 @@
 
 #include "apu/signal/square_wave.hpp"
 #include "channel.hpp"
-#include "frame_sequencer.hpp"
 #include "length_timer.hpp"
 #include "volume_sweep.hpp"
 #include "wavelength_sweep.hpp"
@@ -14,8 +13,7 @@ class ChannelWave : public Channel
     ChannelWave();
     virtual ~ChannelWave() = default;
     virtual float getAudioSample() override;
-    void step(int cycles);
-    void tickCounter();
+    void step(int cycles) override;
     void trigger() override;
     void setWavelength(int wavelength);
     int getWavelength();
@@ -27,12 +25,10 @@ class ChannelWave : public Channel
     int getVolumeControl() const;
 
   protected:
-    static const int FRAME_SEQUENCER_FREQ = 512;
     static const int LENGTH_TIMER_FREQ = 256;
     static const int VOLUME_SWEEP_FREQ = 64;
     void tickLengthTimer();
     virtual void triggerImpl();
-    FrameSequencer _frameSequencer;
     VolumeSweep _volumeSweep;
     SquareWave _squareWave;
     LengthTimer _lengthTimer;

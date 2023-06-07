@@ -62,10 +62,14 @@ set(SOURCE_FILES
         src/apu/apu.hpp
         src/apu/signal/square_wave.cpp
         src/apu/signal/square_wave.hpp
+        src/apu/channels/channel.cpp
+        src/apu/channels/channel.hpp
         src/apu/channels/channel_wave.hpp
         src/apu/channels/channel_wave.cpp
         src/apu/channels/channel1.hpp
         src/apu/channels/channel1.cpp
+        src/apu/channels/channel2.cpp
+        src/apu/channels/channel2.hpp
         src/apu/channels/wavelength_sweep.cpp
         src/apu/channels/wavelength_sweep.hpp
         src/apu/channels/volume_sweep.cpp
@@ -76,8 +80,6 @@ set(SOURCE_FILES
         src/apu/channels/frame_sequencer.hpp
         src/apu/signal/falling_edge_detector.cpp
         src/apu/signal/falling_edge_detector.hpp
-        src/apu/channels/channel.cpp
-        src/apu/channels/channel.hpp
         src/apu/channels/audio_mixer.cpp
         src/apu/channels/audio_mixer.hpp)
 
