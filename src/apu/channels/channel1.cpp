@@ -16,7 +16,7 @@ void Channel1::onWavelengthChanged(int wavelength)
 
 void Channel1::onWavelengthOverflow()
 {
-    _enable = false;
+    enable(false);
 }
 
 void Channel1::setSweepControl(int value)

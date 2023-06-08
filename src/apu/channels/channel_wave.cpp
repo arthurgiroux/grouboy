@@ -9,8 +9,7 @@ ChannelWave::ChannelWave() : Channel()
 
 float ChannelWave::getAudioSample()
 {
-    float dacIn = static_cast<float>(_squareWave.getAmplitude() * _volumeSweep.getVolume()) / 15.f;
-    return (dacIn * 2 - 1);
+    return convertFromDigitalToAnalog(_squareWave.getAmplitude() * _volumeSweep.getVolume());
 }
 
 void ChannelWave::step(int cycles)
@@ -20,7 +19,7 @@ void ChannelWave::step(int cycles)
 
 void ChannelWave::trigger()
 {
-    _enable = true;
+    enable(true);
     _squareWave.reset();
     _volumeSweep.setPeriod(_volumeCtrl & 0b00000111);
     int volumeDirection = (utils::isNthBitSet(_volumeCtrl, 3) ? 1 : -1);
@@ -84,7 +83,7 @@ void ChannelWave::tickLengthTimer()
         _lengthTimer.tick();
         if (_lengthTimer.isTimerElapsed())
         {
-            _enable = false;
+            enable(false);
         }
     }
 }
