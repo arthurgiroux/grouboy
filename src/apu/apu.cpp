@@ -14,18 +14,27 @@ APU::APU(Timer* timer, int samplingFrequency)
 
 void APU::step(int cycles)
 {
-    // TODO: Bit 5 instead of bit 4 in double CG mode
-    if (_fallingEdgeDetector.detectFallingEdge(_timer->getDividerRegisterValue() & 0x10))
+    if (_enabled)
     {
+        // TODO: Bit 5 instead of bit 4 in double CG mode
+        if (_fallingEdgeDetector.detectFallingEdge(_timer->getDividerRegisterValue() & 0x10))
+        {
+            for (Channel* channel : _channels)
+            {
+                if (channel->isEnabled())
+                {
+                    channel->tickCounter();
+                }
+            }
+        }
+
         for (Channel* channel : _channels)
         {
-            channel->tickCounter();
+            if (channel->isEnabled())
+            {
+                channel->step(cycles);
+            }
         }
-    }
-
-    for (Channel* channel : _channels)
-    {
-        channel->step(cycles);
     }
 
     _cycleCounter += cycles;
@@ -38,7 +47,12 @@ void APU::step(int cycles)
 
 void APU::addSampleToAudioBuffer()
 {
-    auto sample = _mixer.getSample();
+    AudioMixer::Sample sample{0.0f, 0.0f};
+    if (_enabled)
+    {
+        sample = _mixer.getSample();
+    }
+
     _audioBuffer.push_back(sample.left);
     _audioBuffer.push_back(sample.right);
 }
@@ -91,50 +105,64 @@ byte APU::readRegister(const word& addr)
 
 void APU::writeRegister(const word& addr, const byte& value)
 {
-    if (addr == CH1_SWEEP_REG_ADDR)
+    if (_enabled)
     {
-        _channel1.setSweepControl(value);
-    }
-    else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
-    {
-        ChannelWave& channel = getChannelWaveFromRegAddr(addr);
-        channel.getWave().setDutyPattern(value >> 6);
-        channel.setLengthTimer(value & 0b00111111);
-    }
-    else if (addr == CH1_VOLUME_CTRL_ADDR || addr == CH2_VOLUME_CTRL_ADDR)
-    {
-        getChannelWaveFromRegAddr(addr).setVolumeControl(value);
-    }
-    else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR || addr == CH2_WAVELENGTH_LOW_REG_ADDR)
-    {
-        ChannelWave& channel = getChannelWaveFromRegAddr(addr);
-        int wavelengthHigh = channel.getWavelength() & 0xFF00;
-        channel.setWavelength(wavelengthHigh | value);
-    }
-    else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR || addr == CH2_WAVELENGTH_AND_CONTROL_REG_ADDR)
-    {
-        ChannelWave& channel = getChannelWaveFromRegAddr(addr);
-        channel.enableLengthTimer(utils::isNthBitSet(value, 6));
-
-        int wavelengthLow = channel.getWavelength() & 0xFF;
-        channel.setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
-
-        if (utils::isNthBitSet(value, 7))
+        if (addr == CH1_SWEEP_REG_ADDR)
         {
-            channel.trigger();
+            _channel1.setSweepControl(value);
+        }
+        else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
+        {
+            ChannelWave& channel = getChannelWaveFromRegAddr(addr);
+            channel.getWave().setDutyPattern(value >> 6);
+            channel.setLengthTimer(value & 0b00111111);
+        }
+        else if (addr == CH1_VOLUME_CTRL_ADDR || addr == CH2_VOLUME_CTRL_ADDR)
+        {
+            ChannelWave& channel = getChannelWaveFromRegAddr(addr);
+            if ((value & 0xF8) == 0)
+            {
+                channel.enableDAC(false);
+                channel.enable(false);
+            }
+            else
+            {
+                channel.enableDAC(true);
+            }
+            channel.setVolumeControl(value);
+        }
+        else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR || addr == CH2_WAVELENGTH_LOW_REG_ADDR)
+        {
+            ChannelWave& channel = getChannelWaveFromRegAddr(addr);
+            int wavelengthHigh = channel.getWavelength() & 0xFF00;
+            channel.setWavelength(wavelengthHigh | value);
+        }
+        else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR || addr == CH2_WAVELENGTH_AND_CONTROL_REG_ADDR)
+        {
+            ChannelWave& channel = getChannelWaveFromRegAddr(addr);
+            channel.enableLengthTimer(utils::isNthBitSet(value, 6));
+
+            int wavelengthLow = channel.getWavelength() & 0xFF;
+            channel.setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
+
+            if (utils::isNthBitSet(value, 7) && channel.isDACEnabled())
+            {
+                channel.trigger();
+            }
+        }
+        else if (addr == MASTER_VOLUME_ADDR)
+        {
+            _mixer.setVolumeScaleRight(value & 0x7);
+            _mixer.setVolumeScaleLeft((value >> 4) & 0x7);
+        }
+        else if (addr == SOUND_PANNING_ADDR)
+        {
+            _mixer.setPanningControlRight(value & 0xF);
+            _mixer.setPanningControlLeft((value >> 4) & 0xF);
         }
     }
-    else if (addr == MASTER_VOLUME_ADDR)
-    {
-        _mixer.setVolumeScaleRight(value & 0x7);
-        _mixer.setVolumeScaleLeft((value >> 4) & 0x7);
-    }
-    else if (addr == SOUND_PANNING_ADDR)
-    {
-        _mixer.setPanningControlRight(value & 0xF);
-        _mixer.setPanningControlLeft((value >> 4) & 0xF);
-    }
-    else if (addr == SOUND_CTRL_ADDR)
+
+    if (addr == SOUND_CTRL_ADDR)
     {
         _enabled = value >> 7;
     }
