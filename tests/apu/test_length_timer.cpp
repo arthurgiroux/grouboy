@@ -4,7 +4,8 @@
 class LengthTimerTest : public ::testing::Test
 {
   protected:
-    LengthTimer lengthTimer;
+    static const int DURATION = 64;
+    LengthTimer lengthTimer = LengthTimer(DURATION);
 };
 
 TEST_F(LengthTimerTest, SetStartValueShouldSetInitialValueCorrectly)

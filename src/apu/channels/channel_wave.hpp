@@ -27,11 +27,12 @@ class ChannelWave : public Channel
   protected:
     static const int LENGTH_TIMER_FREQ = 256;
     static const int VOLUME_SWEEP_FREQ = 64;
+    static const int LENGTH_TIMER_DURATION = 64;
     void tickLengthTimer();
     virtual void triggerImpl();
     VolumeSweep _volumeSweep;
     SquareWave _squareWave;
-    LengthTimer _lengthTimer;
+    LengthTimer _lengthTimer = LengthTimer(LENGTH_TIMER_DURATION);
     int _wavelength = 0;
     bool _lengthTimerEnabled = false;
     int _volumeCtrl = 0;
