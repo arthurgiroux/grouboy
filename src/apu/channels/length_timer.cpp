@@ -1,6 +1,6 @@
 #include "length_timer.hpp"
 
-LengthTimer::LengthTimer()
+LengthTimer::LengthTimer(int durationInTicks) : _durationInTicks(durationInTicks)
 {
 }
 
@@ -21,7 +21,7 @@ int LengthTimer::getStartValue() const
 
 bool LengthTimer::isTimerElapsed() const
 {
-    return _ticksElapsed >= DURATION_IN_TICKS;
+    return _ticksElapsed >= _durationInTicks;
 }
 
 void LengthTimer::restartTimer()

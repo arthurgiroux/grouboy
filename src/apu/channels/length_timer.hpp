@@ -4,7 +4,7 @@
 class LengthTimer
 {
   public:
-    LengthTimer();
+    LengthTimer(int durationInTicks);
     void tick();
     void restartTimer();
     void setStartValue(int startValue);
@@ -12,9 +12,9 @@ class LengthTimer
     bool isTimerElapsed() const;
 
   private:
-    static const int DURATION_IN_TICKS = 64;
     int _startValue = 0;
     int _ticksElapsed = 0;
+    int _durationInTicks = 0;
 };
 
 #endif // GROUBOY_LENGTH_TIMER_HPP
