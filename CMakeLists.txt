@@ -81,7 +81,9 @@ set(SOURCE_FILES
         src/apu/signal/falling_edge_detector.cpp
         src/apu/signal/falling_edge_detector.hpp
         src/apu/channels/audio_mixer.cpp
-        src/apu/channels/audio_mixer.hpp)
+        src/apu/channels/audio_mixer.hpp
+        src/apu/channels/channel3.cpp
+        src/apu/channels/channel3.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
