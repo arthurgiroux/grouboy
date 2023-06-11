@@ -28,6 +28,10 @@ class DummyChannel : public Channel
         _enable = false;
     }
 
+    void step(int cycles) override
+    {
+    }
+
   private:
     float _sampleValue = 0.f;
 };
