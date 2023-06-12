@@ -1,7 +1,6 @@
 #ifndef GROUBOY_SQUARE_WAVE_HPP
 #define GROUBOY_SQUARE_WAVE_HPP
 
-#include "memory/mmu.hpp"
 #include <array>
 #include <bitset>
 

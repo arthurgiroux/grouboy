@@ -1,5 +1,6 @@
 #include "channel_wave.hpp"
 #include "channel.hpp"
+#include "common/utils.hpp"
 
 ChannelWave::ChannelWave() : Channel()
 {
