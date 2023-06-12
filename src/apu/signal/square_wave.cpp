@@ -1,4 +1,5 @@
 #include "square_wave.hpp"
+#include "common/utils.hpp"
 
 int SquareWave::getAmplitude() const
 {

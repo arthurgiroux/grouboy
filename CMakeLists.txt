@@ -83,7 +83,9 @@ set(SOURCE_FILES
         src/apu/channels/audio_mixer.cpp
         src/apu/channels/audio_mixer.hpp
         src/apu/channels/channel3.cpp
-        src/apu/channels/channel3.hpp)
+        src/apu/channels/channel3.hpp
+        src/apu/signal/wave.cpp
+        src/apu/signal/wave.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
