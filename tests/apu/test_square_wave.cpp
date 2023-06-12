@@ -21,19 +21,20 @@ TEST_F(SquareWaveTest, SetDutyPatternShouldChangeDutyPattern)
     ASSERT_EQ(wave.getDutyPattern(), dutyPattern);
 }
 
-TEST_F(SquareWaveTest, Step)
+TEST_F(SquareWaveTest, StepShouldCycleCorrectlyThroughPattern)
 {
     int frequency = 2048;
     int dutyPattern = 2;
     int expectedValue = 0b10000111;
-    // 0b11100001
     wave.setFrequency(frequency);
     wave.setDutyPattern(dutyPattern);
-    ASSERT_EQ(wave.getAmplitude(), 1);
-    for (int i = 0; i < frequency; ++i)
-    {
-        ASSERT_EQ(wave.getAmplitude(), 1);
-    }
-    wave.setDutyPattern(dutyPattern);
     ASSERT_EQ(wave.getDutyPattern(), dutyPattern);
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < frequency; ++j)
+        {
+            ASSERT_EQ(wave.getAmplitude(), (expectedValue >> (i)) & 0x01);
+            wave.step(1);
+        }
+    }
 }
