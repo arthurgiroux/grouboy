@@ -12,10 +12,10 @@ class Channel
     virtual void trigger() = 0;
     virtual void step(int cycles) = 0;
     bool isEnabled() const;
-    bool isDACEnabled() const;
     void enableDAC(bool value);
     void enable(bool value);
     void tickCounter();
+    bool isDACEnabled() const;
 
   protected:
     static const int FRAME_SEQUENCER_FREQ = 512;

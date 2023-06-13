@@ -47,7 +47,6 @@ void Wave<SZ>::setFrequency(int frequency)
     if (_frequency != frequency)
     {
         _frequency = frequency;
-        resetFrequencyTimer();
     }
 }
 
