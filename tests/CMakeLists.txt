@@ -122,7 +122,8 @@ add_executable(
         apu/test_length_timer.cpp
         apu/test_frame_sequencer.cpp
         apu/test_falling_edge_detector.cpp
-        apu/test_audio_mixer.cpp)
+        apu/test_audio_mixer.cpp
+        apu/test_wave.cpp)
 
 target_link_libraries(
         apu_tests

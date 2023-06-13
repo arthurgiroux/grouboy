@@ -3,6 +3,7 @@
 template <int SZ>
 Wave<SZ>::Wave()
 {
+    reset();
 }
 
 template <int SZ>
@@ -79,3 +80,5 @@ void Wave<SZ>::nextSample()
 {
     _wavePosition = (_wavePosition + 1) % SZ;
 }
+
+template class Wave<32>;
