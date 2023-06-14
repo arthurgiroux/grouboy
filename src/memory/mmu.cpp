@@ -40,7 +40,7 @@ const std::map<word, int> MMU::mappedIOMask = {
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
 
-const utils::AddressRange MMU::apuRegisterRange = utils::AddressRange(0xFF10, 0xFF26);
+const utils::AddressRange MMU::apuRegisterRange = utils::AddressRange(0xFF10, 0xFF3F);
 
 MMU::MMU()
 {
