@@ -126,8 +126,7 @@ byte APU::readRegister(const word& addr)
         // TODO: Handle reading from Wave RAM while channel is enabled
         int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
         int sampleIndex = relativeAddr / 2;
-        int nibbleIndex = relativeAddr % 2;
-        return (_channel3.getWave().getSample(sampleIndex) >> (nibbleIndex * 4)) & 0x0F;
+        return (_channel3.getWave().getSample(sampleIndex) << 4) | _channel3.getWave().getSample(sampleIndex + 1);
     }
 
     return 0;
@@ -192,10 +191,10 @@ void APU::writeRegister(const word& addr, const byte& value)
         }
         else if (addr == CH3_DAC_REG_ADDR)
         {
-            bool value = utils::isNthBitSet(value, 7);
-            _channel3.enableDAC(value);
+            bool dacValue = utils::isNthBitSet(value, 7);
+            _channel3.enableDAC(dacValue);
             // Disabling DAC also disables the channel
-            if (!value)
+            if (!dacValue)
             {
                 _channel3.enable(false);
             }
@@ -229,9 +228,8 @@ void APU::writeRegister(const word& addr, const byte& value)
         {
             int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
             int sampleIndex = relativeAddr / 2;
-            int nibbleIndex = relativeAddr % 2;
-            int currentSample = _channel3.getWave().getSample(sampleIndex);
-            _channel3.getWave().setSample(sampleIndex, currentSample & (value << (nibbleIndex * 4)));
+            _channel3.getWave().setSample(sampleIndex, (value >> 4) & 0x0F);
+            _channel3.getWave().setSample(sampleIndex + 1, value & 0x0F);
         }
     }
 
