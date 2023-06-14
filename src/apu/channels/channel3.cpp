@@ -79,7 +79,7 @@ void Channel3::tickLengthTimer()
 
 int Channel3::adjustVolume(int value)
 {
-    switch (value)
+    switch (_volumeCtrl)
     {
     case 0:
         return 0;
