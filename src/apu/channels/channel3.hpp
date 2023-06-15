@@ -10,7 +10,7 @@ class Channel3 : public Channel
   public:
     Channel3();
     ~Channel3() = default;
-    virtual float getAudioSample() override;
+    float getAudioSample() override;
     void step(int cycles) override;
     void trigger() override;
     void setWavelength(int wavelength);
