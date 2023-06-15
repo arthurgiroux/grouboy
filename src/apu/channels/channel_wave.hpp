@@ -18,23 +18,16 @@ class ChannelWave : public Channel
     void setWavelength(int wavelength);
     int getWavelength();
     SquareWave& getWave();
-    void setLengthTimer(int timer);
-    void enableLengthTimer(bool value);
-    bool isLengthTimerEnabled() const;
     void setVolumeControl(int value);
     int getVolumeControl() const;
 
   protected:
-    static const int LENGTH_TIMER_FREQ = 256;
     static const int VOLUME_SWEEP_FREQ = 64;
     static const int LENGTH_TIMER_DURATION = 64;
-    void tickLengthTimer();
     virtual void triggerImpl();
     VolumeSweep _volumeSweep;
     SquareWave _squareWave;
-    LengthTimer _lengthTimer = LengthTimer(LENGTH_TIMER_DURATION);
     int _wavelength = 0;
-    bool _lengthTimerEnabled = false;
     int _volumeCtrl = 0;
 };
 

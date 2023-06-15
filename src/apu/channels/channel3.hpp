@@ -16,19 +16,13 @@ class Channel3 : public Channel
     void setWavelength(int wavelength);
     int getWavelength();
     Wave<32>& getWave();
-    void setLengthTimer(int timer);
-    void enableLengthTimer(bool value);
-    bool isLengthTimerEnabled() const;
     void setVolumeControl(int value);
     int getVolumeControl() const;
 
   private:
-    static const int LENGTH_TIMER_FREQ = 256;
     static const int LENGTH_TIMER_DURATION = 256;
-    void tickLengthTimer();
     int adjustVolume(int value);
     Wave<32> _wave;
-    LengthTimer _lengthTimer = LengthTimer(LENGTH_TIMER_DURATION);
     int _wavelength = 0;
     bool _lengthTimerEnabled = false;
     int _volumeCtrl = 0;

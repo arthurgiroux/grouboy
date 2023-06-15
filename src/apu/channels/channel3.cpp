@@ -1,8 +1,7 @@
 #include "channel3.hpp"
 
-Channel3::Channel3()
+Channel3::Channel3() : Channel(LENGTH_TIMER_DURATION)
 {
-    _frameSequencer.addFrame(FrameSequencer::Frame([&] { tickLengthTimer(); }, LENGTH_TIMER_FREQ));
 }
 
 float Channel3::getAudioSample()
@@ -40,21 +39,6 @@ Wave<32>& Channel3::getWave()
     return _wave;
 }
 
-void Channel3::setLengthTimer(int timer)
-{
-    _lengthTimer.setStartValue(timer);
-}
-
-void Channel3::enableLengthTimer(bool value)
-{
-    _lengthTimerEnabled = value;
-}
-
-bool Channel3::isLengthTimerEnabled() const
-{
-    return _lengthTimerEnabled;
-}
-
 void Channel3::setVolumeControl(int value)
 {
     _volumeCtrl = value;
@@ -63,18 +47,6 @@ void Channel3::setVolumeControl(int value)
 int Channel3::getVolumeControl() const
 {
     return _volumeCtrl;
-}
-
-void Channel3::tickLengthTimer()
-{
-    if (_lengthTimerEnabled && !_enable)
-    {
-        _lengthTimer.tick();
-        if (_lengthTimer.isTimerElapsed())
-        {
-            enable(false);
-        }
-    }
 }
 
 int Channel3::adjustVolume(int value)
