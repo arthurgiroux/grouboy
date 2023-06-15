@@ -1,7 +1,8 @@
 #include "channel.hpp"
 
-Channel::Channel() : _frameSequencer(FRAME_SEQUENCER_FREQ)
+Channel::Channel(int lengthTimerDuration) : _frameSequencer(FRAME_SEQUENCER_FREQ), _lengthTimer(lengthTimerDuration)
 {
+    _frameSequencer.addFrame(FrameSequencer::Frame([&] { tickLengthTimer(); }, LENGTH_TIMER_FREQ));
 }
 
 bool Channel::isEnabled() const
@@ -39,4 +40,31 @@ float Channel::convertFromDigitalToAnalog(int value)
 void Channel::enable(bool value)
 {
     _enable = value;
+}
+
+void Channel::setLengthTimer(int timer)
+{
+    _lengthTimer.setStartValue(timer);
+}
+
+void Channel::enableLengthTimer(bool value)
+{
+    _lengthTimerEnabled = value;
+}
+
+bool Channel::isLengthTimerEnabled() const
+{
+    return _lengthTimerEnabled;
+}
+
+void Channel::tickLengthTimer()
+{
+    if (_lengthTimerEnabled && !_enable)
+    {
+        _lengthTimer.tick();
+        if (_lengthTimer.isTimerElapsed())
+        {
+            enable(false);
+        }
+    }
 }

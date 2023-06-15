@@ -2,10 +2,9 @@
 #include "channel.hpp"
 #include "common/utils.hpp"
 
-ChannelWave::ChannelWave() : Channel()
+ChannelWave::ChannelWave() : Channel(LENGTH_TIMER_DURATION)
 {
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { _volumeSweep.tick(); }, VOLUME_SWEEP_FREQ));
-    _frameSequencer.addFrame(FrameSequencer::Frame([&] { tickLengthTimer(); }, LENGTH_TIMER_FREQ));
 }
 
 float ChannelWave::getAudioSample()
@@ -52,21 +51,6 @@ SquareWave& ChannelWave::getWave()
     return _squareWave;
 }
 
-void ChannelWave::setLengthTimer(int timer)
-{
-    _lengthTimer.setStartValue(timer);
-}
-
-void ChannelWave::enableLengthTimer(bool value)
-{
-    _lengthTimerEnabled = value;
-}
-
-bool ChannelWave::isLengthTimerEnabled() const
-{
-    return _lengthTimerEnabled;
-}
-
 void ChannelWave::setVolumeControl(int value)
 {
     _volumeCtrl = value;
@@ -75,16 +59,4 @@ void ChannelWave::setVolumeControl(int value)
 int ChannelWave::getVolumeControl() const
 {
     return _volumeCtrl;
-}
-
-void ChannelWave::tickLengthTimer()
-{
-    if (_lengthTimerEnabled && !_enable)
-    {
-        _lengthTimer.tick();
-        if (_lengthTimer.isTimerElapsed())
-        {
-            enable(false);
-        }
-    }
 }
