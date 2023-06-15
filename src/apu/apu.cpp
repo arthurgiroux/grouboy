@@ -6,12 +6,13 @@ const utils::AddressRange APU::CH2_ADDR_RANGE = utils::AddressRange(0xFF15, 0xFF
 const utils::AddressRange APU::CH3_WAVE_PATTERN_ADDR = utils::AddressRange(0xFF30, 0xFF3F);
 
 APU::APU(Timer* timer, int samplingFrequency)
-    : _timer(timer), _samplingFrequency(samplingFrequency), _mixer(&_channel1, &_channel2, &_channel3, nullptr)
+    : _timer(timer), _samplingFrequency(samplingFrequency), _mixer(&_channel1, &_channel2, &_channel3, &_channel4)
 {
     _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
     _channels.push_back(&_channel1);
     _channels.push_back(&_channel2);
     _channels.push_back(&_channel3);
+    _channels.push_back(&_channel4);
 }
 
 void APU::step(int cycles)
@@ -99,7 +100,8 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == SOUND_CTRL_ADDR)
     {
-        return (_enabled << 7) | (_channel3.isEnabled() << 2) | (_channel2.isEnabled() << 1) | (_channel1.isEnabled());
+        return (_enabled << 7) | (_channel4.isEnabled() << 3) | (_channel3.isEnabled() << 2) |
+               (_channel2.isEnabled() << 1) | (_channel1.isEnabled());
     }
     else if (addr == CH3_DAC_REG_ADDR)
     {
@@ -127,6 +129,23 @@ byte APU::readRegister(const word& addr)
         int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
         int sampleIndex = relativeAddr / 2;
         return (_channel3.getWave().getSample(sampleIndex) << 4) | _channel3.getWave().getSample(sampleIndex + 1);
+    }
+    else if (addr == CH4_LENGTH_TIMER)
+    {
+        // TODO: Check if this is write-only
+        return 0xFF;
+    }
+    else if (addr == CH4_VOLUME_CTRL_ADDR)
+    {
+        return _channel4.getVolumeControl();
+    }
+    else if (addr == CH4_NOISE_CTRL_ADDR)
+    {
+        return _channel4.getNoiseControl();
+    }
+    else if (addr == CH4_NOISE_CTRL_ADDR)
+    {
+        return _channel4.isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
 
     return 0;
@@ -230,6 +249,26 @@ void APU::writeRegister(const word& addr, const byte& value)
             int sampleIndex = relativeAddr / 2;
             _channel3.getWave().setSample(sampleIndex, (value >> 4) & 0x0F);
             _channel3.getWave().setSample(sampleIndex + 1, value & 0x0F);
+        }
+        else if (addr == CH4_LENGTH_TIMER)
+        {
+            _channel4.setLengthTimer(value & 0b00111111);
+        }
+        else if (addr == CH4_VOLUME_CTRL_ADDR)
+        {
+            _channel4.setVolumeControl(value);
+        }
+        else if (addr == CH4_NOISE_CTRL_ADDR)
+        {
+            _channel4.setNoiseControl(value);
+        }
+        else if (addr == CH4_CHANNEL_CTRL_ADDR)
+        {
+            _channel4.enableLengthTimer(utils::isNthBitSet(value, 6));
+            if (utils::isNthBitSet(value, 7))
+            {
+                _channel4.trigger();
+            }
         }
     }
 

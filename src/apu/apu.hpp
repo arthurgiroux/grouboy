@@ -5,6 +5,7 @@
 #include "apu/channels/channel1.hpp"
 #include "apu/channels/channel2.hpp"
 #include "apu/channels/channel3.hpp"
+#include "apu/channels/channel4.hpp"
 #include "common/types.hpp"
 #include "signal/falling_edge_detector.hpp"
 #include "timer/timer.hpp"
@@ -44,6 +45,11 @@ class APU
     static const int CH3_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF1E;
     static const utils::AddressRange CH3_WAVE_PATTERN_ADDR;
 
+    static const int CH4_LENGTH_TIMER = 0xFF20;
+    static const int CH4_VOLUME_CTRL_ADDR = 0xFF21;
+    static const int CH4_NOISE_CTRL_ADDR = 0xFF22;
+    static const int CH4_CHANNEL_CTRL_ADDR = 0xFF23;
+
     static const int MASTER_VOLUME_ADDR = 0xFF24;
     static const int SOUND_PANNING_ADDR = 0xFF25;
     static const int SOUND_CTRL_ADDR = 0xFF26;
@@ -55,6 +61,7 @@ class APU
     Channel1 _channel1{};
     Channel2 _channel2{};
     Channel3 _channel3{};
+    Channel4 _channel4{};
     std::vector<Channel*> _channels = {};
     AudioMixer _mixer;
     int _samplingFrequency;
