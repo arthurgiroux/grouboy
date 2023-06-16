@@ -256,6 +256,15 @@ void APU::writeRegister(const word& addr, const byte& value)
         }
         else if (addr == CH4_VOLUME_CTRL_ADDR)
         {
+            if ((value & 0xF8) == 0)
+            {
+                _channel4.enableDAC(false);
+                _channel4.enable(false);
+            }
+            else
+            {
+                _channel4.enableDAC(true);
+            }
             _channel4.setVolumeControl(value);
         }
         else if (addr == CH4_NOISE_CTRL_ADDR)
@@ -265,7 +274,7 @@ void APU::writeRegister(const word& addr, const byte& value)
         else if (addr == CH4_CHANNEL_CTRL_ADDR)
         {
             _channel4.enableLengthTimer(utils::isNthBitSet(value, 6));
-            if (utils::isNthBitSet(value, 7))
+            if (utils::isNthBitSet(value, 7) && _channel4.isDACEnabled())
             {
                 _channel4.trigger();
             }
