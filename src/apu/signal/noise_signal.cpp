@@ -1,5 +1,6 @@
 #include "noise_signal.hpp"
 #include "common/utils.hpp"
+#include "spdlog/spdlog.h"
 
 NoiseSignal::NoiseSignal()
 {
@@ -60,7 +61,7 @@ bool NoiseSignal::isWideModeEnabled() const
 
 void NoiseSignal::nextSample()
 {
-    int val = (_lfsrValue & 0x01) ^ (_lfsrValue & 0x02);
+    int val = (~((_lfsrValue) ^ (_lfsrValue >> 1)) & 0x01);
     utils::setNthBit(_lfsrValue, 15, val);
     if (!_wideModeEnabled)
     {
