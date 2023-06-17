@@ -12,6 +12,7 @@ void LengthTimer::tick()
 void LengthTimer::setStartValue(int startValue)
 {
     _startValue = startValue;
+    restartTimer();
 }
 
 int LengthTimer::getStartValue() const
