@@ -18,7 +18,6 @@ void Channel3::trigger()
 {
     enable(true);
     _wave.reset();
-    _lengthTimer.restartTimer();
 }
 
 void Channel3::setWavelength(int wavelength)
