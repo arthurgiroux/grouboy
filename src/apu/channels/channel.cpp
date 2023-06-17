@@ -59,7 +59,7 @@ bool Channel::isLengthTimerEnabled() const
 
 void Channel::tickLengthTimer()
 {
-    if (_lengthTimerEnabled && !_enable)
+    if (_lengthTimerEnabled && _enable)
     {
         _lengthTimer.tick();
         if (_lengthTimer.isTimerElapsed())
