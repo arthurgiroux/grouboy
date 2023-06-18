@@ -114,3 +114,8 @@ TEST_F(BlarggTest, TestForInstrTimingShouldBeSuccessful)
 {
     assertTestForRomArePassing("instr_timing.gb");
 }
+
+TEST_F(BlarggTest, TestForSoundLengthTimerShouldBeSuccessful)
+{
+    assertTestForRomArePassing("sound/02-len ctr.gb");
+}
