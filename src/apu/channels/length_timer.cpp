@@ -29,3 +29,8 @@ void LengthTimer::restartTimer()
 {
     _ticksElapsed = _startValue;
 }
+
+int LengthTimer::getDuration() const
+{
+    return _durationInTicks;
+}

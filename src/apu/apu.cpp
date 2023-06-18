@@ -163,7 +163,7 @@ void APU::writeRegister(const word& addr, const byte& value)
         {
             ChannelWave& channel = getChannelWaveFromRegAddr(addr);
             channel.getWave().setDutyPattern(value >> 6);
-            channel.setLengthTimer(value & 0b00111111);
+            setLengthTimer(channel, value & 0b00111111);
         }
         else if (addr == CH1_VOLUME_CTRL_ADDR || addr == CH2_VOLUME_CTRL_ADDR)
         {
@@ -220,7 +220,7 @@ void APU::writeRegister(const word& addr, const byte& value)
         }
         else if (addr == CH3_LENGTH_TIMER_REG_ADDR)
         {
-            _channel3.setLengthTimer(value);
+            setLengthTimer(_channel3, value);
         }
         else if (addr == CH3_OUTPUT_LEVEL_ADDR)
         {
@@ -252,7 +252,7 @@ void APU::writeRegister(const word& addr, const byte& value)
         }
         else if (addr == CH4_LENGTH_TIMER)
         {
-            _channel4.setLengthTimer(value & 0b00111111);
+            setLengthTimer(_channel4, value & 0b00111111);
         }
         else if (addr == CH4_VOLUME_CTRL_ADDR)
         {
@@ -300,4 +300,14 @@ ChannelWave& APU::getChannelWaveFromRegAddr(word addr)
     }
 
     throw std::runtime_error("Couldn't infer APU channel from register address");
+}
+
+void APU::setLengthTimer(Channel& channel, int duration)
+{
+    // Quirky behavior, if the value is the max duration, then the timer is set to 0
+    if (duration == channel.getLengthTimerDuration())
+    {
+        duration = 0;
+    }
+    channel.setLengthTimer(duration);
 }

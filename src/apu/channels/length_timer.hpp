@@ -10,6 +10,7 @@ class LengthTimer
     void setStartValue(int startValue);
     int getStartValue() const;
     bool isTimerElapsed() const;
+    int getDuration() const;
 
   private:
     int _startValue = 0;

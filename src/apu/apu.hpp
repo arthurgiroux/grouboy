@@ -56,6 +56,7 @@ class APU
 
     void addSampleToAudioBuffer();
     ChannelWave& getChannelWaveFromRegAddr(word addr);
+    void setLengthTimer(Channel& channel, int duration);
 
     Timer* _timer;
     Channel1 _channel1{};

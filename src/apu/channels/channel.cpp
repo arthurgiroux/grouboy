@@ -68,3 +68,8 @@ void Channel::tickLengthTimer()
         }
     }
 }
+
+int Channel::getLengthTimerDuration() const
+{
+    return _lengthTimer.getDuration();
+}
