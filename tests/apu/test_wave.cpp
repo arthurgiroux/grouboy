@@ -34,6 +34,7 @@ TEST_F(WaveTest, StepShouldCycleCorrectlyThroughSamplesAndStartFrom2NdSample)
     }
 
     wave.setFrequency(frequency);
+    wave.resetFrequencyTimer();
     for (int i = 0; i < WAVE_SIZE - 1; ++i)
     {
         for (int j = 0; j < frequency; ++j)

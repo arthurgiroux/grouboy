@@ -16,9 +16,9 @@ class Wave
     int getFrequency() const;
     void setSample(int index, int value);
     byte getSample(int index) const;
+    void resetFrequencyTimer();
 
   private:
-    void resetFrequencyTimer();
     void nextSample();
     int _wavePosition = 0;
     int _frequencyTimerValue = 0;
