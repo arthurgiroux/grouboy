@@ -5,7 +5,7 @@
 class DummyChannel : public Channel
 {
   public:
-    DummyChannel(float sampleValue) : _sampleValue(sampleValue)
+    DummyChannel(float sampleValue) : Channel(LENGTH_TIMER_DURATION), _sampleValue(sampleValue)
     {
     }
 
@@ -33,6 +33,7 @@ class DummyChannel : public Channel
     }
 
   private:
+    static const int LENGTH_TIMER_DURATION = 64;
     float _sampleValue = 0.f;
 };
 
