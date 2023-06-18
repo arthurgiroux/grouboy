@@ -18,6 +18,10 @@ void Channel4::trigger()
     int volumeDirection = (utils::isNthBitSet(_volumeCtrl, 3) ? 1 : -1);
     _volumeSweep.setDirection(volumeDirection);
     _volumeSweep.setVolume((_volumeCtrl & 0b11110000) >> 4);
+    if (_lengthTimer.isTimerElapsed())
+    {
+        _lengthTimer.setStartValue(0);
+    }
     enable(true);
 }
 
