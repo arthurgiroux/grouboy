@@ -17,6 +17,10 @@ void Channel3::step(int cycles)
 void Channel3::trigger()
 {
     enable(true);
+    if (_lengthTimer.isTimerElapsed())
+    {
+        _lengthTimer.setStartValue(0);
+    }
     _wave.reset();
 }
 
