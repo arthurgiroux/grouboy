@@ -77,7 +77,7 @@ byte APU::readRegister(const word& addr)
 {
     if (addr == CH1_SWEEP_REG_ADDR)
     {
-        return _channel1.getSweepControl();
+        return 0b10000000 | _channel1.getSweepControl();
     }
     else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
     {
@@ -97,7 +97,7 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == SOUND_CTRL_ADDR)
     {
-        return (_enabled << 7) | (_channel4.isEnabled() << 3) | (_channel3.isEnabled() << 2) |
+        return 0b01110000 | (_enabled << 7) | (_channel4.isEnabled() << 3) | (_channel3.isEnabled() << 2) |
                (_channel2.isEnabled() << 1) | (_channel1.isEnabled());
     }
     else if (addr == CH3_DAC_REG_ADDR)
@@ -110,7 +110,7 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == CH3_OUTPUT_LEVEL_ADDR)
     {
-        return 0x9F & (_channel3.getVolumeControl() << 5);
+        return 0x9F | (_channel3.getVolumeControl() << 5);
     }
     else if (addr == CH3_WAVELENGTH_LOW_REG_ADDR)
     {
@@ -130,7 +130,7 @@ byte APU::readRegister(const word& addr)
     else if (addr == CH4_LENGTH_TIMER)
     {
         // TODO: Check if this is write-only
-        return 0xFF;
+        return 0b11000000;
     }
     else if (addr == CH4_VOLUME_CTRL_ADDR)
     {
@@ -140,7 +140,7 @@ byte APU::readRegister(const word& addr)
     {
         return _channel4.getNoiseControl();
     }
-    else if (addr == CH4_NOISE_CTRL_ADDR)
+    else if (addr == CH4_CHANNEL_CTRL_ADDR)
     {
         return _channel4.isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
