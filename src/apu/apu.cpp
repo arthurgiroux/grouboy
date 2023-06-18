@@ -24,10 +24,7 @@ void APU::step(int cycles)
         {
             for (Channel* channel : _channels)
             {
-                if (channel->isEnabled())
-                {
-                    channel->tickCounter();
-                }
+                channel->tickCounter();
             }
         }
 
