@@ -34,11 +34,20 @@ add_executable(
         cpu/test_cpu_instructions_misc_control.cpp
         cpu/test_cpu_instructions_16bits_arithmetic_logical.cpp
         cpu/test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        cpu/test_blargg.cpp
         apu/test_palette.cpp)
 
 target_link_libraries(
         cpu_tests
+        gbemulator_core
+        gtest_main
+)
+
+add_executable(
+        blargg_tests
+        test_blargg.cpp)
+
+target_link_libraries(
+        blargg_tests
         gbemulator_core
         gtest_main
 )
@@ -134,6 +143,7 @@ target_link_libraries(
 include(GoogleTest)
 gtest_discover_tests(utils_tests)
 gtest_discover_tests(cpu_tests PROPERTIES TIMEOUT 60)
+gtest_discover_tests(blargg_tests PROPERTIES TIMEOUT 60)
 gtest_discover_tests(ppu_tests)
 gtest_discover_tests(mmu_tests)
 gtest_discover_tests(serial_tests)
