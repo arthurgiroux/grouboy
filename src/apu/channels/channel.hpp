@@ -23,6 +23,7 @@ class Channel
     void setLengthTimer(int timer);
     void enableLengthTimer(bool value);
     bool isLengthTimerEnabled() const;
+    int getLengthTimerDuration() const;
 
   protected:
     static const int FRAME_SEQUENCER_FREQ = 512;
