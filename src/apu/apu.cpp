@@ -145,7 +145,8 @@ byte APU::readRegister(const word& addr)
         return _channel4.isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
 
-    return 0;
+    // Unmapped register should return FF
+    return 0xFF;
 }
 
 void APU::writeRegister(const word& addr, const byte& value)
