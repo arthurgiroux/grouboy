@@ -63,3 +63,42 @@ void AudioMixer::setPanningControlRight(int panningControl)
 {
     _panningControlRight = panningControl;
 }
+
+void AudioMixer::enableVinLeft(bool enable)
+{
+    _mixVinLeft = enable;
+}
+void AudioMixer::enableVinRight(bool enable)
+{
+    _mixVinRight = enable;
+}
+
+bool AudioMixer::isVinLeftEnabled() const
+{
+    return _mixVinLeft;
+}
+
+bool AudioMixer::isVinRightEnabled() const
+{
+    return _mixVinRight;
+}
+
+int AudioMixer::getVolumeScaleLeft() const
+{
+    return _volumeScaleLeft;
+}
+
+int AudioMixer::getVolumeScaleRight() const
+{
+    return _volumeScaleRight;
+}
+
+int AudioMixer::getPanningControlLeft() const
+{
+    return _panningControlLeft;
+}
+
+int AudioMixer::getPanningControlRight() const
+{
+    return _panningControlRight;
+}

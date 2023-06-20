@@ -19,8 +19,16 @@ class AudioMixer
     Sample getSample();
     void setVolumeScaleLeft(int scale);
     void setVolumeScaleRight(int scale);
+    int getVolumeScaleLeft() const;
+    int getVolumeScaleRight() const;
     void setPanningControlLeft(int panningControl);
     void setPanningControlRight(int panningControl);
+    int getPanningControlLeft() const;
+    int getPanningControlRight() const;
+    void enableVinLeft(bool enable);
+    void enableVinRight(bool enable);
+    bool isVinLeftEnabled() const;
+    bool isVinRightEnabled() const;
 
   private:
     static const int NBR_CHANNELS = 4;
@@ -34,6 +42,8 @@ class AudioMixer
     int _volumeScaleRight = 0;
     int _panningControlLeft = 0;
     int _panningControlRight = 0;
+    bool _mixVinLeft = false;
+    bool _mixVinRight = false;
 };
 
 #endif // GROUBOY_AUDIO_MIXER_HPP
