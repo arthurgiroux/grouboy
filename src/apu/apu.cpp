@@ -77,7 +77,7 @@ byte APU::readRegister(const word& addr)
 {
     if (addr == CH1_SWEEP_REG_ADDR)
     {
-        return 0b10000000 | _channel1.getSweepControl();
+        return 0x80 | _channel1.getSweepControl();
     }
     else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
     {
@@ -97,7 +97,7 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == SOUND_CTRL_ADDR)
     {
-        return 0b01110000 | (_enabled << 7) | (_channel4.isEnabled() << 3) | (_channel3.isEnabled() << 2) |
+        return 0x70 | (_enabled << 7) | (_channel4.isEnabled() << 3) | (_channel3.isEnabled() << 2) |
                (_channel2.isEnabled() << 1) | (_channel1.isEnabled());
     }
     else if (addr == CH3_DAC_REG_ADDR)
@@ -122,15 +122,13 @@ byte APU::readRegister(const word& addr)
     }
     else if (CH3_WAVE_PATTERN_ADDR.contains(addr))
     {
-        // TODO: Handle reading from Wave RAM while channel is enabled
         int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
         int sampleIndex = relativeAddr / 2;
         return (_channel3.getWave().getSample(sampleIndex) << 4) | _channel3.getWave().getSample(sampleIndex + 1);
     }
     else if (addr == CH4_LENGTH_TIMER)
     {
-        // TODO: Check if this is write-only
-        return 0b11000000;
+        return 0xFF;
     }
     else if (addr == CH4_VOLUME_CTRL_ADDR)
     {
@@ -143,6 +141,15 @@ byte APU::readRegister(const word& addr)
     else if (addr == CH4_CHANNEL_CTRL_ADDR)
     {
         return _channel4.isLengthTimerEnabled() ? 0xFF : 0xBF;
+    }
+    else if (addr == MASTER_VOLUME_ADDR)
+    {
+        return (_mixer.isVinLeftEnabled() << 7) | (_mixer.getVolumeScaleLeft() << 4) |
+               (_mixer.isVinRightEnabled() << 3) | _mixer.getVolumeScaleRight();
+    }
+    else if (addr == SOUND_PANNING_ADDR)
+    {
+        return (_mixer.getPanningControlLeft() << 4) | _mixer.getPanningControlRight();
     }
 
     // Unmapped register should return FF
@@ -198,6 +205,8 @@ void APU::writeRegister(const word& addr, const byte& value)
         }
         else if (addr == MASTER_VOLUME_ADDR)
         {
+            _mixer.enableVinLeft(utils::isNthBitSet(value, 7));
+            _mixer.enableVinRight(utils::isNthBitSet(value, 3));
             _mixer.setVolumeScaleRight(value & 0x7);
             _mixer.setVolumeScaleLeft((value >> 4) & 0x7);
         }
