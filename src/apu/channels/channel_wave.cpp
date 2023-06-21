@@ -20,7 +20,8 @@ void ChannelWave::step(int cycles)
 void ChannelWave::trigger()
 {
     enable(true);
-    _squareWave.reset();
+    _squareWave.setDutyPosition(0);
+    _squareWave.resetFrequencyTimer();
     _volumeSweep.setPeriod(_volumeCtrl & 0b00000111);
     int volumeDirection = (utils::isNthBitSet(_volumeCtrl, 3) ? 1 : -1);
     _volumeSweep.setDirection(volumeDirection);
@@ -62,4 +63,13 @@ void ChannelWave::setVolumeControl(int value)
 int ChannelWave::getVolumeControl() const
 {
     return _volumeCtrl;
+}
+
+void ChannelWave::reset()
+{
+    Channel::reset();
+    _wavelength = 0;
+    _volumeCtrl = 0;
+    _volumeSweep.reset();
+    _squareWave.reset();
 }

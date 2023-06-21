@@ -31,11 +31,18 @@ int Channel1::getSweepControl() const
 
 void Channel1::triggerImpl()
 {
-    int sweepDirection = (Channel1::_sweepControlValue & 0b00001000) >> 3;
-    int sweepPeriod = (Channel1::_sweepControlValue & 0b01110000) >> 4;
-    int shift = Channel1::_sweepControlValue & 0b00000111;
-    Channel1::_wavelengthSweep.setDirection(sweepDirection);
-    Channel1::_wavelengthSweep.setPeriod(sweepPeriod);
-    Channel1::_wavelengthSweep.setShift(shift);
-    Channel1::_wavelengthSweep.setWavelength(getWavelength());
+    int sweepDirection = (_sweepControlValue & 0b00001000) >> 3;
+    int sweepPeriod = (_sweepControlValue & 0b01110000) >> 4;
+    int shift = _sweepControlValue & 0b00000111;
+    _wavelengthSweep.setDirection(sweepDirection);
+    _wavelengthSweep.setPeriod(sweepPeriod);
+    _wavelengthSweep.setShift(shift);
+    _wavelengthSweep.setWavelength(getWavelength());
+}
+
+void Channel1::reset()
+{
+    ChannelWave::reset();
+    _sweepControlValue = 0;
+    _wavelengthSweep.reset();
 }

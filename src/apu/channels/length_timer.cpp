@@ -34,3 +34,9 @@ int LengthTimer::getDuration() const
 {
     return _durationInTicks;
 }
+
+void LengthTimer::reset()
+{
+    _startValue = 0;
+    _ticksElapsed = 0;
+}

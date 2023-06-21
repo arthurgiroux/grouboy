@@ -18,6 +18,7 @@ class Channel3 : public Channel
     Wave<32>& getWave();
     void setVolumeControl(int value);
     int getVolumeControl() const;
+    void reset() override;
 
   private:
     static const int LENGTH_TIMER_DURATION = 256;

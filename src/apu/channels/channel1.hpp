@@ -16,6 +16,7 @@ class Channel1 : public ChannelWave
     void setSweepControl(int value);
     int getSweepControl() const;
     ~Channel1() = default;
+    void reset() override;
 
   protected:
     void triggerImpl() override;

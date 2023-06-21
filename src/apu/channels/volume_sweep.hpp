@@ -11,6 +11,7 @@ class VolumeSweep
     int getPeriod() const;
     int getVolume() const;
     void tick();
+    void reset();
 
   private:
     int _volume = 0;

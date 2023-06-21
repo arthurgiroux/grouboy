@@ -65,3 +65,12 @@ int Channel4::getNoiseControl() const
 {
     return _noiseControl;
 }
+
+void Channel4::reset()
+{
+    Channel::reset();
+    _volumeSweep.reset();
+    _noiseSignal.reset();
+    _volumeCtrl = 0;
+    _noiseControl = 0;
+}

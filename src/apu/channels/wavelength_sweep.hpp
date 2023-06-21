@@ -21,6 +21,7 @@ class WavelengthSweep
     int getShift() const;
     void setWavelengthChangedCallback(WavelengthChangedCallback cb);
     void setWavelengthOverflowCallback(WavelengthOverflowCallback cb);
+    void reset();
 
   private:
     WavelengthChangedCallback _wavelengthChangedCallback;

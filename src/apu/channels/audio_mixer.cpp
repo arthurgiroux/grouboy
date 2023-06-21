@@ -102,3 +102,13 @@ int AudioMixer::getPanningControlRight() const
 {
     return _panningControlRight;
 }
+
+void AudioMixer::reset()
+{
+    _volumeScaleLeft = 0;
+    _volumeScaleRight = 0;
+    _panningControlLeft = 0;
+    _panningControlRight = 0;
+    _mixVinLeft = false;
+    _mixVinRight = false;
+}
