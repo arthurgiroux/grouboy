@@ -29,6 +29,7 @@ class AudioMixer
     void enableVinRight(bool enable);
     bool isVinLeftEnabled() const;
     bool isVinRightEnabled() const;
+    void reset();
 
   private:
     static const int NBR_CHANNELS = 4;

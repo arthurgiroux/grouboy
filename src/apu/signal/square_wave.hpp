@@ -15,10 +15,11 @@ class SquareWave
     int getFrequency() const;
     void setDutyPattern(int pattern);
     int getDutyPattern() const;
+    void resetFrequencyTimer();
+    void setDutyPosition(int index);
 
   private:
     static constexpr std::array<int, 4> _wavePatterns = {0b00000001, 0b10000001, 0b10000111, 0b01111110};
-    void resetFrequencyTimer();
     void nextWaveValue();
     int _waveDutyPosition = 0;
     int _dutyPattern = 0;

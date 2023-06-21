@@ -15,6 +15,7 @@ class Channel4 : public Channel
     float getAudioSample() override;
     void setNoiseControl(int control);
     int getNoiseControl() const;
+    void reset() override;
 
   private:
     static const int LENGTH_TIMER_DURATION = 64;

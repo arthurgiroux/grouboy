@@ -24,7 +24,7 @@ TEST_F(WaveTest, SetSampleShouldChangeSample)
     }
 }
 
-TEST_F(WaveTest, StepShouldCycleCorrectlyThroughSamplesAndStartFrom2NdSample)
+TEST_F(WaveTest, StepShouldCycleCorrectlyThroughSamples)
 {
     int frequency = 2048;
     for (int i = 0; i < WAVE_SIZE; ++i)
@@ -35,11 +35,11 @@ TEST_F(WaveTest, StepShouldCycleCorrectlyThroughSamplesAndStartFrom2NdSample)
 
     wave.setFrequency(frequency);
     wave.resetFrequencyTimer();
-    for (int i = 0; i < WAVE_SIZE - 1; ++i)
+    for (int i = 0; i < WAVE_SIZE; ++i)
     {
         for (int j = 0; j < frequency; ++j)
         {
-            ASSERT_EQ(wave.getAmplitude(), i + 2);
+            ASSERT_EQ(wave.getAmplitude(), i + 1);
             wave.step(1);
         }
     }
@@ -55,7 +55,7 @@ TEST_F(WaveTest, StepShouldRewindBackToFirstSampleWhenSignalSizeReached)
     }
 
     wave.setFrequency(frequency);
-    for (int i = 0; i < WAVE_SIZE - 2; ++i)
+    for (int i = 0; i < WAVE_SIZE - 1; ++i)
     {
         wave.step(frequency);
     }

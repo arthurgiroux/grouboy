@@ -52,3 +52,11 @@ int VolumeSweep::getPeriod() const
 {
     return _period;
 }
+
+void VolumeSweep::reset()
+{
+    _volume = 0;
+    _direction = 1;
+    _period = 0;
+    _timer = 0;
+}

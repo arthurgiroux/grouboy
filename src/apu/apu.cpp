@@ -289,7 +289,9 @@ void APU::writeRegister(const word& addr, const byte& value)
             for (auto& channel : _channels)
             {
                 channel->enable(false);
+                channel->reset();
             }
+            _mixer.reset();
         }
     }
     else if (CH3_WAVE_PATTERN_ADDR.contains(addr))

@@ -20,6 +20,7 @@ class ChannelWave : public Channel
     SquareWave& getWave();
     void setVolumeControl(int value);
     int getVolumeControl() const;
+    virtual void reset() override;
 
   protected:
     static const int VOLUME_SWEEP_FREQ = 64;

@@ -99,3 +99,12 @@ int WavelengthSweep::getWavelength() const
 {
     return _wavelength;
 }
+
+void WavelengthSweep::reset()
+{
+    _timer = 0;
+    _period = 0;
+    _wavelength = 0;
+    _sign = 1;
+    _shift = 0;
+}

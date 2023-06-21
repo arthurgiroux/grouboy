@@ -9,9 +9,7 @@ Wave<SZ>::Wave()
 template <int SZ>
 void Wave<SZ>::reset()
 {
-    // Quirk: the initial wave position is 1 and not 0.
-    // Source: https://github.com/LIJI32/SameSuite/blob/master/apu/channel_3/channel_3_first_sample.asm
-    _wavePosition = 1;
+    _wavePosition = 0;
     resetFrequencyTimer();
 }
 
@@ -78,6 +76,12 @@ template <int SZ>
 void Wave<SZ>::nextSample()
 {
     _wavePosition = (_wavePosition + 1) % SZ;
+}
+
+template <int SZ>
+void Wave<SZ>::setPosition(int index)
+{
+    _wavePosition = index;
 }
 
 template class Wave<32>;

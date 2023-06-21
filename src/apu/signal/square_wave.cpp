@@ -66,5 +66,12 @@ int SquareWave::getFrequency() const
 void SquareWave::reset()
 {
     _waveDutyPosition = 0;
+    _dutyPattern = 0;
+    _frequency = 0;
     resetFrequencyTimer();
+}
+
+void SquareWave::setDutyPosition(int index)
+{
+    _waveDutyPosition = 0;
 }

@@ -73,3 +73,10 @@ int Channel::getLengthTimerDuration() const
 {
     return _lengthTimer.getDuration();
 }
+
+void Channel::reset()
+{
+    _isDACEnabled = false;
+    _lengthTimerEnabled = false;
+    _lengthTimer.reset();
+}
