@@ -123,7 +123,7 @@ byte APU::readRegister(const word& addr)
     else if (CH3_WAVE_PATTERN_ADDR.contains(addr))
     {
         int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
-        int sampleIndex = relativeAddr / 2;
+        int sampleIndex = relativeAddr * 2;
         return (_channel3.getWave().getSample(sampleIndex) << 4) | _channel3.getWave().getSample(sampleIndex + 1);
     }
     else if (addr == CH4_LENGTH_TIMER)
@@ -250,13 +250,6 @@ void APU::writeRegister(const word& addr, const byte& value)
                 _channel3.trigger();
             }
         }
-        else if (CH3_WAVE_PATTERN_ADDR.contains(addr))
-        {
-            int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
-            int sampleIndex = relativeAddr / 2;
-            _channel3.getWave().setSample(sampleIndex, (value >> 4) & 0x0F);
-            _channel3.getWave().setSample(sampleIndex + 1, value & 0x0F);
-        }
         else if (addr == CH4_LENGTH_TIMER)
         {
             setLengthTimer(_channel4, value & 0b00111111);
@@ -298,6 +291,13 @@ void APU::writeRegister(const word& addr, const byte& value)
                 channel->enable(false);
             }
         }
+    }
+    else if (CH3_WAVE_PATTERN_ADDR.contains(addr))
+    {
+        int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
+        int sampleIndex = relativeAddr * 2;
+        _channel3.getWave().setSample(sampleIndex, (value >> 4) & 0x0F);
+        _channel3.getWave().setSample(sampleIndex + 1, value & 0x0F);
     }
 }
 
