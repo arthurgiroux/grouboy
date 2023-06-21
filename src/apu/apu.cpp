@@ -290,7 +290,14 @@ void APU::writeRegister(const word& addr, const byte& value)
 
     if (addr == SOUND_CTRL_ADDR)
     {
-        _enabled = value >> 7;
+        _enabled = (value >> 7);
+        if (!_enabled)
+        {
+            for (auto& channel : _channels)
+            {
+                channel->enable(false);
+            }
+        }
     }
 }
 
