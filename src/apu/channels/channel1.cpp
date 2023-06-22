@@ -34,7 +34,7 @@ void Channel1::triggerImpl()
     int sweepDirection = (_sweepControlValue & 0b00001000) >> 3;
     int sweepPeriod = (_sweepControlValue & 0b01110000) >> 4;
     int shift = _sweepControlValue & 0b00000111;
-    _wavelengthSweep.setDirection(sweepDirection);
+    _wavelengthSweep.setDirection(sweepDirection ? -1 : 1);
     _wavelengthSweep.setPeriod(sweepPeriod);
     _wavelengthSweep.setShift(shift);
     _wavelengthSweep.setWavelength(getWavelength());
