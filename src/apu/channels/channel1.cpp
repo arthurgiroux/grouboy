@@ -38,6 +38,8 @@ void Channel1::triggerImpl()
     _wavelengthSweep.setPeriod(sweepPeriod);
     _wavelengthSweep.setShift(shift);
     _wavelengthSweep.setWavelength(getWavelength());
+    _wavelengthSweep.setEnabled(shift > 0 || sweepPeriod > 0);
+    _wavelengthSweep.trigger();
 }
 
 void Channel1::reset()
