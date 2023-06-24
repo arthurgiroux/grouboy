@@ -22,17 +22,21 @@ class WavelengthSweep
     void setWavelengthChangedCallback(WavelengthChangedCallback cb);
     void setWavelengthOverflowCallback(WavelengthOverflowCallback cb);
     void reset();
+    void trigger();
+    void setEnabled(bool value);
 
   private:
     WavelengthChangedCallback _wavelengthChangedCallback;
     WavelengthOverflowCallback _wavelengthOverflowCallback;
     int generateNewWavelength() const;
     bool didWavelengthOverflow(int wavelength) const;
+    void resetTimer();
     int _timer = 0;
     int _period = 0;
     int _wavelength = 0;
     int _sign = 1;
     int _shift = 0;
+    bool _enabled = false;
 };
 
 #endif // GROUBOY_WAVELENGTH_SWEEP_HPP

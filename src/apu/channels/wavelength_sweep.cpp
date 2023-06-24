@@ -10,8 +10,7 @@ void WavelengthSweep::tick()
 
     if (_timer <= 0)
     {
-        // TODO: check about 8 value
-        _timer = _period ? _period : 8;
+        resetTimer();
 
         if (_period > 0 && _enabled)
         {
@@ -38,6 +37,7 @@ void WavelengthSweep::tick()
 
 void WavelengthSweep::trigger()
 {
+    resetTimer();
     if (_shift > 0)
     {
         int newWavelength = generateNewWavelength();
@@ -53,6 +53,12 @@ void WavelengthSweep::trigger()
             _wavelengthOverflowCallback();
         }
     }
+}
+
+void WavelengthSweep::resetTimer()
+{
+    // Quirky behavior: When the period is zero the timer is set to 8
+    _timer = _period > 0 ? _period : 8;
 }
 
 bool WavelengthSweep::didWavelengthOverflow(int wavelength) const
@@ -77,10 +83,6 @@ int WavelengthSweep::getPeriod() const
 
 void WavelengthSweep::setPeriod(int period)
 {
-    if (_period == 0)
-    {
-        _timer = period;
-    }
     _period = period;
 }
 
