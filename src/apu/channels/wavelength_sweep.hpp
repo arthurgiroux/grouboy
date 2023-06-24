@@ -24,13 +24,13 @@ class WavelengthSweep
     void reset();
     void trigger();
     void setEnabled(bool value);
+    void resetTimer();
 
   private:
     WavelengthChangedCallback _wavelengthChangedCallback;
     WavelengthOverflowCallback _wavelengthOverflowCallback;
     int generateNewWavelength() const;
     bool didWavelengthOverflow(int wavelength) const;
-    void resetTimer();
     int _timer = 0;
     int _period = 0;
     int _wavelength = 0;
