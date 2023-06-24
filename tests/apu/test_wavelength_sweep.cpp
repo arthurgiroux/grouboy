@@ -72,6 +72,8 @@ TEST_F(WavelengthSweepTest, TickWhenPeriodIsSetAndDirectionIsPositiveShouldIncre
     int direction = 1;
     wavelengthSweep.setDirection(direction);
     ASSERT_EQ(wavelengthSweep.getDirection(), direction);
+    wavelengthSweep.setEnabled(true);
+    wavelengthSweep.resetTimer();
 
     for (int i = 0; i < period - 1; ++i)
     {
@@ -102,6 +104,10 @@ TEST_F(WavelengthSweepTest, TickWhenPeriodIsSetAndDirectionIsNegativeShouldDecre
     int direction = -1;
     wavelengthSweep.setDirection(direction);
     ASSERT_EQ(wavelengthSweep.getDirection(), direction);
+
+    wavelengthSweep.setEnabled(true);
+    wavelengthSweep.resetTimer();
+
     for (int i = 0; i < period - 1; ++i)
     {
         wavelengthSweep.tick();
@@ -131,6 +137,9 @@ TEST_F(WavelengthSweepTest, TickWhenWavelengthOverflowsShouldNotChangeWavelength
     int direction = 1;
     wavelengthSweep.setDirection(direction);
     ASSERT_EQ(wavelengthSweep.getDirection(), direction);
+    wavelengthSweep.setEnabled(true);
+    wavelengthSweep.resetTimer();
+
     for (int i = 0; i < period - 1; ++i)
     {
         wavelengthSweep.tick();
@@ -160,6 +169,9 @@ TEST_F(WavelengthSweepTest, TickWhenWavelengthPostOverflowsShouldChangeWavelengt
     int direction = 1;
     wavelengthSweep.setDirection(direction);
     ASSERT_EQ(wavelengthSweep.getDirection(), direction);
+    wavelengthSweep.setEnabled(true);
+    wavelengthSweep.resetTimer();
+
     for (int i = 0; i < period - 1; ++i)
     {
         wavelengthSweep.tick();
