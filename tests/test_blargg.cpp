@@ -124,3 +124,8 @@ TEST_F(BlarggTest, TestForSoundLengthTimerShouldBeSuccessful)
 {
     assertTestForRomArePassing("sound/02-len ctr.gb");
 }
+
+TEST_F(BlarggTest, TestForSoundWavelengthSweepShouldBeSuccessful)
+{
+    assertTestForRomArePassing("sound/04-sweep.gb");
+}
