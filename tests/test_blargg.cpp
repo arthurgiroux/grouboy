@@ -129,3 +129,8 @@ TEST_F(BlarggTest, TestForSoundWavelengthSweepShouldBeSuccessful)
 {
     assertTestForRomArePassing("sound/04-sweep.gb");
 }
+
+TEST_F(BlarggTest, TestForSoundOverflowOnTriggerShouldBeSuccessful)
+{
+    assertTestForRomArePassing("sound/06-overflow on trigger.gb");
+}
