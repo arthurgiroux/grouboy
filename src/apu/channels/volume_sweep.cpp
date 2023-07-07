@@ -17,6 +17,7 @@ void VolumeSweep::setDirection(int sign)
 void VolumeSweep::setPeriod(int period)
 {
     _period = period;
+    // Setting the period will restart the timer
     _timer = period;
 }
 
@@ -37,6 +38,8 @@ void VolumeSweep::tick()
     {
         _timer = _period;
         _volume = (_volume + _direction);
+
+        // If the value underflows or overflows, we loop it back
         if (_volume < 0)
         {
             _volume = 0xF;
