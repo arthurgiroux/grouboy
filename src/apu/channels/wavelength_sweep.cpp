@@ -38,6 +38,7 @@ void WavelengthSweep::tick()
 void WavelengthSweep::trigger()
 {
     resetTimer();
+    // When triggering from a channel, the wavelength should be updated if necessary
     if (_shift > 0)
     {
         int newWavelength = generateNewWavelength();

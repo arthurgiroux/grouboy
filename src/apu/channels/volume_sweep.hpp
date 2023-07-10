@@ -35,7 +35,7 @@ class VolumeSweep
 
     /**
      * Get the period
-     * @return the number of ticks
+     * @return the period in number of ticks
      */
     int getPeriod() const;
 
