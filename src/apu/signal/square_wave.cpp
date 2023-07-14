@@ -73,5 +73,5 @@ void SquareWave::reset()
 
 void SquareWave::setDutyPosition(int index)
 {
-    _waveDutyPosition = 0;
+    _waveDutyPosition = index;
 }

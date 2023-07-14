@@ -38,3 +38,11 @@ TEST_F(SquareWaveTest, StepShouldCycleCorrectlyThroughPattern)
         }
     }
 }
+
+TEST_F(SquareWaveTest, SetDutyPositionShouldSetThePosition)
+{
+    ASSERT_EQ(wave.getAmplitude(), 1);
+    int dutyPosition = 7;
+    wave.setDutyPosition(dutyPosition);
+    ASSERT_EQ(wave.getAmplitude(), 0);
+}
