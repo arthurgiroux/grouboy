@@ -1,4 +1,5 @@
 #include "falling_edge_detector.hpp"
+
 FallingEdgeDetector::FallingEdgeDetector()
 {
 }
