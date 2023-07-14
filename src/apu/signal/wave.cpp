@@ -55,7 +55,7 @@ int Wave<SZ>::getFrequency() const
 }
 
 template <int SZ>
-void Wave<SZ>::setSample(int index, int value)
+void Wave<SZ>::setSample(int index, byte value)
 {
     _waveSamples[index] = value;
 }
