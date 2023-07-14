@@ -1,6 +1,5 @@
 #include "noise_signal.hpp"
 #include "common/utils.hpp"
-#include "spdlog/spdlog.h"
 
 NoiseSignal::NoiseSignal()
 {
@@ -61,6 +60,20 @@ bool NoiseSignal::isWideModeEnabled() const
 
 void NoiseSignal::nextSample()
 {
+    /*
+     *              bit operations of the LFSR
+     *
+     * ┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+     * │ 15│ 14│ 13│ 12│ 11│ 10│ 9 │ 8 │ 7 │ 6 │ 5 │ 4 │ 3 │ 2 │ 1 │ 0 │
+     * │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │
+     * └─▲─┴───┴───┴───┴───┴───┴───┴───┴─▲─┴───┴───┴───┴───┴───┴─┬─┴─┬─┘
+     *   │                               │                       │   │
+     *   │                        narrow mode only     ┌────┐    │   │
+     *   │                               │             │    │◄───┘   │
+     *   └───────────────────────────────┴─────────────┤NXOR│        │
+     *                                                 │    │◄───────┘
+     *                                                 └────┘
+     */
     int val = (~((_lfsrValue) ^ (_lfsrValue >> 1)) & 0x01);
     utils::setNthBit(_lfsrValue, 15, val);
     if (!_wideModeEnabled)
