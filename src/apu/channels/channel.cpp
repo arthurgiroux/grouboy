@@ -1,6 +1,7 @@
 #include "channel.hpp"
 
-Channel::Channel(int lengthTimerDuration) : _frameSequencer(FRAME_SEQUENCER_FREQ), _lengthTimer(lengthTimerDuration)
+Channel::Channel(int lengthTimerDuration, float highpassCoeff)
+    : _frameSequencer(FRAME_SEQUENCER_FREQ), _lengthTimer(lengthTimerDuration), _highpassFilter(highpassCoeff)
 {
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { tickLengthTimer(); }, LENGTH_TIMER_FREQ));
 }
@@ -34,7 +35,9 @@ float Channel::convertFromDigitalToAnalog(int value)
 
     // We convert a value from [0, 15] to [-1, 1]
     // Note: the slope direction is negative, 0 gets mapped to 1 and 15 to -1
-    return -(value / 7.5f - 1.0f);
+    float in = -(value / 7.5f - 1.0f);
+
+    return _highpassFilter.filterValue(in);
 }
 
 void Channel::enable(bool value)

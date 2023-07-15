@@ -1,6 +1,7 @@
 #ifndef GROUBOY_CHANNEL_HPP
 #define GROUBOY_CHANNEL_HPP
 
+#include "apu/filters/highpass_filter.hpp"
 #include "apu/signal/square_wave.hpp"
 #include "frame_sequencer.hpp"
 #include "length_timer.hpp"
@@ -10,7 +11,7 @@
 class Channel
 {
   public:
-    explicit Channel(int lengthTimerDuration);
+    explicit Channel(int lengthTimerDuration, float highpassCoeff);
     virtual ~Channel() = default;
     virtual float getAudioSample() = 0;
     virtual void trigger() = 0;
@@ -36,6 +37,7 @@ class Channel
     FrameSequencer _frameSequencer;
     LengthTimer _lengthTimer;
     bool _lengthTimerEnabled = false;
+    HighpassFilter _highpassFilter;
 };
 
 #endif // GROUBOY_CHANNEL_HPP

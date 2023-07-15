@@ -89,7 +89,9 @@ set(SOURCE_FILES
         src/apu/channels/channel4.cpp
         src/apu/channels/channel4.hpp
         src/apu/signal/noise_signal.cpp
-        src/apu/signal/noise_signal.hpp)
+        src/apu/signal/noise_signal.hpp
+        src/apu/filters/highpass_filter.cpp
+        src/apu/filters/highpass_filter.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)

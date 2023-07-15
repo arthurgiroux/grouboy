@@ -6,7 +6,7 @@
 class Channel2 : public ChannelWave
 {
   public:
-    explicit Channel2();
+    explicit Channel2(float highpassCoeff);
     ~Channel2() = default;
 };
 

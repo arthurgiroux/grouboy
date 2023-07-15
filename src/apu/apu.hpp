@@ -54,21 +54,27 @@ class APU
     static const int SOUND_PANNING_ADDR = 0xFF25;
     static const int SOUND_CTRL_ADDR = 0xFF26;
 
+    /**
+     * High-pass filter coefficient that is close to real hardware behavior.
+     * See https://gbdev.gg8.se/wiki/articles/Gameboy_sound_hardware#Obscure_Behavior
+     */
+    static constexpr float HIGHPASS_BASE_COEFF = 0.999958f;
+
     void addSampleToAudioBuffer();
     ChannelWave& getChannelWaveFromRegAddr(word addr);
     void setLengthTimer(Channel& channel, int duration);
 
     Timer* _timer;
-    Channel1 _channel1{};
-    Channel2 _channel2{};
-    Channel3 _channel3{};
-    Channel4 _channel4{};
+    std::unique_ptr<Channel1> _channel1;
+    std::unique_ptr<Channel2> _channel2;
+    std::unique_ptr<Channel3> _channel3;
+    std::unique_ptr<Channel4> _channel4;
     std::vector<Channel*> _channels = {};
-    AudioMixer _mixer;
+    std::unique_ptr<AudioMixer> _mixer;
     int _samplingFrequency;
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;
-    AudioBuffer _audioBuffer = {};
+    AudioBuffer _audioBuffer = {0};
     FallingEdgeDetector _fallingEdgeDetector;
     bool _enabled = false;
 };
