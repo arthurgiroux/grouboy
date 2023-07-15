@@ -5,14 +5,22 @@ const utils::AddressRange APU::CH1_ADDR_RANGE = utils::AddressRange(0xFF10, 0xFF
 const utils::AddressRange APU::CH2_ADDR_RANGE = utils::AddressRange(0xFF15, 0xFF19);
 const utils::AddressRange APU::CH3_WAVE_PATTERN_ADDR = utils::AddressRange(0xFF30, 0xFF3F);
 
-APU::APU(Timer* timer, int samplingFrequency)
-    : _timer(timer), _samplingFrequency(samplingFrequency), _mixer(&_channel1, &_channel2, &_channel3, &_channel4)
+APU::APU(Timer* timer, int samplingFrequency) : _timer(timer), _samplingFrequency(samplingFrequency)
 {
-    _numberOfCyclesPerAudioSample = CPU::CLOCK_FREQUENCY_HZ / _samplingFrequency;
-    _channels.push_back(&_channel1);
-    _channels.push_back(&_channel2);
-    _channels.push_back(&_channel3);
-    _channels.push_back(&_channel4);
+    float subsamplingRatio = CPU::CLOCK_FREQUENCY_HZ / static_cast<float>(samplingFrequency);
+    float highpassCoeff = std::pow(HIGHPASS_BASE_COEFF, subsamplingRatio);
+
+    _channel1 = std::make_unique<Channel1>(highpassCoeff);
+    _channel2 = std::make_unique<Channel2>(highpassCoeff);
+    _channel3 = std::make_unique<Channel3>(highpassCoeff);
+    _channel4 = std::make_unique<Channel4>(highpassCoeff);
+
+    _mixer = std::make_unique<AudioMixer>(_channel1.get(), _channel2.get(), _channel3.get(), _channel4.get());
+    _numberOfCyclesPerAudioSample = static_cast<int>(subsamplingRatio);
+    _channels.push_back(_channel1.get());
+    _channels.push_back(_channel2.get());
+    _channels.push_back(_channel3.get());
+    _channels.push_back(_channel4.get());
 }
 
 void APU::step(int cycles)
@@ -50,7 +58,7 @@ void APU::addSampleToAudioBuffer()
     AudioMixer::Sample sample{0.0f, 0.0f};
     if (_enabled)
     {
-        sample = _mixer.getSample();
+        sample = _mixer->getSample();
     }
 
     _audioBuffer.push_back(sample.left);
@@ -77,7 +85,7 @@ byte APU::readRegister(const word& addr)
 {
     if (addr == CH1_SWEEP_REG_ADDR)
     {
-        return 0x80 | _channel1.getSweepControl();
+        return 0x80 | _channel1->getSweepControl();
     }
     else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
     {
@@ -97,12 +105,12 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == SOUND_CTRL_ADDR)
     {
-        return 0x70 | (_enabled << 7) | (_channel4.isEnabled() << 3) | (_channel3.isEnabled() << 2) |
-               (_channel2.isEnabled() << 1) | (_channel1.isEnabled());
+        return 0x70 | (_enabled << 7) | (_channel4->isEnabled() << 3) | (_channel3->isEnabled() << 2) |
+               (_channel2->isEnabled() << 1) | (_channel1->isEnabled());
     }
     else if (addr == CH3_DAC_REG_ADDR)
     {
-        return 0x7F | (_channel3.isDACEnabled() << 7);
+        return 0x7F | (_channel3->isDACEnabled() << 7);
     }
     else if (addr == CH3_LENGTH_TIMER_REG_ADDR)
     {
@@ -110,7 +118,7 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == CH3_OUTPUT_LEVEL_ADDR)
     {
-        return 0x9F | (_channel3.getVolumeControl() << 5);
+        return 0x9F | (_channel3->getVolumeControl() << 5);
     }
     else if (addr == CH3_WAVELENGTH_LOW_REG_ADDR)
     {
@@ -118,13 +126,13 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == CH3_WAVELENGTH_AND_CONTROL_REG_ADDR)
     {
-        return _channel3.isLengthTimerEnabled() ? 0xFF : 0xBF;
+        return _channel3->isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
     else if (CH3_WAVE_PATTERN_ADDR.contains(addr))
     {
         int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
         int sampleIndex = relativeAddr * 2;
-        return (_channel3.getWave().getSample(sampleIndex) << 4) | _channel3.getWave().getSample(sampleIndex + 1);
+        return (_channel3->getWave().getSample(sampleIndex) << 4) | _channel3->getWave().getSample(sampleIndex + 1);
     }
     else if (addr == CH4_LENGTH_TIMER)
     {
@@ -132,24 +140,24 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == CH4_VOLUME_CTRL_ADDR)
     {
-        return _channel4.getVolumeControl();
+        return _channel4->getVolumeControl();
     }
     else if (addr == CH4_NOISE_CTRL_ADDR)
     {
-        return _channel4.getNoiseControl();
+        return _channel4->getNoiseControl();
     }
     else if (addr == CH4_CHANNEL_CTRL_ADDR)
     {
-        return _channel4.isLengthTimerEnabled() ? 0xFF : 0xBF;
+        return _channel4->isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
     else if (addr == MASTER_VOLUME_ADDR)
     {
-        return (_mixer.isVinLeftEnabled() << 7) | (_mixer.getVolumeScaleLeft() << 4) |
-               (_mixer.isVinRightEnabled() << 3) | _mixer.getVolumeScaleRight();
+        return (_mixer->isVinLeftEnabled() << 7) | (_mixer->getVolumeScaleLeft() << 4) |
+               (_mixer->isVinRightEnabled() << 3) | _mixer->getVolumeScaleRight();
     }
     else if (addr == SOUND_PANNING_ADDR)
     {
-        return (_mixer.getPanningControlLeft() << 4) | _mixer.getPanningControlRight();
+        return (_mixer->getPanningControlLeft() << 4) | _mixer->getPanningControlRight();
     }
 
     // Unmapped register should return FF
@@ -162,7 +170,7 @@ void APU::writeRegister(const word& addr, const byte& value)
     {
         if (addr == CH1_SWEEP_REG_ADDR)
         {
-            _channel1.setSweepControl(value);
+            _channel1->setSweepControl(value);
         }
         else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
         {
@@ -205,78 +213,78 @@ void APU::writeRegister(const word& addr, const byte& value)
         }
         else if (addr == MASTER_VOLUME_ADDR)
         {
-            _mixer.enableVinLeft(utils::isNthBitSet(value, 7));
-            _mixer.enableVinRight(utils::isNthBitSet(value, 3));
-            _mixer.setVolumeScaleRight(value & 0x7);
-            _mixer.setVolumeScaleLeft((value >> 4) & 0x7);
+            _mixer->enableVinLeft(utils::isNthBitSet(value, 7));
+            _mixer->enableVinRight(utils::isNthBitSet(value, 3));
+            _mixer->setVolumeScaleRight(value & 0x7);
+            _mixer->setVolumeScaleLeft((value >> 4) & 0x7);
         }
         else if (addr == SOUND_PANNING_ADDR)
         {
-            _mixer.setPanningControlRight(value & 0xF);
-            _mixer.setPanningControlLeft((value >> 4) & 0xF);
+            _mixer->setPanningControlRight(value & 0xF);
+            _mixer->setPanningControlLeft((value >> 4) & 0xF);
         }
         else if (addr == CH3_DAC_REG_ADDR)
         {
             bool dacValue = utils::isNthBitSet(value, 7);
-            _channel3.enableDAC(dacValue);
+            _channel3->enableDAC(dacValue);
             // Disabling DAC also disables the channel
             if (!dacValue)
             {
-                _channel3.enable(false);
+                _channel3->enable(false);
             }
         }
         else if (addr == CH3_LENGTH_TIMER_REG_ADDR)
         {
-            setLengthTimer(_channel3, value);
+            setLengthTimer(*_channel3, value);
         }
         else if (addr == CH3_OUTPUT_LEVEL_ADDR)
         {
-            _channel3.setVolumeControl((value >> 5) & 0x03);
+            _channel3->setVolumeControl((value >> 5) & 0x03);
         }
         else if (addr == CH3_WAVELENGTH_LOW_REG_ADDR)
         {
-            int wavelengthHigh = _channel3.getWavelength() & 0xFF00;
-            _channel3.setWavelength(wavelengthHigh | value);
+            int wavelengthHigh = _channel3->getWavelength() & 0xFF00;
+            _channel3->setWavelength(wavelengthHigh | value);
         }
         else if (addr == CH3_WAVELENGTH_AND_CONTROL_REG_ADDR)
         {
-            _channel3.enableLengthTimer(utils::isNthBitSet(value, 6));
+            _channel3->enableLengthTimer(utils::isNthBitSet(value, 6));
 
-            int wavelengthLow = _channel3.getWavelength() & 0xFF;
-            _channel3.setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
+            int wavelengthLow = _channel3->getWavelength() & 0xFF;
+            _channel3->setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
 
-            if (utils::isNthBitSet(value, 7) && _channel3.isDACEnabled())
+            if (utils::isNthBitSet(value, 7) && _channel3->isDACEnabled())
             {
-                _channel3.trigger();
+                _channel3->trigger();
             }
         }
         else if (addr == CH4_LENGTH_TIMER)
         {
-            setLengthTimer(_channel4, value & 0b00111111);
+            setLengthTimer(*_channel4, value & 0b00111111);
         }
         else if (addr == CH4_VOLUME_CTRL_ADDR)
         {
             if ((value & 0xF8) == 0)
             {
-                _channel4.enableDAC(false);
-                _channel4.enable(false);
+                _channel4->enableDAC(false);
+                _channel4->enable(false);
             }
             else
             {
-                _channel4.enableDAC(true);
+                _channel4->enableDAC(true);
             }
-            _channel4.setVolumeControl(value);
+            _channel4->setVolumeControl(value);
         }
         else if (addr == CH4_NOISE_CTRL_ADDR)
         {
-            _channel4.setNoiseControl(value);
+            _channel4->setNoiseControl(value);
         }
         else if (addr == CH4_CHANNEL_CTRL_ADDR)
         {
-            _channel4.enableLengthTimer(utils::isNthBitSet(value, 6));
-            if (utils::isNthBitSet(value, 7) && _channel4.isDACEnabled())
+            _channel4->enableLengthTimer(utils::isNthBitSet(value, 6));
+            if (utils::isNthBitSet(value, 7) && _channel4->isDACEnabled())
             {
-                _channel4.trigger();
+                _channel4->trigger();
             }
         }
     }
@@ -298,8 +306,8 @@ void APU::writeRegister(const word& addr, const byte& value)
     {
         int relativeAddr = CH3_WAVE_PATTERN_ADDR.relative(addr);
         int sampleIndex = relativeAddr * 2;
-        _channel3.getWave().setSample(sampleIndex, (value >> 4) & 0x0F);
-        _channel3.getWave().setSample(sampleIndex + 1, value & 0x0F);
+        _channel3->getWave().setSample(sampleIndex, (value >> 4) & 0x0F);
+        _channel3->getWave().setSample(sampleIndex + 1, value & 0x0F);
     }
 }
 
@@ -307,12 +315,12 @@ ChannelWave& APU::getChannelWaveFromRegAddr(word addr)
 {
     if (CH1_ADDR_RANGE.contains(addr))
     {
-        return _channel1;
+        return *_channel1;
     }
 
     else if (CH2_ADDR_RANGE.contains(addr))
     {
-        return _channel2;
+        return *_channel2;
     }
 
     throw std::runtime_error("Couldn't infer APU channel from register address");

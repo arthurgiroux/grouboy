@@ -2,7 +2,7 @@
 #include "channel.hpp"
 #include "common/utils.hpp"
 
-ChannelWave::ChannelWave() : Channel(LENGTH_TIMER_DURATION)
+ChannelWave::ChannelWave(float highpassCoeff) : Channel(LENGTH_TIMER_DURATION, highpassCoeff)
 {
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { _volumeSweep.tick(); }, VOLUME_SWEEP_FREQ));
 }

@@ -12,7 +12,7 @@
 class Channel1 : public ChannelWave
 {
   public:
-    explicit Channel1();
+    explicit Channel1(float highpassCoeff);
     void setSweepControl(int value);
     int getSweepControl() const;
     ~Channel1() = default;

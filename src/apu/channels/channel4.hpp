@@ -7,7 +7,7 @@
 class Channel4 : public Channel
 {
   public:
-    explicit Channel4();
+    explicit Channel4(float highpassCoeff);
     void step(int cycles) override;
     void trigger() override;
     void setVolumeControl(int value);

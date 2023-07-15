@@ -1,6 +1,6 @@
 #include "channel1.hpp"
 
-Channel1::Channel1() : ChannelWave()
+Channel1::Channel1(float highpassCoeff) : ChannelWave(highpassCoeff)
 {
     using std::placeholders::_1;
     _wavelengthSweep.setWavelengthChangedCallback(std::bind(&Channel1::onWavelengthChanged, this, _1));

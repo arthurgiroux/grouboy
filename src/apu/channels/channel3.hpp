@@ -8,7 +8,7 @@
 class Channel3 : public Channel
 {
   public:
-    Channel3();
+    Channel3(float highpassCoeff);
     ~Channel3() = default;
     float getAudioSample() override;
     void step(int cycles) override;

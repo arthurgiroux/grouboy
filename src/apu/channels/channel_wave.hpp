@@ -10,7 +10,7 @@
 class ChannelWave : public Channel
 {
   public:
-    ChannelWave();
+    ChannelWave(float highpassCoeff);
     virtual ~ChannelWave() = default;
     virtual float getAudioSample() override;
     void step(int cycles) override;

@@ -1,7 +1,7 @@
 #include "channel4.hpp"
 #include "common/utils.hpp"
 
-Channel4::Channel4() : Channel(LENGTH_TIMER_DURATION)
+Channel4::Channel4(float highpassCoeff) : Channel(LENGTH_TIMER_DURATION, highpassCoeff)
 {
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { _volumeSweep.tick(); }, VOLUME_SWEEP_FREQ));
 }

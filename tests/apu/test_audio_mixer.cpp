@@ -5,7 +5,7 @@
 class DummyChannel : public Channel
 {
   public:
-    DummyChannel(float sampleValue) : Channel(LENGTH_TIMER_DURATION), _sampleValue(sampleValue)
+    DummyChannel(float sampleValue) : Channel(LENGTH_TIMER_DURATION, 1.0f), _sampleValue(sampleValue)
     {
     }
 
