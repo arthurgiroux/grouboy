@@ -30,19 +30,19 @@ class APU
     static const int CH1_SWEEP_REG_ADDR = 0xFF10;
     static const int CH1_LENGTH_TIMER_AND_DUTY = 0xFF11;
     static const int CH1_VOLUME_CTRL_ADDR = 0xFF12;
-    static const int CH1_WAVELENGTH_LOW_REG_ADDR = 0xFF13;
-    static const int CH1_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF14;
+    static const int CH1_FREQUENCY_LOW_REG_ADDR = 0xFF13;
+    static const int CH1_FREQUENCY_AND_CONTROL_REG_ADDR = 0xFF14;
 
     static const int CH2_LENGTH_TIMER_AND_DUTY = 0xFF16;
     static const int CH2_VOLUME_CTRL_ADDR = 0xFF17;
-    static const int CH2_WAVELENGTH_LOW_REG_ADDR = 0xFF18;
-    static const int CH2_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF19;
+    static const int CH2_FREQUENCY_LOW_REG_ADDR = 0xFF18;
+    static const int CH2_FREQUENCY_AND_CONTROL_REG_ADDR = 0xFF19;
 
     static const int CH3_DAC_REG_ADDR = 0xFF1A;
     static const int CH3_LENGTH_TIMER_REG_ADDR = 0xFF1B;
     static const int CH3_OUTPUT_LEVEL_ADDR = 0xFF1C;
-    static const int CH3_WAVELENGTH_LOW_REG_ADDR = 0xFF1D;
-    static const int CH3_WAVELENGTH_AND_CONTROL_REG_ADDR = 0xFF1E;
+    static const int CH3_FREQUENCY_LOW_REG_ADDR = 0xFF1D;
+    static const int CH3_FREQUENCY_AND_CONTROL_REG_ADDR = 0xFF1E;
     static const utils::AddressRange CH3_WAVE_PATTERN_ADDR;
 
     static const int CH4_LENGTH_TIMER = 0xFF20;

@@ -37,17 +37,17 @@ void ChannelWave::triggerImpl()
 {
 }
 
-void ChannelWave::setWavelength(int wavelength)
+void ChannelWave::setFrequency(int frequency)
 {
-    _wavelength = wavelength;
+    _frequency = frequency;
 
-    int waveFrequency = (2048 - wavelength) * 4;
+    int waveFrequency = (2048 - frequency) * 4;
     _squareWave.setFrequency(waveFrequency);
 }
 
-int ChannelWave::getWavelength()
+int ChannelWave::getFrequency()
 {
-    return _wavelength;
+    return _frequency;
 }
 
 SquareWave& ChannelWave::getWave()
@@ -68,7 +68,7 @@ int ChannelWave::getVolumeControl() const
 void ChannelWave::reset()
 {
     Channel::reset();
-    _wavelength = 0;
+    _frequency = 0;
     _volumeCtrl = 0;
     _volumeSweep.reset();
     _squareWave.reset();

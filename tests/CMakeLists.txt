@@ -125,7 +125,7 @@ target_link_libraries(
 
 add_executable(
         apu_tests
-        apu/test_wavelength_sweep.cpp
+        apu/test_frequency_sweep.cpp
         apu/test_square_wave.cpp
         apu/test_volume_sweep.cpp
         apu/test_length_timer.cpp

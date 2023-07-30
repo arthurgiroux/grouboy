@@ -95,11 +95,11 @@ byte APU::readRegister(const word& addr)
     {
         return getChannelWaveFromRegAddr(addr).getVolumeControl();
     }
-    else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR || addr == CH2_WAVELENGTH_LOW_REG_ADDR)
+    else if (addr == CH1_FREQUENCY_LOW_REG_ADDR || addr == CH2_FREQUENCY_LOW_REG_ADDR)
     {
         return 0xFF;
     }
-    else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR || addr == CH2_WAVELENGTH_AND_CONTROL_REG_ADDR)
+    else if (addr == CH1_FREQUENCY_AND_CONTROL_REG_ADDR || addr == CH2_FREQUENCY_AND_CONTROL_REG_ADDR)
     {
         return getChannelWaveFromRegAddr(addr).isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
@@ -120,11 +120,11 @@ byte APU::readRegister(const word& addr)
     {
         return 0x9F | (_channel3->getVolumeControl() << 5);
     }
-    else if (addr == CH3_WAVELENGTH_LOW_REG_ADDR)
+    else if (addr == CH3_FREQUENCY_LOW_REG_ADDR)
     {
         return 0xFF;
     }
-    else if (addr == CH3_WAVELENGTH_AND_CONTROL_REG_ADDR)
+    else if (addr == CH3_FREQUENCY_AND_CONTROL_REG_ADDR)
     {
         return _channel3->isLengthTimerEnabled() ? 0xFF : 0xBF;
     }
@@ -192,19 +192,19 @@ void APU::writeRegister(const word& addr, const byte& value)
             }
             channel.setVolumeControl(value);
         }
-        else if (addr == CH1_WAVELENGTH_LOW_REG_ADDR || addr == CH2_WAVELENGTH_LOW_REG_ADDR)
+        else if (addr == CH1_FREQUENCY_LOW_REG_ADDR || addr == CH2_FREQUENCY_LOW_REG_ADDR)
         {
             ChannelWave& channel = getChannelWaveFromRegAddr(addr);
-            int wavelengthHigh = channel.getWavelength() & 0xFF00;
-            channel.setWavelength(wavelengthHigh | value);
+            int frequencyHigh = channel.getFrequency() & 0xFF00;
+            channel.setFrequency(frequencyHigh | value);
         }
-        else if (addr == CH1_WAVELENGTH_AND_CONTROL_REG_ADDR || addr == CH2_WAVELENGTH_AND_CONTROL_REG_ADDR)
+        else if (addr == CH1_FREQUENCY_AND_CONTROL_REG_ADDR || addr == CH2_FREQUENCY_AND_CONTROL_REG_ADDR)
         {
             ChannelWave& channel = getChannelWaveFromRegAddr(addr);
             channel.enableLengthTimer(utils::isNthBitSet(value, 6));
 
-            int wavelengthLow = channel.getWavelength() & 0xFF;
-            channel.setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
+            int frequencyLow = channel.getFrequency() & 0xFF;
+            channel.setFrequency(((value & 0b00000111) << 8) | frequencyLow);
 
             if (utils::isNthBitSet(value, 7) && channel.isDACEnabled())
             {
@@ -241,17 +241,17 @@ void APU::writeRegister(const word& addr, const byte& value)
         {
             _channel3->setVolumeControl((value >> 5) & 0x03);
         }
-        else if (addr == CH3_WAVELENGTH_LOW_REG_ADDR)
+        else if (addr == CH3_FREQUENCY_LOW_REG_ADDR)
         {
-            int wavelengthHigh = _channel3->getWavelength() & 0xFF00;
-            _channel3->setWavelength(wavelengthHigh | value);
+            int frequencyHigh = _channel3->getFrequency() & 0xFF00;
+            _channel3->setFrequency(frequencyHigh | value);
         }
-        else if (addr == CH3_WAVELENGTH_AND_CONTROL_REG_ADDR)
+        else if (addr == CH3_FREQUENCY_AND_CONTROL_REG_ADDR)
         {
             _channel3->enableLengthTimer(utils::isNthBitSet(value, 6));
 
-            int wavelengthLow = _channel3->getWavelength() & 0xFF;
-            _channel3->setWavelength(((value & 0b00000111) << 8) | wavelengthLow);
+            int frequencyLow = _channel3->getFrequency() & 0xFF;
+            _channel3->setFrequency(((value & 0b00000111) << 8) | frequencyLow);
 
             if (utils::isNthBitSet(value, 7) && _channel3->isDACEnabled())
             {

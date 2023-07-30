@@ -27,17 +27,17 @@ void Channel3::trigger()
     _wave.setPosition(1);
 }
 
-void Channel3::setWavelength(int wavelength)
+void Channel3::setFrequency(int frequency)
 {
-    _wavelength = wavelength;
+    _frequency = frequency;
 
-    int waveFrequency = (2048 - wavelength) * 2;
+    int waveFrequency = (2048 - frequency) * 2;
     _wave.setFrequency(waveFrequency);
 }
 
-int Channel3::getWavelength()
+int Channel3::getFrequency()
 {
-    return _wavelength;
+    return _frequency;
 }
 
 Wave<32>& Channel3::getWave()
@@ -76,7 +76,7 @@ void Channel3::reset()
 {
     Channel::reset();
     _wave.reset();
-    _wavelength = 0;
+    _frequency = 0;
     _lengthTimerEnabled = false;
     _volumeCtrl = 0;
 }

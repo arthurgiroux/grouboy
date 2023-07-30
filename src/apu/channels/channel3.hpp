@@ -13,8 +13,8 @@ class Channel3 : public Channel
     float getAudioSample() override;
     void step(int cycles) override;
     void trigger() override;
-    void setWavelength(int wavelength);
-    int getWavelength();
+    void setFrequency(int frequency);
+    int getFrequency();
     Wave<32>& getWave();
     void setVolumeControl(int value);
     int getVolumeControl() const;
@@ -24,7 +24,7 @@ class Channel3 : public Channel
     static const int LENGTH_TIMER_DURATION = 256;
     int adjustVolume(int value);
     Wave<32> _wave;
-    int _wavelength = 0;
+    int _frequency = 0;
     bool _lengthTimerEnabled = false;
     int _volumeCtrl = 0;
 };

@@ -3,18 +3,18 @@
 Channel1::Channel1(float highpassCoeff) : ChannelWave(highpassCoeff)
 {
     using std::placeholders::_1;
-    _wavelengthSweep.setWavelengthChangedCallback(std::bind(&Channel1::onWavelengthChanged, this, _1));
-    _wavelengthSweep.setWavelengthOverflowCallback(std::bind(&Channel1::onWavelengthOverflow, this));
+    _frequencySweep.setFrequencyChangedCallback(std::bind(&Channel1::onFrequencyChanged, this, _1));
+    _frequencySweep.setFrequencyOverflowCallback(std::bind(&Channel1::onFrequencyOverflow, this));
 
-    _frameSequencer.addFrame(FrameSequencer::Frame([&] { _wavelengthSweep.tick(); }, WAVELENGTH_SWEEP_FREQ));
+    _frameSequencer.addFrame(FrameSequencer::Frame([&] { _frequencySweep.tick(); }, FREQUENCY_SWEEP_FREQ));
 }
 
-void Channel1::onWavelengthChanged(int wavelength)
+void Channel1::onFrequencyChanged(int frequency)
 {
-    setWavelength(wavelength);
+    setFrequency(frequency);
 }
 
-void Channel1::onWavelengthOverflow()
+void Channel1::onFrequencyOverflow()
 {
     enable(false);
 }
@@ -25,9 +25,9 @@ void Channel1::setSweepControl(int value)
     int sweepDirection = (_sweepControlValue & 0b00001000) >> 3;
     int sweepPeriod = (_sweepControlValue & 0b01110000) >> 4;
     int shift = _sweepControlValue & 0b00000111;
-    _wavelengthSweep.setDirection(sweepDirection ? -1 : 1);
-    _wavelengthSweep.setPeriod(sweepPeriod);
-    _wavelengthSweep.setShift(shift);
+    _frequencySweep.setDirection(sweepDirection ? -1 : 1);
+    _frequencySweep.setPeriod(sweepPeriod);
+    _frequencySweep.setShift(shift);
 }
 
 int Channel1::getSweepControl() const
@@ -37,14 +37,14 @@ int Channel1::getSweepControl() const
 
 void Channel1::triggerImpl()
 {
-    _wavelengthSweep.setWavelength(getWavelength());
-    _wavelengthSweep.setEnabled(_wavelengthSweep.getShift() > 0 || _wavelengthSweep.getPeriod() > 0);
-    _wavelengthSweep.trigger();
+    _frequencySweep.setFrequency(getFrequency());
+    _frequencySweep.setEnabled(_frequencySweep.getShift() > 0 || _frequencySweep.getPeriod() > 0);
+    _frequencySweep.trigger();
 }
 
 void Channel1::reset()
 {
     ChannelWave::reset();
     _sweepControlValue = 0;
-    _wavelengthSweep.reset();
+    _frequencySweep.reset();
 }
