@@ -3,9 +3,9 @@
 
 #include "apu/signal/square_wave.hpp"
 #include "channel.hpp"
+#include "frequency_sweep.hpp"
 #include "length_timer.hpp"
 #include "volume_sweep.hpp"
-#include "wavelength_sweep.hpp"
 
 class ChannelWave : public Channel
 {
@@ -15,8 +15,8 @@ class ChannelWave : public Channel
     virtual float getAudioSample() override;
     void step(int cycles) override;
     void trigger() override;
-    void setWavelength(int wavelength);
-    int getWavelength();
+    void setFrequency(int frequency);
+    int getFrequency();
     SquareWave& getWave();
     void setVolumeControl(int value);
     int getVolumeControl() const;
@@ -28,7 +28,7 @@ class ChannelWave : public Channel
     virtual void triggerImpl();
     VolumeSweep _volumeSweep;
     SquareWave _squareWave;
-    int _wavelength = 0;
+    int _frequency = 0;
     int _volumeCtrl = 0;
 };
 

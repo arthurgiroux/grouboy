@@ -70,8 +70,8 @@ set(SOURCE_FILES
         src/apu/channels/channel1.cpp
         src/apu/channels/channel2.cpp
         src/apu/channels/channel2.hpp
-        src/apu/channels/wavelength_sweep.cpp
-        src/apu/channels/wavelength_sweep.hpp
+        src/apu/channels/frequency_sweep.cpp
+        src/apu/channels/frequency_sweep.hpp
         src/apu/channels/volume_sweep.cpp
         src/apu/channels/volume_sweep.hpp
         src/apu/channels/length_timer.cpp

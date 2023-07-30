@@ -5,9 +5,9 @@
 #include "channel.hpp"
 #include "channel_wave.hpp"
 #include "frame_sequencer.hpp"
+#include "frequency_sweep.hpp"
 #include "length_timer.hpp"
 #include "volume_sweep.hpp"
-#include "wavelength_sweep.hpp"
 
 class Channel1 : public ChannelWave
 {
@@ -22,10 +22,10 @@ class Channel1 : public ChannelWave
     void triggerImpl() override;
 
   private:
-    static const int WAVELENGTH_SWEEP_FREQ = 128;
-    void onWavelengthChanged(int wavelength);
-    void onWavelengthOverflow();
-    WavelengthSweep _wavelengthSweep;
+    static const int FREQUENCY_SWEEP_FREQ = 128;
+    void onFrequencyChanged(int frequency);
+    void onFrequencyOverflow();
+    FrequencySweep _frequencySweep;
     int _sweepControlValue = 0;
 };
 

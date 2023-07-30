@@ -4,9 +4,9 @@
 #include "apu/filters/highpass_filter.hpp"
 #include "apu/signal/square_wave.hpp"
 #include "frame_sequencer.hpp"
+#include "frequency_sweep.hpp"
 #include "length_timer.hpp"
 #include "volume_sweep.hpp"
-#include "wavelength_sweep.hpp"
 
 /**
  * An audio channel is a sound generation unit that is used by the APU
