@@ -64,8 +64,8 @@ set(SOURCE_FILES
         src/apu/signal/square_wave.hpp
         src/apu/channels/channel.cpp
         src/apu/channels/channel.hpp
-        src/apu/channels/channel_wave.hpp
-        src/apu/channels/channel_wave.cpp
+        src/apu/channels/pulse_channel.hpp
+        src/apu/channels/pulse_channel.cpp
         src/apu/channels/channel1.hpp
         src/apu/channels/channel1.cpp
         src/apu/channels/channel2.cpp

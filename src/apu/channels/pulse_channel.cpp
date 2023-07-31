@@ -1,23 +1,23 @@
-#include "channel_wave.hpp"
+#include "pulse_channel.hpp"
 #include "channel.hpp"
 #include "common/utils.hpp"
 
-ChannelWave::ChannelWave(float highpassCoeff) : Channel(LENGTH_TIMER_DURATION, highpassCoeff)
+PulseChannel::PulseChannel(float highpassCoeff) : Channel(LENGTH_TIMER_DURATION, highpassCoeff)
 {
     _frameSequencer.addFrame(FrameSequencer::Frame([&] { _volumeSweep.tick(); }, VOLUME_SWEEP_FREQ));
 }
 
-float ChannelWave::getAudioSample()
+float PulseChannel::getAudioSample()
 {
     return convertFromDigitalToAnalog(_squareWave.getAmplitude() * _volumeSweep.getVolume());
 }
 
-void ChannelWave::step(int cycles)
+void PulseChannel::step(int cycles)
 {
     _squareWave.step(cycles);
 }
 
-void ChannelWave::trigger()
+void PulseChannel::trigger()
 {
     enable(true);
     _squareWave.setDutyPosition(0);
@@ -33,11 +33,11 @@ void ChannelWave::trigger()
     triggerImpl();
 }
 
-void ChannelWave::triggerImpl()
+void PulseChannel::triggerImpl()
 {
 }
 
-void ChannelWave::setFrequency(int frequency)
+void PulseChannel::setFrequency(int frequency)
 {
     _frequency = frequency;
 
@@ -45,27 +45,27 @@ void ChannelWave::setFrequency(int frequency)
     _squareWave.setFrequency(waveFrequency);
 }
 
-int ChannelWave::getFrequency()
+int PulseChannel::getFrequency()
 {
     return _frequency;
 }
 
-SquareWave& ChannelWave::getWave()
+SquareWave& PulseChannel::getWave()
 {
     return _squareWave;
 }
 
-void ChannelWave::setVolumeControl(int value)
+void PulseChannel::setVolumeControl(int value)
 {
     _volumeCtrl = value;
 }
 
-int ChannelWave::getVolumeControl() const
+int PulseChannel::getVolumeControl() const
 {
     return _volumeCtrl;
 }
 
-void ChannelWave::reset()
+void PulseChannel::reset()
 {
     Channel::reset();
     _frequency = 0;

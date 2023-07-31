@@ -61,7 +61,7 @@ class APU
     static constexpr float HIGHPASS_BASE_COEFF = 0.999958f;
 
     void addSampleToAudioBuffer();
-    ChannelWave& getChannelWaveFromRegAddr(word addr);
+    PulseChannel& getChannelWaveFromRegAddr(word addr);
     void setLengthTimer(Channel& channel, int duration);
 
     Timer* _timer;

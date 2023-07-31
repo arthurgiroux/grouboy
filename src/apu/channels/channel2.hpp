@@ -1,9 +1,9 @@
 #ifndef GROUBOY_CHANNEL2_HPP
 #define GROUBOY_CHANNEL2_HPP
 
-#include "channel_wave.hpp"
+#include "pulse_channel.hpp"
 
-class Channel2 : public ChannelWave
+class Channel2 : public PulseChannel
 {
   public:
     explicit Channel2(float highpassCoeff);

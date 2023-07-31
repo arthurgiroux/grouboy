@@ -1,6 +1,6 @@
 #include "channel1.hpp"
 
-Channel1::Channel1(float highpassCoeff) : ChannelWave(highpassCoeff)
+Channel1::Channel1(float highpassCoeff) : PulseChannel(highpassCoeff)
 {
     using std::placeholders::_1;
     _frequencySweep.setFrequencyChangedCallback(std::bind(&Channel1::onFrequencyChanged, this, _1));
@@ -44,7 +44,7 @@ void Channel1::triggerImpl()
 
 void Channel1::reset()
 {
-    ChannelWave::reset();
+    PulseChannel::reset();
     _sweepControlValue = 0;
     _frequencySweep.reset();
 }
