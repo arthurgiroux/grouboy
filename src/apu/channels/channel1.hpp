@@ -3,13 +3,13 @@
 
 #include "apu/signal/square_wave.hpp"
 #include "channel.hpp"
-#include "channel_wave.hpp"
 #include "frame_sequencer.hpp"
 #include "frequency_sweep.hpp"
 #include "length_timer.hpp"
+#include "pulse_channel.hpp"
 #include "volume_sweep.hpp"
 
-class Channel1 : public ChannelWave
+class Channel1 : public PulseChannel
 {
   public:
     explicit Channel1(float highpassCoeff);
