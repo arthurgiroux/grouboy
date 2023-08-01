@@ -85,7 +85,7 @@ byte APU::readRegister(const word& addr)
 {
     if (addr == CH1_SWEEP_REG_ADDR)
     {
-        return 0x80 | _channel1->getSweepControl();
+        return 0x80 | _channel1->getFrequencySweepControl();
     }
     else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
     {
@@ -170,7 +170,7 @@ void APU::writeRegister(const word& addr, const byte& value)
     {
         if (addr == CH1_SWEEP_REG_ADDR)
         {
-            _channel1->setSweepControl(value);
+            _channel1->setFrequencySweepControl(value);
         }
         else if (addr == CH1_LENGTH_TIMER_AND_DUTY || addr == CH2_LENGTH_TIMER_AND_DUTY)
         {

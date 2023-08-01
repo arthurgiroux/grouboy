@@ -19,7 +19,7 @@ void Channel1::onFrequencyOverflow()
     enable(false);
 }
 
-void Channel1::setSweepControl(int value)
+void Channel1::setFrequencySweepControl(int value)
 {
     _sweepControlValue = value;
     int sweepDirection = (_sweepControlValue & 0b00001000) >> 3;
@@ -30,7 +30,7 @@ void Channel1::setSweepControl(int value)
     _frequencySweep.setShift(shift);
 }
 
-int Channel1::getSweepControl() const
+int Channel1::getFrequencySweepControl() const
 {
     return _sweepControlValue;
 }
