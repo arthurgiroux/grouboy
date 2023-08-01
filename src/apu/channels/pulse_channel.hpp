@@ -11,9 +11,8 @@
  * A pulse channel is an channel that generates pulse-width modulated waves.
  * The APU has two pulse channels, Channel 1 and Channel 2.
  * This class is an abstract class for the common components of both channels.
- * The frequency of the wave and the output volume can be controlled
- * either directly of through a frequency sweep and volume sweep
- * that will update the frequency and/or automatically periodically.
+ * The output volume can be controlled either directly of through a volume sweep
+ * that will update it periodically.
  */
 class PulseChannel : public Channel
 {

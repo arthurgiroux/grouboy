@@ -8,6 +8,9 @@ class Channel2 : public PulseChannel
   public:
     explicit Channel2(float highpassCoeff);
     ~Channel2() = default;
+
+  private:
+    void triggerImpl() override {};
 };
 
 #endif // GROUBOY_CHANNEL2_HPP
