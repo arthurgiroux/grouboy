@@ -49,7 +49,8 @@ class VolumeSweep
      * Tick the volume sweep.
      * If the period elapsed, the volume will be either increased or decreased by 1,
      * depending on the direction.
-     * The volume value is stayed between [0, 15] and will loop if it over/underflows.
+     * The volume value is kept between [0, 15] and if the sweep would result in an overflow or underflow
+     * then it will not change the value.
      */
     void tick();
 

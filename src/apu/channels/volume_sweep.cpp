@@ -37,16 +37,11 @@ void VolumeSweep::tick()
     if (_timer == 0)
     {
         _timer = _period;
-        _volume = (_volume + _direction);
 
-        // If the value underflows or overflows, we loop it back
-        if (_volume < 0)
+        // If the operation would cause an under/overflow then we don't proceed
+        if ((_direction > 0 && _volume < 0xF) || (_direction < 0 && _volume > 0))
         {
-            _volume = 0xF;
-        }
-        else if (_volume > 0xF)
-        {
-            _volume = 0;
+            _volume = (_volume + _direction);
         }
     }
 }
