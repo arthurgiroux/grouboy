@@ -49,7 +49,7 @@ TEST_F(VolumeSweepTest, TickWhenPeriodIsReachedAndDirectionIsPositiveShouldIncre
     ASSERT_EQ(volumeSweep.getVolume(), expectedVolume + 1);
 }
 
-TEST_F(VolumeSweepTest, TickShouldOverflowVolumeOn4Bits)
+TEST_F(VolumeSweepTest, TickShouldNotOverflowVolumeOn4Bits)
 {
     int period = 10;
     volumeSweep.setPeriod(period);
@@ -61,7 +61,7 @@ TEST_F(VolumeSweepTest, TickShouldOverflowVolumeOn4Bits)
         ASSERT_EQ(volumeSweep.getVolume(), expectedVolume);
         volumeSweep.tick();
     }
-    ASSERT_EQ(volumeSweep.getVolume(), 0);
+    ASSERT_EQ(volumeSweep.getVolume(), 0x0F);
 }
 
 TEST_F(VolumeSweepTest, TickWhenPeriodIsReachedAndDirectionIsPositiveShouldDecrementVolume)
@@ -79,7 +79,7 @@ TEST_F(VolumeSweepTest, TickWhenPeriodIsReachedAndDirectionIsPositiveShouldDecre
     ASSERT_EQ(volumeSweep.getVolume(), expectedVolume - 1);
 }
 
-TEST_F(VolumeSweepTest, TickShoulUnderflowVolumeOn4Bits)
+TEST_F(VolumeSweepTest, TickShoulNotUnderflowVolumeOn4Bits)
 {
     int period = 10;
     volumeSweep.setPeriod(period);
@@ -91,5 +91,5 @@ TEST_F(VolumeSweepTest, TickShoulUnderflowVolumeOn4Bits)
         ASSERT_EQ(volumeSweep.getVolume(), expectedVolume);
         volumeSweep.tick();
     }
-    ASSERT_EQ(volumeSweep.getVolume(), 0x0F);
+    ASSERT_EQ(volumeSweep.getVolume(), 0x00);
 }
