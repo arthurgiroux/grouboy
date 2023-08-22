@@ -1,5 +1,7 @@
 #include "channel3.hpp"
 
+#include <stdexcept>
+
 Channel3::Channel3(float highpassCoeff) : Channel(LENGTH_TIMER_DURATION, highpassCoeff)
 {
 }

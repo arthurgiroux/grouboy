@@ -1,4 +1,5 @@
 #include "wave.hpp"
+#include <cmath>
 
 template <int SZ>
 Wave<SZ>::Wave()
@@ -26,7 +27,7 @@ void Wave<SZ>::step(int cycles)
         // If we have remainder we deduct it from the new value
         if (value < 0)
         {
-            _frequencyTimerValue -= abs(value);
+            _frequencyTimerValue -= std::abs(value);
         }
 
         nextSample();
