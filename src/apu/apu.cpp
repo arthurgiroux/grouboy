@@ -1,6 +1,8 @@
 #include "apu.hpp"
 #include "cpu/cpu.hpp"
 
+#include <cmath>
+
 const utils::AddressRange APU::CH1_ADDR_RANGE = utils::AddressRange(0xFF10, 0xFF14);
 const utils::AddressRange APU::CH2_ADDR_RANGE = utils::AddressRange(0xFF15, 0xFF19);
 const utils::AddressRange APU::CH3_WAVE_PATTERN_ADDR = utils::AddressRange(0xFF30, 0xFF3F);
