@@ -1,10 +1,13 @@
 # GrouBoy - a modern C++ Game Boy emulator [![Build Status](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)
 
-This is an educative implementation of a Game Boy Emulator made in modern C++.
+This is an educational implementation of a Game Boy Emulator, developed using modern C++.
+The primary aim of this project is to provide an implementation that is easy to read, well architecture, with extensive
+code documentation and testing.
+It is designed to function seamlessly on Windows, Mac, and Linux.
 
 ## Features
 
-Here's the list of implemented features:
+The following features are implemented:
 
 * Memory abstraction
 * All CPU instructions
@@ -18,11 +21,17 @@ Here's the list of implemented features:
     * MBC1
     * MBC2
     * MBC3
+* Sound
+    * Channel 1
+    * Channel 2
+    * Channel 3
+    * Channel 4
 
 Future work:
 
+* Sub-instruction CPU timing
+* FIFO PPU
 * Other MBCs
-* Sound
 
 ## Input mapping
 
@@ -43,7 +52,7 @@ Future work:
 
 ## Dependencies
 
-This project relies on SDL for the GUI, GoogleTest for the testing suite, and sdplog for logging.
+This project relies on SDL for the GUI, GoogleTest for the testing suite, and spdlog for logging.
 
 ## Compilation
 
@@ -60,23 +69,31 @@ cmake --build .
 The emulator is tested using various test suites and automated test cases for all components.
 You can find the test report in the Github actions.
 
-Blaarg's test coverage:
+Blargg's test coverage:
 
-| Category            | Test Name               | Pass/Fail           |
-|---------------------|-------------------------|---------------------|
-| CPU Instructions    | 01 - Special            | :white_check_mark:	 |
-| CPU Instructions    | 02 - Interrupts         | :white_check_mark:	 |
-| CPU Instructions    | 03 - Op SP, HL          | :white_check_mark:	 |
-| CPU Instructions    | 04 - Op r,imm           | :white_check_mark:	 |
-| CPU Instructions    | 05 - Op rp              | :white_check_mark:	 |
-| CPU Instructions    | 06 - LD r,r             | :white_check_mark:	 |
-| CPU Instructions    | 07 - JR,JP,Call,RET,RST | :white_check_mark:	 |
-| CPU Instructions    | 08 - Misc Instrs        | :white_check_mark:	 |
-| CPU Instructions    | 09 - Op r,r             | :white_check_mark:	 |
-| CPU Instructions    | 10 - Bits Ops           | :white_check_mark:	 |
-| CPU Instructions    | 11 - Op a,(hl)          | :white_check_mark:	 |
-| CPU Instructions    | 07 - JR,JP,Call,RET,RST | :white_check_mark:	 |
-| Instructions Timing | Instr Timing            | :white_check_mark:	 |
+| Category            | Test Name                  | Pass/Fail           |
+|---------------------|----------------------------|---------------------|
+| CPU Instructions    | 01 - Special               | :white_check_mark:	 |
+| CPU Instructions    | 02 - Interrupts            | :white_check_mark:	 |
+| CPU Instructions    | 03 - Op SP, HL             | :white_check_mark:	 |
+| CPU Instructions    | 04 - Op r,imm              | :white_check_mark:	 |
+| CPU Instructions    | 05 - Op rp                 | :white_check_mark:	 |
+| CPU Instructions    | 06 - LD r,r                | :white_check_mark:	 |
+| CPU Instructions    | 07 - JR,JP,Call,RET,RST    | :white_check_mark:	 |
+| CPU Instructions    | 08 - Misc Instrs           | :white_check_mark:	 |
+| CPU Instructions    | 09 - Op r,r                | :white_check_mark:	 |
+| CPU Instructions    | 10 - Bits Ops              | :white_check_mark:	 |
+| CPU Instructions    | 11 - Op a,(hl)             | :white_check_mark:	 |
+| Instructions Timing | Instr Timing               | :white_check_mark:	 |
+| Sound               | 01 - Registers             | :white_check_mark:	 |
+| Sound               | 02 - Len ctr               | :white_check_mark:	 |
+| Sound               | 03 - Trigger               | :x:	                |
+| Sound               | 04 - Sweep                 | :white_check_mark:	 |
+| Sound               | 05 - Sweep details         | :x:	                |
+| Sound               | 06 - Overflow on trigger   | :white_check_mark:	 |
+| Sound               | 07 - Len sweep period sync | :x:	                |
+| Sound               | 08 - Len ctrl during power | :x:	                |
+| Sound               | 09 - Wave read while on    | :x:	                |
 
 [Acid2 test](https://github.com/mattcurrie/dmg-acid2):
 
