@@ -354,13 +354,13 @@ void PPU::swapFrameBuffers()
 }
 
 PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
-    : _mmu(mmu_), _interruptManager(interruptManager), _paletteBackground(_mmu, ADDR_PALETTE_BG),
-      _paletteObj0(_mmu, ADDR_PALETTE_OBJ0), _paletteObj1(_mmu, ADDR_PALETTE_OBJ1),
-      _lcdStatusRegister(std::make_unique<LCDStatusRegister>(_mmu))
+    : _mmu(mmu_), _interruptManager(interruptManager), _lcdStatusRegister(std::make_unique<LCDStatusRegister>(_mmu)),
+      _paletteBackground(_mmu, ADDR_PALETTE_BG), _paletteObj0(_mmu, ADDR_PALETTE_OBJ0),
+      _paletteObj1(_mmu, ADDR_PALETTE_OBJ1)
 {
     reset();
 
-    for (int i = 0; i < _sprites.size(); ++i)
+    for (unsigned int i = 0; i < _sprites.size(); ++i)
     {
         _sprites[i] = std::make_unique<Sprite>(_mmu, i);
     }

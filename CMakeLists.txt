@@ -97,6 +97,12 @@ add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
 target_link_libraries(gbemulator_core spdlog::spdlog)
 
+if (MSVC)
+    target_compile_options(gbemulator_core PRIVATE /W4 /WX)
+else ()
+    target_compile_options(gbemulator_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif ()
+
 set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
 add_subdirectory(${SDL3_DIR})
 

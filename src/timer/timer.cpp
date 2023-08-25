@@ -57,7 +57,7 @@ bool Timer::isTimerCounterEnabled()
 
 int Timer::getClockDivider()
 {
-    int clockSelected = _mmu->read(TIMER_CONTROL_ADDR) & 0b00000011;
+    unsigned int clockSelected = _mmu->read(TIMER_CONTROL_ADDR) & 0b00000011;
     if (clockSelected < CLOCK_DIVIDER_VALUES.size())
     {
         return CLOCK_DIVIDER_VALUES[clockSelected];

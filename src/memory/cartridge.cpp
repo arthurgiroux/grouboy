@@ -131,7 +131,7 @@ int Cartridge::getROMSize() const
 
 int Cartridge::getRAMSize() const
 {
-    int ramSizeValue = data[CARTRIDGE_RAM_SIZE_ADDR];
+    unsigned int ramSizeValue = data[CARTRIDGE_RAM_SIZE_ADDR];
 
     if (!hasRAM())
     {

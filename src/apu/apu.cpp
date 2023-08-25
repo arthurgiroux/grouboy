@@ -7,7 +7,7 @@ const utils::AddressRange APU::CH1_ADDR_RANGE = utils::AddressRange(0xFF10, 0xFF
 const utils::AddressRange APU::CH2_ADDR_RANGE = utils::AddressRange(0xFF15, 0xFF19);
 const utils::AddressRange APU::CH3_WAVE_PATTERN_ADDR = utils::AddressRange(0xFF30, 0xFF3F);
 
-APU::APU(Timer* timer, int samplingFrequency) : _timer(timer), _samplingFrequency(samplingFrequency)
+APU::APU(Timer* timer, int samplingFrequency) : _timer(timer)
 {
     float subsamplingRatio = CPU::CLOCK_FREQUENCY_HZ / static_cast<float>(samplingFrequency);
     float highpassCoeff = std::pow(HIGHPASS_BASE_COEFF, subsamplingRatio);

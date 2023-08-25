@@ -20,7 +20,7 @@ byte MBCRomOnly::readROM(const word& addr)
     }
 }
 
-void MBCRomOnly::writeROM(const word& addr, const byte& value)
+void MBCRomOnly::writeROM(const word& /*addr*/, const byte& /*value*/)
 {
 }
 
@@ -55,7 +55,7 @@ std::vector<byte> MBCRomOnly::serializeRAM()
     return std::vector<byte>();
 }
 
-bool MBCRomOnly::unserializeRAM(const std::vector<byte>& data)
+bool MBCRomOnly::unserializeRAM(const std::vector<byte>& /*data*/)
 {
     return true;
 }
