@@ -18,7 +18,6 @@ class LCDStatusRegister
      * @param mmu   The MMU to use to read/write the registers
      */
     explicit LCDStatusRegister(MMU& mmu);
-    ;
 
     /**
      * Update the PPU mode information

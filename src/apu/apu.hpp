@@ -71,7 +71,6 @@ class APU
     std::unique_ptr<Channel4> _channel4;
     std::vector<Channel*> _channels = {};
     std::unique_ptr<AudioMixer> _mixer;
-    int _samplingFrequency;
     int _numberOfCyclesPerAudioSample;
     int _cycleCounter = 0;
     AudioBuffer _audioBuffer = {0};

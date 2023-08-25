@@ -224,7 +224,6 @@ class PPU
      * @param value the new mode of the PPU.
      */
     void setMode(Mode value);
-    ;
 
     /**
      * Render the given scanline.
