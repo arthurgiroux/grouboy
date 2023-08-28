@@ -29,9 +29,11 @@ const std::array<byte, 256> MMU::BIOS = {
 
 const std::set<word> MMU::unmappedIOAddrs = {0xFF03, 0xFF08, 0xFF09, 0xFF0A, 0xFF0B, 0xFF0C, 0xFF0D, 0xFF0E};
 
-const std::map<word, int> MMU::mappedIOMask = {
-    {HardwareIOAddr::P1, 0b11000000}, {HardwareIOAddr::SC, 0b01111110},   {HardwareIOAddr::TAC, 0b11111000},
-    {HardwareIOAddr::IF, 0b11100000}, {HardwareIOAddr::STAT, 0b10000000}, {HardwareIOAddr::BOOT_ROOM_LOCK, 0b11111110}};
+const std::map<word, int> MMU::mappedIOMask = {{HardwareIOAddr::P1, 0b11000000},
+                                               {HardwareIOAddr::SC, 0b01111110},
+                                               {HardwareIOAddr::IF, 0b11100000},
+                                               {HardwareIOAddr::STAT, 0b10000000},
+                                               {HardwareIOAddr::BOOT_ROOM_LOCK, 0b11111110}};
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
 
@@ -92,6 +94,22 @@ byte MMU::read(const word& addr)
     else if (_apu != nullptr && apuRegisterRange.contains(addr))
     {
         return _apu->readRegister(addr);
+    }
+    else if (_timer != nullptr && addr == TIMER_DIV_ADDR)
+    {
+        return _timer->getDividerRegisterValue();
+    }
+    else if (_timer != nullptr && addr == TIMER_COUNTER_ADDR)
+    {
+        return _timer->getTimerCounterValue();
+    }
+    else if (_timer != nullptr && addr == TIMER_MODULO_ADDR)
+    {
+        return _timer->getTimerModuloValue();
+    }
+    else if (_timer != nullptr && addr == TIMER_CONTROL_ADDR)
+    {
+        return 0b11111000 | _timer->isTimerCounterEnabled() << 2 | _timer->getClockDivider();
     }
 
     return memory[addr];
@@ -166,18 +184,26 @@ void MMU::write(const word& addr, const byte& value)
     {
         _apu->writeRegister(addr, value);
     }
+    else if (_timer != nullptr && addr == TIMER_DIV_ADDR)
+    {
+        _timer->resetDividerRegisterValue();
+    }
+    else if (_timer != nullptr && addr == TIMER_COUNTER_ADDR)
+    {
+        _timer->setTimerCounterValue(value);
+    }
+    else if (_timer != nullptr && addr == TIMER_MODULO_ADDR)
+    {
+        _timer->setTimerModuloValue(value);
+    }
+    else if (_timer != nullptr && addr == TIMER_CONTROL_ADDR)
+    {
+        _timer->enableTimerCounter(utils::isNthBitSet(value, 2));
+        _timer->setClockDivider(value & 0x00000011);
+    }
     else
     {
-        // Special behavior: when trying to write to the divider register
-        // of the timer, it resets the value to 0.
-        if (addr == Timer::DIVIDER_REGISTER_ADDR)
-        {
-            memory[addr] = 0;
-        }
-        else
-        {
-            memory[addr] = value;
-        }
+        memory[addr] = value;
     }
 }
 
@@ -258,4 +284,9 @@ bool MMU::unserializeCartridgeRAM(const std::vector<byte>& data)
 void MMU::setAPU(APU* apu)
 {
     _apu = apu;
+}
+
+void MMU::setTimer(Timer* timer)
+{
+    _timer = timer;
 }

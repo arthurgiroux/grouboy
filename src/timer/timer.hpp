@@ -14,7 +14,7 @@ class InterruptManager;
  *          This timer can't be deactivated but can be reset on demand.
  *
  *      The timer counter:
- *          A programmable timer that can enabled/disabled.
+ *          A programmable timer that can be enabled/disabled.
  *          This timer is counting at a specific frequency and increasing an 8-bit counter.
  *          Once this counter overflows, a "Timer interrupt" is triggered.
  *          After overflowing, the counter will start counting again from the value set in
@@ -31,13 +31,13 @@ class Timer
      * Create a new Timer wrapper.
      * Once created, use tick() to update the timer based on elapsed CPU ticks.
      *
-     * @param mmu   The MMU to use.
+     * @param interruptManager   The manager to raise interrupts
      */
-    explicit Timer(MMU* mmu, InterruptManager* interruptManager) : _mmu(mmu), _interruptManager(interruptManager){};
+    explicit Timer(InterruptManager* interruptManager) : _interruptManager(interruptManager){};
     ~Timer() = default;
 
     /**
-     * Inform the timer that a certain number of CPU ticks elapsed.
+     * Inform the timer that a certain number of CPU ticks has elapsed.
      * This will update the timers according to their internal frequency and parameters.
      *
      * @param ticks     the number of CPU ticks that elapsed
@@ -52,12 +52,23 @@ class Timer
     int getDividerRegisterValue() const;
 
     /**
+     * Reset the divider register and associated internal counter to 0.
+     */
+    void resetDividerRegisterValue();
+
+    /**
      * Get the current value of the timer counter.
-     * This value is incremented by during by the timer counter logic.
+     * This value is incremented during by the timer counter logic.
      *
      * @return timer counter value
      */
     int getTimerCounterValue() const;
+
+    /**
+     * Set the timer counter to a specific value.
+     * @param value A value between 0 and 255
+     */
+    void setTimerCounterValue(int value);
 
     /**
      * Get the value that the counter will be set to when overflowing.
@@ -74,14 +85,9 @@ class Timer
     void setTimerModuloValue(int value);
 
     /**
-     * Enable the timer counter.
+     * Enable or disable the timer counter.
      */
-    void enableTimerCounter();
-
-    /**
-     * Disable the timer counter.
-     */
-    void disableTimerCounter();
+    void enableTimerCounter(bool state);
 
     /**
      * Return if the Timer Counter is enabled or not.
@@ -102,14 +108,13 @@ class Timer
     /**
      * Set the clock divider to be used by the timer counter.
      *
-     * @param value Possible values are: 16, 64, 256, 1024
+     * @param value Possible values are:
+     * 0: 16
+     * 1: 64
+     * 2: 256
+     * 3: 1024
      */
-    void setClockDivider(int value);
-
-    /**
-     * The address where the value of the Divider Register is stored.
-     */
-    static const int DIVIDER_REGISTER_ADDR = 0xFF04;
+    void setClockDivider(unsigned int value);
 
     /**
      * The frequency in Hz of the divider register timer.
@@ -117,27 +122,6 @@ class Timer
     static const int DIV_REGISTER_FREQUENCY_HZ = 16384;
 
   private:
-    /**
-     * Update the stored value of the clock divider based on the selected clock divider
-     * in the Timer Control register.
-     */
-    void updateTimerCounterClockDivider();
-
-    /**
-     * The address where the value of the Timer Counter is stored.
-     */
-    static const int TIMER_COUNTER_ADDR = 0xFF05;
-
-    /**
-     * The address where the value of the Timer Modulo is stored.
-     */
-    static const int TIMER_MODULO_ADDR = 0xFF06;
-
-    /**
-     * The address where the parameters of the Timer Counter are stored.
-     */
-    static const int TIMER_CONTROL_ADDR = 0xFF07;
-
     /**
      * Conversion factor from CPU ticks to CPU cycles.
      */
@@ -163,24 +147,51 @@ class Timer
         256};
 
     /**
+     * Increment the Divider Register value based on the number of CPU cycles elapsed.
+     * @param cycles    The number of CPU cycles elapsed
+     */
+    void incrementDivRegister(int cycles);
+
+    /**
+     * Increment the Timer Counter value based on the number of CPU cycles elapsed.
+     * @param cycles    The number of CPU cycles elapsed
+     */
+    void incrementTimerCounter(int cycles);
+
+    /**
      * The number of CPU cycles accumulated for the Divider Register since the last increment of the counter.
      */
-    int dividerRegisterCycles = 0;
+    int _dividerRegisterCycles = 0;
 
     /**
      * The number of CPU cycles accumulated for the Timer Counter since the last increment of the counter.
      */
-    int timerCounterCycles = 0;
+    int _timerCounterCycles = 0;
 
     /**
      * The value of the clock divider for the Timer Counter.
      */
-    int timerCounterClockDivider = 0;
+    int _timerCounterClockDivider = 0;
 
     /**
-     * The MMU to use for accessing the register and incrementing counters.
+     * The value of the Divider Register.
      */
-    MMU* _mmu = nullptr;
+    byte _dividerRegisterValue = 0;
+
+    /**
+     * The value of the Timer Counter.
+     */
+    byte _timerCounter = 0;
+
+    /**
+     * The value of the Timer Modulo.
+     */
+    int _timerModulo = 0;
+
+    /**
+     * The state of the Timer Counter.
+     */
+    bool _timerCounterEnabled = false;
 
     /**
      * The interrupt manager that will be used to retrieve information about interrupts.

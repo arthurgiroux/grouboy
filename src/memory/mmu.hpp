@@ -14,6 +14,7 @@
 
 // Forward declaration
 class APU;
+class Timer;
 class InputController;
 
 /***********************************
@@ -40,6 +41,7 @@ class MMU
     Cartridge* getCartridge();
     void setInputController(InputController* controller);
     void setAPU(APU* apu);
+    void setTimer(Timer* timer);
     void reset();
 
     /**
@@ -76,7 +78,6 @@ class MMU
     {
         P1 = 0xFF00,
         SC = 0xFF02,
-        TAC = 0xFF07,
         IF = 0xFF0F,
         STAT = 0xFF41,
         BOOT_ROOM_LOCK = 0xFF50,
@@ -117,14 +118,31 @@ class MMU
     static const int DMA_TRANSFER_ADDR = 0xFF46;
     static const int DMA_TRANSFER_LENGTH = 160;
     static const int DMA_TRANSFER_TARGET_ADDR = 0xFE00;
+
+    /**
+     * The address where the value of the Divider Register is stored.
+     */
+    static const int TIMER_DIV_ADDR = 0xFF04;
+
+    /**
+     * The address where the value of the Timer Counter is stored.
+     */
+    static const int TIMER_COUNTER_ADDR = 0xFF05;
+
+    /**
+     * The address where the value of the Timer Modulo is stored.
+     */
+    static const int TIMER_MODULO_ADDR = 0xFF06;
+
+    /**
+     * The address where the parameters of the Timer Counter are stored.
+     */
+    static const int TIMER_CONTROL_ADDR = 0xFF07;
+
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
 
     APU* _apu = nullptr;
-
-    // The Timer class is allowed to directly access the internal memory representation.
-    // This is so that they can circumvent the check when writing to the timer divider register.
-    // TODO: Expose an "unsafe write" function to better encapsulate this.
-    friend class Timer;
+    Timer* _timer = nullptr;
 };
 
 #endif

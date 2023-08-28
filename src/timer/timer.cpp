@@ -1,119 +1,104 @@
 #include "timer.hpp"
 #include "cpu/cpu.hpp"
-#include <algorithm>
 
 const int Timer::DIV_TIMER_CLOCK_DIVIDER = CPU::CLOCK_FREQUENCY_HZ / DIV_REGISTER_FREQUENCY_HZ;
-
-void Timer::updateTimerCounterClockDivider()
-{
-    int divider = getClockDivider();
-    if (timerCounterClockDivider != divider)
-    {
-        // When there's a change of divider, the internal counting needs to be reset.
-        timerCounterCycles = 0;
-        timerCounterClockDivider = divider;
-    }
-}
 
 void Timer::tick(int ticks)
 {
     int cycles = ticks * TICKS_TO_CPU_CYCLES;
-    dividerRegisterCycles += cycles;
-    if (dividerRegisterCycles >= DIV_TIMER_CLOCK_DIVIDER)
-    {
-        // TODO: Check if we need to reset to 0
-        dividerRegisterCycles -= DIV_TIMER_CLOCK_DIVIDER;
-        _mmu->memory[DIVIDER_REGISTER_ADDR] = getDividerRegisterValue() + 1;
-    }
+    incrementDivRegister(cycles);
 
     if (isTimerCounterEnabled())
     {
-        updateTimerCounterClockDivider();
+        incrementTimerCounter(cycles);
+    }
+}
 
-        timerCounterCycles += cycles;
-
-        while (timerCounterCycles >= timerCounterClockDivider)
+void Timer::incrementTimerCounter(int cycles)
+{
+    _timerCounterCycles += cycles;
+    int clockDivider = CLOCK_DIVIDER_VALUES[_timerCounterClockDivider];
+    while (_timerCounterCycles >= clockDivider)
+    {
+        _timerCounterCycles -= clockDivider;
+        int maxTimerValue = 0xFF;
+        if (_timerCounter == maxTimerValue)
         {
-            timerCounterCycles -= timerCounterClockDivider;
-            int value = getTimerCounterValue();
-            int maxTimerValue = 0xFF;
-            if (value == maxTimerValue)
-            {
-                _mmu->write(TIMER_COUNTER_ADDR, getTimerModuloValue());
-                _interruptManager->raiseInterrupt(InterruptType::TIMER);
-            }
-            else
-            {
-                _mmu->write(TIMER_COUNTER_ADDR, value + 1);
-            }
+            _timerCounter = _timerModulo;
+            _interruptManager->raiseInterrupt(InterruptType::TIMER);
         }
+        else
+        {
+            _timerCounter++;
+        }
+    }
+}
+
+void Timer::incrementDivRegister(int cycles)
+{
+    _dividerRegisterCycles += cycles;
+    if (_dividerRegisterCycles >= DIV_TIMER_CLOCK_DIVIDER)
+    {
+        _dividerRegisterCycles -= DIV_TIMER_CLOCK_DIVIDER;
+        _dividerRegisterValue++;
     }
 }
 
 bool Timer::isTimerCounterEnabled()
 {
-    return utils::isNthBitSet(_mmu->read(TIMER_CONTROL_ADDR), 2);
+    return _timerCounterEnabled;
 }
 
 int Timer::getClockDivider()
 {
-    unsigned int clockSelected = _mmu->read(TIMER_CONTROL_ADDR) & 0b00000011;
-    if (clockSelected < CLOCK_DIVIDER_VALUES.size())
-    {
-        return CLOCK_DIVIDER_VALUES[clockSelected];
-    }
-    else
-    {
-        throw std::runtime_error("Unhandled clock select value");
-    }
+    return _timerCounterClockDivider;
 }
 
 int Timer::getDividerRegisterValue() const
 {
-    return _mmu->read(DIVIDER_REGISTER_ADDR);
+    return _dividerRegisterValue;
 }
 
 int Timer::getTimerCounterValue() const
 {
-    return _mmu->read(TIMER_COUNTER_ADDR);
+    return _timerCounter;
 }
 
 int Timer::getTimerModuloValue() const
 {
-    return _mmu->read(TIMER_MODULO_ADDR);
+    return _timerModulo;
 }
 
 void Timer::setTimerModuloValue(int value)
 {
-    _mmu->write(TIMER_MODULO_ADDR, value);
+    _timerModulo = value;
 }
 
-void Timer::enableTimerCounter()
+void Timer::enableTimerCounter(bool enable)
 {
-    int timerControlValue = _mmu->read(TIMER_CONTROL_ADDR);
-    utils::setNthBit(timerControlValue, 2, true);
-    _mmu->write(TIMER_CONTROL_ADDR, timerControlValue);
+    _timerCounterEnabled = enable;
 }
 
-void Timer::disableTimerCounter()
+void Timer::setClockDivider(unsigned int value)
 {
-    int timerControlValue = _mmu->read(TIMER_CONTROL_ADDR);
-    utils::setNthBit(timerControlValue, 2, false);
-    _mmu->write(TIMER_CONTROL_ADDR, timerControlValue);
-}
-
-void Timer::setClockDivider(int value)
-{
-    auto it = std::find(CLOCK_DIVIDER_VALUES.begin(), CLOCK_DIVIDER_VALUES.end(), value);
-    if (it == CLOCK_DIVIDER_VALUES.end())
+    if (value >= CLOCK_DIVIDER_VALUES.size())
     {
-        throw std::runtime_error("Unhandled clock select value");
+        return;
     }
     else
     {
-        int timerControlValue = _mmu->read(TIMER_CONTROL_ADDR);
-        timerControlValue &= 0b11111100;
-        timerControlValue |= std::distance(CLOCK_DIVIDER_VALUES.begin(), it);
-        _mmu->write(TIMER_CONTROL_ADDR, timerControlValue);
+        _timerCounterClockDivider = value;
+        // When there's a change of divider, the internal counting needs to be reset.
+        _timerCounterCycles = 0;
     }
+}
+void Timer::setTimerCounterValue(int value)
+{
+    _timerCounter = value;
+}
+
+void Timer::resetDividerRegisterValue()
+{
+    _dividerRegisterValue = 0;
+    _timerCounterCycles = 0;
 }

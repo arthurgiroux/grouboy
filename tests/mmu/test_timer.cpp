@@ -11,7 +11,8 @@ class TimerTest : public ::testing::Test
     {
         cpu = std::make_unique<CPU>(mmu);
         interruptManager = std::make_unique<InterruptManager>(cpu.get(), &mmu);
-        timer = std::make_unique<Timer>(&mmu, interruptManager.get());
+        timer = std::make_unique<Timer>(interruptManager.get());
+        mmu.setTimer(timer.get());
     }
 
     MMU mmu;
@@ -25,6 +26,10 @@ class TimerTest : public ::testing::Test
      * We convert the number of CPU cycles to ticks by dividing by 4.
      */
     static const int NBR_TICKS_TO_INCREASE_DIV_REGISTER = 64;
+    static const int DIV_ADDR = 0xFF04;
+    static const int COUNTER_ADDR = 0xFF05;
+    static const int MODULO_ADDR = 0xFF06;
+    static const int CONTROL_ADDR = 0xFF07;
 };
 
 TEST_F(TimerTest, DivRegisterValueShouldBe0AtInit)
@@ -50,7 +55,7 @@ TEST_F(TimerTest, WritingToDividerRegisterShouldResetValueTo0)
         timer->tick(NBR_TICKS_TO_INCREASE_DIV_REGISTER);
     }
     ASSERT_EQ(timer->getDividerRegisterValue(), expectedDivValue);
-    mmu.write(Timer::DIVIDER_REGISTER_ADDR, 0x12);
+    mmu.write(DIV_ADDR, 0x12);
     ASSERT_EQ(timer->getDividerRegisterValue(), 0);
 }
 
@@ -76,33 +81,33 @@ TEST_F(TimerTest, SetTimerModuloValueShouldSetValueCorrectly)
 TEST_F(TimerTest, EnableTimerCounterShouldEnableTimer)
 {
     ASSERT_FALSE(timer->isTimerCounterEnabled());
-    timer->enableTimerCounter();
+    timer->enableTimerCounter(true);
     ASSERT_TRUE(timer->isTimerCounterEnabled());
 }
 
 TEST_F(TimerTest, DisableTimerCounterShouldDisableTimer)
 {
-    timer->enableTimerCounter();
+    timer->enableTimerCounter(true);
     ASSERT_TRUE(timer->isTimerCounterEnabled());
-    timer->disableTimerCounter();
+    timer->enableTimerCounter(false);
     ASSERT_FALSE(timer->isTimerCounterEnabled());
 }
 
 TEST_F(TimerTest, SetClockDividerShouldSetExpectedValue)
 {
-    int clockDividerValue = 1024;
+    int clockDividerValue = 0;
     timer->setClockDivider(clockDividerValue);
     ASSERT_EQ(timer->getClockDivider(), clockDividerValue);
-    clockDividerValue = 256;
+    clockDividerValue = 3;
     timer->setClockDivider(clockDividerValue);
     ASSERT_EQ(timer->getClockDivider(), clockDividerValue);
 }
 
 TEST_F(TimerTest, TimerCounterAt4096HzShouldIncrementEvery256Tick)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 1024;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 0;
+    int ticksToIncrement = 256;
     timer->setClockDivider(clockDivider);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
     timer->tick(ticksToIncrement - 1);
@@ -113,9 +118,9 @@ TEST_F(TimerTest, TimerCounterAt4096HzShouldIncrementEvery256Tick)
 
 TEST_F(TimerTest, TimerCounterAt262144HzShouldIncrementEvery4Tick)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 16;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 1;
+    int ticksToIncrement = 4;
     timer->setClockDivider(clockDivider);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
     timer->tick(ticksToIncrement - 1);
@@ -126,9 +131,9 @@ TEST_F(TimerTest, TimerCounterAt262144HzShouldIncrementEvery4Tick)
 
 TEST_F(TimerTest, TimerCounterAt65536HzShouldIncrementEvery16Tick)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 64;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 2;
+    int ticksToIncrement = 16;
     timer->setClockDivider(clockDivider);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
     timer->tick(ticksToIncrement - 1);
@@ -139,9 +144,9 @@ TEST_F(TimerTest, TimerCounterAt65536HzShouldIncrementEvery16Tick)
 
 TEST_F(TimerTest, TimerCounterAt16384HzShouldIncrementEvery64Tick)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 256;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 3;
+    int ticksToIncrement = 64;
     timer->setClockDivider(clockDivider);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
     timer->tick(ticksToIncrement - 1);
@@ -152,9 +157,9 @@ TEST_F(TimerTest, TimerCounterAt16384HzShouldIncrementEvery64Tick)
 
 TEST_F(TimerTest, TimerCounterShouldOverflowToModuloValue)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 256;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 3;
+    int ticksToIncrement = 64;
     int moduloValue = 0x42;
     timer->setTimerModuloValue(moduloValue);
     timer->setClockDivider(clockDivider);
@@ -171,9 +176,9 @@ TEST_F(TimerTest, TimerCounterShouldOverflowToModuloValue)
 
 TEST_F(TimerTest, TimerCounterShouldRaiseTimerInterruptOnOverflow)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 256;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 3;
+    int ticksToIncrement = 64;
     timer->setClockDivider(clockDivider);
 
     int maxTimerValue = 0xFF;
@@ -189,15 +194,15 @@ TEST_F(TimerTest, TimerCounterShouldRaiseTimerInterruptOnOverflow)
 
 TEST_F(TimerTest, InternalTimerCounterShouldResetWhenChangingClockDivider)
 {
-    timer->enableTimerCounter();
-    int clockDivider = 256;
-    int ticksToIncrement = clockDivider / 4;
+    timer->enableTimerCounter(true);
+    int clockDivider = 3;
+    int ticksToIncrement = 64;
     timer->setClockDivider(clockDivider);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
     timer->tick(ticksToIncrement - 1);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
-    clockDivider = 1024;
-    ticksToIncrement = clockDivider / 4;
+    clockDivider = 0;
+    ticksToIncrement = 256;
     timer->setClockDivider(clockDivider);
     timer->tick(1);
     ASSERT_EQ(timer->getTimerCounterValue(), 0);
