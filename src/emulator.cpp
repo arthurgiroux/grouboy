@@ -2,10 +2,10 @@
 #include <fstream>
 
 Emulator::Emulator()
-    : cpu(mmu), ppu(mmu, cpu.getInterruptManager()), timer(&mmu, cpu.getInterruptManager()),
-      apu(&timer, AUDIO_SAMPLING_FREQ)
+    : cpu(mmu), ppu(mmu, cpu.getInterruptManager()), timer(cpu.getInterruptManager()), apu(&timer, AUDIO_SAMPLING_FREQ)
 {
     mmu.setAPU(&apu);
+    mmu.setTimer(&timer);
     mmu.setInputController(&inputController);
 }
 
