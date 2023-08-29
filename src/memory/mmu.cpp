@@ -199,7 +199,7 @@ void MMU::write(const word& addr, const byte& value)
     else if (_timer != nullptr && addr == TIMER_CONTROL_ADDR)
     {
         _timer->enableTimerCounter(utils::isNthBitSet(value, 2));
-        _timer->setClockDivider(value & 0x00000011);
+        _timer->setClockDivider(value & 0b00000011);
     }
     else
     {

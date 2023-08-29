@@ -171,7 +171,7 @@ class Timer
     /**
      * The value of the clock divider for the Timer Counter.
      */
-    int _timerCounterClockDivider = 0;
+    unsigned int _timerCounterClockDivider = 0;
 
     /**
      * The value of the Divider Register.
