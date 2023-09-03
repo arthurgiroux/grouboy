@@ -103,13 +103,23 @@ Blargg's test coverage:
 
 [Mooneye test suite](https://github.com/Gekkio/mooneye-test-suite):
 
-| Category         | Test Name      | Pass/Fail          |
-|------------------|----------------|--------------------|
-| CPU Instructions | DAA            | :white_check_mark: |
-| Bits             | MEM OAM        | :white_check_mark: |
-| Bits             | Reg F          | :white_check_mark: |
-| Bits             | unused_hwio-GS | :white_check_mark: |
-| OAM DMA          | Basic          | :white_check_mark: |
+| Category         | Test Name         | Pass/Fail          |
+|------------------|-------------------|--------------------|
+| CPU Instructions | DAA               | :white_check_mark: |
+| Bits             | MEM OAM           | :white_check_mark: |
+| Bits             | Reg F             | :white_check_mark: |
+| Bits             | unused_hwio-GS    | :white_check_mark: |
+| OAM DMA          | Basic             | :white_check_mark: |
+| Timer            | Div Write         | :white_check_mark: |
+| Timer            | Rapid toggle      | :x:                |
+| Timer            | Tim00             | :white_check_mark: |
+| Timer            | Tim00 Div trigger | :x:                |
+| Timer            | Tim01             | :white_check_mark: |
+| Timer            | Tim01 Div trigger | :x:                |
+| Timer            | Tim10             | :white_check_mark: |
+| Timer            | Tim10 Div trigger | :x:                |
+| Timer            | Tim11             | :white_check_mark: |
+| Timer            | Tim11 Div trigger | :x:                |
 
 ## Contributing
 

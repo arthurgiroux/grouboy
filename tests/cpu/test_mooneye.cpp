@@ -80,3 +80,28 @@ TEST_F(MoonEyeTest, TestForDMABasicShouldBeSuccessful)
 {
     assertTestForRomArePassing("acceptance/oam_dma/basic.gb");
 }
+
+TEST_F(MoonEyeTest, TestForTimerDivWriteShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/timer/div_write.gb");
+}
+
+TEST_F(MoonEyeTest, TestForTimerTim00ShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/timer/tim00.gb");
+}
+
+TEST_F(MoonEyeTest, TestForTimerTim01ShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/timer/tim01.gb");
+}
+
+TEST_F(MoonEyeTest, TestForTimerTim10ShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/timer/tim10.gb");
+}
+
+TEST_F(MoonEyeTest, TestForTimerTim11ShouldBeSuccessful)
+{
+    assertTestForRomArePassing("acceptance/timer/tim11.gb");
+}
