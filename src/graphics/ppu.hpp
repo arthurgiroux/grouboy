@@ -99,7 +99,7 @@ class PPU
      * @param isStacked Is the tile we want to retrieve a stacked 8x16 tile
      * @return The requested tile
      */
-    Tile getTileById(byte tileId, int8_t tileSetId, bool isStacked = false);
+    Tile getTileById(byte tileId, sbyte tileSetId, bool isStacked = false);
 
     /**
      * Get a reference to the last rendered frame.
@@ -147,7 +147,7 @@ class PPU
      *
      * @return index of the tile data area to use
      */
-    int backgroundAndWindowTileDataAreaIndex() const;
+    sbyte backgroundAndWindowTileDataAreaIndex() const;
 
     /**
      * Return the index of the tile map to use for the background
@@ -330,7 +330,7 @@ class PPU
     /**
      * Scanline currently being rendered.
      */
-    int _currentScanline = 0;
+    byte _currentScanline = 0;
 
     /**
      * An internal line counter used to render the window.

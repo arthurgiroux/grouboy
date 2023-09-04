@@ -45,7 +45,7 @@ void CPU::load16BitsRegisterAndImmediateOffsetIn16BitsRegister(byte& msbRegister
     unsetFlag(CpuFlags::ZERO);
     unsetFlag(CpuFlags::SUBSTRACTION);
     sbyte offset = static_cast<sbyte>(mmu.read(pc));
-    int newValue = otherReg + offset;
+    word newValue = otherReg + offset;
     pc++;
     msbRegister = getMsbFromWord(newValue);
     lsbRegister = getLsbFromWord(newValue);

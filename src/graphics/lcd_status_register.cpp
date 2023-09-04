@@ -7,7 +7,7 @@ LCDStatusRegister::LCDStatusRegister(MMU& mmu) : _mmu(mmu)
 void LCDStatusRegister::updateFlagMode(PPU::Mode value)
 {
     // We mask the bits used for the mode to reset them
-    int status = _mmu.read(ADDR_LCD_STATUS) & 0b11111100;
+    byte status = _mmu.read(ADDR_LCD_STATUS) & 0b11111100;
     if (value == PPU::HBLANK)
     {
         status |= 0x00;
@@ -37,7 +37,7 @@ void LCDStatusRegister::setLYCompareFlag(bool value)
 {
     int status = _mmu.read(ADDR_LCD_STATUS);
     utils::setNthBit(status, 2, value);
-    _mmu.write(ADDR_LCD_STATUS, status);
+    _mmu.write(ADDR_LCD_STATUS, static_cast<byte>(status));
 }
 
 bool LCDStatusRegister::isLYCompareStatInterruptEnabled()
