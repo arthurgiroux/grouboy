@@ -12,8 +12,8 @@ void CPU::addTwo8BitsRegistersToTwo8BitsRegisters(byte& resultRegMsb, byte& resu
     result += addValue;
     setCarryFlag(result > 0xFFFF);
     setHalfCarryFlag(((origValue & 0xFFF) + (addValue & 0xFFF)) > 0xFFF);
-    resultRegMsb = getMsbFromWord(result);
-    resultRegLsb = getLsbFromWord(result);
+    resultRegMsb = getMsbFromWord(static_cast<word>(result));
+    resultRegLsb = getLsbFromWord(static_cast<word>(result));
     lastInstructionTicks = 2;
 }
 

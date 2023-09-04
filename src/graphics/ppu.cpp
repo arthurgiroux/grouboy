@@ -366,7 +366,7 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     }
 }
 
-Tile PPU::getTileById(byte tileId, int8_t tileSetId, bool isStacked)
+Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
 {
     int tileSetOffset = ADDR_TILE_SET_0;
     int tileIdCorrected = tileId;
@@ -418,9 +418,9 @@ bool PPU::isWindowEnabled() const
     return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 5);
 }
 
-int PPU::backgroundAndWindowTileDataAreaIndex() const
+sbyte PPU::backgroundAndWindowTileDataAreaIndex() const
 {
-    return !utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 4);
+    return static_cast<sbyte>(!utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 4));
 }
 
 int PPU::backgroundTileMapIndex() const
