@@ -75,14 +75,14 @@ class Timer
      *
      * @return the timer modulo value
      */
-    int getTimerModuloValue() const;
+    byte getTimerModuloValue() const;
 
     /**
      * Set the value that the counter will be set to when overflowing.
      *
      * @param value The new timer modulo value
      */
-    void setTimerModuloValue(int value);
+    void setTimerModuloValue(byte value);
 
     /**
      * Enable or disable the timer counter.
@@ -186,7 +186,7 @@ class Timer
     /**
      * The value of the Timer Modulo.
      */
-    int _timerModulo = 0;
+    byte _timerModulo = 0;
 
     /**
      * The state of the Timer Counter.

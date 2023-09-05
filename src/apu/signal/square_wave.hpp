@@ -1,6 +1,7 @@
 #ifndef GROUBOY_SQUARE_WAVE_HPP
 #define GROUBOY_SQUARE_WAVE_HPP
 
+#include "common/types.hpp"
 #include <array>
 #include <bitset>
 
@@ -65,7 +66,7 @@ class SquareWave
      * Get the id of the selected wave pattern
      * @return A value between [0, 3]
      */
-    int getDutyPattern() const;
+    byte getDutyPattern() const;
 
     /**
      * Reset the internal frequency counter.
@@ -97,7 +98,7 @@ class SquareWave
     /**
      * The selected wave pattern.
      */
-    int _dutyPattern = 0;
+    byte _dutyPattern = 0;
 
     /**
      * The internal frequency counter, when it reaches the selected frequency a new sample is generated.

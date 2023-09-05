@@ -29,11 +29,11 @@ const std::array<byte, 256> MMU::BIOS = {
 
 const std::set<word> MMU::unmappedIOAddrs = {0xFF03, 0xFF08, 0xFF09, 0xFF0A, 0xFF0B, 0xFF0C, 0xFF0D, 0xFF0E};
 
-const std::map<word, int> MMU::mappedIOMask = {{HardwareIOAddr::P1, 0b11000000},
-                                               {HardwareIOAddr::SC, 0b01111110},
-                                               {HardwareIOAddr::IF, 0b11100000},
-                                               {HardwareIOAddr::STAT, 0b10000000},
-                                               {HardwareIOAddr::BOOT_ROOM_LOCK, 0b11111110}};
+const std::map<word, byte> MMU::mappedIOMask = {{HardwareIOAddr::P1, 0b11000000},
+                                                {HardwareIOAddr::SC, 0b01111110},
+                                                {HardwareIOAddr::IF, 0b11100000},
+                                                {HardwareIOAddr::STAT, 0b10000000},
+                                                {HardwareIOAddr::BOOT_ROOM_LOCK, 0b11111110}};
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
 

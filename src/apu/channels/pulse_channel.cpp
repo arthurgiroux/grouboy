@@ -55,12 +55,12 @@ SquareWave& PulseChannel::getWave()
     return _squareWave;
 }
 
-void PulseChannel::setVolumeControl(int value)
+void PulseChannel::setVolumeControl(byte value)
 {
     _volumeCtrl = value;
 }
 
-int PulseChannel::getVolumeControl() const
+byte PulseChannel::getVolumeControl() const
 {
     return _volumeCtrl;
 }

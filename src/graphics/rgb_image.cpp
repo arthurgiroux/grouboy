@@ -38,9 +38,9 @@ void RGBImage::setPixel(int x, int y, byte value)
 
 void RGBImage::copyPixel(int x, int y, const RGBImage& source, int sourceX, int sourceY)
 {
-    int r = source.getPixelR(sourceX, sourceY);
-    int g = source.getPixelG(sourceX, sourceY);
-    int b = source.getPixelB(sourceX, sourceY);
+    byte r = source.getPixelR(sourceX, sourceY);
+    byte g = source.getPixelG(sourceX, sourceY);
+    byte b = source.getPixelB(sourceX, sourceY);
     setPixel(x, y, r, g, b);
 }
 

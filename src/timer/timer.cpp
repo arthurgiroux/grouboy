@@ -64,12 +64,12 @@ int Timer::getTimerCounterValue() const
     return _timerCounter;
 }
 
-int Timer::getTimerModuloValue() const
+byte Timer::getTimerModuloValue() const
 {
     return _timerModulo;
 }
 
-void Timer::setTimerModuloValue(int value)
+void Timer::setTimerModuloValue(byte value)
 {
     _timerModulo = value;
 }

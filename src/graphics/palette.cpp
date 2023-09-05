@@ -31,7 +31,7 @@ Palette::Palette(MMU& mmu, word paletteAddr) : _mmu(mmu), _paletteAddr(paletteAd
 
 byte Palette::convertColorId(byte colorId)
 {
-    int paletteData = _mmu.read(_paletteAddr);
+    byte paletteData = _mmu.read(_paletteAddr);
 
     /*
      * The mapping with color is the following:

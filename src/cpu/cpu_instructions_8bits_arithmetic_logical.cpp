@@ -180,7 +180,7 @@ void CPU::sub8BitsValueAndCarryTo8BitsRegister(byte& reg, byte value)
 {
     setFlag(CpuFlags::SUBSTRACTION);
     word result = reg - value;
-    int offset = isFlagSet(CpuFlags::CARRY) ? 1 : 0;
+    word offset = isFlagSet(CpuFlags::CARRY) ? 1 : 0;
     result -= offset;
     setCarryFlag(result > 0xFF);
     setHalfCarryFlag(((reg & 0xF) - (value & 0xF) - offset) < 0);

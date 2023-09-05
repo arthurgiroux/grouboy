@@ -164,7 +164,7 @@ void PPU::renderScanlineBackground(int scanline)
          */
         int colorValue = getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
                              .getColorData(xOffsetTile, yOffsetTile);
-        int convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
+        byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
 }
@@ -226,10 +226,9 @@ void PPU::renderScanlineWindow(int scanline)
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
-        int colorValue = getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
-                             .getColorData(xOffsetTile, yOffsetTile);
-        // int colorValue = tilemap[tileIndex].getColorData(xOffsetTile, yOffsetTile);
-        int convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
+        byte colorValue = getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+                              .getColorData(xOffsetTile, yOffsetTile);
+        byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
 
@@ -284,7 +283,7 @@ void PPU::renderScanlineSprite(int scanline)
 
     for (auto* sprite : spritesToRender)
     {
-        int tileId = sprite->getTileId();
+        byte tileId = sprite->getTileId();
         bool isStackedTile = spriteSize() > SingleTile::TILE_HEIGHT;
         if (isStackedTile)
         {

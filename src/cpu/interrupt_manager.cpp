@@ -15,14 +15,14 @@ void InterruptManager::raiseInterrupt(InterruptType type)
 {
     int interruptFlag = _mmu->read(INTERRUPT_FLAG_ADDR);
     utils::setNthBit(interruptFlag, bitPositionInFlagForInterruptType[type], true);
-    _mmu->write(INTERRUPT_FLAG_ADDR, interruptFlag);
+    _mmu->write(INTERRUPT_FLAG_ADDR, static_cast<byte>(interruptFlag));
 }
 
 void InterruptManager::clearInterrupt(InterruptType type)
 {
     int interruptFlag = _mmu->read(INTERRUPT_FLAG_ADDR);
     utils::setNthBit(interruptFlag, bitPositionInFlagForInterruptType[type], false);
-    _mmu->write(INTERRUPT_FLAG_ADDR, interruptFlag);
+    _mmu->write(INTERRUPT_FLAG_ADDR, static_cast<byte>(interruptFlag));
 }
 
 bool InterruptManager::isAnyInterruptEnabled()

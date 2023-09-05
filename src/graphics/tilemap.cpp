@@ -4,12 +4,12 @@ Tilemap::Tilemap(MMU* mmu, word tilemapAddr) : _mmu(mmu)
 {
     for (int i = 0; i < HEIGHT * WIDTH; ++i)
     {
-        sbyte tileId = _mmu->read(tilemapAddr + i);
+        sbyte tileId = static_cast<sbyte>(_mmu->read(tilemapAddr + i));
         _tileIds[i] = tileId;
     }
 }
 
-int Tilemap::getTileIdForIndex(int index) const
+sbyte Tilemap::getTileIdForIndex(int index) const
 {
     return _tileIds[index];
 }

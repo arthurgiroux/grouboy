@@ -30,7 +30,7 @@ void Channel1::setFrequencySweepControl(int value)
     _frequencySweep.setShift(shift);
 }
 
-int Channel1::getFrequencySweepControl() const
+byte Channel1::getFrequencySweepControl() const
 {
     return _sweepControlValue;
 }

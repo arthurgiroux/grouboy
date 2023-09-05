@@ -26,7 +26,7 @@ class Tilemap
      * @param index the index inside the tilemap, between 0 and WIDTH*HEIGHT
      * @return a signed tile id
      */
-    int getTileIdForIndex(int index) const;
+    sbyte getTileIdForIndex(int index) const;
 
     /**
      * Retrieve the tile index for a given entry in the tilemap, using xy coordinate
