@@ -29,7 +29,7 @@ class MBC3 : public MemoryBankController
     void writeRAM(const word& addr, const byte& value) override;
     std::vector<byte> serializeRAM() override;
     bool unserializeRAM(const std::vector<byte>& data) override;
-    
+
   private:
     /**
      * The address range that corresponds to the fixed ROM bank
@@ -59,12 +59,12 @@ class MBC3 : public MemoryBankController
     /**
      * The size of a ROM bank in bytes
      */
-    static const int ROM_BANK_SIZE_IN_BYTES = 16_KiB;
+    static const size_t ROM_BANK_SIZE_IN_BYTES = 16_KiB;
 
     /**
      * The size of a RAM bank in bytes
      */
-    static const int RAM_BANK_SIZE_IN_BYTES = 8_KiB;
+    static const size_t RAM_BANK_SIZE_IN_BYTES = 8_KiB;
 
     /**
      * Maximum number of ram banks

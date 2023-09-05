@@ -34,7 +34,7 @@ bool Sprite::isRenderedOverBackgroundAndWindow() const
     return !utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_BGWINDOW_OVER_OBJ);
 }
 
-int Sprite::readDataFromPayload(int idx) const
+byte Sprite::readDataFromPayload(int idx) const
 {
     return _mmu.read(SPRITE_ATTR_TABLE_ADDR + PAYLOAD_PER_SPRITE * _id + idx);
 }

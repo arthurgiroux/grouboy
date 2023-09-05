@@ -16,5 +16,5 @@ void SerialTransferManager::finalizeTransfer()
     // We clear the transfer flag to allow for next transfer
     int transferControl = _mmu->read(SERIAL_TRANSFER_CONTROL_ADDR);
     utils::setNthBit(transferControl, TRANSFER_START_FLAG_BIT, false);
-    _mmu->write(SERIAL_TRANSFER_CONTROL_ADDR, transferControl);
+    _mmu->write(SERIAL_TRANSFER_CONTROL_ADDR, static_cast<byte>(transferControl));
 }

@@ -59,7 +59,7 @@ class PulseChannel : public Channel
      *
      * @param value a value in the format above
      */
-    void setVolumeControl(int value);
+    void setVolumeControl(byte value);
 
     /**
      * Get the volume control value.
@@ -67,7 +67,7 @@ class PulseChannel : public Channel
      *
      * @return the volume control value
      */
-    int getVolumeControl() const;
+    byte getVolumeControl() const;
     void reset() override;
 
   protected:
@@ -97,7 +97,7 @@ class PulseChannel : public Channel
     /**
      * The volume control
      */
-    int _volumeCtrl = 0;
+    byte _volumeCtrl = 0;
 };
 
 #endif // GROUBOY_PULSE_CHANNEL_HPP

@@ -3,6 +3,7 @@
 
 #include "apu/signal/square_wave.hpp"
 #include "channel.hpp"
+#include "common/types.hpp"
 #include "frame_sequencer.hpp"
 #include "frequency_sweep.hpp"
 #include "length_timer.hpp"
@@ -38,7 +39,7 @@ class Channel1 : public PulseChannel
      * @see setFrequencySweepControl for details
      * @return The sweep control value
      */
-    int getFrequencySweepControl() const;
+    byte getFrequencySweepControl() const;
     ~Channel1() override = default;
     void reset() override;
 
@@ -62,7 +63,7 @@ class Channel1 : public PulseChannel
      */
     void onFrequencyOverflow();
     FrequencySweep _frequencySweep;
-    int _sweepControlValue = 0;
+    byte _sweepControlValue = 0;
 };
 
 #endif // GROUBOY_CHANNEL1_HPP

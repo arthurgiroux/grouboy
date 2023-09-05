@@ -86,7 +86,7 @@ class MMU
     /**
      * bitmask for unused bits for the mapped hardware IO
      */
-    static const std::map<word, int> mappedIOMask;
+    static const std::map<word, byte> mappedIOMask;
 
     /**
      * List of non-consecutive unmapped IO addresses

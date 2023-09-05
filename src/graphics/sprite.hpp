@@ -98,7 +98,7 @@ class Sprite
      * @param idx	the index of the data to read
      * @return	the data read from the payload
      */
-    int readDataFromPayload(int idx) const;
+    byte readDataFromPayload(int idx) const;
 
     static const int SPRITE_ATTR_TABLE_ADDR = 0xFE00;
     static const int PAYLOAD_PER_SPRITE = 4;

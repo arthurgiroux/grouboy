@@ -53,7 +53,7 @@ void SquareWave::setDutyPattern(int index)
     _dutyPattern = index;
 }
 
-int SquareWave::getDutyPattern() const
+byte SquareWave::getDutyPattern() const
 {
     return _dutyPattern;
 }
