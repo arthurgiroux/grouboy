@@ -43,14 +43,14 @@ class Cartridge
      *
      * @return  the size of the ROM in bytes
      */
-    int getROMSize() const;
+    size_t getROMSize() const;
 
     /**
      * Get the size of the RAM in bytes
      *
      * @return  the size of the ROM in bytes
      */
-    int getRAMSize() const;
+    size_t getRAMSize() const;
 
     /**
      * Represents the type of hardware presents on the cartridge

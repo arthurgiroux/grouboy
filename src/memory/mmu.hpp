@@ -109,35 +109,35 @@ class MMU
     std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
     std::unique_ptr<Cartridge> cartridge = nullptr;
     std::unique_ptr<MemoryBankController> memoryBankController = nullptr;
-    static const int EXTERNAL_RAM_START_ADDR = 0xA000;
-    static const int EXTERNAL_RAM_END_ADDR = 0xC000;
-    static const int ROM_BANK_1_END_ADDR = 0x8000;
-    static const int BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
+    static constexpr word EXTERNAL_RAM_START_ADDR = 0xA000;
+    static constexpr word EXTERNAL_RAM_END_ADDR = 0xC000;
+    static constexpr word ROM_BANK_1_END_ADDR = 0x8000;
+    static constexpr word BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
     InputController* inputController = nullptr;
-    static const int JOYPAD_MAP_ADDR = 0xFF00;
-    static const int DMA_TRANSFER_ADDR = 0xFF46;
+    static constexpr word JOYPAD_MAP_ADDR = 0xFF00;
+    static constexpr word DMA_TRANSFER_ADDR = 0xFF46;
     static const int DMA_TRANSFER_LENGTH = 160;
-    static const int DMA_TRANSFER_TARGET_ADDR = 0xFE00;
+    static constexpr word DMA_TRANSFER_TARGET_ADDR = 0xFE00;
 
     /**
      * The address where the value of the Divider Register is stored.
      */
-    static const int TIMER_DIV_ADDR = 0xFF04;
+    static constexpr word TIMER_DIV_ADDR = 0xFF04;
 
     /**
      * The address where the value of the Timer Counter is stored.
      */
-    static const int TIMER_COUNTER_ADDR = 0xFF05;
+    static constexpr word TIMER_COUNTER_ADDR = 0xFF05;
 
     /**
      * The address where the value of the Timer Modulo is stored.
      */
-    static const int TIMER_MODULO_ADDR = 0xFF06;
+    static constexpr word TIMER_MODULO_ADDR = 0xFF06;
 
     /**
      * The address where the parameters of the Timer Counter are stored.
      */
-    static const int TIMER_CONTROL_ADDR = 0xFF07;
+    static constexpr word TIMER_CONTROL_ADDR = 0xFF07;
 
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
 

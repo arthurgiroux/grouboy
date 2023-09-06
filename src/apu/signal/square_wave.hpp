@@ -58,9 +58,9 @@ class SquareWave
      *  2: duty-cycle = 50%
      *  3: duty-cycle = 75%
      *
-     * @param pattern The pattern to select, value between [0, 3]
+     * @param index The pattern to select, value between [0, 3]
      */
-    void setDutyPattern(int pattern);
+    void setDutyPattern(byte index);
 
     /**
      * Get the id of the selected wave pattern

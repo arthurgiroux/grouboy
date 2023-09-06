@@ -49,7 +49,7 @@ class Timer
      *
      * @return The byte value of the divider register.
      */
-    int getDividerRegisterValue() const;
+    byte getDividerRegisterValue() const;
 
     /**
      * Reset the divider register and associated internal counter to 0.
@@ -62,13 +62,13 @@ class Timer
      *
      * @return timer counter value
      */
-    int getTimerCounterValue() const;
+    byte getTimerCounterValue() const;
 
     /**
      * Set the timer counter to a specific value.
      * @param value A value between 0 and 255
      */
-    void setTimerCounterValue(int value);
+    void setTimerCounterValue(byte value);
 
     /**
      * Get the value that the counter will be set to when overflowing.
@@ -103,7 +103,7 @@ class Timer
      *
      * @return  How many CPU cycles are needed to increase the timer counter
      */
-    int getClockDivider();
+    byte getClockDivider();
 
     /**
      * Set the clock divider to be used by the timer counter.
@@ -114,7 +114,7 @@ class Timer
      * 2: 256
      * 3: 1024
      */
-    void setClockDivider(unsigned int value);
+    void setClockDivider(byte value);
 
     /**
      * The frequency in Hz of the divider register timer.
@@ -171,7 +171,7 @@ class Timer
     /**
      * The value of the clock divider for the Timer Counter.
      */
-    unsigned int _timerCounterClockDivider = 0;
+    byte _timerCounterClockDivider = 0;
 
     /**
      * The value of the Divider Register.

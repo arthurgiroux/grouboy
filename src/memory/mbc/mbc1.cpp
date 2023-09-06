@@ -52,9 +52,9 @@ void MBC1::writeROM(const word& addr, const byte& value)
         }
 
         // We also mask the selected bank with the number of available banks
-        int nbrBanks = _cartridge->getROMSize() / ROM_BANK_SIZE_IN_BYTES;
+        size_t nbrBanks = _cartridge->getROMSize() / ROM_BANK_SIZE_IN_BYTES;
         // Retrieve the number of bits needed to encode the bank number
-        int nbrBitsNeeded = log2(nbrBanks);
+        int nbrBitsNeeded = static_cast<int>(log2(static_cast<double>(nbrBanks)));
         selectedBankValue &= (1 << nbrBitsNeeded) - 1;
 
         _selectedROMBankId = selectedBankValue;
@@ -99,7 +99,8 @@ std::vector<byte> MBC1::serializeRAM()
 
 bool MBC1::unserializeRAM(const std::vector<byte>& data)
 {
-    if (data.size() != _ram.size()) {
+    if (data.size() != _ram.size())
+    {
         return false;
     }
 

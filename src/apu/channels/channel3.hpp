@@ -16,8 +16,8 @@ class Channel3 : public Channel
     void setFrequency(int frequency);
     int getFrequency();
     Wave<32>& getWave();
-    void setVolumeControl(int value);
-    int getVolumeControl() const;
+    void setVolumeControl(byte value);
+    byte getVolumeControl() const;
     void reset() override;
 
   private:
@@ -26,7 +26,7 @@ class Channel3 : public Channel
     Wave<32> _wave;
     int _frequency = 0;
     bool _lengthTimerEnabled = false;
-    int _volumeCtrl = 0;
+    byte _volumeCtrl = 0;
 };
 
 #endif // GROUBOY_CHANNEL3_HPP

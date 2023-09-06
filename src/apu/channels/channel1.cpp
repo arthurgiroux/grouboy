@@ -19,7 +19,7 @@ void Channel1::onFrequencyOverflow()
     enable(false);
 }
 
-void Channel1::setFrequencySweepControl(int value)
+void Channel1::setFrequencySweepControl(byte value)
 {
     _sweepControlValue = value;
     int sweepDirection = (_sweepControlValue & 0b00001000) >> 3;

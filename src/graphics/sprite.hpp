@@ -53,7 +53,7 @@ class Sprite
      *
      * @return 	the id of the tile to render from the tilemap
      */
-    int getTileId() const;
+    byte getTileId() const;
 
     /**
      * Should the tile be flipped vertically when rendering this sprite.

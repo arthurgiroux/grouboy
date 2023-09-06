@@ -124,12 +124,12 @@ void Cartridge::readType()
     type = static_cast<CartridgeType>(data[CARTRIDGE_TYPE_ADDR]);
 }
 
-int Cartridge::getROMSize() const
+size_t Cartridge::getROMSize() const
 {
-    return 32_KiB * (1 << data[CARTRIDGE_ROM_SIZE_ADDR]);
+    return 32_KiB * (1 << static_cast<size_t>(data[CARTRIDGE_ROM_SIZE_ADDR]));
 }
 
-int Cartridge::getRAMSize() const
+size_t Cartridge::getRAMSize() const
 {
     unsigned int ramSizeValue = data[CARTRIDGE_RAM_SIZE_ADDR];
 
@@ -139,7 +139,7 @@ int Cartridge::getRAMSize() const
     }
 
     // Values taken from: https://gbdev.io/pandocs/The_Cartridge_Header.html#0149--ram-size
-    std::array<int, 6> ramSizeValueToBytes = {0_KiB, 0_KiB, 8_KiB, 32_KiB, 128_KiB, 64_KiB};
+    std::array<size_t, 6> ramSizeValueToBytes = {0_KiB, 0_KiB, 8_KiB, 32_KiB, 128_KiB, 64_KiB};
 
     if (ramSizeValue >= ramSizeValueToBytes.size())
     {

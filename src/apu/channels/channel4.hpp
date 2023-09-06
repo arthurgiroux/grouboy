@@ -10,11 +10,11 @@ class Channel4 : public Channel
     explicit Channel4(float highpassCoeff);
     void step(int cycles) override;
     void trigger() override;
-    void setVolumeControl(int value);
-    int getVolumeControl() const;
+    void setVolumeControl(byte value);
+    byte getVolumeControl() const;
     float getAudioSample() override;
-    void setNoiseControl(int control);
-    int getNoiseControl() const;
+    void setNoiseControl(byte control);
+    byte getNoiseControl() const;
     void reset() override;
 
   private:
@@ -22,8 +22,8 @@ class Channel4 : public Channel
     static const int VOLUME_SWEEP_FREQ = 64;
     VolumeSweep _volumeSweep;
     NoiseSignal _noiseSignal;
-    int _volumeCtrl = 0;
-    int _noiseControl = 0;
+    byte _volumeCtrl = 0;
+    byte _noiseControl = 0;
 };
 
 #endif // GROUBOY_CHANNEL4_HPP

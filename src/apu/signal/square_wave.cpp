@@ -48,7 +48,7 @@ void SquareWave::resetFrequencyTimer()
     _frequencyTimerValue = _frequency;
 }
 
-void SquareWave::setDutyPattern(int index)
+void SquareWave::setDutyPattern(byte index)
 {
     _dutyPattern = index;
 }

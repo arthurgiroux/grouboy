@@ -108,7 +108,7 @@ byte APU::readRegister(const word& addr)
     else if (addr == SOUND_CTRL_ADDR)
     {
         return 0x70 | (_enabled << 7) | (_channel4->isEnabled() << 3) | (_channel3->isEnabled() << 2) |
-               (_channel2->isEnabled() << 1) | (_channel1->isEnabled());
+               (_channel2->isEnabled() << 1) | static_cast<byte>(_channel1->isEnabled());
     }
     else if (addr == CH3_DAC_REG_ADDR)
     {
@@ -154,12 +154,12 @@ byte APU::readRegister(const word& addr)
     }
     else if (addr == MASTER_VOLUME_ADDR)
     {
-        return (_mixer->isVinLeftEnabled() << 7) | (_mixer->getVolumeScaleLeft() << 4) |
-               (_mixer->isVinRightEnabled() << 3) | _mixer->getVolumeScaleRight();
+        return static_cast<byte>((_mixer->isVinLeftEnabled() << 7) | (_mixer->getVolumeScaleLeft() << 4) |
+                                 (_mixer->isVinRightEnabled() << 3) | _mixer->getVolumeScaleRight());
     }
     else if (addr == SOUND_PANNING_ADDR)
     {
-        return (_mixer->getPanningControlLeft() << 4) | _mixer->getPanningControlRight();
+        return static_cast<byte>((_mixer->getPanningControlLeft() << 4) | _mixer->getPanningControlRight());
     }
 
     // Unmapped register should return FF
