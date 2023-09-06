@@ -162,8 +162,8 @@ void PPU::renderScanlineBackground(int scanline)
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
-        int colorValue = getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
-                             .getColorData(xOffsetTile, yOffsetTile);
+        byte colorValue = getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+                              .getColorData(xOffsetTile, yOffsetTile);
         byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
@@ -324,8 +324,8 @@ void PPU::renderScanlineSprite(int scanline)
             }
 
             Palette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
-            int colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
-            int convertedPaletteColor = palette.convertColorId(colorId);
+            byte colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
+            byte convertedPaletteColor = palette.convertColorId(colorId);
 
             // We are copying the pixel if it's not white, white is treated as transparent
             bool isPixelOpaque = colorId != 0;
@@ -367,7 +367,7 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
 
 Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
 {
-    int tileSetOffset = ADDR_TILE_SET_0;
+    word tileSetOffset = ADDR_TILE_SET_0;
     int tileIdCorrected = tileId;
     if (tileSetId == 1)
     {
@@ -375,7 +375,7 @@ Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
         tileIdCorrected = static_cast<sbyte>(tileId);
     }
 
-    word tileBaseAddr = tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected;
+    word tileBaseAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
 
     int tileBytesPerTile = isStacked ? StackedTile::BYTES_PER_TILE : SingleTile::BYTES_PER_TILE;
     Tile::TileDataArray dataArray = {};
@@ -383,7 +383,7 @@ Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
 
     for (int i = 0; i < tileBytesPerTile; ++i)
     {
-        dataArray[i] = _mmu.read(tileBaseAddr + i);
+        dataArray[i] = _mmu.read(static_cast<word>(tileBaseAddr + i));
     }
 
     if (isStacked)
@@ -398,7 +398,7 @@ Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
 
 Tilemap PPU::getTileMap(int index)
 {
-    int tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
+    word tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
     return Tilemap(&_mmu, tileMapAddr);
 }
 

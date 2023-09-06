@@ -49,17 +49,17 @@ bool Timer::isTimerCounterEnabled()
     return _timerCounterEnabled;
 }
 
-int Timer::getClockDivider()
+byte Timer::getClockDivider()
 {
     return _timerCounterClockDivider;
 }
 
-int Timer::getDividerRegisterValue() const
+byte Timer::getDividerRegisterValue() const
 {
     return _dividerRegisterValue;
 }
 
-int Timer::getTimerCounterValue() const
+byte Timer::getTimerCounterValue() const
 {
     return _timerCounter;
 }
@@ -79,7 +79,7 @@ void Timer::enableTimerCounter(bool enable)
     _timerCounterEnabled = enable;
 }
 
-void Timer::setClockDivider(unsigned int value)
+void Timer::setClockDivider(byte value)
 {
     if (value >= CLOCK_DIVIDER_VALUES.size())
     {
@@ -92,7 +92,7 @@ void Timer::setClockDivider(unsigned int value)
         _timerCounterCycles = 0;
     }
 }
-void Timer::setTimerCounterValue(int value)
+void Timer::setTimerCounterValue(byte value)
 {
     _timerCounter = value;
 }

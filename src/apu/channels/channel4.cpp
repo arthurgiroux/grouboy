@@ -30,17 +30,17 @@ float Channel4::getAudioSample()
     return convertFromDigitalToAnalog(_noiseSignal.getAmplitude() * _volumeSweep.getVolume());
 }
 
-void Channel4::setVolumeControl(int value)
+void Channel4::setVolumeControl(byte value)
 {
     _volumeCtrl = value;
 }
 
-int Channel4::getVolumeControl() const
+byte Channel4::getVolumeControl() const
 {
     return _volumeCtrl;
 }
 
-void Channel4::setNoiseControl(int control)
+void Channel4::setNoiseControl(byte control)
 {
     _noiseControl = control;
     int clockShift = (control & 0xF0) >> 4;
@@ -61,7 +61,7 @@ void Channel4::setNoiseControl(int control)
     _noiseSignal.setFrequency(frequency);
 }
 
-int Channel4::getNoiseControl() const
+byte Channel4::getNoiseControl() const
 {
     return _noiseControl;
 }

@@ -9,7 +9,7 @@ int Sprite::getId() const
     return _id;
 }
 
-int Sprite::getTileId() const
+byte Sprite::getTileId() const
 {
     return readDataFromPayload(PAYLOAD_DATA_TILEID_IDX);
 }
@@ -36,7 +36,7 @@ bool Sprite::isRenderedOverBackgroundAndWindow() const
 
 byte Sprite::readDataFromPayload(int idx) const
 {
-    return _mmu.read(SPRITE_ATTR_TABLE_ADDR + PAYLOAD_PER_SPRITE * _id + idx);
+    return _mmu.read(static_cast<word>(SPRITE_ATTR_TABLE_ADDR + PAYLOAD_PER_SPRITE * _id + idx));
 }
 
 int Sprite::getXPositionOnScreen() const

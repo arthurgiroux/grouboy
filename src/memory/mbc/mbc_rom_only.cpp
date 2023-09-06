@@ -8,7 +8,7 @@ MBCRomOnly::MBCRomOnly(Cartridge* cartridge) : MemoryBankController(cartridge)
 
 byte MBCRomOnly::readROM(const word& addr)
 {
-    int romSize = _cartridge->getROMSize();
+    size_t romSize = _cartridge->getROMSize();
     if (addr < romSize)
     {
         return _cartridge->getData()[addr];

@@ -32,7 +32,7 @@ class Channel1 : public PulseChannel
      *
      * @param value a 8bit value in the format above
      */
-    void setFrequencySweepControl(int value);
+    void setFrequencySweepControl(byte value);
 
     /**
      * Get the frequency sweep control value.

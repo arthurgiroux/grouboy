@@ -263,44 +263,44 @@ class PPU
     /**
      * The address of the tile map with index 0.
      */
-    static const int ADDR_MAP_0 = 0x9800;
+    static constexpr word ADDR_MAP_0 = 0x9800;
 
     /**
      * The address of the tile map with index 1.
      */
-    static const int ADDR_MAP_1 = 0x9C00;
+    static constexpr word ADDR_MAP_1 = 0x9C00;
 
     /**
      * The address of the tile set with index 0.
      */
-    static const int ADDR_TILE_SET_0 = 0x8000;
+    static constexpr word ADDR_TILE_SET_0 = 0x8000;
 
     /**
      * The address of the tile set with index 1.
      */
-    static const int ADDR_TILE_SET_1 = 0x9000;
+    static constexpr word ADDR_TILE_SET_1 = 0x9000;
 
     /**
      * The address of the LCD control register.
      */
-    static const int ADDR_LCD_PPU_CONTROL = 0xFF40;
+    static constexpr word ADDR_LCD_PPU_CONTROL = 0xFF40;
 
     /**
      * The address of the scroll-y register.
      */
-    static const int ADDR_SCROLL_Y = 0xFF42;
+    static constexpr word ADDR_SCROLL_Y = 0xFF42;
 
     /**
      * The address of the scroll-x register.
      */
-    static const int ADDR_SCROLL_X = 0xFF43;
+    static constexpr word ADDR_SCROLL_X = 0xFF43;
 
     /**
      * The address where we store the information of the scanline being rendered.
      */
-    static const int ADDR_SCANLINE = 0xFF44;
-    static const int WINDOW_ADDR_SCROLL_Y = 0xFF4A;
-    static const int WINDOW_ADDR_SCROLL_X = 0xFF4B;
+    static constexpr word ADDR_SCANLINE = 0xFF44;
+    static constexpr word WINDOW_ADDR_SCROLL_Y = 0xFF4A;
+    static constexpr word WINDOW_ADDR_SCROLL_X = 0xFF4B;
 
     /**
      * The number of sprites in the OAM.
@@ -377,17 +377,17 @@ class PPU
     /**
      * The address of the palette to use for background sprites.
      */
-    static const int ADDR_PALETTE_BG = 0xFF47;
+    static const word ADDR_PALETTE_BG = 0xFF47;
 
     /**
      * The address of the palette with index 0 to use for sprites (object rendering).
      */
-    static const int ADDR_PALETTE_OBJ0 = 0x0FF48;
+    static const word ADDR_PALETTE_OBJ0 = 0x0FF48;
 
     /**
      * The address of the palette with index 1 to use for sprites (object rendering).
      */
-    static const int ADDR_PALETTE_OBJ1 = 0x0FF49;
+    static const word ADDR_PALETTE_OBJ1 = 0x0FF49;
 
     /**
      * The palette to use for background sprites.

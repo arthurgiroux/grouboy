@@ -47,12 +47,12 @@ Wave<32>& Channel3::getWave()
     return _wave;
 }
 
-void Channel3::setVolumeControl(int value)
+void Channel3::setVolumeControl(byte value)
 {
     _volumeCtrl = value;
 }
 
-int Channel3::getVolumeControl() const
+byte Channel3::getVolumeControl() const
 {
     return _volumeCtrl;
 }
