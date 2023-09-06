@@ -126,7 +126,7 @@ void Cartridge::readType()
 
 size_t Cartridge::getROMSize() const
 {
-    return 32_KiB * (1 << static_cast<size_t>(data[CARTRIDGE_ROM_SIZE_ADDR]));
+    return 32_KiB * (1ULL << data[CARTRIDGE_ROM_SIZE_ADDR]);
 }
 
 size_t Cartridge::getRAMSize() const
