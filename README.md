@@ -121,6 +121,13 @@ Blargg's test coverage:
 | Timer            | Tim11             | :white_check_mark: |
 | Timer            | Tim11 Div trigger | :x:                |
 
+## Reference
+
+* <https://izik1.github.io/gbops/index.html>
+* <https://gbdev.io/pandocs/>
+* <https://gbdev.gg8.se/wiki/articles/Main_Page>
+* <https://archive.org/details/GameBoyProgManVer1.1/mode/2up?view=theater>
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
