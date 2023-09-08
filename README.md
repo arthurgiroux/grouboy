@@ -48,7 +48,11 @@ Future work:
 
 ## Demo
 
-![Demo](demo_image/emulator_demo.gif)
+| Name    | Output                          |
+|---------|---------------------------------|
+| Zelda   | ![Demo](demo_image/zelda.gif)   |
+| Mario   | ![Demo](demo_image/mario.gif)   |
+| Pokemon | ![Demo](demo_image/pokemon.gif) |
 
 ## Dependencies
 
