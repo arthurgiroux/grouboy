@@ -13,6 +13,7 @@ class PixelFIFO
     Pixel pop();
     bool isEmpty() const;
     bool isFull() const;
+    size_t size() const;
 
   private:
     static const int MAX_SIZE = 16;

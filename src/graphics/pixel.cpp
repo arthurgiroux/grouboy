@@ -24,3 +24,14 @@ byte Pixel::getBackgroundPriority() const
 {
     return _backgroundPriority;
 }
+
+bool Pixel::operator==(const Pixel& rhs) const
+{
+    return _color == rhs._color && _palette == rhs._palette && _spritePriority == rhs._spritePriority &&
+           _backgroundPriority == rhs._backgroundPriority;
+}
+
+bool Pixel::operator!=(const Pixel& rhs) const
+{
+    return !(rhs == *this);
+}
