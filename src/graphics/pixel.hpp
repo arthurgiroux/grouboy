@@ -12,6 +12,8 @@ class Pixel
     byte getPalette() const;
     byte getSpritePriority() const;
     byte getBackgroundPriority() const;
+    bool operator==(const Pixel& rhs) const;
+    bool operator!=(const Pixel& rhs) const;
 
   private:
     byte _color;

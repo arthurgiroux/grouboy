@@ -21,3 +21,8 @@ bool PixelFIFO::isFull() const
 {
     return _fifo.size() == MAX_SIZE;
 }
+
+size_t PixelFIFO::size() const
+{
+    return _fifo.size();
+}
