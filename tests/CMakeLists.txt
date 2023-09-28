@@ -68,7 +68,7 @@ add_executable(
         ppu/test_tile.cpp
         ppu/test_rgb_image.cpp
         ppu/test_sprite.cpp
-)
+        ppu/test_pixel.cpp)
 
 target_link_libraries(
         ppu_tests

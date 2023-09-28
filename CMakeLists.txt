@@ -91,7 +91,11 @@ set(SOURCE_FILES
         src/apu/signal/noise_signal.cpp
         src/apu/signal/noise_signal.hpp
         src/apu/filters/highpass_filter.cpp
-        src/apu/filters/highpass_filter.hpp)
+        src/apu/filters/highpass_filter.hpp
+        src/graphics/pixel_fifo.cpp
+        src/graphics/pixel_fifo.hpp
+        src/graphics/pixel.cpp
+        src/graphics/pixel.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
