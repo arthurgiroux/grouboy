@@ -28,6 +28,13 @@ void PPU::step(int nbrTicks)
 
     if (_currentMode == OAM_ACCESS && _ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
     {
+        _spritesToRender.clear();
+
+        if (areSpritesEnabled())
+        {
+            _spritesToRender = getSpritesThatShouldBeRendered(_currentScanline);
+        }
+
         setMode(VRAM_ACCESS);
     }
     else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
@@ -86,6 +93,55 @@ void PPU::step(int nbrTicks)
     }
 
     _mmu.write(ADDR_SCANLINE, _currentScanline);
+}
+
+std::vector<Sprite*> PPU::getSpritesThatShouldBeRendered(int scanline)
+{
+    std::vector<Sprite*> spritesToRender = {};
+    int nbrSpritesInScanline = 0;
+
+    /*
+     * In order to find which sprites to render, we need to check the coordinate of every sprite.
+     * There's a maximum number of sprites that can be rendered per scanline.
+     */
+    for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
+    {
+        auto& sprite = _sprites[i];
+        int spriteSz = spriteSize();
+        int spriteStartVerticalPos = sprite->getYPositionOnScreen();
+        int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
+
+        if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
+        {
+            nbrSpritesInScanline++;
+            /*
+             * If the sprite is outside the screen bound then it's not going to be effectively rendered,
+             * but it still counts as if it was rendered and should increment the number of sprites rendered.
+             */
+            if ((sprite->getXPositionOnScreen() + SingleTile::TILE_WIDTH) < 0 ||
+                sprite->getXPositionOnScreen() >= SCREEN_WIDTH)
+            {
+                continue;
+            }
+
+            spritesToRender.push_back(sprite.get());
+        }
+    }
+
+    if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
+    {
+        spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
+    }
+
+    /*
+     * Sort sprite by priority, from lowest to highest.
+     * We will render first the lowest priority sprite so that they can be overridden by a sprite with higher
+     * priority.
+     */
+    std::sort(spritesToRender.begin(), spritesToRender.end(),
+              [](Sprite* l, Sprite* r) { return !l->isPriorityBiggerThanOtherSprite(*r); });
+
+    return spritesToRender;
 }
 
 void PPU::renderScanline(int scanline)
@@ -238,50 +294,7 @@ void PPU::renderScanlineWindow(int scanline)
 
 void PPU::renderScanlineSprite(int scanline)
 {
-    int nbrSpritesInScanline = 0;
-
-    std::vector<Sprite*> spritesToRender = {};
-    /*
-     * In order to find which sprites to render, we need to check the coordinate of every sprite.
-     * There's a maximum number of sprites that can be rendered per scanline.
-     */
-    for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
-    {
-        auto& sprite = _sprites[i];
-        int spriteSz = spriteSize();
-        int spriteStartVerticalPos = sprite->getYPositionOnScreen();
-        int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
-
-        if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
-        {
-            nbrSpritesInScanline++;
-            /*
-             * If the sprite is outside the screen bound then it's not going to be effectively rendered
-             * but it still counts as if it was rendered and should increment the number of sprites rendered.
-             */
-            if ((sprite->getXPositionOnScreen() + SingleTile::TILE_WIDTH) < 0 ||
-                sprite->getXPositionOnScreen() >= PPU::SCREEN_WIDTH)
-            {
-                continue;
-            }
-
-            spritesToRender.push_back(sprite.get());
-        }
-    }
-
-    if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
-    {
-        spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
-    }
-
-    /*
-     * Sort sprite by priority, from lowest to highest.
-     * We will render first the lowest priority sprite so that they can be overridden by a sprite with higher priority.
-     */
-    std::sort(spritesToRender.begin(), spritesToRender.end(),
-              [](Sprite* l, Sprite* r) { return !l->isPriorityBiggerThanOtherSprite(*r); });
-
-    for (auto* sprite : spritesToRender)
+    for (auto* sprite : _spritesToRender)
     {
         byte tileId = sprite->getTileId();
         bool isStackedTile = spriteSize() > SingleTile::TILE_HEIGHT;
