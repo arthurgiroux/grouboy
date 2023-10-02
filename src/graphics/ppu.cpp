@@ -36,15 +36,21 @@ void PPU::step(int nbrTicks)
         }
 
         setMode(VRAM_ACCESS);
+        _backgroundWindowFIFO.clear();
+        _spritesFIFO.clear();
     }
-    else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
+    else if (_currentMode == VRAM_ACCESS)
     {
-        if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
+        renderPixel();
+        if (_ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
         {
-            _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
+            {
+                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            }
+            setMode(HBLANK);
+            renderScanline(_currentScanline);
         }
-        setMode(HBLANK);
-        renderScanline(_currentScanline);
     }
     else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= HBLANK_TICKS)
     {
@@ -473,4 +479,16 @@ void PPU::setMode(PPU::Mode value)
     _currentMode = value;
     // TODO: Check if we should take into account modulo of ticks
     _ticksSpentInCurrentMode = 0;
+}
+
+void PPU::renderPixel()
+{
+    if (_backgroundWindowFIFO.isEmpty())
+    {
+        // TODO: Fill FIFO
+    }
+
+    if (_spritesFIFO.isEmpty())
+    {
+    }
 }

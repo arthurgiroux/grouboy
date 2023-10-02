@@ -3,6 +3,7 @@
 
 #include "memory/mmu.hpp"
 #include "palette.hpp"
+#include "pixel_fifo.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
 #include "tile.hpp"
@@ -415,6 +416,11 @@ class PPU
     Palette _paletteObj1;
 
     std::vector<Sprite*> _spritesToRender = {};
+
+    PixelFIFO _backgroundWindowFIFO;
+
+    PixelFIFO _spritesFIFO;
+    void renderPixel();
 };
 
 #endif // GBEMULATOR_PPU_HPP
