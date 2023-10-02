@@ -26,3 +26,8 @@ size_t PixelFIFO::size() const
 {
     return _fifo.size();
 }
+
+void PixelFIFO::clear()
+{
+    _fifo = {};
+}

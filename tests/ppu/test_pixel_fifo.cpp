@@ -50,3 +50,17 @@ TEST_F(PixelFIFOTest, PixelFIFOWith16ElementsShouldBeFull)
     }
     ASSERT_TRUE(fifo.isFull());
 }
+
+TEST_F(PixelFIFOTest, ClearShouldRemoveAllElements)
+{
+    int maxSize = 16;
+    for (int i = 0; i < maxSize; ++i)
+    {
+        auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00);
+        fifo.push(pixel);
+    }
+    ASSERT_TRUE(fifo.isFull());
+    fifo.clear();
+    ASSERT_FALSE(fifo.isFull());
+    ASSERT_TRUE(fifo.isEmpty());
+}
