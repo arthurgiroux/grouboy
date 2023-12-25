@@ -61,6 +61,11 @@ void MMU::reset()
 
 byte MMU::read(const word& addr)
 {
+    if (cartridgeHeaderAddr.contains(addr) && cartridge != nullptr)
+    {
+        return cartridge->getData()[addr];
+    }
+
     if (addr < BIOS.size() && isBootRomActive())
     {
         return memory[addr];
