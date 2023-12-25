@@ -118,6 +118,7 @@ class MMU
     static constexpr word DMA_TRANSFER_ADDR = 0xFF46;
     static const int DMA_TRANSFER_LENGTH = 160;
     static constexpr word DMA_TRANSFER_TARGET_ADDR = 0xFE00;
+    const utils::AddressRange cartridgeHeaderAddr = utils::AddressRange(0x0100, 0x014F);
 
     /**
      * The address where the value of the Divider Register is stored.
