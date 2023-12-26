@@ -109,8 +109,7 @@ class MMU
     std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
     std::unique_ptr<Cartridge> cartridge = nullptr;
     std::unique_ptr<MemoryBankController> memoryBankController = nullptr;
-    static constexpr word EXTERNAL_RAM_START_ADDR = 0xA000;
-    static constexpr word EXTERNAL_RAM_END_ADDR = 0xC000;
+    const utils::AddressRange externalRamAddr = utils::AddressRange(0xA000, 0xC000);
     static constexpr word ROM_BANK_1_END_ADDR = 0x8000;
     static constexpr word BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
     InputController* inputController = nullptr;
