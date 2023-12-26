@@ -20,7 +20,7 @@ class InputController;
 /***********************************
             MEMORY LAYOUT
 
- [ BIOS | ROM BANK 0 | ROM BANK 1 | GPU VRAM | Ext. RAM | Working RAM | Sprites info | I/O | ZRAM ]
+ [ BOOTROM | ROM BANK 0 | ROM BANK 1 | GPU VRAM | Ext. RAM | Working RAM | Sprites info | I/O | ZRAM ]
  0     256b   8k    16k    24k   32k        40k        48k           56k                         64k
 
 
@@ -59,7 +59,7 @@ class MMU
     bool unserializeCartridgeRAM(const std::vector<byte>& data);
 
     static const size_t MEMORY_SIZE_IN_BYTES = 65536;
-    static const std::array<byte, 256> BIOS;
+    static const std::array<byte, 2304> BOOTROM;
 
     class InvalidMemoryAccessException : public std::exception
     {
