@@ -76,9 +76,9 @@ byte MMU::read(const word& addr)
         return memoryBankController->readROM(addr);
     }
 
-    else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
+    else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
     {
-        return memoryBankController->readRAM(addr - EXTERNAL_RAM_START_ADDR);
+        return memoryBankController->readRAM(externalRamAddr.relative(addr));
     }
 
     else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
@@ -181,9 +181,9 @@ void MMU::write(const word& addr, const byte& value)
         memoryBankController->writeROM(addr, value);
     }
 
-    else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
+    else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
     {
-        memoryBankController->writeRAM(addr - EXTERNAL_RAM_START_ADDR, value);
+        memoryBankController->writeRAM(externalRamAddr.relative(addr), value);
     }
     else if (_apu != nullptr && apuRegisterRange.contains(addr))
     {
