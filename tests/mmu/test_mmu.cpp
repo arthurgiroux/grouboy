@@ -71,9 +71,9 @@ TEST(MMU, MemoryShouldContainBios)
 {
     auto mmu = MMU();
 
-    for (int i = 0; i < sizeof(MMU::BIOS); i++)
+    for (int i = 0; i < sizeof(MMU::BOOTROM); i++)
     {
-        ASSERT_EQ(MMU::BIOS[i], mmu.read(i));
+        ASSERT_EQ(MMU::BOOTROM[i], mmu.read(i));
     }
 }
 
