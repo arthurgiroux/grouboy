@@ -313,7 +313,7 @@ class MMU
     Timer* _timer = nullptr;
 
     /**
-     * The address of the bank id register
+     * The address of the VRAM bank id register
      */
     static constexpr word VRAM_BANK_ID_ADDR = 0xFF4F;
 
@@ -326,6 +326,21 @@ class MMU
      * The memory bank to use for the VRAM
      */
     SwitchableMemoryBank<2, 8_KiB> vramMemoryBank;
+
+    /**
+     * The address of the WRAM bank id register
+     */
+    static constexpr word WRAM_BANK_ID_ADDR = 0xFF70;
+
+    /**
+     * The address of the WRAM mapping
+     */
+    const utils::AddressRange wramAddressRange = utils::AddressRange(0xD000, 0xDFFF);
+
+    /**
+     * The memory bank to use for the WRAM
+     */
+    SwitchableMemoryBank<7, 4_KiB> wramMemoryBank;
 };
 
 #endif
