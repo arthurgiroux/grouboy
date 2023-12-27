@@ -10,6 +10,7 @@
 #include "common/types.hpp"
 #include "cpu/input_controller.hpp"
 #include "memory/mbc/memory_bank_controller.hpp"
+#include "switchable_memory_bank.hpp"
 #include "timer/timer.hpp"
 
 // Forward declaration
@@ -17,31 +18,118 @@ class APU;
 class Timer;
 class InputController;
 
-/***********************************
-            MEMORY LAYOUT
-
- [ BOOTROM | ROM BANK 0 | ROM BANK 1 | GPU VRAM | Ext. RAM | Working RAM | Sprites info | I/O | ZRAM ]
- 0     256b   8k    16k    24k   32k        40k        48k           56k                         64k
-
-
- ***********************************/
-
+/**
+ * The MMU class is responsible for managing the memory access and mapping.
+ * It handles read and write operations to various memory regions such as ROM, RAM, I/O registers,
+ * and other critical areas within the Game Boy architecture.
+ */
 class MMU
 {
+    /**
+     * The internal memory mapping is the following:
+            +----------------------+ <--- 0x0000
+            | ROM Bank 00          |   16KiB
+            | (Usually fixed)      |
+            +----------------------+ <--- 0x4000
+            | ROM Bank 01~NN       |   16KiB
+            | (Switchable)         |
+            +----------------------+ <--- 0x8000
+            | Video RAM (VRAM)     |   8KiB
+            | (Switchable in CGB)  |
+            +----------------------+ <--- 0xA000
+            | External RAM         |   8KiB
+            | (Switchable if any)  |
+            +----------------------+ <--- 0xC000
+            | Work RAM (WRAM)      |  4KiB
+            +----------------------+ <--- 0xD000
+            | Work RAM (WRAM)      |  4KiB
+            | (Switchable in CGB)  |
+            +----------------------+ <--- 0xE000
+            | Echo RAM             |
+            | (Prohibited)         |
+            +----------------------+ <--- 0xFE00
+            | Object Attribute Mem |
+            +----------------------+ <--- 0xFEA0
+            | Not usable           |
+            +----------------------+ <--- 0xFF00
+            | I/O Registers        |
+            +----------------------+ <--- 0xFF80
+            | High RAM             |
+            +----------------------+ <--- 0xFFFF
+            | Interrupt Enable     |
+            |      register        |
+            +----------------------+
+     */
   public:
     MMU();
     ~MMU() = default;
 
+    /**
+     * Read the value of the given memory location
+     * @param addr The address of the location
+     * @return The value in memory
+     */
     byte read(const word& addr);
+
+    /**
+     * Read the value of two consecutive memory location
+     * @param addr The address of the location
+     * @return the 2-bytes value in memory
+     */
     word readWord(const word& addr);
+
+    /**
+     * Write a given value to a memory location
+     * @param addr The address of the location
+     * @param value The byte value to write
+     */
     void write(const word& addr, const byte& value);
+
+    /**
+     * Write a given two-byte value to two consecutive memory location
+     * @param addr The address of the location
+     * @param value  The 2-bytes value to write
+     */
     void writeWord(const word& addr, const word& value);
+
+    /**
+     * Load a cartridge from a file.
+     * @param filepath The location of the cartridge file.
+     * @return true if loaded successfully, false otherwise
+     */
     bool loadCartridge(const std::string& filepath);
+
+    /**
+     * @return true if the boot rom is active, false otherwise
+     */
     bool isBootRomActive();
+
+    /**
+     * @return A pointer to the loaded cartridge
+     */
     Cartridge* getCartridge();
+
+    /**
+     * Set the input controller that will be used for register mapping
+     * @param controller the controller to use
+     */
     void setInputController(InputController* controller);
+
+    /**
+     * Set the APU that will be used for register mapping
+     * @param apu the APU to use
+     */
     void setAPU(APU* apu);
+
+    /**
+     * Set the Timer that will be used for register mapping
+     * @param timer The timer implementation to use
+     */
     void setTimer(Timer* timer);
+
+    /**
+     * Reset the state of the MMU
+     */
     void reset();
 
     /**
@@ -58,9 +146,19 @@ class MMU
      */
     bool unserializeCartridgeRAM(const std::vector<byte>& data);
 
+    /**
+     * The total size of the memory in bytes
+     */
     static const size_t MEMORY_SIZE_IN_BYTES = 65536;
+
+    /**
+     * The boot rom that will be loaded when the emulator is booted
+     */
     static const std::array<byte, 2304> BOOTROM;
 
+    /**
+     * Exception class for invalid memory access
+     */
     class InvalidMemoryAccessException : public std::exception
     {
       public:
@@ -103,20 +201,76 @@ class MMU
      */
     static const utils::AddressRange apuRegisterRange;
 
+    /**
+     * Get the memory representation of the joypad state.
+     * @return a bitmasked byte representing the state of the joypad
+     */
     byte getJoypadMemoryRepresentation();
 
+    /**
+     * Perform a DMA transfer from the given source to the DMA destination
+     * @param sourceAddr The source address for the DMA
+     */
     void performDMATransfer(word sourceAddr);
+
+    /**
+     * The internal representation of the memory
+     */
     std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
+
+    /**
+     * The loaded cartridge
+     */
     std::unique_ptr<Cartridge> cartridge = nullptr;
+
+    /**
+     * The memory bank that will be used for the cartridge mapping
+     */
     std::unique_ptr<MemoryBankController> memoryBankController = nullptr;
-    const utils::AddressRange externalRamAddr = utils::AddressRange(0xA000, 0xC000);
-    static constexpr word ROM_BANK_1_END_ADDR = 0x8000;
-    static constexpr word BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
+
+    /**
+     * The control to be used for input mapping
+     */
     InputController* inputController = nullptr;
+
+    /**
+     * External RAM address range
+     */
+    const utils::AddressRange externalRamAddr = utils::AddressRange(0xA000, 0xC000);
+
+    /**
+     * The end address of the 1st ROM bank
+     */
+    static constexpr word ROM_BANK_1_END_ADDR = 0x8000;
+
+    /**
+     * The address of unmapped flag in the boot room
+     */
+    static constexpr word BOOT_ROM_UNMAPPED_FLAG_ADDR = 0xFF50;
+
+    /**
+     * The address of the memory location where joypad state will be mapped
+     */
     static constexpr word JOYPAD_MAP_ADDR = 0xFF00;
+
+    /**
+     * The address of the DMA control location
+     */
     static constexpr word DMA_TRANSFER_ADDR = 0xFF46;
+
+    /**
+     * The length in bytes of the DMA transfer
+     */
     static const int DMA_TRANSFER_LENGTH = 160;
+
+    /**
+     * The target address of a DMA transfer
+     */
     static constexpr word DMA_TRANSFER_TARGET_ADDR = 0xFE00;
+
+    /**
+     * The address in memory where the cartridge header will be mapped
+     */
     const utils::AddressRange cartridgeHeaderAddr = utils::AddressRange(0x0100, 0x014F);
 
     /**
@@ -139,9 +293,23 @@ class MMU
      */
     static constexpr word TIMER_CONTROL_ADDR = 0xFF07;
 
+    /**
+     * Set bitmask value depending on the state of a button.
+     *
+     * @param button the button to check
+     * @param bitPosition the bitmask position to set
+     * @param value The output value to modify
+     */
     void setNthBitIfButtonIsReleased(InputController::Button button, int bitPosition, int& value);
 
+    /**
+     * The APU to use for audio register mapping
+     */
     APU* _apu = nullptr;
+
+    /**
+     * The timer to use for timer register mapping
+     */
     Timer* _timer = nullptr;
 };
 
