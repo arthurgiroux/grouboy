@@ -48,9 +48,19 @@ byte MMU::read(const word& addr)
         return memory[addr];
     }
 
+    else if (addr == VRAM_BANK_ID_ADDR)
+    {
+        return vramMemoryBank.getBankId() & 0xFE;
+    }
+
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
         return memoryBankController->readROM(addr);
+    }
+
+    else if (vramAddressRange.contains(addr))
+    {
+        return vramMemoryBank.read(vramAddressRange.relative(addr));
     }
 
     else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
@@ -153,9 +163,19 @@ void MMU::write(const word& addr, const byte& value)
         return;
     }
 
+    else if (addr == VRAM_BANK_ID_ADDR)
+    {
+        vramMemoryBank.switchBank(value & 0x01);
+    }
+
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
         memoryBankController->writeROM(addr, value);
+    }
+
+    else if (vramAddressRange.contains(addr))
+    {
+        vramMemoryBank.write(vramAddressRange.relative(addr), value);
     }
 
     else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
