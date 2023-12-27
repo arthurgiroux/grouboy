@@ -37,3 +37,4 @@ unsigned int SwitchableMemoryBank<NBR_BANK, MEM_SIZE>::getBankId() const
 }
 
 template class SwitchableMemoryBank<2, 8_KiB>;
+template class SwitchableMemoryBank<7, 4_KiB>;

@@ -68,6 +68,16 @@ byte MMU::read(const word& addr)
         return memoryBankController->readRAM(externalRamAddr.relative(addr));
     }
 
+    else if (addr == WRAM_BANK_ID_ADDR)
+    {
+        return wramMemoryBank.getBankId() & 0xF8;
+    }
+
+    else if (wramAddressRange.contains(addr))
+    {
+        return wramMemoryBank.read(wramAddressRange.relative(addr));
+    }
+
     else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
     {
         return getJoypadMemoryRepresentation();
@@ -182,6 +192,18 @@ void MMU::write(const word& addr, const byte& value)
     {
         memoryBankController->writeRAM(externalRamAddr.relative(addr), value);
     }
+
+    else if (addr == WRAM_BANK_ID_ADDR)
+    {
+        // Value 0 maps to the first bank, other value map to 1-based bank
+        wramMemoryBank.switchBank(value == 0 ? 0 : (value & 0x07) - 1);
+    }
+
+    else if (wramAddressRange.contains(addr))
+    {
+        wramMemoryBank.write(wramAddressRange.relative(addr), value);
+    }
+
     else if (_apu != nullptr && apuRegisterRange.contains(addr))
     {
         _apu->writeRegister(addr, value);
