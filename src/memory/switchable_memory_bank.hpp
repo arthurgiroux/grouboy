@@ -41,6 +41,14 @@ class SwitchableMemoryBank
     byte read(word addr) const;
 
     /**
+     * Read the value at the given address for the given bank
+     * @param addr a value between 0 and MEM_SIZE-1
+     * @param bankId The index of the bank, between 0 and NBR_BANK-1
+     * @return the value in memory of the given bank
+     */
+    byte readFromBank(word addr, unsigned int bankId) const;
+
+    /**
      * Write the given value at the given address for the active bank.
      *
      * @param addr a value between 0 and MEM_SIZE-1

@@ -67,3 +67,16 @@ TEST_F(SwitchableMemoryBankTest, WriteAtMaxValueShouldStoreValueCorrectly)
     memoryBank.write(addr, value);
     ASSERT_EQ(memoryBank.read(addr), value);
 }
+
+TEST_F(SwitchableMemoryBankTest, ReadFromSpecificBankShouldReturnTheCorrectValue)
+{
+    byte valueBank1 = 0x0F;
+    byte valueBank2 = 0xF0;
+    word addr = 0xFF;
+    ASSERT_EQ(memoryBank.read(addr), 0);
+    memoryBank.write(addr, valueBank1);
+    memoryBank.switchBank(1);
+    memoryBank.write(addr, valueBank2);
+    ASSERT_EQ(memoryBank.readFromBank(addr, 0), valueBank1);
+    ASSERT_EQ(memoryBank.readFromBank(addr, 1), valueBank2);
+}
