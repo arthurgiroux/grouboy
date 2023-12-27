@@ -82,7 +82,8 @@ add_executable(
         mmu/test_mmu.cpp
         cpu/test_cartridge.cpp
         test_input_controller.cpp
-        mmu/test_mbc.cpp)
+        mmu/test_mbc.cpp
+        mmu/test_switchable_memory_bank.cpp)
 
 target_link_libraries(
         mmu_tests

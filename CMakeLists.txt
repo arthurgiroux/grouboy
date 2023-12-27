@@ -96,7 +96,9 @@ set(SOURCE_FILES
         src/graphics/pixel_fifo.hpp
         src/graphics/pixel.cpp
         src/graphics/pixel.hpp
-        src/memory/bootrom.hpp)
+        src/memory/bootrom.hpp
+        src/memory/switchable_memory_bank.cpp
+        src/memory/switchable_memory_bank.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
