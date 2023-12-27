@@ -311,6 +311,21 @@ class MMU
      * The timer to use for timer register mapping
      */
     Timer* _timer = nullptr;
+
+    /**
+     * The address of the bank id register
+     */
+    static constexpr word VRAM_BANK_ID_ADDR = 0xFF4F;
+
+    /**
+     * The address of the VRAM mapping
+     */
+    const utils::AddressRange vramAddressRange = utils::AddressRange(0x8000, 0x9FFF);
+
+    /**
+     * The memory bank to use for the VRAM
+     */
+    SwitchableMemoryBank<2, 8_KiB> vramMemoryBank;
 };
 
 #endif
