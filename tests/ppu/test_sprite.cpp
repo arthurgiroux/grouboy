@@ -111,3 +111,11 @@ TEST_F(SpriteTest, getPaletteIdShouldReturnThePaletteIdSetInMemory)
     setDataFlagInMemory(spriteId, 0b00010000);
     ASSERT_EQ(sprite.getPaletteId(), 1);
 }
+
+TEST_F(SpriteTest, getBankIdShouldReturnTheBankIdSetInMemory)
+{
+    int spriteId = 20;
+    Sprite sprite(mmu, spriteId);
+    setDataFlagInMemory(spriteId, 0b00001000);
+    ASSERT_EQ(sprite.getBankId(), 1);
+}

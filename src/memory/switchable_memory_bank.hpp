@@ -18,7 +18,7 @@ class SwitchableMemoryBank
 {
   public:
     SwitchableMemoryBank() = default;
-    ~SwitchableMemoryBank() = default;
+    virtual ~SwitchableMemoryBank() = default;
 
     /**
      * Get the id of the active bank.

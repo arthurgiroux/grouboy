@@ -224,8 +224,10 @@ void PPU::renderScanlineBackground(int scanline)
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
-        byte colorValue = getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
-                              .getColorData(xOffsetTile, yOffsetTile);
+        byte colorValue =
+            _mmu.getVRAM()
+                .getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+                .getColorData(xOffsetTile, yOffsetTile);
         byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
     }
@@ -288,7 +290,8 @@ void PPU::renderScanlineWindow(int scanline)
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
-        byte colorValue = getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+        byte colorValue = _mmu.getVRAM()
+                              .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
                               .getColorData(xOffsetTile, yOffsetTile);
         byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
         _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
@@ -313,7 +316,7 @@ void PPU::renderScanlineSprite(int scanline)
             tileId &= 0xFE;
         }
 
-        Tile tile = getTileById(tileId, 0, isStackedTile);
+        Tile tile = _mmu.getVRAM().getTileById(tileId, 0, sprite->getBankId(), isStackedTile);
 
         int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
         if (sprite->isFlippedVertically())
@@ -381,37 +384,6 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     for (unsigned int i = 0; i < _sprites.size(); ++i)
     {
         _sprites[i] = std::make_unique<Sprite>(_mmu, i);
-    }
-}
-
-Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
-{
-    word tileSetOffset = ADDR_TILE_SET_0;
-    int tileIdCorrected = tileId;
-    if (tileSetId == 1)
-    {
-        tileSetOffset = ADDR_TILE_SET_1;
-        tileIdCorrected = static_cast<sbyte>(tileId);
-    }
-
-    word tileBaseAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
-
-    int tileBytesPerTile = isStacked ? StackedTile::BYTES_PER_TILE : SingleTile::BYTES_PER_TILE;
-    Tile::TileDataArray dataArray = {};
-    dataArray.resize(tileBytesPerTile);
-
-    for (int i = 0; i < tileBytesPerTile; ++i)
-    {
-        dataArray[i] = _mmu.read(static_cast<word>(tileBaseAddr + i));
-    }
-
-    if (isStacked)
-    {
-        return StackedTile(dataArray);
-    }
-    else
-    {
-        return SingleTile(dataArray);
     }
 }
 

@@ -93,16 +93,6 @@ class PPU
     }
 
     /**
-     * Retrieve a tile with a given index from a given tile set.
-     *
-     * @param tileId The index of the tile to retrieve
-     * @param tileSetId The tile set to use
-     * @param isStacked Is the tile we want to retrieve a stacked 8x16 tile
-     * @return The requested tile
-     */
-    Tile getTileById(byte tileId, sbyte tileSetId, bool isStacked = false);
-
-    /**
      * Get a reference to the last rendered frame.
      *
      * @return The frame.
@@ -280,16 +270,6 @@ class PPU
      * The address of the tile map with index 1.
      */
     static constexpr word ADDR_MAP_1 = 0x9C00;
-
-    /**
-     * The address of the tile set with index 0.
-     */
-    static constexpr word ADDR_TILE_SET_0 = 0x8000;
-
-    /**
-     * The address of the tile set with index 1.
-     */
-    static constexpr word ADDR_TILE_SET_1 = 0x9000;
 
     /**
      * The address of the LCD control register.
