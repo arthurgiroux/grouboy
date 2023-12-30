@@ -100,7 +100,9 @@ set(SOURCE_FILES
         src/memory/switchable_memory_bank.cpp
         src/memory/switchable_memory_bank.hpp
         src/memory/vram.cpp
-        src/memory/vram.hpp)
+        src/memory/vram.hpp
+        src/graphics/rgb_color.cpp
+        src/graphics/rgb_color.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
