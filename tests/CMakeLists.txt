@@ -11,7 +11,7 @@ include_directories(../src)
 include_directories(../libs)
 
 # TODO: Set this using environment variable, CMake seems to have issues with this right now
-add_compile_definitions(DATADIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+add_compile_definitions("DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\"")
 
 add_executable(
         utils_tests
@@ -69,7 +69,8 @@ add_executable(
         ppu/test_rgb_image.cpp
         ppu/test_sprite.cpp
         ppu/test_pixel.cpp
-        ppu/test_pixel_fifo.cpp)
+        ppu/test_pixel_fifo.cpp
+        ppu/test_rgb_color.cpp)
 
 target_link_libraries(
         ppu_tests
