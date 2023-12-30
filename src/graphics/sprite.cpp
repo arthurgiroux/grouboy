@@ -65,3 +65,8 @@ bool Sprite::isPriorityBiggerThanOtherSprite(const Sprite& other) const
         return getXPositionOnScreen() < other.getXPositionOnScreen();
     }
 }
+
+int Sprite::getBankId() const
+{
+    return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_BANKID);
+}

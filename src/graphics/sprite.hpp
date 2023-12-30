@@ -91,6 +91,14 @@ class Sprite
      */
     int getPaletteId() const;
 
+    /**
+     * (Color mode only)
+     * Which bank should be used to retrieve the tile in the VRAM.
+     *
+     * @return the id of the bank to use in the VRAM
+     */
+    int getBankId() const;
+
   private:
     /**
      * Read a certain data from the payload containing sprite information.
@@ -112,6 +120,7 @@ class Sprite
     static const int DATA_FLAG_BIT_VFLIP = 6;
     static const int DATA_FLAG_BIT_HFLIP = 5;
     static const int DATA_FLAG_BIT_PALETTEID = 4;
+    static const int DATA_FLAG_BIT_BANKID = 3;
 
     MMU& _mmu;
     int _id;

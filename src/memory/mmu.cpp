@@ -50,7 +50,7 @@ byte MMU::read(const word& addr)
 
     else if (addr == VRAM_BANK_ID_ADDR)
     {
-        return vramMemoryBank.getBankId() & 0xFE;
+        return vram.getBankId() & 0xFE;
     }
 
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
@@ -60,7 +60,7 @@ byte MMU::read(const word& addr)
 
     else if (vramAddressRange.contains(addr))
     {
-        return vramMemoryBank.read(vramAddressRange.relative(addr));
+        return vram.read(vramAddressRange.relative(addr));
     }
 
     else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
@@ -175,7 +175,7 @@ void MMU::write(const word& addr, const byte& value)
 
     else if (addr == VRAM_BANK_ID_ADDR)
     {
-        vramMemoryBank.switchBank(value & 0x01);
+        vram.switchBank(value & 0x01);
     }
 
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
@@ -185,7 +185,7 @@ void MMU::write(const word& addr, const byte& value)
 
     else if (vramAddressRange.contains(addr))
     {
-        vramMemoryBank.write(vramAddressRange.relative(addr), value);
+        vram.write(vramAddressRange.relative(addr), value);
     }
 
     else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
@@ -313,4 +313,9 @@ void MMU::setAPU(APU* apu)
 void MMU::setTimer(Timer* timer)
 {
     _timer = timer;
+}
+
+VRAM& MMU::getVRAM()
+{
+    return vram;
 }

@@ -12,6 +12,7 @@
 #include "memory/mbc/memory_bank_controller.hpp"
 #include "switchable_memory_bank.hpp"
 #include "timer/timer.hpp"
+#include "vram.hpp"
 
 // Forward declaration
 class APU;
@@ -145,6 +146,8 @@ class MMU
      * @param data  the serialized data to load.
      */
     bool unserializeCartridgeRAM(const std::vector<byte>& data);
+
+    VRAM& getVRAM();
 
     /**
      * The total size of the memory in bytes
@@ -323,9 +326,9 @@ class MMU
     const utils::AddressRange vramAddressRange = utils::AddressRange(0x8000, 0x9FFF);
 
     /**
-     * The memory bank to use for the VRAM
+     * The VRAM
      */
-    SwitchableMemoryBank<2, 8_KiB> vramMemoryBank;
+    VRAM vram;
 
     /**
      * The address of the WRAM bank id register
