@@ -1,4 +1,4 @@
-#include "graphics/palette.hpp"
+#include "graphics/grayscale_palette.hpp"
 #include <gtest/gtest.h>
 
 class PaletteTest : public ::testing::Test
@@ -10,7 +10,7 @@ class PaletteTest : public ::testing::Test
 TEST_F(PaletteTest, PaletteConvertColorIdShouldAccordingToValueInMemory)
 {
     int paletteAddr = 0x1234;
-    Palette palette(mmu, paletteAddr);
+    GrayscalePalette palette(mmu, paletteAddr);
 
     // We remap all colors to the opposite one
     int colorMapping = 0b00011011;
@@ -24,12 +24,12 @@ TEST_F(PaletteTest, PaletteConvertColorIdShouldAccordingToValueInMemory)
 TEST_F(PaletteTest, MultiplePaletteShouldWorkIndependently)
 {
     int paletteAddr1 = 0x1234;
-    Palette palette1(mmu, paletteAddr1);
+    GrayscalePalette palette1(mmu, paletteAddr1);
     int colorMapping1 = 0b00011011;
     mmu.write(paletteAddr1, colorMapping1);
 
     int paletteAddr2 = 0x1235;
-    Palette palette2(mmu, paletteAddr2);
+    GrayscalePalette palette2(mmu, paletteAddr2);
     int colorMapping2 = 0b11100100;
     mmu.write(paletteAddr2, colorMapping2);
 
@@ -46,20 +46,20 @@ TEST_F(PaletteTest, MultiplePaletteShouldWorkIndependently)
 
 TEST_F(PaletteTest, ConvertingColor0ToGrayscaleShouldGiveWhite)
 {
-    ASSERT_EQ(Palette::convertColorToGrayscale(0), Palette::COLOR_WHITE);
+    ASSERT_EQ(GrayscalePalette::convertToColor(0), GrayscalePalette::COLOR_WHITE);
 }
 
 TEST_F(PaletteTest, ConvertingColor1ToGrayscaleShouldGiveLightGray)
 {
-    ASSERT_EQ(Palette::convertColorToGrayscale(1), Palette::COLOR_LIGHT_GRAY);
+    ASSERT_EQ(GrayscalePalette::convertToColor(1), GrayscalePalette::COLOR_LIGHT_GRAY);
 }
 
 TEST_F(PaletteTest, ConvertingColor2ToGrayscaleShouldGiveDarkGray)
 {
-    ASSERT_EQ(Palette::convertColorToGrayscale(2), Palette::COLOR_DARK_GRAY);
+    ASSERT_EQ(GrayscalePalette::convertToColor(2), GrayscalePalette::COLOR_DARK_GRAY);
 }
 
 TEST_F(PaletteTest, ConvertingColor2ToGrayscaleShouldGiveBlack)
 {
-    ASSERT_EQ(Palette::convertColorToGrayscale(3), Palette::COLOR_BLACK);
+    ASSERT_EQ(GrayscalePalette::convertToColor(3), GrayscalePalette::COLOR_BLACK);
 }

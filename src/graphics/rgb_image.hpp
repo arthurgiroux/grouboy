@@ -2,6 +2,7 @@
 #define GBEMULATOR_RGB_IMAGE_HPP
 
 #include "common/utils.hpp"
+#include "rgb_color.hpp"
 #include <vector>
 
 /**
@@ -67,6 +68,14 @@ class RGBImage
      * @param value 	the grayscale value of the pixel [0;255]
      */
     void setPixel(int x, int y, byte value);
+
+    /**
+     * Set a given pixel to a specific rgb color
+     * @param x                 the x coordinate in pixel
+     * @param y                 the y coordinate in pixel
+     * @param color             the rgb color to set
+     */
+    void setPixel(int x, int y, RGBColor color);
 
     /**
      * Copy a pixel from another image into this image.
