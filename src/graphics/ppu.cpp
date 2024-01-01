@@ -1,8 +1,8 @@
 
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
+#include "graphics/grayscale_palette.hpp"
 #include "graphics/lcd_status_register.hpp"
-#include "graphics/palette.hpp"
 #include "spdlog/spdlog.h"
 #include "tilemap.hpp"
 #include <algorithm>
@@ -228,8 +228,7 @@ void PPU::renderScanlineBackground(int scanline)
             _mmu.getVRAM()
                 .getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
                 .getColorData(xOffsetTile, yOffsetTile);
-        byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
-        _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
+        _temporaryFrame.setPixel(x, scanline, _paletteBackground.convertToColor(colorValue));
     }
 }
 
@@ -293,8 +292,7 @@ void PPU::renderScanlineWindow(int scanline)
         byte colorValue = _mmu.getVRAM()
                               .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
                               .getColorData(xOffsetTile, yOffsetTile);
-        byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
-        _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
+        _temporaryFrame.setPixel(x, scanline, _paletteBackground.convertToColor(colorValue));
     }
 
     // We increment the window line counter only when a scanline window is rendered
@@ -345,9 +343,8 @@ void PPU::renderScanlineSprite(int scanline)
                 xCoordinateInTile = tile.getWidth() - 1 - xCoordinateInTile;
             }
 
-            Palette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
+            GrayscalePalette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
             byte colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
-            byte convertedPaletteColor = palette.convertColorId(colorId);
 
             // We are copying the pixel if it's not white, white is treated as transparent
             bool isPixelOpaque = colorId != 0;
@@ -361,8 +358,7 @@ void PPU::renderScanlineSprite(int scanline)
 
             if (isPixelOpaque && pixelShouldBeRendered)
             {
-                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline,
-                                         Palette::convertColorToGrayscale(convertedPaletteColor));
+                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline, palette.convertToColor(colorId));
             }
         }
     }

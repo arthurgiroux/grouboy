@@ -22,3 +22,13 @@ byte RGBColor::getBlue() const
 {
     return blue;
 }
+
+bool RGBColor::operator==(const RGBColor& rhs) const
+{
+    return red == rhs.red && green == rhs.green && blue == rhs.blue;
+}
+
+bool RGBColor::operator!=(const RGBColor& rhs) const
+{
+    return !(rhs == *this);
+}

@@ -1,5 +1,4 @@
 #include "tile.hpp"
-#include "palette.hpp"
 #include <bitset>
 
 void Tile::convertToPixels()
@@ -23,15 +22,11 @@ void Tile::convertToPixels()
             // The pixels are ordered from left to right, the highest bit is the leftmost pixel.
             byte colorData = (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
             _colorData[line * _width + x] = colorData;
-            byte grayscaleValue = Palette::convertColorToGrayscale(colorData);
-
-            _image.setPixel(x, line, grayscaleValue);
         }
     }
 }
 
-Tile::Tile(const Tile::TileDataArray& data, int height, int width)
-    : _data(data), _height(height), _width(width), _image(height, width)
+Tile::Tile(const Tile::TileDataArray& data, int height, int width) : _data(data), _height(height), _width(width)
 {
     _colorData.resize(height * width);
     convertToPixels();
@@ -47,14 +42,14 @@ int Tile::getWidth() const
     return _width;
 }
 
-const RGBImage& Tile::getImage() const
-{
-    return _image;
-}
-
 byte Tile::getColorData(int x, int y) const
 {
     return _colorData[y * _width + x];
+}
+
+const std::vector<byte>& Tile::getColorData() const
+{
+    return _colorData;
 }
 
 SingleTile::SingleTile(const Tile::TileDataArray& data) : Tile(data, TILE_HEIGHT, TILE_WIDTH)

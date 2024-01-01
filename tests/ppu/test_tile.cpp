@@ -1,81 +1,51 @@
-#include "graphics/palette.hpp"
 #include "graphics/tile.hpp"
 #include <gtest/gtest.h>
 
-TEST(TileTest, AllZeroTileShouldBeAllWhite)
+TEST(SingleTileTest, HeightShouldBe8)
 {
-    Tile::TileDataArray data = {};
-    data.resize(SingleTile::BYTES_PER_TILE);
+    std::vector<byte> data(16);
     SingleTile tile(data);
-    const std::vector<byte>& pixels = tile.getImage().getData();
-
-    for (size_t i = 0; i < pixels.size(); i++)
-    {
-        ASSERT_EQ(pixels[i], Palette::COLOR_WHITE);
-    }
+    ASSERT_EQ(tile.getHeight(), 8);
 }
 
-TEST(TileTest, FilledTileShouldBeAllBlack)
+TEST(SingleTileTest, WidthShouldBe8)
 {
-    Tile::TileDataArray data = {};
-    data.resize(SingleTile::BYTES_PER_TILE);
-    for (int i = 0; i < data.size(); ++i)
-    {
-        data[i] = 0xFF;
-    }
+    std::vector<byte> data(16);
     SingleTile tile(data);
-    const std::vector<byte>& pixels = tile.getImage().getData();
-
-    for (size_t i = 0; i < pixels.size(); i++)
-    {
-        ASSERT_EQ(pixels[i], Palette::COLOR_BLACK);
-    }
+    ASSERT_EQ(tile.getWidth(), 8);
 }
 
-TEST(TileTest, LSBTileShouldBeAllLightGray)
+TEST(SingleTileTest, ColorIdShouldBeReadFromAdjacentsBytes)
 {
-    Tile::TileDataArray data = {};
-    data.resize(SingleTile::BYTES_PER_TILE);
-    for (size_t i = 0; i < data.size(); ++i)
-    {
-        if (i % 2 == 0)
-        {
-            data[i] = 0xFF;
-        }
-        else
-        {
-            data[i] = 0;
-        }
-    }
+    std::vector<byte> data(16);
+    /*
+     * [ 0 | 1 | 0 | 0 | 1 | 1 | 1 | 0 ]
+     * [ 1 | 0 | 0 | 0 | 1 | 0 | 1 | 1 ]
+     *   2   1   0   0   3   1   3   2
+     */
+    data[0] = 0b01001110;
+    data[1] = 0b10001011;
     SingleTile tile(data);
-    const std::vector<byte>& pixels = tile.getImage().getData();
-
-    for (size_t i = 0; i < pixels.size(); i++)
-    {
-        ASSERT_EQ(pixels[i], Palette::COLOR_LIGHT_GRAY);
-    }
+    ASSERT_EQ(tile.getColorData(0, 0), 2);
+    ASSERT_EQ(tile.getColorData(1, 0), 1);
+    ASSERT_EQ(tile.getColorData(2, 0), 0);
+    ASSERT_EQ(tile.getColorData(3, 0), 0);
+    ASSERT_EQ(tile.getColorData(4, 0), 3);
+    ASSERT_EQ(tile.getColorData(5, 0), 1);
+    ASSERT_EQ(tile.getColorData(6, 0), 3);
+    ASSERT_EQ(tile.getColorData(7, 0), 2);
 }
 
-TEST(TileTest, MSBTileShouldBeAllDarkGray)
+TEST(StackedTileTest, HeightShouldBe16)
 {
-    Tile::TileDataArray data = {};
-    data.resize(SingleTile::BYTES_PER_TILE);
-    for (size_t i = 0; i < data.size(); ++i)
-    {
-        if (i % 2 == 1)
-        {
-            data[i] = 0xFF;
-        }
-        else
-        {
-            data[i] = 0;
-        }
-    }
-    SingleTile tile(data);
-    const std::vector<byte>& pixels = tile.getImage().getData();
+    std::vector<byte> data(16);
+    StackedTile tile(data);
+    ASSERT_EQ(tile.getHeight(), 16);
+}
 
-    for (size_t i = 0; i < pixels.size(); i++)
-    {
-        ASSERT_EQ(pixels[i], Palette::COLOR_DARK_GRAY);
-    }
+TEST(StackedTileTest, WidthShouldBe8)
+{
+    std::vector<byte> data(16);
+    StackedTile tile(data);
+    ASSERT_EQ(tile.getWidth(), 8);
 }

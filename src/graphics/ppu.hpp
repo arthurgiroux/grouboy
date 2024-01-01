@@ -1,8 +1,8 @@
 #ifndef GBEMULATOR_PPU_HPP
 #define GBEMULATOR_PPU_HPP
 
+#include "grayscale_palette.hpp"
 #include "memory/mmu.hpp"
-#include "palette.hpp"
 #include "pixel_fifo.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
@@ -383,17 +383,17 @@ class PPU
     /**
      * The palette to use for background sprites.
      */
-    Palette _paletteBackground;
+    GrayscalePalette _paletteBackground;
 
     /**
      * The palette with index 0 to use for sprites (object rendering).
      */
-    Palette _paletteObj0;
+    GrayscalePalette _paletteObj0;
 
     /**
      * The palette with index 1 to use for sprites (object rendering).
      */
-    Palette _paletteObj1;
+    GrayscalePalette _paletteObj1;
 
     std::vector<Sprite*> _spritesToRender = {};
 

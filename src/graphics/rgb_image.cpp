@@ -88,3 +88,8 @@ void RGBImage::copyImage(int x, int y, const RGBImage& source)
 {
     copyRegion(x, y, source, 0, 0, source.getHeight(), source.getWidth());
 }
+
+void RGBImage::setPixel(int x, int y, RGBColor color)
+{
+    setPixel(x, y, color.getRed(), color.getGreen(), color.getBlue());
+}

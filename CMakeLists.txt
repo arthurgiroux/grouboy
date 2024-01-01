@@ -46,8 +46,8 @@ set(SOURCE_FILES
         src/cpu/input_controller.hpp
         src/graphics/rgb_image.cpp
         src/graphics/rgb_image.hpp
-        src/graphics/palette.cpp
-        src/graphics/palette.hpp
+        src/graphics/grayscale_palette.cpp
+        src/graphics/grayscale_palette.hpp
         src/graphics/sprite.cpp
         src/graphics/sprite.hpp
         src/serial/serial_transfer_manager.cpp
