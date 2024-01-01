@@ -1,34 +1,14 @@
 #include "grayscale_palette.hpp"
 #include "rgb_color.hpp"
 
-const RGBColor GrayscalePalette::COLOR_WHITE = RGBColor(255);
-const RGBColor GrayscalePalette::COLOR_LIGHT_GRAY = RGBColor(170);
-const RGBColor GrayscalePalette::COLOR_DARK_GRAY = RGBColor(85);
-const RGBColor GrayscalePalette::COLOR_BLACK = RGBColor(0);
-
 RGBColor GrayscalePalette::convertToColor(byte colorId)
 {
-    byte paletteId = convertColorId(colorId);
-
-    if (paletteId == 0)
-    {
-        return COLOR_WHITE;
-    }
-    else if (paletteId == 1)
-    {
-        return COLOR_LIGHT_GRAY;
-    }
-    else if (paletteId == 2)
-    {
-        return COLOR_DARK_GRAY;
-    }
-    else
-    {
-        return COLOR_BLACK;
-    }
+    return getColorForId(convertColorId(colorId));
 }
 
-GrayscalePalette::GrayscalePalette(MMU& mmu, word paletteAddr) : _mmu(mmu), _paletteAddr(paletteAddr)
+GrayscalePalette::GrayscalePalette(MMU& mmu, word paletteAddr)
+    : GenericPalette({RGBColor::WHITE, RGBColor::LIGHT_GRAY, RGBColor::DARK_GRAY, RGBColor::BLACK}), _mmu(mmu),
+      _paletteAddr(paletteAddr)
 {
 }
 

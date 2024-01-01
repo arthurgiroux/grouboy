@@ -1,5 +1,10 @@
 #include "rgb_color.hpp"
 
+const RGBColor RGBColor::WHITE = RGBColor(255);
+const RGBColor RGBColor::LIGHT_GRAY = RGBColor(170);
+const RGBColor RGBColor::DARK_GRAY = RGBColor(85);
+const RGBColor RGBColor::BLACK = RGBColor(0);
+
 RGBColor::RGBColor(byte r, byte g, byte b) : red(r), green(g), blue(b)
 {
 }
