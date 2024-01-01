@@ -1,6 +1,7 @@
 #ifndef GBEMULATOR_PALETTE_HPP
 #define GBEMULATOR_PALETTE_HPP
 
+#include "generic_palette.hpp"
 #include "graphics/rgb_color.hpp"
 #include "memory/mmu.hpp"
 
@@ -11,7 +12,7 @@
  * by being able to switch colors before rendering without having
  * to store another sprite data.
  */
-class GrayscalePalette
+class GrayscalePalette : public GenericPalette
 {
   public:
     /**
@@ -29,26 +30,6 @@ class GrayscalePalette
      * @return a grayscale colorId [0, 255]
      */
     RGBColor convertToColor(byte colorId);
-
-    /**
-     * The color black
-     */
-    static const RGBColor COLOR_BLACK;
-
-    /**
-     * The color white
-     */
-    static const RGBColor COLOR_WHITE;
-
-    /**
-     * The color dark gray
-     */
-    static const RGBColor COLOR_DARK_GRAY;
-
-    /**
-     * The color for light gray
-     */
-    static const RGBColor COLOR_LIGHT_GRAY;
 
   private:
     /**

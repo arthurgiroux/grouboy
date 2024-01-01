@@ -41,9 +41,29 @@ class RGBColor
      * @return a value between 0 and 255
      */
     byte getBlue() const;
-    
+
     bool operator==(const RGBColor& rhs) const;
     bool operator!=(const RGBColor& rhs) const;
+
+    /**
+     * The color black
+     */
+    static const RGBColor BLACK;
+
+    /**
+     * The color white
+     */
+    static const RGBColor WHITE;
+
+    /**
+     * The color dark gray
+     */
+    static const RGBColor DARK_GRAY;
+
+    /**
+     * The color for light gray
+     */
+    static const RGBColor LIGHT_GRAY;
 
   private:
     byte red = 0;
