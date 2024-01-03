@@ -104,7 +104,9 @@ set(SOURCE_FILES
         src/graphics/rgb_color.cpp
         src/graphics/rgb_color.hpp
         src/graphics/generic_palette.cpp
-        src/graphics/generic_palette.hpp)
+        src/graphics/generic_palette.hpp
+        src/graphics/color_palette_memory_mapper.cpp
+        src/graphics/color_palette_memory_mapper.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
