@@ -94,6 +94,10 @@ void setNthBit(int& value, int bitPosition, bool state);
  */
 bool readBinaryDataFromFile(const std::string& filepath, std::vector<byte>& out);
 
+byte convertFrom5BitsTo8Bits(byte value);
+
+byte convertFrom8BitsTo5Bits(byte value);
+
 /**
  * Represents a memory range between two addresses.
  */

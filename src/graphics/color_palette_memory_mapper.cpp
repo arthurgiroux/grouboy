@@ -1,4 +1,5 @@
 #include "color_palette_memory_mapper.hpp"
+#include "palette.hpp"
 
 #include <stdexcept>
 
@@ -22,18 +23,20 @@ bool ColorPaletteMemoryMapper::isAddressAutoIncrementEnabled() const
     return isAddrIncrementEnabled;
 }
 
-void ColorPaletteMemoryMapper::writeColor(int value)
+void ColorPaletteMemoryMapper::writeColor(byte value)
 {
-    int color = colorPalettes[getPaletteIndexFromAddr()].getColorForId(getColorIdFromAddr()).toRGB555();
+    int color = colorPalettes[getPaletteIndexFromAddr()].getRGB555ColorForId(getColorIdFromAddr());
 
     if (address % 2 == 1)
     {
-        value <<= 8;
+        color = (value << 8) | (color & 0xFF);
+    }
+    else
+    {
+        color = (color & 0xFF00) | value;
     }
 
-    color &= value;
-
-    colorPalettes[getPaletteIndexFromAddr()].setColorForId(RGBColor::fromRGB555(color), getColorIdFromAddr());
+    colorPalettes[getPaletteIndexFromAddr()].setColorForId(color, getColorIdFromAddr());
 
     if (isAddrIncrementEnabled)
     {
@@ -41,9 +44,9 @@ void ColorPaletteMemoryMapper::writeColor(int value)
     }
 }
 
-int ColorPaletteMemoryMapper::readColor()
+byte ColorPaletteMemoryMapper::readColor()
 {
-    int color = colorPalettes[getPaletteIndexFromAddr()].getColorForId(getColorIdFromAddr()).toRGB555();
+    int color = colorPalettes[getPaletteIndexFromAddr()].getRGB555ColorForId(getColorIdFromAddr());
     if (address % 2 == 1)
     {
         color >>= 8;
@@ -52,7 +55,7 @@ int ColorPaletteMemoryMapper::readColor()
     return color & 0xFF;
 }
 
-GenericPalette& ColorPaletteMemoryMapper::getColorPalette(unsigned int index)
+Palette& ColorPaletteMemoryMapper::getColorPalette(unsigned int index)
 {
     if (index >= colorPalettes.size())
     {
