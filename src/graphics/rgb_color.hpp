@@ -45,6 +45,10 @@ class RGBColor
     bool operator==(const RGBColor& rhs) const;
     bool operator!=(const RGBColor& rhs) const;
 
+    static RGBColor fromRGB555(int value);
+
+    int toRGB555() const;
+
     /**
      * The color black
      */

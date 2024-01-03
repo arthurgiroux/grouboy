@@ -71,7 +71,8 @@ add_executable(
         ppu/test_pixel.cpp
         ppu/test_pixel_fifo.cpp
         ppu/test_rgb_color.cpp
-        ppu/test_grayscale_palette.cpp)
+        ppu/test_grayscale_palette.cpp
+        ppu/test_color_palette_memory_mapper.cpp)
 
 target_link_libraries(
         ppu_tests

@@ -37,3 +37,22 @@ bool RGBColor::operator!=(const RGBColor& rhs) const
 {
     return !(rhs == *this);
 }
+
+RGBColor RGBColor::fromRGB555(int value)
+{
+    byte red = (((value) & 0x1F) * 255) / 31;
+    byte green = (((value >> 5) & 0x1F) * 255) / 31;
+    byte blue = ((value >> 10 & 0x1F) * 255) / 31;
+    return {red, green, blue};
+}
+
+int RGBColor::toRGB555() const
+{
+    unsigned short r5 = (red * 31) / 255;
+    unsigned short g5 = (green * 31) / 255;
+    unsigned short b5 = (blue * 31) / 255;
+
+    unsigned short rgb555 = (r5 << 10) | (g5 << 5) | b5;
+
+    return rgb555;
+}
