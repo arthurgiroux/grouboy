@@ -19,6 +19,8 @@ class VRAM : public SwitchableMemoryBank<2, 8_KiB>
     Tile getTileById(byte tileId, sbyte tileSetId, unsigned int bankId, bool isStacked = false);
     Tile getTileById(byte tileId, sbyte tileSetId, bool isStacked = false);
 
+    const utils::AddressRange addressRange = utils::AddressRange(0x8000, 0x9FFF);
+
   private:
     /**
      * The address of the tile set with index 0.

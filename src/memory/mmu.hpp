@@ -9,6 +9,7 @@
 #include "cartridge.hpp"
 #include "common/types.hpp"
 #include "cpu/input_controller.hpp"
+#include "graphics/color_palette_memory_mapper.hpp"
 #include "memory/mbc/memory_bank_controller.hpp"
 #include "switchable_memory_bank.hpp"
 #include "timer/timer.hpp"
@@ -148,6 +149,9 @@ class MMU
     bool unserializeCartridgeRAM(const std::vector<byte>& data);
 
     VRAM& getVRAM();
+
+    ColorPaletteMemoryMapper& getColorPaletteMemoryMapperBackground();
+    ColorPaletteMemoryMapper& getColorPaletteMemoryMapperObj();
 
     /**
      * The total size of the memory in bytes
@@ -321,11 +325,6 @@ class MMU
     static constexpr word VRAM_BANK_ID_ADDR = 0xFF4F;
 
     /**
-     * The address of the VRAM mapping
-     */
-    const utils::AddressRange vramAddressRange = utils::AddressRange(0x8000, 0x9FFF);
-
-    /**
      * The VRAM
      */
     VRAM vram;
@@ -344,6 +343,15 @@ class MMU
      * The memory bank to use for the WRAM
      */
     SwitchableMemoryBank<7, 4_KiB> wramMemoryBank;
+
+    static constexpr word COLOR_PALETTE_SPECS_BACKGROUND_ADDR = 0xFF68;
+    static constexpr word COLOR_PALETTE_DATA_BACKGROUND_ADDR = 0xFF69;
+
+    static constexpr word COLOR_PALETTE_SPECS_OBJECTS_ADDR = 0xFF6A;
+    static constexpr word COLOR_PALETTE_DATA_OBJECTS_ADDR = 0xFF6B;
+
+    ColorPaletteMemoryMapper colorPaletteMemoryMapperBackground;
+    ColorPaletteMemoryMapper colorPaletteMemoryMapperObjects;
 };
 
 #endif
