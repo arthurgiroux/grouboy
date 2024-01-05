@@ -14,7 +14,7 @@ byte Sprite::getTileId() const
     return readDataFromPayload(PAYLOAD_DATA_TILEID_IDX);
 }
 
-int Sprite::getPaletteId() const
+int Sprite::getGrayscalePaletteId() const
 {
     return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_PALETTEID);
 }
@@ -69,4 +69,9 @@ bool Sprite::isPriorityBiggerThanOtherSprite(const Sprite& other) const
 int Sprite::getBankId() const
 {
     return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_BANKID);
+}
+
+int Sprite::getColorPaletteId() const
+{
+    return readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX) & 0x07;
 }

@@ -89,7 +89,9 @@ class Sprite
      *
      * @return  either 0 or 1, for the palette id.
      */
-    int getPaletteId() const;
+    int getGrayscalePaletteId() const;
+
+    int getColorPaletteId() const;
 
     /**
      * (Color mode only)

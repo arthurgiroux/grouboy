@@ -220,15 +220,23 @@ void PPU::renderScanlineBackground(int scanline)
         int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
         int yOffsetTile = (scanline + scrollY) % SingleTile::TILE_HEIGHT;
 
+        int bankId = 0;
+        Palette* palette = &_paletteBackground;
+        if (_mmu.getCartridge()->isColorModeSupported())
+        {
+            Tilemap::TileInfo tileInfo = background.getTileInfoForIndex(tileIndex);
+            bankId = tileInfo.getVRAMBankId();
+            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(tileInfo.getColorPaletteId());
+        }
         /*
          * We retrieve the pixel color by getting the original sprite color,
-         * converting using the palette and converting it to a grayscale value.
+         * converting using the palette and converting it to a grayscale or color value.
          */
-        byte colorValue =
-            _mmu.getVRAM()
-                .getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
-                .getColorData(xOffsetTile, yOffsetTile);
-        _temporaryFrame.setPixel(x, scanline, _paletteBackground.convertToColor(colorValue));
+        byte colorValue = _mmu.getVRAM()
+                              .getTileById(background.getTileIdForIndex(tileIndex),
+                                           backgroundAndWindowTileDataAreaIndex(), bankId, false)
+                              .getColorData(xOffsetTile, yOffsetTile);
+        _temporaryFrame.setPixel(x, scanline, palette->getColorForId(colorValue));
     }
 }
 
@@ -285,14 +293,24 @@ void PPU::renderScanlineWindow(int scanline)
         int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
         int yOffsetTile = _windowLineCounter % SingleTile::TILE_HEIGHT;
 
+        int bankId = 0;
+        Palette* palette = &_paletteBackground;
+        if (_mmu.getCartridge()->isColorModeSupported())
+        {
+            Tilemap::TileInfo tileInfo = tilemap.getTileInfoForIndex(tileIndex);
+            bankId = tileInfo.getVRAMBankId();
+            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(tileInfo.getColorPaletteId());
+        }
+
         /*
          * We retrieve the pixel color by getting the original sprite color,
          * converting using the palette and converting it to a grayscale value.
          */
         byte colorValue = _mmu.getVRAM()
-                              .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+                              .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
+                                           bankId, false)
                               .getColorData(xOffsetTile, yOffsetTile);
-        _temporaryFrame.setPixel(x, scanline, _paletteBackground.convertToColor(colorValue));
+        _temporaryFrame.setPixel(x, scanline, palette->getColorForId(colorValue));
     }
 
     // We increment the window line counter only when a scanline window is rendered
@@ -314,7 +332,9 @@ void PPU::renderScanlineSprite(int scanline)
             tileId &= 0xFE;
         }
 
-        Tile tile = _mmu.getVRAM().getTileById(tileId, 0, sprite->getBankId(), isStackedTile);
+        int bankId = _mmu.getCartridge()->isColorModeSupported() ? sprite->getBankId() : 0;
+
+        Tile tile = _mmu.getVRAM().getTileById(tileId, 0, bankId, isStackedTile);
 
         int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
         if (sprite->isFlippedVertically())
@@ -343,7 +363,12 @@ void PPU::renderScanlineSprite(int scanline)
                 xCoordinateInTile = tile.getWidth() - 1 - xCoordinateInTile;
             }
 
-            GrayscalePalette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
+            Palette* palette = sprite->getGrayscalePaletteId() ? &_paletteObj1 : &_paletteObj0;
+            if (_mmu.getCartridge()->isColorModeSupported())
+            {
+                palette = &_mmu.getColorPaletteMemoryMapperObj().getColorPalette(sprite->getColorPaletteId());
+            }
+
             byte colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
 
             // We are copying the pixel if it's not white, white is treated as transparent
@@ -358,7 +383,7 @@ void PPU::renderScanlineSprite(int scanline)
 
             if (isPixelOpaque && pixelShouldBeRendered)
             {
-                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline, palette.convertToColor(colorId));
+                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline, palette->getColorForId(colorId));
             }
         }
     }
@@ -386,7 +411,7 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
 Tilemap PPU::getTileMap(int index)
 {
     word tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
-    return Tilemap(&_mmu, tileMapAddr);
+    return Tilemap(&_mmu.getVRAM(), tileMapAddr);
 }
 
 bool PPU::isDisplayEnabled() const

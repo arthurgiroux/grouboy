@@ -53,14 +53,24 @@ byte MMU::read(const word& addr)
         return vram.getBankId() & 0xFE;
     }
 
+    else if (addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    {
+        return colorPaletteMemoryMapperBackground.readColor();
+    }
+
+    else if (addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    {
+        return colorPaletteMemoryMapperObjects.readColor();
+    }
+
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
         return memoryBankController->readROM(addr);
     }
 
-    else if (vramAddressRange.contains(addr))
+    else if (vram.addressRange.contains(addr))
     {
-        return vram.read(vramAddressRange.relative(addr));
+        return vram.read(vram.addressRange.relative(addr));
     }
 
     else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
@@ -178,14 +188,36 @@ void MMU::write(const word& addr, const byte& value)
         vram.switchBank(value & 0x01);
     }
 
+    else if (addr == COLOR_PALETTE_SPECS_BACKGROUND_ADDR)
+    {
+        colorPaletteMemoryMapperBackground.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
+        colorPaletteMemoryMapperBackground.setAddress(value & 0x7F);
+    }
+
+    else if (addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    {
+        colorPaletteMemoryMapperBackground.writeColor(value);
+    }
+
+    else if (addr == COLOR_PALETTE_SPECS_OBJECTS_ADDR)
+    {
+        colorPaletteMemoryMapperObjects.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
+        colorPaletteMemoryMapperObjects.setAddress(value & 0x7F);
+    }
+
+    else if (addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    {
+        colorPaletteMemoryMapperObjects.writeColor(value);
+    }
+
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
     {
         memoryBankController->writeROM(addr, value);
     }
 
-    else if (vramAddressRange.contains(addr))
+    else if (vram.addressRange.contains(addr))
     {
-        vram.write(vramAddressRange.relative(addr), value);
+        vram.write(vram.addressRange.relative(addr), value);
     }
 
     else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
@@ -318,4 +350,14 @@ void MMU::setTimer(Timer* timer)
 VRAM& MMU::getVRAM()
 {
     return vram;
+}
+
+ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperBackground()
+{
+    return colorPaletteMemoryMapperBackground;
+}
+
+ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperObj()
+{
+    return colorPaletteMemoryMapperObjects;
 }
