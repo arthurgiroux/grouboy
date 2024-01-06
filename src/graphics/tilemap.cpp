@@ -19,8 +19,8 @@ Tilemap::TileInfo::TileInfo(int attributes)
 {
     _colorPaletteId = attributes & 0x03;
     _vramBankId = (attributes >> 3) & 0x01;
-    _isFlippedVertically = utils::isNthBitSet(attributes, 5);
-    _isFlippedHorizontally = utils::isNthBitSet(attributes, 6);
+    _isFlippedHorizontally = utils::isNthBitSet(attributes, 5);
+    _isFlippedVertically = utils::isNthBitSet(attributes, 6);
     _isRenderedAboveSprites = utils::isNthBitSet(attributes, 7);
 }
 
