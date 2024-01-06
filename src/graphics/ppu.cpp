@@ -265,6 +265,16 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
             Tilemap::TileInfo tileInfo = tilemap.getTileInfoForIndex(tileIndex);
             bankId = tileInfo.getVRAMBankId();
             palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(tileInfo.getColorPaletteId());
+
+            if (tileInfo.isFlippedHorizontally())
+            {
+                xOffsetTile = SingleTile::TILE_WIDTH - 1 - xOffsetTile;
+            }
+
+            if (tileInfo.isFlippedVertically())
+            {
+                yOffsetTile = SingleTile::TILE_HEIGHT - 1 - yOffsetTile;
+            }
         }
 
         /*
