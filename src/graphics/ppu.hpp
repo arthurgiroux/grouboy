@@ -238,6 +238,17 @@ class PPU
     void renderScanlineWindow(int scanline);
 
     /**
+     * Common logic to render either the background or window part of the given scanline.
+     *
+     * @param scanline  the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
+     * @param scrollX   The scroll value to use for x coordinate
+     * @param scrollY   The scroll value to use for y coordinate
+     * @param tilemap   The tilemap to retrieve the tile
+     * @param isWindow  Whether or not we are rendering the window or backgroung
+     */
+    void renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scrollY, Tilemap& tilemap, bool isWindow);
+
+    /**
      * Render the sprite part of the given scanline.
      *
      * @param scanline the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]

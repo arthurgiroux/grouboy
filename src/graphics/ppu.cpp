@@ -181,63 +181,7 @@ void PPU::renderScanlineBackground(int scanline)
     // Retrieve the tilemap we are going to use
     Tilemap background = getTileMap(backgroundTileMapIndex());
 
-    /*
-     * The tilemap is a 32x32 map of tiles of 8x8 pixels.
-     * Since we are rendering only a line here, we can already compute which
-     * line of the tilemap we are going to render.
-     * We can compute the line by seeing how many tiles we span vertically.
-     */
-    int lineInTileMap = (scanline + scrollY) / SingleTile::TILE_HEIGHT;
-    lineInTileMap %= Tilemap::HEIGHT;
-    assert(lineInTileMap < Tilemap::HEIGHT);
-
-    int offsetInTileMap = lineInTileMap * Tilemap::WIDTH;
-
-    /*
-     * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
-     * pixels that corresponds in the current frame buffer.
-     */
-    for (int x = 0; x < SCREEN_WIDTH; ++x)
-    {
-        int xIndexOffset = scrollX + x;
-
-        // The background map is not clamped, if we go "too far right",
-        // it should display tiles that are on the left.
-        if (xIndexOffset >= Tilemap::WIDTH * SingleTile::TILE_WIDTH)
-        {
-            xIndexOffset %= Tilemap::WIDTH * SingleTile::TILE_WIDTH;
-        }
-        assert(xIndexOffset < Tilemap::WIDTH * SingleTile::TILE_WIDTH);
-
-        // We see how many tiles we span horizontally and add it to our offset to find the tile index
-        int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
-
-        /*
-         * Now that we retrieve the tile corresponding to the pixel, we need to copy the pixel
-         * that corresponds to the one we are rendering.
-         * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
-         */
-        int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
-        int yOffsetTile = (scanline + scrollY) % SingleTile::TILE_HEIGHT;
-
-        int bankId = 0;
-        Palette* palette = &_paletteBackground;
-        if (_mmu.getCartridge()->isColorModeSupported())
-        {
-            Tilemap::TileInfo tileInfo = background.getTileInfoForIndex(tileIndex);
-            bankId = tileInfo.getVRAMBankId();
-            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(tileInfo.getColorPaletteId());
-        }
-        /*
-         * We retrieve the pixel color by getting the original sprite color,
-         * converting using the palette and converting it to a grayscale or color value.
-         */
-        byte colorValue = _mmu.getVRAM()
-                              .getTileById(background.getTileIdForIndex(tileIndex),
-                                           backgroundAndWindowTileDataAreaIndex(), bankId, false)
-                              .getColorData(xOffsetTile, yOffsetTile);
-        _temporaryFrame.setPixel(x, scanline, palette->getColorForId(colorValue));
-    }
+    renderScanlineBackgroundOrWindow(scanline, scrollX, scrollY, background, false);
 }
 
 void PPU::renderScanlineWindow(int scanline)
@@ -255,13 +199,19 @@ void PPU::renderScanlineWindow(int scanline)
     // Retrieve the tilemap we are going to use
     Tilemap tilemap = getTileMap(windowTileMapIndex());
 
+    renderScanlineBackgroundOrWindow(scanline, scrollX, scrollY, tilemap, true);
+}
+
+void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scrollY, Tilemap& tilemap, bool isWindow)
+{
     /*
      * The tilemap is a 32x32 map of tiles of 8x8 pixels.
      * Since we are rendering only a line here, we can already compute which
      * line of the tilemap we are going to render.
      * We can compute the line by seeing how many tiles we span vertically.
      */
-    int lineInTileMap = _windowLineCounter / SingleTile::TILE_HEIGHT;
+    int startLine = isWindow ? _windowLineCounter : (scanline + scrollY);
+    int lineInTileMap = startLine / SingleTile::TILE_HEIGHT;
     lineInTileMap %= Tilemap::HEIGHT;
     assert(lineInTileMap < Tilemap::HEIGHT);
 
@@ -271,14 +221,27 @@ void PPU::renderScanlineWindow(int scanline)
      * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
      * pixels that corresponds in the current frame buffer.
      */
-    for (int x = scrollX; x < SCREEN_WIDTH; ++x)
-    {
-        int xIndexOffset = x - scrollX;
 
-        // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
+    // Background always starts from the top but window can be scrolled
+    int startX = isWindow ? scrollX : 0;
+
+    for (int x = startX; x < SCREEN_WIDTH; ++x)
+    {
+        int xIndexOffset = isWindow ? x - scrollX : scrollX + x;
+
         if (xIndexOffset >= Tilemap::WIDTH * SingleTile::TILE_WIDTH)
         {
-            break;
+            if (isWindow)
+            {
+                // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
+                break;
+            }
+            else
+            {
+                // The background map is not clamped, if we go "too far right",
+                // it should display tiles that are on the left.
+                xIndexOffset %= Tilemap::WIDTH * SingleTile::TILE_WIDTH;
+            }
         }
         assert(xIndexOffset < Tilemap::WIDTH * SingleTile::TILE_WIDTH);
 
@@ -291,7 +254,9 @@ void PPU::renderScanlineWindow(int scanline)
          * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
          */
         int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
-        int yOffsetTile = _windowLineCounter % SingleTile::TILE_HEIGHT;
+
+        int startY = isWindow ? _windowLineCounter : (scanline + scrollY);
+        int yOffsetTile = startY % SingleTile::TILE_HEIGHT;
 
         int bankId = 0;
         Palette* palette = &_paletteBackground;
@@ -304,7 +269,7 @@ void PPU::renderScanlineWindow(int scanline)
 
         /*
          * We retrieve the pixel color by getting the original sprite color,
-         * converting using the palette and converting it to a grayscale value.
+         * converting using the palette and converting it to a grayscale or color value.
          */
         byte colorValue = _mmu.getVRAM()
                               .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
@@ -313,8 +278,11 @@ void PPU::renderScanlineWindow(int scanline)
         _temporaryFrame.setPixel(x, scanline, palette->getColorForId(colorValue));
     }
 
-    // We increment the window line counter only when a scanline window is rendered
-    _windowLineCounter++;
+    if (isWindow)
+    {
+        // We increment the window line counter only when a scanline window is rendered
+        _windowLineCounter++;
+    }
 }
 
 void PPU::renderScanlineSprite(int scanline)
