@@ -243,7 +243,7 @@ class MMU
     /**
      * External RAM address range
      */
-    const utils::AddressRange externalRamAddr = utils::AddressRange(0xA000, 0xC000);
+    const utils::AddressRange externalRamAddr = utils::AddressRange(0xA000, 0xBFFF);
 
     /**
      * The end address of the 1st ROM bank
