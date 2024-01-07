@@ -15,10 +15,10 @@ TEST_F(PaletteTest, PaletteConvertColorIdShouldAccordingToValueInMemory)
     // We remap all colors to the opposite one
     int colorMapping = 0b00011011;
     mmu.write(paletteAddr, colorMapping);
-    ASSERT_EQ(palette.convertColorId(0), 3);
-    ASSERT_EQ(palette.convertColorId(1), 2);
-    ASSERT_EQ(palette.convertColorId(2), 1);
-    ASSERT_EQ(palette.convertColorId(3), 0);
+    ASSERT_EQ(palette.convertToColor(0), RGBColor::BLACK);
+    ASSERT_EQ(palette.convertToColor(1), RGBColor::DARK_GRAY);
+    ASSERT_EQ(palette.convertToColor(2), RGBColor::LIGHT_GRAY);
+    ASSERT_EQ(palette.convertToColor(3), RGBColor::WHITE);
 }
 
 TEST_F(PaletteTest, MultiplePaletteShouldWorkIndependently)
@@ -33,33 +33,13 @@ TEST_F(PaletteTest, MultiplePaletteShouldWorkIndependently)
     int colorMapping2 = 0b11100100;
     mmu.write(paletteAddr2, colorMapping2);
 
-    ASSERT_EQ(palette1.convertColorId(0), 3);
-    ASSERT_EQ(palette1.convertColorId(1), 2);
-    ASSERT_EQ(palette1.convertColorId(2), 1);
-    ASSERT_EQ(palette1.convertColorId(3), 0);
+    ASSERT_EQ(palette1.convertToColor(0), RGBColor::BLACK);
+    ASSERT_EQ(palette1.convertToColor(1), RGBColor::DARK_GRAY);
+    ASSERT_EQ(palette1.convertToColor(2), RGBColor::LIGHT_GRAY);
+    ASSERT_EQ(palette1.convertToColor(3), RGBColor::WHITE);
 
-    ASSERT_EQ(palette2.convertColorId(0), 0);
-    ASSERT_EQ(palette2.convertColorId(1), 1);
-    ASSERT_EQ(palette2.convertColorId(2), 2);
-    ASSERT_EQ(palette2.convertColorId(3), 3);
-}
-
-TEST_F(PaletteTest, ConvertingColor0ToGrayscaleShouldGiveWhite)
-{
-    ASSERT_EQ(GrayscalePalette::convertToColor(0), RGBColor::WHITE);
-}
-
-TEST_F(PaletteTest, ConvertingColor1ToGrayscaleShouldGiveLightGray)
-{
-    ASSERT_EQ(GrayscalePalette::convertToColor(1), RGBColor::LIGHT_GRAY);
-}
-
-TEST_F(PaletteTest, ConvertingColor2ToGrayscaleShouldGiveDarkGray)
-{
-    ASSERT_EQ(GrayscalePalette::convertToColor(2), RGBColor::DARK_GRAY);
-}
-
-TEST_F(PaletteTest, ConvertingColor2ToGrayscaleShouldGiveBlack)
-{
-    ASSERT_EQ(GrayscalePalette::convertToColor(3), RGBColor::BLACK);
+    ASSERT_EQ(palette2.convertToColor(0), RGBColor::WHITE);
+    ASSERT_EQ(palette2.convertToColor(1), RGBColor::LIGHT_GRAY);
+    ASSERT_EQ(palette2.convertToColor(2), RGBColor::DARK_GRAY);
+    ASSERT_EQ(palette2.convertToColor(3), RGBColor::BLACK);
 }
