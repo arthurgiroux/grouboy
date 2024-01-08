@@ -34,7 +34,7 @@ add_executable(
         cpu/test_cpu_instructions_misc_control.cpp
         cpu/test_cpu_instructions_16bits_arithmetic_logical.cpp
         cpu/test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        apu/test_palette.cpp)
+        ppu/test_palette.cpp)
 
 target_link_libraries(
         cpu_tests

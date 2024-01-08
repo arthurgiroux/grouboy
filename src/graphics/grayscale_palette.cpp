@@ -1,18 +1,13 @@
 #include "grayscale_palette.hpp"
 #include "rgb_color.hpp"
 
-RGBColor GrayscalePalette::convertToColor(byte colorId)
-{
-    return getColorForId(convertColorId(colorId));
-}
-
 GrayscalePalette::GrayscalePalette(MMU& mmu, word paletteAddr)
     : GenericPalette({RGBColor::WHITE, RGBColor::LIGHT_GRAY, RGBColor::DARK_GRAY, RGBColor::BLACK}), _mmu(mmu),
       _paletteAddr(paletteAddr)
 {
 }
 
-byte GrayscalePalette::convertColorId(byte colorId)
+byte GrayscalePalette::convertColorId(byte colorId) const
 {
     byte paletteData = _mmu.read(_paletteAddr);
 
@@ -27,4 +22,9 @@ byte GrayscalePalette::convertColorId(byte colorId)
     int bitMask = 0x03;
 
     return (paletteData >> (colorId * bitsPerMapping)) & bitMask;
+}
+
+RGBColor GrayscalePalette::getColorForId(unsigned int index) const
+{
+    return colorMapping[convertColorId(index)];
 }
