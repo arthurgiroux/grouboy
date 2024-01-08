@@ -23,13 +23,7 @@ class GrayscalePalette : public GenericPalette
      */
     GrayscalePalette(MMU& mmu, word paletteAddr);
 
-    /**
-     * Convert a given color to its grayscale representation.
-     *
-     * @param colorId the color id to convert [0, 3]
-     * @return a grayscale colorId [0, 255]
-     */
-    RGBColor convertToColor(byte colorId);
+    RGBColor getColorForId(unsigned int index) const override;
 
   private:
     /**
@@ -38,7 +32,7 @@ class GrayscalePalette : public GenericPalette
      * @param colorId the color id to convert [0, 3]
      * @return the converted color [0, 3]
      */
-    byte convertColorId(byte colorId);
+    byte convertColorId(byte colorId) const;
 
     /**
      * The MMU to use to retrieve information from memory.

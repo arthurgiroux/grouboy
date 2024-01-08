@@ -5,7 +5,7 @@
 TEST(AcidTest, OutputFromPPUShouldBeEqualToReferenceImage)
 {
     Emulator emulator;
-    
+
     bitmap_image referenceImage(std::string(DATADIR) + "/reference/acid-reference-dmg.bmp");
 
     ASSERT_FALSE(!referenceImage);
@@ -17,7 +17,7 @@ TEST(AcidTest, OutputFromPPUShouldBeEqualToReferenceImage)
     ASSERT_TRUE(emulator.getMMU().loadCartridge(rom));
 
     // We wait a certain number of frames to make sure we are seeing the result of the acid test
-    int expectedFrameId = 100;
+    int expectedFrameId = 500;
     while (emulator.getPPU().getFrameId() < expectedFrameId)
     {
         emulator.exec();

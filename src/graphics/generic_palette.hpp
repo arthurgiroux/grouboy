@@ -12,7 +12,7 @@ class GenericPalette : public Palette
     void setColorForId(RGBColor color, unsigned int index);
     RGBColor getColorForId(unsigned int index) const override;
 
-  private:
+  protected:
     std::array<RGBColor, 4> colorMapping = {RGBColor::BLACK, RGBColor::BLACK, RGBColor::BLACK, RGBColor::BLACK};
 };
 
