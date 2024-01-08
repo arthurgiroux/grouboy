@@ -48,17 +48,17 @@ byte MMU::read(const word& addr)
         return memory[addr];
     }
 
-    else if (addr == VRAM_BANK_ID_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
     {
         return vram.getBankId() & 0xFE;
     }
 
-    else if (addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
     {
         return colorPaletteMemoryMapperBackground.readColor();
     }
 
-    else if (addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
     {
         return colorPaletteMemoryMapperObjects.readColor();
     }
@@ -78,7 +78,7 @@ byte MMU::read(const word& addr)
         return memoryBankController->readRAM(externalRamAddr.relative(addr));
     }
 
-    else if (addr == WRAM_BANK_ID_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
     {
         return wramMemoryBank.getBankId() & 0xF8;
     }
@@ -183,29 +183,29 @@ void MMU::write(const word& addr, const byte& value)
         return;
     }
 
-    else if (addr == VRAM_BANK_ID_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
     {
         vram.switchBank(value & 0x01);
     }
 
-    else if (addr == COLOR_PALETTE_SPECS_BACKGROUND_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_SPECS_BACKGROUND_ADDR)
     {
         colorPaletteMemoryMapperBackground.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
         colorPaletteMemoryMapperBackground.setAddress(value & 0x7F);
     }
 
-    else if (addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
     {
         colorPaletteMemoryMapperBackground.writeColor(value);
     }
 
-    else if (addr == COLOR_PALETTE_SPECS_OBJECTS_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_SPECS_OBJECTS_ADDR)
     {
         colorPaletteMemoryMapperObjects.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
         colorPaletteMemoryMapperObjects.setAddress(value & 0x7F);
     }
 
-    else if (addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
     {
         colorPaletteMemoryMapperObjects.writeColor(value);
     }
@@ -225,7 +225,7 @@ void MMU::write(const word& addr, const byte& value)
         memoryBankController->writeRAM(externalRamAddr.relative(addr), value);
     }
 
-    else if (addr == WRAM_BANK_ID_ADDR)
+    else if (cartridge && cartridge->isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
     {
         // Value 0 maps to the first bank, other value map to 1-based bank
         wramMemoryBank.switchBank(value == 0 ? 0 : (value & 0x07) - 1);
