@@ -152,6 +152,7 @@ std::vector<Sprite*> PPU::getSpritesThatShouldBeRendered(int scanline)
 
 void PPU::renderScanline(int scanline)
 {
+    _scanline.clear();
     if (!isDisplayEnabled())
     {
         return;
@@ -170,6 +171,11 @@ void PPU::renderScanline(int scanline)
     if (areSpritesEnabled())
     {
         renderScanlineSprite(scanline);
+    }
+
+    for (const auto& [key, value] : _scanline)
+    {
+        _temporaryFrame.setPixel(key, scanline, value.getPalette()->getColorForId(value.getColorId()));
     }
 }
 
@@ -260,6 +266,7 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
 
         int bankId = 0;
         Palette* palette = &_paletteBackground;
+        int bgPriority = 0;
         if (_mmu.getCartridge()->isColorModeSupported())
         {
             Tilemap::TileInfo tileInfo = tilemap.getTileInfoForIndex(tileIndex);
@@ -275,6 +282,8 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
             {
                 yOffsetTile = SingleTile::TILE_HEIGHT - 1 - yOffsetTile;
             }
+
+            bgPriority = tileInfo.isRenderedAboveSprites();
         }
 
         /*
@@ -285,7 +294,7 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
                               .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
                                            bankId, false)
                               .getColorData(xOffsetTile, yOffsetTile);
-        _temporaryFrame.setPixel(x, scanline, palette->getColorForId(colorValue));
+        _scanline[x] = Pixel(colorValue, palette, 0, bgPriority);
     }
 
     if (isWindow)
@@ -342,9 +351,28 @@ void PPU::renderScanlineSprite(int scanline)
             }
 
             Palette* palette = sprite->getGrayscalePaletteId() ? &_paletteObj1 : &_paletteObj0;
+            bool hasPriority = false;
             if (_mmu.getCartridge()->isColorModeSupported())
             {
                 palette = &_mmu.getColorPaletteMemoryMapperObj().getColorPalette(sprite->getColorPaletteId());
+                if (!areBackgroundAndWindowEnabled())
+                {
+                    hasPriority = true;
+                }
+                else if (_scanline.count(xCoordinateOnScreen) > 0 &&
+                         _scanline[xCoordinateOnScreen].getBackgroundPriority() == 0 &&
+                         sprite->isRenderedOverBackgroundAndWindow())
+                {
+                    hasPriority = true;
+                }
+                else
+                {
+                    hasPriority = false;
+                }
+            }
+            else
+            {
+                hasPriority = sprite->isRenderedOverBackgroundAndWindow();
             }
 
             byte colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
@@ -356,12 +384,11 @@ void PPU::renderScanlineSprite(int scanline)
              * The pixel should only be rendered if it's over background/window or if
              * the background/window didn't render to this pixel.
              */
-            bool pixelShouldBeRendered = sprite->isRenderedOverBackgroundAndWindow() ||
-                                         _temporaryFrame.isPixelWhite(xCoordinateOnScreen, scanline);
+            bool bgHasWhitePixel = _scanline.count(xCoordinateOnScreen) == 0;
 
-            if (isPixelOpaque && pixelShouldBeRendered)
+            if (isPixelOpaque && (bgHasWhitePixel || hasPriority))
             {
-                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline, palette->getColorForId(colorId));
+                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, 0, 0);
             }
         }
     }

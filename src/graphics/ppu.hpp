@@ -3,6 +3,7 @@
 
 #include "grayscale_palette.hpp"
 #include "memory/mmu.hpp"
+#include "pixel.hpp"
 #include "pixel_fifo.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
@@ -412,6 +413,7 @@ class PPU
 
     PixelFIFO _spritesFIFO;
     void renderPixel();
+    std::map<int, Pixel> _scanline;
 };
 
 #endif // GBEMULATOR_PPU_HPP
