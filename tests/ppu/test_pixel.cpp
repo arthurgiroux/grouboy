@@ -4,7 +4,7 @@
 TEST(PixelTest, PixelColorCanBeSetAndGetCorrectly)
 {
     auto pixel = Pixel(0x0F, 0, 0, 0);
-    ASSERT_EQ(pixel.getColor(), 0x0F);
+    ASSERT_EQ(pixel.getColorId(), 0x0F);
 }
 
 TEST(PixelTest, PixelPaletteCanBeSetAndGetCorrectly)
