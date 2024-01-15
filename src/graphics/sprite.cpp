@@ -56,6 +56,8 @@ bool Sprite::isPriorityBiggerThanOtherSprite(const Sprite& other) const
      * When X coordinates are identical, the object located first
      * in OAM has higher priority.
      */
+    return getXPositionOnScreen() < other.getXPositionOnScreen();
+    
     if (getXPositionOnScreen() == other.getXPositionOnScreen())
     {
         return getId() < other.getId();
