@@ -139,14 +139,6 @@ std::vector<Sprite*> PPU::getSpritesThatShouldBeRendered(int scanline)
         spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
     }
 
-    /*
-     * Sort sprite by priority, from lowest to highest.
-     * We will render first the lowest priority sprite so that they can be overridden by a sprite with higher
-     * priority.
-     */
-    std::sort(spritesToRender.begin(), spritesToRender.end(),
-              [](Sprite* l, Sprite* r) { return !l->isPriorityBiggerThanOtherSprite(*r); });
-
     return spritesToRender;
 }
 
@@ -158,7 +150,7 @@ void PPU::renderScanline(int scanline)
         return;
     }
 
-    if (areBackgroundAndWindowEnabled())
+    if (_mmu.getCartridge()->isColorModeSupported() || areBackgroundAndWindowEnabled())
     {
         renderScanlineBackground(scanline);
 
@@ -294,7 +286,7 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
                               .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
                                            bankId, false)
                               .getColorData(xOffsetTile, yOffsetTile);
-        _scanline[x] = Pixel(colorValue, palette, 0, bgPriority);
+        _scanline[x] = Pixel(colorValue, palette, -1, bgPriority);
     }
 
     if (isWindow)
@@ -355,16 +347,25 @@ void PPU::renderScanlineSprite(int scanline)
             if (_mmu.getCartridge()->isColorModeSupported())
             {
                 palette = &_mmu.getColorPaletteMemoryMapperObj().getColorPalette(sprite->getColorPaletteId());
-                if (!areBackgroundAndWindowEnabled())
+
+                // We check if there was another sprite rendered before that has a higher priority
+                if (_scanline.count(xCoordinateOnScreen) > 0 && _scanline[xCoordinateOnScreen].getSpritePriority() >= 0)
+                {
+                    hasPriority = false;
+                }
+                // Otherwise, we check if background/window could have priority
+                else if (areBackgroundAndWindowDeprioritized())
                 {
                     hasPriority = true;
                 }
+                // in case that background doesn't have priority and sprite have priority, sprite will take over
                 else if (_scanline.count(xCoordinateOnScreen) > 0 &&
                          _scanline[xCoordinateOnScreen].getBackgroundPriority() == 0 &&
                          sprite->isRenderedOverBackgroundAndWindow())
                 {
                     hasPriority = true;
                 }
+                // In all the other cases background and window will have priority
                 else
                 {
                     hasPriority = false;
@@ -380,15 +381,14 @@ void PPU::renderScanlineSprite(int scanline)
             // We are copying the pixel if it's not white, white is treated as transparent
             bool isPixelOpaque = colorId != 0;
 
-            /*
-             * The pixel should only be rendered if it's over background/window or if
-             * the background/window didn't render to this pixel.
-             */
-            bool bgHasWhitePixel = _scanline.count(xCoordinateOnScreen) == 0;
+            bool bgHasWhitePixel =
+                _scanline.count(xCoordinateOnScreen) == 0 ||
+                (_scanline.count(xCoordinateOnScreen) > 0 && _scanline[xCoordinateOnScreen].getSpritePriority() < 0 &&
+                 _scanline[xCoordinateOnScreen].getColorId() == 0);
 
             if (isPixelOpaque && (bgHasWhitePixel || hasPriority))
             {
-                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, 0, 0);
+                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, sprite->getId(), 0);
             }
         }
     }
@@ -457,6 +457,11 @@ bool PPU::areSpritesEnabled() const
 bool PPU::areBackgroundAndWindowEnabled() const
 {
     return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
+}
+
+bool PPU::areBackgroundAndWindowDeprioritized() const
+{
+    return !utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
 }
 
 void PPU::reset()
