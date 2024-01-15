@@ -170,6 +170,14 @@ class PPU
     bool areBackgroundAndWindowEnabled() const;
 
     /**
+     * /!\ COLOR MODE ONLY /!\
+     * Return if the objects will always be rendered on top the of background / window
+     *
+     * @return true if background and window never have priority, false otherwise
+     */
+    bool areBackgroundAndWindowDeprioritized() const;
+
+    /**
      * Reset the PPU to its initial state.
      */
     void reset();
