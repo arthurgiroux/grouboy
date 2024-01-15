@@ -17,7 +17,7 @@ Tilemap::TileInfo Tilemap::getTileInfoForIndex(int index) const
 
 Tilemap::TileInfo::TileInfo(int attributes)
 {
-    _colorPaletteId = attributes & 0x03;
+    _colorPaletteId = attributes & 0x07;
     _vramBankId = (attributes >> 3) & 0x01;
     _isFlippedHorizontally = utils::isNthBitSet(attributes, 5);
     _isFlippedVertically = utils::isNthBitSet(attributes, 6);
