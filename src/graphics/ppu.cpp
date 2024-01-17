@@ -150,7 +150,7 @@ void PPU::renderScanline(int scanline)
         return;
     }
 
-    if (_mmu.getCartridge()->isColorModeSupported() || areBackgroundAndWindowEnabled())
+    if (_mmu.isColorModeSupported() || areBackgroundAndWindowEnabled())
     {
         renderScanlineBackground(scanline);
 
@@ -259,7 +259,7 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
         int bankId = 0;
         Palette* palette = &_paletteBackground;
         int bgPriority = 0;
-        if (_mmu.getCartridge()->isColorModeSupported())
+        if (_mmu.isColorModeSupported())
         {
             Tilemap::TileInfo tileInfo = tilemap.getTileInfoForIndex(tileIndex);
             bankId = tileInfo.getVRAMBankId();
@@ -311,7 +311,7 @@ void PPU::renderScanlineSprite(int scanline)
             tileId &= 0xFE;
         }
 
-        int bankId = _mmu.getCartridge()->isColorModeSupported() ? sprite->getBankId() : 0;
+        int bankId = _mmu.isColorModeSupported() ? sprite->getBankId() : 0;
 
         Tile tile = _mmu.getVRAM().getTileById(tileId, 0, bankId, isStackedTile);
 
@@ -344,7 +344,7 @@ void PPU::renderScanlineSprite(int scanline)
 
             Palette* palette = sprite->getGrayscalePaletteId() ? &_paletteObj1 : &_paletteObj0;
             bool hasPriority = false;
-            if (_mmu.getCartridge()->isColorModeSupported())
+            if (_mmu.isColorModeSupported())
             {
                 palette = &_mmu.getColorPaletteMemoryMapperObj().getColorPalette(sprite->getColorPaletteId());
 

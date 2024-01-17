@@ -48,17 +48,17 @@ byte MMU::read(const word& addr)
         return memory[addr];
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
+    else if (isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
     {
         return vram.getBankId() & 0xFE;
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
     {
         return colorPaletteMemoryMapperBackground.readColor();
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
     {
         return colorPaletteMemoryMapperObjects.readColor();
     }
@@ -78,7 +78,7 @@ byte MMU::read(const word& addr)
         return memoryBankController->readRAM(externalRamAddr.relative(addr));
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
+    else if (isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
     {
         return wramMemoryBank.getBankId() & 0xF8;
     }
@@ -177,35 +177,36 @@ void MMU::write(const word& addr, const byte& value)
         return;
     }
 
-    // Once the bootroom has been deactivated we can't reactivate it again
-    else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR && !isBootRomActive())
+    // Writing to the bootrom address deactivates it
+    else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
     {
+        isInBootrom = false;
         return;
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
+    else if (isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
     {
         vram.switchBank(value & 0x01);
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_SPECS_BACKGROUND_ADDR)
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_SPECS_BACKGROUND_ADDR)
     {
         colorPaletteMemoryMapperBackground.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
         colorPaletteMemoryMapperBackground.setAddress(value & 0x7F);
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
     {
         colorPaletteMemoryMapperBackground.writeColor(value);
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_SPECS_OBJECTS_ADDR)
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_SPECS_OBJECTS_ADDR)
     {
         colorPaletteMemoryMapperObjects.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
         colorPaletteMemoryMapperObjects.setAddress(value & 0x7F);
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
     {
         colorPaletteMemoryMapperObjects.writeColor(value);
     }
@@ -225,7 +226,7 @@ void MMU::write(const word& addr, const byte& value)
         memoryBankController->writeRAM(externalRamAddr.relative(addr), value);
     }
 
-    else if (cartridge && cartridge->isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
+    else if (isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
     {
         // Value 0 maps to the first bank, other value map to 1-based bank
         wramMemoryBank.switchBank(value == 0 ? 0 : (value & 0x07) - 1);
@@ -301,7 +302,7 @@ Cartridge* MMU::getCartridge()
 
 bool MMU::isBootRomActive()
 {
-    return !utils::isNthBitSet(read(BOOT_ROM_UNMAPPED_FLAG_ADDR), 0);
+    return isInBootrom;
 }
 
 void MMU::setInputController(InputController* controller)
@@ -360,4 +361,9 @@ ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperBackground()
 ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperObj()
 {
     return colorPaletteMemoryMapperObjects;
+}
+
+bool MMU::isColorModeSupported()
+{
+    return isBootRomActive() || (cartridge != nullptr && cartridge->isColorModeSupported());
 }
