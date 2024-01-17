@@ -148,6 +148,13 @@ class MMU
      */
     bool unserializeCartridgeRAM(const std::vector<byte>& data);
 
+    /**
+     * Returns if emulator should render color, i.e. it's either in the bootrom or
+     * the loaded rom supports color mode.
+     * @return true if color is supported, false otherwise
+     */
+    bool isColorModeSupported();
+
     VRAM& getVRAM();
 
     ColorPaletteMemoryMapper& getColorPaletteMemoryMapperBackground();
@@ -219,6 +226,11 @@ class MMU
      * @param sourceAddr The source address for the DMA
      */
     void performDMATransfer(word sourceAddr);
+
+    /**
+     * If the emulator is currently in the bootrom
+     */
+    bool isInBootrom = true;
 
     /**
      * The internal representation of the memory

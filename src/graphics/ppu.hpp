@@ -280,7 +280,7 @@ class PPU
      * @return a list of sprites to render, ordered by increasing priority
      */
     std::vector<Sprite*> getSpritesThatShouldBeRendered(int scanline);
-
+    
     /**
      * The address of the tile map with index 0.
      */
