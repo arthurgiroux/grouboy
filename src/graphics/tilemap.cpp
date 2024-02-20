@@ -6,12 +6,13 @@ Tilemap::Tilemap(VRAM* vram, word tilemapAddr) : _vram(vram), _address(tilemapAd
 
 sbyte Tilemap::getTileIdForIndex(int index) const
 {
-    return static_cast<sbyte>(_vram->readFromBank(_vram->addressRange.relative(_address + index), 0));
+    return static_cast<sbyte>(
+        _vram->readFromBank(_vram->addressRange.relative(static_cast<word>(_address + index)), 0));
 }
 
 Tilemap::TileInfo Tilemap::getTileInfoForIndex(int index) const
 {
-    byte attr = _vram->readFromBank(_vram->addressRange.relative(_address + index), 1);
+    byte attr = _vram->readFromBank(_vram->addressRange.relative(static_cast<word>(_address + index)), 1);
     return TileInfo(attr);
 }
 

@@ -77,14 +77,6 @@ class Sprite
     bool isRenderedOverBackgroundAndWindow() const;
 
     /**
-     * Compare the render priority of the current sprite with another one.
-     *
-     * @param other the sprite priority to compare it
-     * @return True if the sprite priority is bigger than the other one, false otherwise
-     */
-    bool isPriorityBiggerThanOtherSprite(const Sprite& other) const;
-
-    /**
      * Get the id of the palette to use to render the Sprite.
      *
      * @return  either 0 or 1, for the palette id.
