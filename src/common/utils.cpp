@@ -1,4 +1,5 @@
 #include "utils.hpp"
+#include <cmath>
 #include <fstream>
 #include <vector>
 
