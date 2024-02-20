@@ -2,39 +2,56 @@
 #include "emulator.hpp"
 #include <gtest/gtest.h>
 
-TEST(AcidTest, OutputFromPPUShouldBeEqualToReferenceImage)
+class AcidTest : public ::testing::Test
 {
-    Emulator emulator;
-
-    bitmap_image referenceImage(std::string(DATADIR) + "/reference/acid-reference-dmg.bmp");
-
-    ASSERT_FALSE(!referenceImage);
-
-    ASSERT_EQ(referenceImage.width(), PPU::SCREEN_WIDTH);
-    ASSERT_EQ(referenceImage.height(), PPU::SCREEN_HEIGHT);
-
-    std::string rom = std::string(DATADIR) + "/roms/acid/dmg-acid2.gb";
-    ASSERT_TRUE(emulator.getMMU().loadCartridge(rom));
-
-    // We wait a certain number of frames to make sure we are seeing the result of the acid test
-    int expectedFrameId = 500;
-    while (emulator.getPPU().getFrameId() < expectedFrameId)
+  protected:
+    void assertROMOutputIsSimilarToReferenceImage(std::string rom, std::string refImagePath)
     {
-        emulator.exec();
-    }
+        Emulator emulator;
 
-    const RGBImage& image = emulator.getPPU().getLastRenderedFrame();
+        bitmap_image referenceImage(refImagePath);
 
-    for (int y = 0; y < PPU::SCREEN_HEIGHT; ++y)
-    {
-        for (int x = 0; x < PPU::SCREEN_WIDTH; ++x)
+        ASSERT_FALSE(!referenceImage);
+
+        ASSERT_EQ(referenceImage.width(), PPU::SCREEN_WIDTH);
+        ASSERT_EQ(referenceImage.height(), PPU::SCREEN_HEIGHT);
+
+        ASSERT_TRUE(emulator.getMMU().loadCartridge(rom));
+
+        // We wait a certain number of frames to make sure we are seeing the result of the acid test
+        int expectedFrameId = 500;
+        while (emulator.getPPU().getFrameId() < expectedFrameId)
         {
-            rgb_t referenceColor;
-            referenceImage.get_pixel(x, y, referenceColor);
+            emulator.exec();
+        }
 
-            ASSERT_EQ(image.getPixelR(x, y), referenceColor.red);
-            ASSERT_EQ(image.getPixelG(x, y), referenceColor.green);
-            ASSERT_EQ(image.getPixelB(x, y), referenceColor.blue);
+        const RGBImage& image = emulator.getPPU().getLastRenderedFrame();
+
+        for (int y = 0; y < PPU::SCREEN_HEIGHT; ++y)
+        {
+            for (int x = 0; x < PPU::SCREEN_WIDTH; ++x)
+            {
+                rgb_t referenceColor;
+                referenceImage.get_pixel(x, y, referenceColor);
+
+                ASSERT_EQ(image.getPixelR(x, y), referenceColor.red);
+                ASSERT_EQ(image.getPixelG(x, y), referenceColor.green);
+                ASSERT_EQ(image.getPixelB(x, y), referenceColor.blue);
+            }
         }
     }
+};
+
+TEST_F(AcidTest, DMGAcidShouldPass)
+{
+    std::string rom = std::string(DATADIR) + "/roms/acid/dmg-acid2.gb";
+    std::string reImage = std::string(DATADIR) + "/reference/acid-reference-dmg.bmp";
+    assertROMOutputIsSimilarToReferenceImage(rom, reImage);
+}
+
+TEST_F(AcidTest, CGBAcidShouldPass)
+{
+    std::string rom = std::string(DATADIR) + "/roms/acid/cgb-acid2.gbc";
+    std::string reImage = std::string(DATADIR) + "/reference/acid-reference-cgb.bmp";
+    assertROMOutputIsSimilarToReferenceImage(rom, reImage);
 }
