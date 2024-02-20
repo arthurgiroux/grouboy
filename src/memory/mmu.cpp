@@ -18,8 +18,7 @@ const std::set<word> MMU::unmappedIOAddrs = {0xFF03, 0xFF08, 0xFF09, 0xFF0A, 0xF
 const std::map<word, byte> MMU::mappedIOMask = {{HardwareIOAddr::P1, static_cast<byte>(0b11000000)},
                                                 {HardwareIOAddr::SC, static_cast<byte>(0b01111110)},
                                                 {HardwareIOAddr::IF, static_cast<byte>(0b11100000)},
-                                                {HardwareIOAddr::STAT, static_cast<byte>(0b10000000)},
-                                                {HardwareIOAddr::BOOT_ROOM_LOCK, static_cast<byte>(0b11111110)}};
+                                                {HardwareIOAddr::STAT, static_cast<byte>(0b10000000)}};
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
 
@@ -46,6 +45,11 @@ byte MMU::read(const word& addr)
     if (addr < BOOTROM.size() && isBootRomActive())
     {
         return memory[addr];
+    }
+
+    else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
+    {
+        return !isInBootrom | 0b11111110;
     }
 
     else if (isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
