@@ -94,8 +94,22 @@ void setNthBit(int& value, int bitPosition, bool state);
  */
 bool readBinaryDataFromFile(const std::string& filepath, std::vector<byte>& out);
 
+/**
+ * Convert a value from 5 bits range to 8 bits range.
+ * This will map the maximum 5 bits value to the maximum 8 bits value.
+ *
+ * @param value The 5 bits value to convert.
+ * @return The converted value on 8 bits
+ */
 byte convertFrom5BitsTo8Bits(byte value);
 
+/**
+ * Convert a value from 8 bits range to 5 bits range.
+ * This will map the maximum 8 bits value to the maximum 5 bits value.
+ *
+ * @param value The 8 bits value to convert.
+ * @return The converted value on 5 bits
+ */
 byte convertFrom8BitsTo5Bits(byte value);
 
 /**
