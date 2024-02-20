@@ -70,15 +70,15 @@ bool readBinaryDataFromFile(const std::string& filepath, std::vector<byte>& out)
 byte convertFrom5BitsTo8Bits(byte value)
 {
     int MAX_VALUE_5BIT = 31;
-    int MAX_VALUE_8BIT = 255;
-    return static_cast<byte>(((value & 0x1F) * MAX_VALUE_8BIT) / MAX_VALUE_5BIT);
+    float MAX_VALUE_8BIT = 255.f;
+    return static_cast<byte>(round(((value & 0x1F) * MAX_VALUE_8BIT) / MAX_VALUE_5BIT));
 }
 
 byte convertFrom8BitsTo5Bits(byte value)
 {
     int MAX_VALUE_5BIT = 31;
-    int MAX_VALUE_8BIT = 255;
-    return static_cast<byte>((value * MAX_VALUE_5BIT) / MAX_VALUE_8BIT);
+    float MAX_VALUE_8BIT = 255.f;
+    return static_cast<byte>(round((value * MAX_VALUE_5BIT) / MAX_VALUE_8BIT));
 }
 
 AddressRange::AddressRange(word start, word end) : _startAddr(start), _endAddr(end)
