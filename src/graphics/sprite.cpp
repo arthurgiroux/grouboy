@@ -49,25 +49,6 @@ int Sprite::getYPositionOnScreen() const
     return readDataFromPayload(PAYLOAD_DATA_Y_IDX) - Y_SCREEN_OFFSET;
 }
 
-bool Sprite::isPriorityBiggerThanOtherSprite(const Sprite& other) const
-{
-    /**
-     * the smaller the X coordinate, the higher the priority.
-     * When X coordinates are identical, the object located first
-     * in OAM has higher priority.
-     */
-    return getXPositionOnScreen() < other.getXPositionOnScreen();
-    
-    if (getXPositionOnScreen() == other.getXPositionOnScreen())
-    {
-        return getId() < other.getId();
-    }
-    else
-    {
-        return getXPositionOnScreen() < other.getXPositionOnScreen();
-    }
-}
-
 int Sprite::getBankId() const
 {
     return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_BANKID);

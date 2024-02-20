@@ -49,7 +49,7 @@ byte MMU::read(const word& addr)
 
     else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
     {
-        return !isInBootrom | 0b11111110;
+        return static_cast<byte>(!isInBootrom) | 0b11111110;
     }
 
     else if (isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)

@@ -26,5 +26,5 @@ byte GrayscalePalette::convertColorId(byte colorId) const
 
 RGBColor GrayscalePalette::getColorForId(unsigned int index) const
 {
-    return colorMapping[convertColorId(index)];
+    return colorMapping[convertColorId(static_cast<byte>(index))];
 }
