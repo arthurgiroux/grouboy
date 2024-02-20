@@ -2,7 +2,7 @@
 #define GROUBOY_PIXEL_HPP
 
 #include "common/types.hpp"
-#include "palette.hpp"
+#include "graphics/palette/palette.hpp"
 
 class Pixel
 {

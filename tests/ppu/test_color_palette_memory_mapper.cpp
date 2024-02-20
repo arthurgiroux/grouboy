@@ -1,5 +1,5 @@
-#include "graphics/color_palette_memory_mapper.hpp"
-#include "graphics/palette.hpp"
+#include "graphics/palette/color_palette_memory_mapper.hpp"
+#include "graphics/palette/palette.hpp"
 #include <gtest/gtest.h>
 
 class ColorPaletteMemoryMapperTest : public ::testing::Test

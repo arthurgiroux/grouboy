@@ -1,4 +1,4 @@
-#include "graphics/grayscale_palette.hpp"
+#include "graphics/palette/grayscale_palette.hpp"
 #include <gtest/gtest.h>
 
 class PaletteTest : public ::testing::Test

@@ -1,7 +1,7 @@
 #ifndef GROUBOY_RGB555_PALETTE_HPP
 #define GROUBOY_RGB555_PALETTE_HPP
 
-#include "graphics/palette.hpp"
+#include "graphics/palette/palette.hpp"
 
 class RGB555Palette : public Palette
 {

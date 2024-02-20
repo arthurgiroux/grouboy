@@ -1,5 +1,5 @@
 #include "grayscale_palette.hpp"
-#include "rgb_color.hpp"
+#include "graphics/rgb_color.hpp"
 
 GrayscalePalette::GrayscalePalette(MMU& mmu, word paletteAddr)
     : GenericPalette({RGBColor::WHITE, RGBColor::LIGHT_GRAY, RGBColor::DARK_GRAY, RGBColor::BLACK}), _mmu(mmu),
