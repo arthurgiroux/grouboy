@@ -16,22 +16,22 @@ TEST_F(PixelFIFOTest, PixelFIFOShouldBeEmptyAtInit)
 
 TEST_F(PixelFIFOTest, PushShouldIncreaseFIFO)
 {
-    auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00);
+    auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00, Pixel::Source::SPRITE);
     fifo.push(pixel);
     ASSERT_EQ(fifo.size(), 1);
 }
 
 TEST_F(PixelFIFOTest, PixelFIFOWithOneElementShouldNotBeEmpty)
 {
-    auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00);
+    auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00, Pixel::Source::SPRITE);
     fifo.push(pixel);
     ASSERT_FALSE(fifo.isEmpty());
 }
 
 TEST_F(PixelFIFOTest, PopShouldRemoveFirstElement)
 {
-    auto firstPixel = Pixel(0x0F, 0x00, 0x00, 0x00);
-    auto secondPixel = Pixel(0xF0, 0x00, 0x00, 0x00);
+    auto firstPixel = Pixel(0x0F, 0x00, 0x00, 0x00, Pixel::Source::SPRITE);
+    auto secondPixel = Pixel(0xF0, 0x00, 0x00, 0x00, Pixel::Source::SPRITE);
     fifo.push(firstPixel);
     fifo.push(secondPixel);
     ASSERT_EQ(fifo.pop(), firstPixel);
@@ -44,7 +44,7 @@ TEST_F(PixelFIFOTest, PixelFIFOWith16ElementsShouldBeFull)
     int maxSize = 16;
     for (int i = 0; i < maxSize; ++i)
     {
-        auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00);
+        auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00, Pixel::Source::SPRITE);
         fifo.push(pixel);
         ASSERT_EQ(fifo.size(), i + 1);
     }
@@ -56,7 +56,7 @@ TEST_F(PixelFIFOTest, ClearShouldRemoveAllElements)
     int maxSize = 16;
     for (int i = 0; i < maxSize; ++i)
     {
-        auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00);
+        auto pixel = Pixel(0x0F, 0x00, 0x00, 0x00, Pixel::Source::SPRITE);
         fifo.push(pixel);
     }
     ASSERT_TRUE(fifo.isFull());
