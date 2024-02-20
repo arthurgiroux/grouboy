@@ -286,7 +286,7 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
                               .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
                                            bankId, false)
                               .getColorData(xOffsetTile, yOffsetTile);
-        _scanline[x] = Pixel(colorValue, palette, -1, bgPriority);
+        _scanline[x] = Pixel(colorValue, palette, -1, bgPriority, Pixel::Source::BG_WINDOW);
     }
 
     if (isWindow)
@@ -344,12 +344,15 @@ void PPU::renderScanlineSprite(int scanline)
 
             Palette* palette = sprite->getGrayscalePaletteId() ? &_paletteObj1 : &_paletteObj0;
             bool hasPriority = false;
+            int spritePriority = 0;
             if (_mmu.isColorModeSupported())
             {
+                spritePriority = sprite->getId();
                 palette = &_mmu.getColorPaletteMemoryMapperObj().getColorPalette(sprite->getColorPaletteId());
 
                 // We check if there was another sprite rendered before that has a higher priority
-                if (_scanline.count(xCoordinateOnScreen) > 0 && _scanline[xCoordinateOnScreen].getSpritePriority() >= 0)
+                if (_scanline.count(xCoordinateOnScreen) > 0 &&
+                    _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::SPRITE)
                 {
                     hasPriority = false;
                 }
@@ -360,20 +363,35 @@ void PPU::renderScanlineSprite(int scanline)
                 }
                 // in case that background doesn't have priority and sprite have priority, sprite will take over
                 else if (_scanline.count(xCoordinateOnScreen) > 0 &&
+                         _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::BG_WINDOW &&
                          _scanline[xCoordinateOnScreen].getBackgroundPriority() == 0 &&
                          sprite->isRenderedOverBackgroundAndWindow())
                 {
                     hasPriority = true;
                 }
-                // In all the other cases background and window will have priority
-                else
-                {
-                    hasPriority = false;
-                }
             }
             else
             {
-                hasPriority = sprite->isRenderedOverBackgroundAndWindow();
+                // Smaller coordinates is a higher priority
+                spritePriority = -sprite->getXPositionOnScreen();
+
+                // If something was rendered before, we check if it should be overridden
+                if (_scanline.count(xCoordinateOnScreen) > 0)
+                {
+                    Pixel pixel = _scanline[xCoordinateOnScreen];
+                    // If we had a sprite with lower priority, we override it
+                    if (pixel.getSource() == Pixel::Source::SPRITE && spritePriority > pixel.getSpritePriority())
+                    {
+                        hasPriority = true;
+                    }
+
+                    // If we had a non-white background/window and we can override it then we do
+                    else if (pixel.getSource() == Pixel::Source::BG_WINDOW &&
+                             (pixel.getColorId() > 0 && sprite->isRenderedOverBackgroundAndWindow()))
+                    {
+                        hasPriority = true;
+                    }
+                }
             }
 
             byte colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
@@ -381,14 +399,14 @@ void PPU::renderScanlineSprite(int scanline)
             // We are copying the pixel if it's not white, white is treated as transparent
             bool isPixelOpaque = colorId != 0;
 
-            bool bgHasWhitePixel =
-                _scanline.count(xCoordinateOnScreen) == 0 ||
-                (_scanline.count(xCoordinateOnScreen) > 0 && _scanline[xCoordinateOnScreen].getSpritePriority() < 0 &&
-                 _scanline[xCoordinateOnScreen].getColorId() == 0);
+            bool isBackgroundWhite = _scanline.count(xCoordinateOnScreen) == 0 ||
+                                     (_scanline.count(xCoordinateOnScreen) > 0 &&
+                                      _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::BG_WINDOW &&
+                                      (_scanline[xCoordinateOnScreen].getColorId() == 0));
 
-            if (isPixelOpaque && (bgHasWhitePixel || hasPriority))
+            if (isPixelOpaque && (isBackgroundWhite || hasPriority))
             {
-                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, sprite->getId(), 0);
+                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, spritePriority, 0, Pixel::Source::SPRITE);
             }
         }
     }

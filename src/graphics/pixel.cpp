@@ -1,8 +1,9 @@
 #include "pixel.hpp"
 #include "palette.hpp"
 
-Pixel::Pixel(byte colorId, Palette* palette, int spritePriority, int backgroundPriority)
-    : _colorId(colorId), _palette(palette), _spritePriority(spritePriority), _backgroundPriority(backgroundPriority)
+Pixel::Pixel(byte colorId, Palette* palette, int spritePriority, int backgroundPriority, Source source)
+    : _colorId(colorId), _palette(palette), _spritePriority(spritePriority), _backgroundPriority(backgroundPriority),
+      _source(source)
 {
 }
 
@@ -24,6 +25,11 @@ int Pixel::getSpritePriority() const
 int Pixel::getBackgroundPriority() const
 {
     return _backgroundPriority;
+}
+
+Pixel::Source Pixel::getSource() const
+{
+    return _source;
 }
 
 bool Pixel::operator==(const Pixel& rhs) const
