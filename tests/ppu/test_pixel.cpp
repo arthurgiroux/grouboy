@@ -1,4 +1,4 @@
-#include "graphics/generic_palette.hpp"
+#include "graphics/palette/generic_palette.hpp"
 #include "graphics/pixel.hpp"
 #include <gtest/gtest.h>
 

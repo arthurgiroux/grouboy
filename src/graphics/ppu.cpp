@@ -1,8 +1,8 @@
 
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
-#include "graphics/grayscale_palette.hpp"
 #include "graphics/lcd_status_register.hpp"
+#include "graphics/palette/grayscale_palette.hpp"
 #include "spdlog/spdlog.h"
 #include "tilemap.hpp"
 #include <algorithm>

@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_PPU_HPP
 #define GBEMULATOR_PPU_HPP
 
-#include "grayscale_palette.hpp"
+#include "graphics/palette/grayscale_palette.hpp"
 #include "memory/mmu.hpp"
 #include "pixel.hpp"
 #include "pixel_fifo.hpp"
@@ -280,7 +280,7 @@ class PPU
      * @return a list of sprites to render, ordered by increasing priority
      */
     std::vector<Sprite*> getSpritesThatShouldBeRendered(int scanline);
-    
+
     /**
      * The address of the tile map with index 0.
      */

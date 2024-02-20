@@ -1,7 +1,7 @@
 #ifndef GROUBOY_PALETTE_HPP
 #define GROUBOY_PALETTE_HPP
 
-#include "rgb_color.hpp"
+#include "graphics/rgb_color.hpp"
 #include <array>
 
 class Palette

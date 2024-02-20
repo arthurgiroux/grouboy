@@ -1,8 +1,8 @@
 #ifndef GROUBOY_GENERIC_PALETTE_HPP
 #define GROUBOY_GENERIC_PALETTE_HPP
 
+#include "graphics/rgb_color.hpp"
 #include "palette.hpp"
-#include "rgb_color.hpp"
 #include <array>
 
 class GenericPalette : public Palette

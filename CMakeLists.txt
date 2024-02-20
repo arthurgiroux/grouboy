@@ -46,8 +46,8 @@ set(SOURCE_FILES
         src/cpu/input_controller.hpp
         src/graphics/rgb_image.cpp
         src/graphics/rgb_image.hpp
-        src/graphics/grayscale_palette.cpp
-        src/graphics/grayscale_palette.hpp
+        src/graphics/palette/grayscale_palette.cpp
+        src/graphics/palette/grayscale_palette.hpp
         src/graphics/sprite.cpp
         src/graphics/sprite.hpp
         src/serial/serial_transfer_manager.cpp
@@ -103,12 +103,12 @@ set(SOURCE_FILES
         src/memory/vram.hpp
         src/graphics/rgb_color.cpp
         src/graphics/rgb_color.hpp
-        src/graphics/generic_palette.cpp
-        src/graphics/generic_palette.hpp
-        src/graphics/color_palette_memory_mapper.cpp
-        src/graphics/color_palette_memory_mapper.hpp
-        src/graphics/rgb555_palette.cpp
-        src/graphics/rgb555_palette.hpp)
+        src/graphics/palette/generic_palette.cpp
+        src/graphics/palette/generic_palette.hpp
+        src/graphics/palette/color_palette_memory_mapper.cpp
+        src/graphics/palette/color_palette_memory_mapper.hpp
+        src/graphics/palette/rgb555_palette.cpp
+        src/graphics/palette/rgb555_palette.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)

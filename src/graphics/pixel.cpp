@@ -1,5 +1,5 @@
 #include "pixel.hpp"
-#include "palette.hpp"
+#include "graphics/palette/palette.hpp"
 
 Pixel::Pixel(byte colorId, Palette* palette, int spritePriority, int backgroundPriority, Source source)
     : _colorId(colorId), _palette(palette), _spritePriority(spritePriority), _backgroundPriority(backgroundPriority),

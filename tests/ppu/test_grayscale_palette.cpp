@@ -1,4 +1,4 @@
-#include "graphics/grayscale_palette.hpp"
+#include "graphics/palette/grayscale_palette.hpp"
 #include "graphics/tile.hpp"
 #include <gtest/gtest.h>
 

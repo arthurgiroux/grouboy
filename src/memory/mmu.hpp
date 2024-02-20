@@ -9,7 +9,7 @@
 #include "cartridge.hpp"
 #include "common/types.hpp"
 #include "cpu/input_controller.hpp"
-#include "graphics/color_palette_memory_mapper.hpp"
+#include "graphics/palette/color_palette_memory_mapper.hpp"
 #include "memory/mbc/memory_bank_controller.hpp"
 #include "switchable_memory_bank.hpp"
 #include "timer/timer.hpp"
