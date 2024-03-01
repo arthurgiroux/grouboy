@@ -6,17 +6,14 @@
 #include "memory/mmu.hpp"
 
 /**
- * A Grayscale palette is a mapping from one color id to another.
- * The mapping is read from an address in memory.
- * GrayscalePalette are used to extend the reusability of sprites
- * by being able to switch colors before rendering without having
- * to store another sprite data.
+ * A Grayscale palette maps the color id to shades of gray.
+ * The mapping between color id and shade of gray can be set from the MMU.
  */
 class GrayscalePalette : public GenericPalette
 {
   public:
     /**
-     * Create a new palette from a memory slot.
+     * Create a new palette from a memory address.
      *
      * @param mmu   The MMU to use to access the memory.
      * @param paletteAddr   The address of the palette mapping.
