@@ -29,18 +29,18 @@ void ColorPaletteMemoryMapper::writeColor(byte value)
 
     if (address % 2 == 1)
     {
-        color = (value << 8) | (color & 0xFF);
+        color = utils::createWordFromBytes(value, utils::getLsbFromWord(color));
     }
     else
     {
-        color = (color & 0xFF00) | value;
+        color = utils::createWordFromBytes(utils::getMsbFromWord(color), value);
     }
 
     colorPalettes[getPaletteIndexFromAddr()].setColorForId(color, getColorIdFromAddr());
 
     if (isAddrIncrementEnabled)
     {
-        address = (address + 1) % 64;
+        address = (address + 1) % (NBR_PALETTE * COLOR_PER_PALETTE * BYTES_PER_COLOR);
     }
 }
 
@@ -49,10 +49,10 @@ byte ColorPaletteMemoryMapper::readColor()
     int color = colorPalettes[getPaletteIndexFromAddr()].getRGB555ColorForId(getColorIdFromAddr());
     if (address % 2 == 1)
     {
-        color >>= 8;
+        return utils::getMsbFromWord(color);
     }
 
-    return color & 0xFF;
+    return utils::getLsbFromWord(color);
 }
 
 Palette& ColorPaletteMemoryMapper::getColorPalette(unsigned int index)
@@ -67,10 +67,10 @@ Palette& ColorPaletteMemoryMapper::getColorPalette(unsigned int index)
 
 int ColorPaletteMemoryMapper::getPaletteIndexFromAddr() const
 {
-    return address / (2 * 4);
+    return address / (BYTES_PER_COLOR * COLOR_PER_PALETTE);
 }
 
 int ColorPaletteMemoryMapper::getColorIdFromAddr() const
 {
-    return (address / 2) % 4;
+    return (address / BYTES_PER_COLOR) % COLOR_PER_PALETTE;
 }
