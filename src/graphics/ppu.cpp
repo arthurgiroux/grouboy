@@ -286,7 +286,7 @@ void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scro
                               .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
                                            bankId, false)
                               .getColorData(xOffsetTile, yOffsetTile);
-        _scanline[x] = Pixel(colorValue, palette, -1, bgPriority, Pixel::Source::BG_WINDOW);
+        _scanline[x] = Pixel(colorValue, palette, Pixel::Source::BG_WINDOW, bgPriority);
     }
 
     if (isWindow)
@@ -364,7 +364,7 @@ void PPU::renderScanlineSprite(int scanline)
                 // in case that background doesn't have priority and sprite have priority, sprite will take over
                 else if (_scanline.count(xCoordinateOnScreen) > 0 &&
                          _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::BG_WINDOW &&
-                         _scanline[xCoordinateOnScreen].getBackgroundPriority() == 0 &&
+                         _scanline[xCoordinateOnScreen].getPriority() == 0 &&
                          sprite->isRenderedOverBackgroundAndWindow())
                 {
                     hasPriority = true;
@@ -380,7 +380,7 @@ void PPU::renderScanlineSprite(int scanline)
                 {
                     Pixel pixel = _scanline[xCoordinateOnScreen];
                     // If we had a sprite with lower priority, we override it
-                    if (pixel.getSource() == Pixel::Source::SPRITE && spritePriority > pixel.getSpritePriority())
+                    if (pixel.getSource() == Pixel::Source::SPRITE && spritePriority > pixel.getPriority())
                     {
                         hasPriority = true;
                     }
@@ -406,7 +406,7 @@ void PPU::renderScanlineSprite(int scanline)
 
             if (isPixelOpaque && (isBackgroundWhite || hasPriority))
             {
-                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, spritePriority, 0, Pixel::Source::SPRITE);
+                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, Pixel::Source::SPRITE, spritePriority);
             }
         }
     }

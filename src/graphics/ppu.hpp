@@ -281,6 +281,8 @@ class PPU
      */
     std::vector<Sprite*> getSpritesThatShouldBeRendered(int scanline);
 
+    void renderPixel();
+
     /**
      * The address of the tile map with index 0.
      */
@@ -415,13 +417,19 @@ class PPU
      */
     GrayscalePalette _paletteObj1;
 
+    /**
+     * The list of sprites that should be render for the current scanline
+     */
     std::vector<Sprite*> _spritesToRender = {};
+
+    /**
+     * A map of the pixel x-coordinate and pixel to render for the current scanline.
+     */
+    std::map<int, Pixel> _scanline;
 
     PixelFIFO _backgroundWindowFIFO;
 
     PixelFIFO _spritesFIFO;
-    void renderPixel();
-    std::map<int, Pixel> _scanline;
 };
 
 #endif // GBEMULATOR_PPU_HPP
