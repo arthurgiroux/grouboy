@@ -11,15 +11,47 @@
 class Tilemap
 {
   public:
+    /**
+     * On GameBoy Color, each tile in the tilemap is linked to an attribute map,
+     * where attributes about how this tile should be rendered are stored.
+     */
     class TileInfo
     {
       public:
+        /**
+         * Create the tile info from the attribute value
+         * @param attributes the value from the attribute memory value
+         */
         TileInfo(int attributes);
 
+        /**
+         * Should the tile be rendered from right to left
+         * @return true if it should be flipped, false otherwise
+         */
         bool isFlippedHorizontally() const;
+
+        /**
+         * Should the tile be rendered upside-down
+         * @return true if it should be flipped, false otherwise
+         */
         bool isFlippedVertically() const;
+
+        /**
+         * Get the VRAM Bank from which the tile should be retrieve
+         * @return a bank id, 0 or 1
+         */
         int getVRAMBankId() const;
+
+        /**
+         * Get the id of the color palette that should be used to render the tile
+         * @return an id between 0 and 7
+         */
         int getColorPaletteId() const;
+
+        /**
+         * Should this tile have highest priority and be rendered above everything
+         * @return true if it should have highest priority, false otherwise
+         */
         bool isRenderedAboveSprites() const;
 
       private:
