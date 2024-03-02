@@ -6,7 +6,8 @@
 #include <vector>
 
 /**
- *
+ * Represents an RGB image of specific size.
+ * Each components is on 8bits.
  */
 class RGBImage
 {
