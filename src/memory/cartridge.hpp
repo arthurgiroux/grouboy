@@ -96,6 +96,12 @@ class Cartridge
      */
     CartridgeType getType() const;
 
+    /**
+     * Returns if the cartridge support color mode (CGB) or only monochrome.
+     * @return true if color is supported, false otherwise
+     */
+    bool isColorModeSupported() const;
+
   private:
     /**
      * Read the cartridge header from the binary data
@@ -174,6 +180,11 @@ class Cartridge
      * The address of the ram size in the binary data
      */
     static const int CARTRIDGE_RAM_SIZE_ADDR = 0x0149;
+
+    /**
+     * The address of the flag to know if the cartridge should run in color mode or not.
+     */
+    static const int COLOR_MODE_FLAG_ADDR = 0x0143;
 
     /**
      * The cartridge type read from the header

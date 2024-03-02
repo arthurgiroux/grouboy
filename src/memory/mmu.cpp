@@ -10,30 +10,15 @@
 
 #include "apu/apu.hpp"
 #include "cartridge.hpp"
-
-const std::array<byte, 256> MMU::BIOS = {
-    0x31, 0xFE, 0xFF, 0x21, 0x00, 0x80, 0x22, 0xCB, 0x6C, 0x28, 0xFB, 0x3E, 0x80, 0xE0, 0x26, 0xE0, 0x11, 0x3E, 0xF3,
-    0xE0, 0x12, 0xE0, 0x25, 0x3E, 0x77, 0xE0, 0x24, 0x3E, 0x54, 0xE0, 0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A,
-    0x47, 0xCD, 0xA2, 0x00, 0xCD, 0xA2, 0x00, 0x13, 0x7B, 0xEE, 0x34, 0x20, 0xF2, 0x11, 0xD1, 0x00, 0x0E, 0x08, 0x1A,
-    0x13, 0x22, 0x23, 0x0D, 0x20, 0xF9, 0x3E, 0x19, 0xEA, 0x10, 0x99, 0x21, 0x2F, 0x99, 0x0E, 0x0C, 0x3D, 0x28, 0x08,
-    0x32, 0x0D, 0x20, 0xF9, 0x2E, 0x0F, 0x18, 0xF5, 0x3E, 0x1E, 0xE0, 0x42, 0x3E, 0x91, 0xE0, 0x40, 0x16, 0x89, 0x0E,
-    0x0F, 0xCD, 0xB7, 0x00, 0x7A, 0xCB, 0x2F, 0xCB, 0x2F, 0xE0, 0x42, 0x7A, 0x81, 0x57, 0x79, 0xFE, 0x08, 0x20, 0x04,
-    0x3E, 0xA8, 0xE0, 0x47, 0x0D, 0x20, 0xE7, 0x3E, 0xFC, 0xE0, 0x47, 0x3E, 0x83, 0xCD, 0xCA, 0x00, 0x06, 0x05, 0xCD,
-    0xC3, 0x00, 0x3E, 0xC1, 0xCD, 0xCA, 0x00, 0x06, 0x3C, 0xCD, 0xC3, 0x00, 0x21, 0xB0, 0x01, 0xE5, 0xF1, 0x21, 0x4D,
-    0x01, 0x01, 0x13, 0x00, 0x11, 0xD8, 0x00, 0xC3, 0xFE, 0x00, 0x3E, 0x04, 0x0E, 0x00, 0xCB, 0x20, 0xF5, 0xCB, 0x11,
-    0xF1, 0xCB, 0x11, 0x3D, 0x20, 0xF5, 0x79, 0x22, 0x23, 0x22, 0x23, 0xC9, 0xE5, 0x21, 0x0F, 0xFF, 0xCB, 0x86, 0xCB,
-    0x46, 0x28, 0xFC, 0xE1, 0xC9, 0xCD, 0xB7, 0x00, 0x05, 0x20, 0xFA, 0xC9, 0xE0, 0x13, 0x3E, 0x87, 0xE0, 0x14, 0xC9,
-    0x3C, 0x42, 0xB9, 0xA5, 0xB9, 0xA5, 0x42, 0x3C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0x50};
+#include "memory/bootrom.hpp"
+#include "spdlog/spdlog.h"
 
 const std::set<word> MMU::unmappedIOAddrs = {0xFF03, 0xFF08, 0xFF09, 0xFF0A, 0xFF0B, 0xFF0C, 0xFF0D, 0xFF0E};
 
 const std::map<word, byte> MMU::mappedIOMask = {{HardwareIOAddr::P1, static_cast<byte>(0b11000000)},
                                                 {HardwareIOAddr::SC, static_cast<byte>(0b01111110)},
                                                 {HardwareIOAddr::IF, static_cast<byte>(0b11100000)},
-                                                {HardwareIOAddr::STAT, static_cast<byte>(0b10000000)},
-                                                {HardwareIOAddr::BOOT_ROOM_LOCK, static_cast<byte>(0b11111110)}};
+                                                {HardwareIOAddr::STAT, static_cast<byte>(0b10000000)}};
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
 
@@ -47,23 +32,39 @@ MMU::MMU()
 void MMU::reset()
 {
     memory = {};
-    std::copy(BIOS.begin(), BIOS.end(), memory.begin());
+    std::copy(BOOTROM.begin(), BOOTROM.end(), memory.begin());
 }
-
-/***********************************
-            MEMORY LAYOUT
-
-[ BIOS | ROM BANK 0 | ROM BANK 1 | GPU VRAM | Ext. RAM | Working RAM | Sprites info | I/O | ZRAM ]
-    0     256b   8k    16k    24k   32k        40k        48k           56k                         64k
-
-
-    ***********************************/
 
 byte MMU::read(const word& addr)
 {
-    if (addr < BIOS.size() && isBootRomActive())
+    if (cartridgeHeaderAddr.contains(addr) && cartridge != nullptr)
+    {
+        return cartridge->getData()[addr];
+    }
+
+    if (addr < BOOTROM.size() && isBootRomActive())
     {
         return memory[addr];
+    }
+
+    else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
+    {
+        return static_cast<byte>(!isInBootrom) | 0b11111110;
+    }
+
+    else if (isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
+    {
+        return vram.getBankId() & 0xFE;
+    }
+
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    {
+        return colorPaletteMemoryMapperBackground.readColor();
+    }
+
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    {
+        return colorPaletteMemoryMapperObjects.readColor();
     }
 
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
@@ -71,9 +72,24 @@ byte MMU::read(const word& addr)
         return memoryBankController->readROM(addr);
     }
 
-    else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
+    else if (vram.addressRange.contains(addr))
     {
-        return memoryBankController->readRAM(addr - EXTERNAL_RAM_START_ADDR);
+        return vram.read(vram.addressRange.relative(addr));
+    }
+
+    else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
+    {
+        return memoryBankController->readRAM(externalRamAddr.relative(addr));
+    }
+
+    else if (isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
+    {
+        return wramMemoryBank.getBankId() & 0xF8;
+    }
+
+    else if (wramAddressRange.contains(addr))
+    {
+        return wramMemoryBank.read(wramAddressRange.relative(addr));
     }
 
     else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
@@ -165,10 +181,38 @@ void MMU::write(const word& addr, const byte& value)
         return;
     }
 
-    // Once the bootroom has been deactivated we can't reactivate it again
-    else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR && !isBootRomActive())
+    // Writing to the bootrom address deactivates it
+    else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
     {
+        isInBootrom = false;
         return;
+    }
+
+    else if (isColorModeSupported() && addr == VRAM_BANK_ID_ADDR)
+    {
+        vram.switchBank(value & 0x01);
+    }
+
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_SPECS_BACKGROUND_ADDR)
+    {
+        colorPaletteMemoryMapperBackground.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
+        colorPaletteMemoryMapperBackground.setAddress(value & 0x7F);
+    }
+
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_BACKGROUND_ADDR)
+    {
+        colorPaletteMemoryMapperBackground.writeColor(value);
+    }
+
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_SPECS_OBJECTS_ADDR)
+    {
+        colorPaletteMemoryMapperObjects.enableAddressAutoIncrement(utils::isNthBitSet(value, 7));
+        colorPaletteMemoryMapperObjects.setAddress(value & 0x7F);
+    }
+
+    else if (isColorModeSupported() && addr == COLOR_PALETTE_DATA_OBJECTS_ADDR)
+    {
+        colorPaletteMemoryMapperObjects.writeColor(value);
     }
 
     else if (addr < ROM_BANK_1_END_ADDR && memoryBankController != nullptr)
@@ -176,10 +220,27 @@ void MMU::write(const word& addr, const byte& value)
         memoryBankController->writeROM(addr, value);
     }
 
-    else if (addr >= EXTERNAL_RAM_START_ADDR && addr < EXTERNAL_RAM_END_ADDR && memoryBankController != nullptr)
+    else if (vram.addressRange.contains(addr))
     {
-        memoryBankController->writeRAM(addr - EXTERNAL_RAM_START_ADDR, value);
+        vram.write(vram.addressRange.relative(addr), value);
     }
+
+    else if (externalRamAddr.contains(addr) && memoryBankController != nullptr)
+    {
+        memoryBankController->writeRAM(externalRamAddr.relative(addr), value);
+    }
+
+    else if (isColorModeSupported() && addr == WRAM_BANK_ID_ADDR)
+    {
+        // Value 0 maps to the first bank, other value map to 1-based bank
+        wramMemoryBank.switchBank(value == 0 ? 0 : (value & 0x07) - 1);
+    }
+
+    else if (wramAddressRange.contains(addr))
+    {
+        wramMemoryBank.write(wramAddressRange.relative(addr), value);
+    }
+
     else if (_apu != nullptr && apuRegisterRange.contains(addr))
     {
         _apu->writeRegister(addr, value);
@@ -245,7 +306,7 @@ Cartridge* MMU::getCartridge()
 
 bool MMU::isBootRomActive()
 {
-    return !utils::isNthBitSet(read(BOOT_ROM_UNMAPPED_FLAG_ADDR), 0);
+    return isInBootrom;
 }
 
 void MMU::setInputController(InputController* controller)
@@ -289,4 +350,24 @@ void MMU::setAPU(APU* apu)
 void MMU::setTimer(Timer* timer)
 {
     _timer = timer;
+}
+
+VRAM& MMU::getVRAM()
+{
+    return vram;
+}
+
+ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperBackground()
+{
+    return colorPaletteMemoryMapperBackground;
+}
+
+ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperObj()
+{
+    return colorPaletteMemoryMapperObjects;
+}
+
+bool MMU::isColorModeSupported()
+{
+    return isBootRomActive() || (cartridge != nullptr && cartridge->isColorModeSupported());
 }

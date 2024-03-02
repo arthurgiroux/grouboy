@@ -62,6 +62,18 @@ class CartridgeTest : public ::testing::Test
 
         ASSERT_EQ(ramSize, expectedRAMSize);
     }
+
+    void assertColorModeGivesExpectedResult(int colorFlag, bool expectedColorModeSupport)
+    {
+        std::vector<byte> data;
+        data.resize(0x200);
+        int colorModeAddr = 0x143;
+        data[colorModeAddr] = colorFlag;
+
+        auto cartridge = Cartridge(data);
+
+        ASSERT_EQ(cartridge.isColorModeSupported(), expectedColorModeSupport);
+    }
 };
 
 TEST(Cartridge, CartridgeDataIsLoadedCorrectly)
@@ -186,4 +198,19 @@ TEST_F(CartridgeTest, CartridgeTypeShouldBeMMM01ForValue11)
 TEST_F(CartridgeTest, CartridgeTypeShouldBeMBC6ForValue32)
 {
     assertCartridgeTypeIsReadSuccessfully(0x20, Cartridge::CartridgeType::MBC6);
+}
+
+TEST_F(CartridgeTest, IsColorModeSupportedShouldReturnTrueWhenFlagisColorOnly)
+{
+    assertColorModeGivesExpectedResult(0xC0, true);
+}
+
+TEST_F(CartridgeTest, IsColorModeSupportedShouldReturnTrueWhenFlagisColorAndMono)
+{
+    assertColorModeGivesExpectedResult(0x80, true);
+}
+
+TEST_F(CartridgeTest, IsColorModeSupportedShouldReturnFalseWhenFlagisMono)
+{
+    assertColorModeGivesExpectedResult(0x00, false);
 }

@@ -808,7 +808,7 @@ TEST_F(CpuInstructions8BitsLoadStoreMoveTest, Load8BitsRegisterAtImmediateAddrSh
 {
     byte expectedValue = 0x9A;
     cpu.setRegisterA(expectedValue);
-    word addr = 0x5C8;
+    word addr = 0x15C8;
     mmu.write(cpu.getProgramCounter(), standardInstructions::LD_nnm_A);
     mmu.writeWord(cpu.getProgramCounter() + 1, addr);
     int ticks = cpu.fetchDecodeAndExecute();

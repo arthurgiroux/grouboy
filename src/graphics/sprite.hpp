@@ -77,19 +77,21 @@ class Sprite
     bool isRenderedOverBackgroundAndWindow() const;
 
     /**
-     * Compare the render priority of the current sprite with another one.
-     *
-     * @param other the sprite priority to compare it
-     * @return True if the sprite priority is bigger than the other one, false otherwise
-     */
-    bool isPriorityBiggerThanOtherSprite(const Sprite& other) const;
-
-    /**
      * Get the id of the palette to use to render the Sprite.
      *
      * @return  either 0 or 1, for the palette id.
      */
-    int getPaletteId() const;
+    int getGrayscalePaletteId() const;
+
+    int getColorPaletteId() const;
+
+    /**
+     * (Color mode only)
+     * Which bank should be used to retrieve the tile in the VRAM.
+     *
+     * @return the id of the bank to use in the VRAM
+     */
+    int getBankId() const;
 
   private:
     /**
@@ -112,6 +114,7 @@ class Sprite
     static const int DATA_FLAG_BIT_VFLIP = 6;
     static const int DATA_FLAG_BIT_HFLIP = 5;
     static const int DATA_FLAG_BIT_PALETTEID = 4;
+    static const int DATA_FLAG_BIT_BANKID = 3;
 
     MMU& _mmu;
     int _id;

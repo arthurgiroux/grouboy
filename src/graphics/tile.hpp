@@ -34,13 +34,6 @@ class Tile
     virtual ~Tile() = default;
 
     /**
-     * Get a RGB representation of the tile
-     *
-     * @return a reference to the image object
-     */
-    const RGBImage& getImage() const;
-
-    /**
      * Get the color data of a given pixel
      *
      * @param x the x coordinate in pixel
@@ -48,6 +41,12 @@ class Tile
      * @return  the color data, values [0, 4]
      */
     byte getColorData(int x, int y) const;
+
+    /**
+     * Get the full color data array
+     * @return The color data for the tile
+     */
+    const std::vector<byte>& getColorData() const;
 
     /**
      * Get the tile's height
@@ -93,11 +92,6 @@ class Tile
      * The width of the image in pixels
      */
     int _width;
-
-    /**
-     * The RGB representation of the tile
-     */
-    RGBImage _image;
 };
 
 /**

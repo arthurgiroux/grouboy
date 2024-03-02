@@ -169,3 +169,11 @@ bool Cartridge::hasRAM() const
 
     return typesWithRAM.count(type) > 0;
 }
+
+bool Cartridge::isColorModeSupported() const
+{
+    byte colorFlag = data[COLOR_MODE_FLAG_ADDR];
+    byte flagColorOnly = 0xC0;
+    byte flagColorAndMono = 0x80;
+    return colorFlag == flagColorOnly || colorFlag == flagColorAndMono;
+}

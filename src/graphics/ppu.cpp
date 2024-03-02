@@ -2,7 +2,7 @@
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
 #include "graphics/lcd_status_register.hpp"
-#include "graphics/palette.hpp"
+#include "graphics/palette/grayscale_palette.hpp"
 #include "spdlog/spdlog.h"
 #include "tilemap.hpp"
 #include <algorithm>
@@ -28,16 +28,29 @@ void PPU::step(int nbrTicks)
 
     if (_currentMode == OAM_ACCESS && _ticksSpentInCurrentMode >= OAM_ACCESS_TICKS)
     {
-        setMode(VRAM_ACCESS);
-    }
-    else if (_currentMode == VRAM_ACCESS && _ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
-    {
-        if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
+        _spritesToRender.clear();
+
+        if (areSpritesEnabled())
         {
-            _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            _spritesToRender = getSpritesThatShouldBeRendered(_currentScanline);
         }
-        setMode(HBLANK);
-        renderScanline(_currentScanline);
+
+        setMode(VRAM_ACCESS);
+        _backgroundWindowFIFO.clear();
+        _spritesFIFO.clear();
+    }
+    else if (_currentMode == VRAM_ACCESS)
+    {
+        renderPixel();
+        if (_ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
+        {
+            if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
+            {
+                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+            }
+            setMode(HBLANK);
+            renderScanline(_currentScanline);
+        }
     }
     else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= HBLANK_TICKS)
     {
@@ -88,14 +101,56 @@ void PPU::step(int nbrTicks)
     _mmu.write(ADDR_SCANLINE, _currentScanline);
 }
 
+std::vector<Sprite*> PPU::getSpritesThatShouldBeRendered(int scanline)
+{
+    std::vector<Sprite*> spritesToRender = {};
+    int nbrSpritesInScanline = 0;
+
+    /*
+     * In order to find which sprites to render, we need to check the coordinate of every sprite.
+     * There's a maximum number of sprites that can be rendered per scanline.
+     */
+    for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
+    {
+        auto& sprite = _sprites[i];
+        int spriteSz = spriteSize();
+        int spriteStartVerticalPos = sprite->getYPositionOnScreen();
+        int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
+
+        if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
+        {
+            nbrSpritesInScanline++;
+            /*
+             * If the sprite is outside the screen bound then it's not going to be effectively rendered,
+             * but it still counts as if it was rendered and should increment the number of sprites rendered.
+             */
+            if ((sprite->getXPositionOnScreen() + SingleTile::TILE_WIDTH) < 0 ||
+                sprite->getXPositionOnScreen() >= SCREEN_WIDTH)
+            {
+                continue;
+            }
+
+            spritesToRender.push_back(sprite.get());
+        }
+    }
+
+    if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
+    {
+        spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
+    }
+
+    return spritesToRender;
+}
+
 void PPU::renderScanline(int scanline)
 {
+    _scanline.clear();
     if (!isDisplayEnabled())
     {
         return;
     }
 
-    if (areBackgroundAndWindowEnabled())
+    if (_mmu.isColorModeSupported() || areBackgroundAndWindowEnabled())
     {
         renderScanlineBackground(scanline);
 
@@ -109,6 +164,11 @@ void PPU::renderScanline(int scanline)
     {
         renderScanlineSprite(scanline);
     }
+
+    for (const auto& [key, value] : _scanline)
+    {
+        _temporaryFrame.setPixel(key, scanline, value.getPalette()->getColorForId(value.getColorId()));
+    }
 }
 
 void PPU::renderScanlineBackground(int scanline)
@@ -119,54 +179,7 @@ void PPU::renderScanlineBackground(int scanline)
     // Retrieve the tilemap we are going to use
     Tilemap background = getTileMap(backgroundTileMapIndex());
 
-    /*
-     * The tilemap is a 32x32 map of tiles of 8x8 pixels.
-     * Since we are rendering only a line here, we can already compute which
-     * line of the tilemap we are going to render.
-     * We can compute the line by seeing how many tiles we span vertically.
-     */
-    int lineInTileMap = (scanline + scrollY) / SingleTile::TILE_HEIGHT;
-    lineInTileMap %= Tilemap::HEIGHT;
-    assert(lineInTileMap < Tilemap::HEIGHT);
-
-    int offsetInTileMap = lineInTileMap * Tilemap::WIDTH;
-
-    /*
-     * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
-     * pixels that corresponds in the current frame buffer.
-     */
-    for (int x = 0; x < SCREEN_WIDTH; ++x)
-    {
-        int xIndexOffset = scrollX + x;
-
-        // The background map is not clamped, if we go "too far right",
-        // it should display tiles that are on the left.
-        if (xIndexOffset >= Tilemap::WIDTH * SingleTile::TILE_WIDTH)
-        {
-            xIndexOffset %= Tilemap::WIDTH * SingleTile::TILE_WIDTH;
-        }
-        assert(xIndexOffset < Tilemap::WIDTH * SingleTile::TILE_WIDTH);
-
-        // We see how many tiles we span horizontally and add it to our offset to find the tile index
-        int tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH);
-
-        /*
-         * Now that we retrieve the tile corresponding to the pixel, we need to copy the pixel
-         * that corresponds to the one we are rendering.
-         * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
-         */
-        int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
-        int yOffsetTile = (scanline + scrollY) % SingleTile::TILE_HEIGHT;
-
-        /*
-         * We retrieve the pixel color by getting the original sprite color,
-         * converting using the palette and converting it to a grayscale value.
-         */
-        byte colorValue = getTileById(background.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
-                              .getColorData(xOffsetTile, yOffsetTile);
-        byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
-        _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
-    }
+    renderScanlineBackgroundOrWindow(scanline, scrollX, scrollY, background, false);
 }
 
 void PPU::renderScanlineWindow(int scanline)
@@ -184,13 +197,19 @@ void PPU::renderScanlineWindow(int scanline)
     // Retrieve the tilemap we are going to use
     Tilemap tilemap = getTileMap(windowTileMapIndex());
 
+    renderScanlineBackgroundOrWindow(scanline, scrollX, scrollY, tilemap, true);
+}
+
+void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scrollY, Tilemap& tilemap, bool isWindow)
+{
     /*
      * The tilemap is a 32x32 map of tiles of 8x8 pixels.
      * Since we are rendering only a line here, we can already compute which
      * line of the tilemap we are going to render.
      * We can compute the line by seeing how many tiles we span vertically.
      */
-    int lineInTileMap = _windowLineCounter / SingleTile::TILE_HEIGHT;
+    int startLine = isWindow ? _windowLineCounter : (scanline + scrollY);
+    int lineInTileMap = startLine / SingleTile::TILE_HEIGHT;
     lineInTileMap %= Tilemap::HEIGHT;
     assert(lineInTileMap < Tilemap::HEIGHT);
 
@@ -200,14 +219,27 @@ void PPU::renderScanlineWindow(int scanline)
      * For each pixel in the line, we are going to retrieve the corresponding tile and copy the
      * pixels that corresponds in the current frame buffer.
      */
-    for (int x = scrollX; x < SCREEN_WIDTH; ++x)
-    {
-        int xIndexOffset = x - scrollX;
 
-        // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
+    // Background always starts from the top but window can be scrolled
+    int startX = isWindow ? scrollX : 0;
+
+    for (int x = startX; x < SCREEN_WIDTH; ++x)
+    {
+        int xIndexOffset = isWindow ? x - scrollX : scrollX + x;
+
         if (xIndexOffset >= Tilemap::WIDTH * SingleTile::TILE_WIDTH)
         {
-            break;
+            if (isWindow)
+            {
+                // The window rendering is clamped, if we go out of bound of the tilemap we stop rendering
+                break;
+            }
+            else
+            {
+                // The background map is not clamped, if we go "too far right",
+                // it should display tiles that are on the left.
+                xIndexOffset %= Tilemap::WIDTH * SingleTile::TILE_WIDTH;
+            }
         }
         assert(xIndexOffset < Tilemap::WIDTH * SingleTile::TILE_WIDTH);
 
@@ -220,68 +252,53 @@ void PPU::renderScanlineWindow(int scanline)
          * Since scrollX have a 1-pixel resolution it means that we can sometimes render only part of a tile for a line.
          */
         int xOffsetTile = xIndexOffset % SingleTile::TILE_WIDTH;
-        int yOffsetTile = _windowLineCounter % SingleTile::TILE_HEIGHT;
+
+        int startY = isWindow ? _windowLineCounter : (scanline + scrollY);
+        int yOffsetTile = startY % SingleTile::TILE_HEIGHT;
+
+        int bankId = 0;
+        Palette* palette = &_paletteBackground;
+        int bgPriority = 0;
+        if (_mmu.isColorModeSupported())
+        {
+            Tilemap::TileInfo tileInfo = tilemap.getTileInfoForIndex(tileIndex);
+            bankId = tileInfo.getVRAMBankId();
+            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(tileInfo.getColorPaletteId());
+
+            if (tileInfo.isFlippedHorizontally())
+            {
+                xOffsetTile = SingleTile::TILE_WIDTH - 1 - xOffsetTile;
+            }
+
+            if (tileInfo.isFlippedVertically())
+            {
+                yOffsetTile = SingleTile::TILE_HEIGHT - 1 - yOffsetTile;
+            }
+
+            bgPriority = tileInfo.isRenderedAboveSprites();
+        }
 
         /*
          * We retrieve the pixel color by getting the original sprite color,
-         * converting using the palette and converting it to a grayscale value.
+         * converting using the palette and converting it to a grayscale or color value.
          */
-        byte colorValue = getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex())
+        byte colorValue = _mmu.getVRAM()
+                              .getTileById(tilemap.getTileIdForIndex(tileIndex), backgroundAndWindowTileDataAreaIndex(),
+                                           bankId, false)
                               .getColorData(xOffsetTile, yOffsetTile);
-        byte convertedPaletteColor = _paletteBackground.convertColorId(colorValue);
-        _temporaryFrame.setPixel(x, scanline, Palette::convertColorToGrayscale(convertedPaletteColor));
+        _scanline[x] = Pixel(colorValue, palette, Pixel::Source::BG_WINDOW, bgPriority);
     }
 
-    // We increment the window line counter only when a scanline window is rendered
-    _windowLineCounter++;
+    if (isWindow)
+    {
+        // We increment the window line counter only when a scanline window is rendered
+        _windowLineCounter++;
+    }
 }
 
 void PPU::renderScanlineSprite(int scanline)
 {
-    int nbrSpritesInScanline = 0;
-
-    std::vector<Sprite*> spritesToRender = {};
-    /*
-     * In order to find which sprites to render, we need to check the coordinate of every sprite.
-     * There's a maximum number of sprites that can be rendered per scanline.
-     */
-    for (int i = 0; i < NBR_SPRITES && nbrSpritesInScanline < MAX_NBR_SPRITES_PER_SCANLINE; ++i)
-    {
-        auto& sprite = _sprites[i];
-        int spriteSz = spriteSize();
-        int spriteStartVerticalPos = sprite->getYPositionOnScreen();
-        int spriteEndVerticalPos = spriteStartVerticalPos + spriteSz;
-
-        if (scanline >= spriteStartVerticalPos && scanline < spriteEndVerticalPos)
-        {
-            nbrSpritesInScanline++;
-            /*
-             * If the sprite is outside the screen bound then it's not going to be effectively rendered
-             * but it still counts as if it was rendered and should increment the number of sprites rendered.
-             */
-            if ((sprite->getXPositionOnScreen() + SingleTile::TILE_WIDTH) < 0 ||
-                sprite->getXPositionOnScreen() >= PPU::SCREEN_WIDTH)
-            {
-                continue;
-            }
-
-            spritesToRender.push_back(sprite.get());
-        }
-    }
-
-    if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
-    {
-        spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
-    }
-
-    /*
-     * Sort sprite by priority, from lowest to highest.
-     * We will render first the lowest priority sprite so that they can be overridden by a sprite with higher priority.
-     */
-    std::sort(spritesToRender.begin(), spritesToRender.end(),
-              [](Sprite* l, Sprite* r) { return !l->isPriorityBiggerThanOtherSprite(*r); });
-
-    for (auto* sprite : spritesToRender)
+    for (auto* sprite : _spritesToRender)
     {
         byte tileId = sprite->getTileId();
         bool isStackedTile = spriteSize() > SingleTile::TILE_HEIGHT;
@@ -294,7 +311,9 @@ void PPU::renderScanlineSprite(int scanline)
             tileId &= 0xFE;
         }
 
-        Tile tile = getTileById(tileId, 0, isStackedTile);
+        int bankId = _mmu.isColorModeSupported() ? sprite->getBankId() : 0;
+
+        Tile tile = _mmu.getVRAM().getTileById(tileId, 0, bankId, isStackedTile);
 
         int yCoordinateInTile = scanline - sprite->getYPositionOnScreen();
         if (sprite->isFlippedVertically())
@@ -323,24 +342,71 @@ void PPU::renderScanlineSprite(int scanline)
                 xCoordinateInTile = tile.getWidth() - 1 - xCoordinateInTile;
             }
 
-            Palette& palette = sprite->getPaletteId() ? _paletteObj1 : _paletteObj0;
+            Palette* palette = sprite->getGrayscalePaletteId() ? &_paletteObj1 : &_paletteObj0;
+            bool hasPriority = false;
+            int spritePriority = 0;
+            if (_mmu.isColorModeSupported())
+            {
+                spritePriority = sprite->getId();
+                palette = &_mmu.getColorPaletteMemoryMapperObj().getColorPalette(sprite->getColorPaletteId());
+
+                // We check if there was another sprite rendered before that has a higher priority
+                if (_scanline.count(xCoordinateOnScreen) > 0 &&
+                    _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::SPRITE)
+                {
+                    hasPriority = false;
+                }
+                // Otherwise, we check if background/window could have priority
+                else if (areBackgroundAndWindowDeprioritized())
+                {
+                    hasPriority = true;
+                }
+                // in case that background doesn't have priority and sprite have priority, sprite will take over
+                else if (_scanline.count(xCoordinateOnScreen) > 0 &&
+                         _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::BG_WINDOW &&
+                         _scanline[xCoordinateOnScreen].getPriority() == 0 &&
+                         sprite->isRenderedOverBackgroundAndWindow())
+                {
+                    hasPriority = true;
+                }
+            }
+            else
+            {
+                // Smaller coordinates is a higher priority
+                spritePriority = -sprite->getXPositionOnScreen();
+
+                // If something was rendered before, we check if it should be overridden
+                if (_scanline.count(xCoordinateOnScreen) > 0)
+                {
+                    Pixel pixel = _scanline[xCoordinateOnScreen];
+                    // If we had a sprite with lower priority, we override it
+                    if (pixel.getSource() == Pixel::Source::SPRITE && spritePriority > pixel.getPriority())
+                    {
+                        hasPriority = true;
+                    }
+
+                    // If we had a non-white background/window and we can override it then we do
+                    else if (pixel.getSource() == Pixel::Source::BG_WINDOW &&
+                             (pixel.getColorId() > 0 && sprite->isRenderedOverBackgroundAndWindow()))
+                    {
+                        hasPriority = true;
+                    }
+                }
+            }
+
             byte colorId = tile.getColorData(xCoordinateInTile, yCoordinateInTile);
-            byte convertedPaletteColor = palette.convertColorId(colorId);
 
             // We are copying the pixel if it's not white, white is treated as transparent
             bool isPixelOpaque = colorId != 0;
 
-            /*
-             * The pixel should only be rendered if it's over background/window or if
-             * the background/window didn't render to this pixel.
-             */
-            bool pixelShouldBeRendered = sprite->isRenderedOverBackgroundAndWindow() ||
-                                         _temporaryFrame.isPixelWhite(xCoordinateOnScreen, scanline);
+            bool isBackgroundWhite = _scanline.count(xCoordinateOnScreen) == 0 ||
+                                     (_scanline.count(xCoordinateOnScreen) > 0 &&
+                                      _scanline[xCoordinateOnScreen].getSource() == Pixel::Source::BG_WINDOW &&
+                                      (_scanline[xCoordinateOnScreen].getColorId() == 0));
 
-            if (isPixelOpaque && pixelShouldBeRendered)
+            if (isPixelOpaque && (isBackgroundWhite || hasPriority))
             {
-                _temporaryFrame.setPixel(xCoordinateOnScreen, scanline,
-                                         Palette::convertColorToGrayscale(convertedPaletteColor));
+                _scanline[xCoordinateOnScreen] = Pixel(colorId, palette, Pixel::Source::SPRITE, spritePriority);
             }
         }
     }
@@ -365,41 +431,10 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     }
 }
 
-Tile PPU::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
-{
-    word tileSetOffset = ADDR_TILE_SET_0;
-    int tileIdCorrected = tileId;
-    if (tileSetId == 1)
-    {
-        tileSetOffset = ADDR_TILE_SET_1;
-        tileIdCorrected = static_cast<sbyte>(tileId);
-    }
-
-    word tileBaseAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
-
-    int tileBytesPerTile = isStacked ? StackedTile::BYTES_PER_TILE : SingleTile::BYTES_PER_TILE;
-    Tile::TileDataArray dataArray = {};
-    dataArray.resize(tileBytesPerTile);
-
-    for (int i = 0; i < tileBytesPerTile; ++i)
-    {
-        dataArray[i] = _mmu.read(static_cast<word>(tileBaseAddr + i));
-    }
-
-    if (isStacked)
-    {
-        return StackedTile(dataArray);
-    }
-    else
-    {
-        return SingleTile(dataArray);
-    }
-}
-
 Tilemap PPU::getTileMap(int index)
 {
     word tileMapAddr = (index == 0) ? ADDR_MAP_0 : ADDR_MAP_1;
-    return Tilemap(&_mmu, tileMapAddr);
+    return Tilemap(&_mmu.getVRAM(), tileMapAddr);
 }
 
 bool PPU::isDisplayEnabled() const
@@ -442,6 +477,11 @@ bool PPU::areBackgroundAndWindowEnabled() const
     return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
 }
 
+bool PPU::areBackgroundAndWindowDeprioritized() const
+{
+    return !utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
+}
+
 void PPU::reset()
 {
     _frameId = 0;
@@ -460,4 +500,16 @@ void PPU::setMode(PPU::Mode value)
     _currentMode = value;
     // TODO: Check if we should take into account modulo of ticks
     _ticksSpentInCurrentMode = 0;
+}
+
+void PPU::renderPixel()
+{
+    if (_backgroundWindowFIFO.isEmpty())
+    {
+        // TODO: Fill FIFO
+    }
+
+    if (_spritesFIFO.isEmpty())
+    {
+    }
 }

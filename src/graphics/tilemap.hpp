@@ -11,13 +11,32 @@
 class Tilemap
 {
   public:
+    class TileInfo
+    {
+      public:
+        TileInfo(int attributes);
+
+        bool isFlippedHorizontally() const;
+        bool isFlippedVertically() const;
+        int getVRAMBankId() const;
+        int getColorPaletteId() const;
+        bool isRenderedAboveSprites() const;
+
+      private:
+        bool _isFlippedHorizontally = false;
+        bool _isFlippedVertically = false;
+        bool _isRenderedAboveSprites = false;
+        int _vramBankId = 0;
+        int _colorPaletteId = 0;
+    };
+
     /**
      * Create a new tilemap from a given memory address.
      *
-     * @param mmu   The MMU to use to access the memory
+     * @param vram   The VRAM to use to access the memory
      * @param tilemapAddr   The address where the tilemap data is stored
      */
-    Tilemap(MMU* mmu, word tilemapAddr);
+    Tilemap(VRAM* vram, word tilemapAddr);
     ~Tilemap() = default;
 
     /**
@@ -27,15 +46,7 @@ class Tilemap
      * @return a signed tile id
      */
     sbyte getTileIdForIndex(int index) const;
-
-    /**
-     * Retrieve the tile index for a given entry in the tilemap, using xy coordinate
-     *
-     * @param x The x coordinate inside the tilemap, between 0 and WIDTH
-     * @param y The y coordinate inside the tilemap, between 0 and HEIGHT
-     * @return a signed tile id
-     */
-    int getTileIdForCoord(int x, int y) const;
+    TileInfo getTileInfoForIndex(int index) const;
 
     /**
      * The tilemap height in pixels.
@@ -49,14 +60,11 @@ class Tilemap
 
   private:
     /**
-     * The array where we store the tile id for each entry in the tilemap
+     * The VRAM to use to access the memory.
      */
-    std::array<sbyte, HEIGHT* WIDTH> _tileIds = {};
+    VRAM* _vram = nullptr;
 
-    /**
-     * The MMU to use to access the memory.
-     */
-    MMU* _mmu = nullptr;
+    word _address = 0;
 };
 
 #endif // GBEMULATOR_TILEMAP_HPP

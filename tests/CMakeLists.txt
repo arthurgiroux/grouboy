@@ -11,7 +11,7 @@ include_directories(../src)
 include_directories(../libs)
 
 # TODO: Set this using environment variable, CMake seems to have issues with this right now
-add_compile_definitions(DATADIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+add_compile_definitions("DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\"")
 
 add_executable(
         utils_tests
@@ -34,7 +34,7 @@ add_executable(
         cpu/test_cpu_instructions_misc_control.cpp
         cpu/test_cpu_instructions_16bits_arithmetic_logical.cpp
         cpu/test_cpu_instructions_8bits_rotation_shifts_bit.cpp
-        apu/test_palette.cpp)
+        ppu/test_palette.cpp)
 
 target_link_libraries(
         cpu_tests
@@ -68,7 +68,11 @@ add_executable(
         ppu/test_tile.cpp
         ppu/test_rgb_image.cpp
         ppu/test_sprite.cpp
-)
+        ppu/test_pixel.cpp
+        ppu/test_pixel_fifo.cpp
+        ppu/test_rgb_color.cpp
+        ppu/test_grayscale_palette.cpp
+        ppu/test_color_palette_memory_mapper.cpp)
 
 target_link_libraries(
         ppu_tests
@@ -81,7 +85,8 @@ add_executable(
         mmu/test_mmu.cpp
         cpu/test_cartridge.cpp
         test_input_controller.cpp
-        mmu/test_mbc.cpp)
+        mmu/test_mbc.cpp
+        mmu/test_switchable_memory_bank.cpp)
 
 target_link_libraries(
         mmu_tests

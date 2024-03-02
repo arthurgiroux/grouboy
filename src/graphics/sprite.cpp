@@ -14,7 +14,7 @@ byte Sprite::getTileId() const
     return readDataFromPayload(PAYLOAD_DATA_TILEID_IDX);
 }
 
-int Sprite::getPaletteId() const
+int Sprite::getGrayscalePaletteId() const
 {
     return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_PALETTEID);
 }
@@ -49,19 +49,12 @@ int Sprite::getYPositionOnScreen() const
     return readDataFromPayload(PAYLOAD_DATA_Y_IDX) - Y_SCREEN_OFFSET;
 }
 
-bool Sprite::isPriorityBiggerThanOtherSprite(const Sprite& other) const
+int Sprite::getBankId() const
 {
-    /**
-     * the smaller the X coordinate, the higher the priority.
-     * When X coordinates are identical, the object located first
-     * in OAM has higher priority.
-     */
-    if (getXPositionOnScreen() == other.getXPositionOnScreen())
-    {
-        return getId() < other.getId();
-    }
-    else
-    {
-        return getXPositionOnScreen() < other.getXPositionOnScreen();
-    }
+    return utils::isNthBitSet(readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX), DATA_FLAG_BIT_BANKID);
+}
+
+int Sprite::getColorPaletteId() const
+{
+    return readDataFromPayload(PAYLOAD_DATA_FLAG_ATTR_IDX) & 0x07;
 }

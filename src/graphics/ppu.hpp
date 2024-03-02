@@ -1,8 +1,10 @@
 #ifndef GBEMULATOR_PPU_HPP
 #define GBEMULATOR_PPU_HPP
 
+#include "graphics/palette/grayscale_palette.hpp"
 #include "memory/mmu.hpp"
-#include "palette.hpp"
+#include "pixel.hpp"
+#include "pixel_fifo.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
 #include "tile.hpp"
@@ -92,16 +94,6 @@ class PPU
     }
 
     /**
-     * Retrieve a tile with a given index from a given tile set.
-     *
-     * @param tileId The index of the tile to retrieve
-     * @param tileSetId The tile set to use
-     * @param isStacked Is the tile we want to retrieve a stacked 8x16 tile
-     * @return The requested tile
-     */
-    Tile getTileById(byte tileId, sbyte tileSetId, bool isStacked = false);
-
-    /**
      * Get a reference to the last rendered frame.
      *
      * @return The frame.
@@ -178,6 +170,14 @@ class PPU
     bool areBackgroundAndWindowEnabled() const;
 
     /**
+     * /!\ COLOR MODE ONLY /!\
+     * Return if the objects will always be rendered on top the of background / window
+     *
+     * @return true if background and window never have priority, false otherwise
+     */
+    bool areBackgroundAndWindowDeprioritized() const;
+
+    /**
      * Reset the PPU to its initial state.
      */
     void reset();
@@ -247,6 +247,17 @@ class PPU
     void renderScanlineWindow(int scanline);
 
     /**
+     * Common logic to render either the background or window part of the given scanline.
+     *
+     * @param scanline  the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
+     * @param scrollX   The scroll value to use for x coordinate
+     * @param scrollY   The scroll value to use for y coordinate
+     * @param tilemap   The tilemap to retrieve the tile
+     * @param isWindow  Whether or not we are rendering the window or backgroung
+     */
+    void renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scrollY, Tilemap& tilemap, bool isWindow);
+
+    /**
      * Render the sprite part of the given scanline.
      *
      * @param scanline the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
@@ -261,6 +272,18 @@ class PPU
     void swapFrameBuffers();
 
     /**
+     * Scan the OAM and retrieve the sprites that should be rendered for a specific scanline.
+     * The sprites will be ordered by increasing priority so that a sprite with lower priority will
+     * be overridden by the next one.
+     *
+     * @param scanline The scanline that the sprites will be rendered on
+     * @return a list of sprites to render, ordered by increasing priority
+     */
+    std::vector<Sprite*> getSpritesThatShouldBeRendered(int scanline);
+
+    void renderPixel();
+
+    /**
      * The address of the tile map with index 0.
      */
     static constexpr word ADDR_MAP_0 = 0x9800;
@@ -269,16 +292,6 @@ class PPU
      * The address of the tile map with index 1.
      */
     static constexpr word ADDR_MAP_1 = 0x9C00;
-
-    /**
-     * The address of the tile set with index 0.
-     */
-    static constexpr word ADDR_TILE_SET_0 = 0x8000;
-
-    /**
-     * The address of the tile set with index 1.
-     */
-    static constexpr word ADDR_TILE_SET_1 = 0x9000;
 
     /**
      * The address of the LCD control register.
@@ -392,17 +405,31 @@ class PPU
     /**
      * The palette to use for background sprites.
      */
-    Palette _paletteBackground;
+    GrayscalePalette _paletteBackground;
 
     /**
      * The palette with index 0 to use for sprites (object rendering).
      */
-    Palette _paletteObj0;
+    GrayscalePalette _paletteObj0;
 
     /**
      * The palette with index 1 to use for sprites (object rendering).
      */
-    Palette _paletteObj1;
+    GrayscalePalette _paletteObj1;
+
+    /**
+     * The list of sprites that should be render for the current scanline
+     */
+    std::vector<Sprite*> _spritesToRender = {};
+
+    /**
+     * A map of the pixel x-coordinate and pixel to render for the current scanline.
+     */
+    std::map<int, Pixel> _scanline;
+
+    PixelFIFO _backgroundWindowFIFO;
+
+    PixelFIFO _spritesFIFO;
 };
 
 #endif // GBEMULATOR_PPU_HPP
