@@ -1,6 +1,6 @@
-# GrouBoy - a modern C++ Game Boy emulator [![Build Status](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)
+# GrouBoy - a modern C++ Game Boy Color emulator [![Build Status](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)](https://github.com/arthurgiroux/gbemulator/actions/workflows/ci.yml/badge.svg)
 
-This is an educational implementation of a Game Boy Emulator, developed using modern C++.
+This is an educational implementation of a Game Boy Color Emulator, developed using modern C++.
 The primary aim of this project is to provide an implementation that is easy to read, well architecture, with extensive
 code documentation and testing.
 It is designed to function seamlessly on Windows, Mac, and Linux.
@@ -26,12 +26,14 @@ The following features are implemented:
     * Channel 2
     * Channel 3
     * Channel 4
+* GameBoy color rendering
 
 Future work:
 
 * Sub-instruction CPU timing
 * FIFO PPU
 * Other MBCs
+* GBC Double-speed
 
 ## Input mapping
 
@@ -48,11 +50,11 @@ Future work:
 
 ## Demo
 
-| Name    | Output                          |
-|---------|---------------------------------|
-| Zelda   | ![Demo](demo_image/zelda.gif)   |
-| Mario   | ![Demo](demo_image/mario.gif)   |
-| Pokemon | ![Demo](demo_image/pokemon.gif) |
+| Name           | Output                                 |
+|----------------|----------------------------------------|
+| Pokemon Silver | ![Demo](demo_image/pokemon_silver.gif) |
+| Zelda          | ![Demo](demo_image/zelda.gif)          |
+| Mario          | ![Demo](demo_image/mario.gif)          |
 
 ## Dependencies
 
@@ -104,6 +106,7 @@ Blargg's test coverage:
 | Reference image                                      | Pass/Fail          |
 |------------------------------------------------------|--------------------|
 | ![Demo](tests/data/reference/acid-reference-dmg.bmp) | :white_check_mark: |
+| ![Demo](tests/data/reference/acid-reference-cgb.bmp) | :white_check_mark: |
 
 [Mooneye test suite](https://github.com/Gekkio/mooneye-test-suite):
 
