@@ -29,11 +29,11 @@ void ColorPaletteMemoryMapper::writeColor(byte value)
 
     if (address % 2 == 1)
     {
-        color = utils::createWordFromBytes(value, utils::getLsbFromWord(color));
+        color = utils::createWordFromBytes(value, utils::getLsbFromWord(static_cast<word>(color)));
     }
     else
     {
-        color = utils::createWordFromBytes(utils::getMsbFromWord(color), value);
+        color = utils::createWordFromBytes(utils::getMsbFromWord(static_cast<word>(color)), value);
     }
 
     colorPalettes[getPaletteIndexFromAddr()].setColorForId(color, getColorIdFromAddr());
@@ -49,10 +49,10 @@ byte ColorPaletteMemoryMapper::readColor()
     int color = colorPalettes[getPaletteIndexFromAddr()].getRGB555ColorForId(getColorIdFromAddr());
     if (address % 2 == 1)
     {
-        return utils::getMsbFromWord(color);
+        return utils::getMsbFromWord(static_cast<word>(color));
     }
 
-    return utils::getLsbFromWord(color);
+    return utils::getLsbFromWord(static_cast<word>(color));
 }
 
 Palette& ColorPaletteMemoryMapper::getColorPalette(unsigned int index)
