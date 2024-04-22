@@ -370,7 +370,7 @@ class PPU
     /**
      * The sprites in the OAM.
      */
-    std::array<std::unique_ptr<Sprite>, NBR_SPRITES> _sprites;
+    std::vector<std::unique_ptr<Sprite>> _sprites = std::vector<std::unique_ptr<Sprite>>(NBR_SPRITES);
 
     /**
      * The interrupt manager to use to raise graphical interrupts.
