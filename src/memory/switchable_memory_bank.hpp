@@ -2,7 +2,7 @@
 #define GROUBOY_SWITCHABLE_MEMORY_BANK_HPP
 
 #include "common/types.hpp"
-#include <array>
+#include <vector>
 
 /**
  * A Switchable Memory Bank allows to map a specific memory space
@@ -60,7 +60,7 @@ class SwitchableMemoryBank
     /**
      * The underlying memory for all the banks
      */
-    std::array<std::array<byte, MEM_SIZE>, NBR_BANK> memory{};
+    std::vector<std::vector<byte>> memory = std::vector<std::vector<byte>>(NBR_BANK, std::vector<byte>(MEM_SIZE));
 
     /**
      * The id of the current bank

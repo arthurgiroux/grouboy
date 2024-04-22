@@ -234,7 +234,7 @@ class MMU
     /**
      * The internal representation of the memory
      */
-    std::array<byte, MEMORY_SIZE_IN_BYTES> memory{};
+    std::vector<byte> memory = std::vector<byte>(MEMORY_SIZE_IN_BYTES);
 
     /**
      * The loaded cartridge
