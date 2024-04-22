@@ -116,14 +116,21 @@ target_link_libraries(gbemulator_core spdlog::spdlog)
 
 if (MSVC)
     target_compile_options(gbemulator_core PRIVATE /W4 /WX)
+elseif (DEFINED EMSCRIPTEN)
+    target_compile_options(gbemulator_core PRIVATE -Wall -Wextra -Wpedantic)
 else ()
     target_compile_options(gbemulator_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif ()
 
+
 set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
 add_subdirectory(${SDL3_DIR})
 
+
 add_executable(grouboy src/main.cpp)
+if (DEFINED EMSCRIPTEN)
+    set_target_properties(grouboy PROPERTIES LINK_FLAGS "-sFORCE_FILESYSTEM")
+endif ()
 
 target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
