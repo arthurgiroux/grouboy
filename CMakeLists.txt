@@ -127,7 +127,9 @@ set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
 add_subdirectory(${SDL3_DIR})
 
 
-add_executable(grouboy src/main.cpp)
+add_executable(grouboy src/main.cpp
+        src/gui/emulator_sdl_gui.cpp
+        src/gui/emulator_sdl_gui.hpp)
 if (DEFINED EMSCRIPTEN)
     set_target_properties(grouboy PROPERTIES LINK_FLAGS "-sFORCE_FILESYSTEM")
 endif ()
