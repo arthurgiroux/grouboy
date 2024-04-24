@@ -331,7 +331,7 @@ void PPU::renderScanlineSprite(int scanline)
             }
 
             // If we are outside the screen on the right we can stop rendering the tile
-            if (xCoordinateOnScreen > SCREEN_WIDTH)
+            if (xCoordinateOnScreen >= SCREEN_WIDTH)
             {
                 break;
             }
