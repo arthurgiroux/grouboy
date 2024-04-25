@@ -5,7 +5,8 @@ void audioBufferCallbackWrapper(void* userdata, unsigned char* data, int length)
     reinterpret_cast<EmulatorSDLGUI*>(userdata)->audioBufferCallback(data, length);
 }
 
-EmulatorSDLGUI::EmulatorSDLGUI(Emulator& emulator) : _emulator(emulator)
+EmulatorSDLGUI::EmulatorSDLGUI(Emulator& emulator)
+    : _emulator(emulator), _apu(_emulator.getAPU()), _ppu(_emulator.getPPU())
 {
 }
 
@@ -155,13 +156,13 @@ void EmulatorSDLGUI::mainLoop()
         }
     }
 
-    while (_frameId == _emulator.getPPU().getFrameId())
+    while (_frameId == _ppu.getFrameId())
     {
         _emulator.exec();
 
         if (_isAudioEnabled)
         {
-            auto buffer = _emulator.getAPU().getAudioBuffer();
+            auto buffer = _apu.getAudioBuffer();
             if (buffer.size() > 0)
             {
                 std::lock_guard<std::mutex> lk(_soundMutex);
@@ -170,15 +171,15 @@ void EmulatorSDLGUI::mainLoop()
                     _audioBuffer.push(buffer[i]);
                 }
 
-                _emulator.getAPU().resetAudioBuffer();
+                _apu.resetAudioBuffer();
             }
         }
-        _emulator.getAPU().resetAudioBuffer();
+        _apu.resetAudioBuffer();
     }
 
-    _frameId = _emulator.getPPU().getFrameId();
+    _frameId = _ppu.getFrameId();
 
-    auto image = _emulator.getPPU().getLastRenderedFrame();
+    auto image = _ppu.getLastRenderedFrame();
     auto data = image.getData();
     void* pixels = nullptr;
     int pitch = 0;

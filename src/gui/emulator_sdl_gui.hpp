@@ -30,6 +30,8 @@ class EmulatorSDLGUI
     static const int WINDOW_WIDTH = 640;
     static const int WINDOW_HEIGHT = 480;
     Emulator& _emulator;
+    APU& _apu;
+    PPU& _ppu;
     SDL_Window* _window = nullptr;
     SDL_Renderer* _renderer = nullptr;
     SDL_Texture* _texture = nullptr;
