@@ -1,8 +1,5 @@
 #include "emulator_sdl_gui.hpp"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
 void audioBufferCallbackWrapper(void* userdata, unsigned char* data, int length)
 {
     reinterpret_cast<EmulatorSDLGUI*>(userdata)->audioBufferCallback(data, length);
@@ -54,7 +51,7 @@ bool EmulatorSDLGUI::create()
         return false;
     }
 
-    _window = SDL_CreateWindow("Grouboy", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    _window = SDL_CreateWindow("Grouboy", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE);
     if (_window == nullptr)
     {
         std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
