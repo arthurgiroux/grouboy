@@ -27,6 +27,8 @@ class EmulatorSDLGUI
     bool shouldQuit() const;
 
   private:
+    static const int WINDOW_WIDTH = 640;
+    static const int WINDOW_HEIGHT = 480;
     Emulator& _emulator;
     SDL_Window* _window = nullptr;
     SDL_Renderer* _renderer = nullptr;
