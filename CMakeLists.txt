@@ -111,6 +111,7 @@ set(SOURCE_FILES
         src/graphics/palette/rgb555_palette.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
+
 target_include_directories(gbemulator_core PRIVATE src/ libs/spdlog-1.11.0/include)
 target_link_libraries(gbemulator_core spdlog::spdlog)
 
@@ -122,22 +123,33 @@ else ()
     target_compile_options(gbemulator_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif ()
 
-
 set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
 add_subdirectory(${SDL3_DIR})
-
 
 add_executable(grouboy src/main.cpp
         src/gui/emulator_sdl_gui.cpp
         src/gui/emulator_sdl_gui.hpp)
-if (DEFINED EMSCRIPTEN)
-    set_target_properties(grouboy PROPERTIES LINK_FLAGS "-sFORCE_FILESYSTEM")
-endif ()
 
 target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
 add_dependencies(grouboy gbemulator_core SDL3::SDL3)
 target_link_libraries(grouboy PRIVATE gbemulator_core SDL3::SDL3)
 
-enable_testing()
-add_subdirectory(tests/)
+if (DEFINED EMSCRIPTEN)
+    add_executable(grouboy_wasm
+            src/wasm/wasm_interface.cpp
+            src/wasm/wasm_interface.hpp
+            src/gui/emulator_sdl_gui.cpp
+            src/gui/emulator_sdl_gui.hpp)
+
+    set_target_properties(grouboy_wasm PROPERTIES LINK_FLAGS "-sFORCE_FILESYSTEM --no-entry")
+    target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
+
+    target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
+
+    add_dependencies(grouboy_wasm gbemulator_core SDL3::SDL3)
+    target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL3::SDL3)
+else ()
+    enable_testing()
+    add_subdirectory(tests/)
+endif ()
