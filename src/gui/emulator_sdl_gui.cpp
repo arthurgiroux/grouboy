@@ -1,9 +1,5 @@
 #include "emulator_sdl_gui.hpp"
-
-void audioBufferCallbackWrapper(void* userdata, unsigned char* data, int length)
-{
-    reinterpret_cast<EmulatorSDLGUI*>(userdata)->audioBufferCallback(data, length);
-}
+#include "spdlog/spdlog.h"
 
 EmulatorSDLGUI::EmulatorSDLGUI(Emulator& emulator)
     : _emulator(emulator), _apu(_emulator.getAPU()), _ppu(_emulator.getPPU())
@@ -12,12 +8,6 @@ EmulatorSDLGUI::EmulatorSDLGUI(Emulator& emulator)
 
 void EmulatorSDLGUI::destroy()
 {
-    if (_isAudioEnabled && _audioDevice >= 0)
-    {
-        SDL_CloseAudioDevice(_audioDevice);
-        _audioDevice = -1;
-    }
-
     if (_texture != nullptr)
     {
         SDL_DestroyTexture(_texture);
@@ -62,19 +52,14 @@ bool EmulatorSDLGUI::create()
 
     if (_isAudioEnabled)
     {
-        // opening an audio device:
         SDL_AudioSpec audio_spec;
         SDL_zero(audio_spec);
-        audio_spec.freq = 48000;
-        audio_spec.format = AUDIO_F32;
+        audio_spec.freq = 44100;
+        audio_spec.format = SDL_AUDIO_F32;
         audio_spec.channels = 2;
-        audio_spec.samples = 4800;
-        audio_spec.callback = audioBufferCallbackWrapper;
-        audio_spec.userdata = this;
 
-        _audioDevice = SDL_OpenAudioDevice(nullptr, 0, &audio_spec, nullptr, 0);
-
-        SDL_PlayAudioDevice(_audioDevice);
+        _audioStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_OUTPUT, &audio_spec, nullptr, nullptr);
+        SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(_audioStream));
     }
 
     _renderer = SDL_CreateRenderer(_window, nullptr, SDL_RENDERER_PRESENTVSYNC);
@@ -95,38 +80,6 @@ bool EmulatorSDLGUI::create()
     }
 
     return true;
-}
-
-void EmulatorSDLGUI::audioBufferCallback(unsigned char* data, int length)
-{
-    if (length <= 0)
-    {
-        return;
-    }
-
-    SDL_memset(data, 0, length);
-    {
-        std::lock_guard<std::mutex> lk(_soundMutex);
-        int bufferSize = _audioBuffer.size();
-        if (bufferSize == 0)
-        {
-            return;
-        }
-
-        int nbrSamplesToWrite = length / sizeof(float);
-        // If we have less data than the audio buffer then we only write that
-        if (bufferSize < nbrSamplesToWrite)
-        {
-            nbrSamplesToWrite = bufferSize;
-        }
-
-        float* buffer = reinterpret_cast<float*>(data);
-        for (int i = 0; i < nbrSamplesToWrite; ++i)
-        {
-            buffer[i] = _audioBuffer.front();
-            _audioBuffer.pop();
-        }
-    }
 }
 
 void EmulatorSDLGUI::mainLoop()
@@ -165,16 +118,14 @@ void EmulatorSDLGUI::mainLoop()
             auto buffer = _apu.getAudioBuffer();
             if (buffer.size() > 0)
             {
-                std::lock_guard<std::mutex> lk(_soundMutex);
-                for (int i = 0; i < buffer.size(); ++i)
-                {
-                    _audioBuffer.push(buffer[i]);
-                }
-
+                SDL_PutAudioStreamData(_audioStream, buffer.data(), buffer.size() * sizeof(buffer[0]));
                 _apu.resetAudioBuffer();
             }
         }
-        _apu.resetAudioBuffer();
+        else
+        {
+            _apu.resetAudioBuffer();
+        }
     }
 
     _frameId = _ppu.getFrameId();

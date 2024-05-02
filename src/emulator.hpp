@@ -100,7 +100,7 @@ class Emulator
     bool loadFromFile(const std::string& filepath);
 
   private:
-    static const int AUDIO_SAMPLING_FREQ = 48000;
+    static const int AUDIO_SAMPLING_FREQ = 44100;
     MMU mmu;
     CPU cpu;
     PPU ppu;

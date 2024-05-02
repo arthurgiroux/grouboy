@@ -16,14 +16,6 @@ class EmulatorSDLGUI
     void mainLoop();
     void destroy();
     void enableAudio(bool status);
-
-    /**
-     * Function called by SDL when it needs more audio data to play
-     * @param data The buffer to fill with available data
-     * @param length The number of bytes of the audio buffer to fill
-     */
-    void audioBufferCallback(unsigned char* data, int length);
-
     bool shouldQuit() const;
 
   private:
@@ -37,12 +29,8 @@ class EmulatorSDLGUI
     SDL_Texture* _texture = nullptr;
     int _frameId = 0;
     bool _isAudioEnabled = true;
-    SDL_AudioDeviceID _audioDevice = -1;
+    SDL_AudioStream* _audioStream = nullptr;
     bool _shouldQuit = false;
-
-    // Mutex used to have unique access to audio buffer between main thread and SDL audio thread
-    std::mutex _soundMutex;
-    std::queue<float> _audioBuffer = {};
 
     std::map<SDL_Keycode, InputController::Button> _buttonMapping = {
         {SDLK_UP, InputController::Button::UP},        {SDLK_DOWN, InputController::Button::DOWN},
