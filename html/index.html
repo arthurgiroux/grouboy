@@ -5,6 +5,10 @@
     <title>Grouboy</title>
 </head>
 <body>
+<div id="loading">Loading...</div>
+<div id="loaded" style="display: none;">
+    <button id="start" onclick="Module.startEmulator()">Start</button>
+</div>
 <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 <script type="text/javascript">
     var Module = {
@@ -12,8 +16,15 @@
             return document.getElementById('canvas');
         })(),
         onRuntimeInitialized: function () {
-            Module._startEmulator();
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('loaded').style.display = 'block';
+        },
+        startEmulator() {
+            console.log("starting emulator");
+            document.getElementById('loaded').style.display = 'none';
+            return _startEmulator();
         }
+
     };
 </script>
 <!--

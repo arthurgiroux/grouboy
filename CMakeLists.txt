@@ -142,9 +142,8 @@ if (DEFINED EMSCRIPTEN)
             src/gui/emulator_sdl_gui.cpp
             src/gui/emulator_sdl_gui.hpp)
 
-    set_target_properties(grouboy_wasm PROPERTIES LINK_FLAGS "-sFORCE_FILESYSTEM --no-entry")
+    target_link_libraries(grouboy_wasm PRIVATE "-sFORCE_FILESYSTEM --no-entry")
     target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
-
     target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
     add_dependencies(grouboy_wasm gbemulator_core SDL3::SDL3)
