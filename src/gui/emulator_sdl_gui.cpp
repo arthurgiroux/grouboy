@@ -59,6 +59,12 @@ bool EmulatorSDLGUI::create()
         audio_spec.channels = 2;
 
         _audioStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_OUTPUT, &audio_spec, nullptr, nullptr);
+        if (_audioStream == nullptr)
+        {
+            spdlog::error("Couldn't open audio stream. Error is: {}", SDL_GetError());
+            destroy();
+            return false;
+        }
         SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(_audioStream));
     }
 

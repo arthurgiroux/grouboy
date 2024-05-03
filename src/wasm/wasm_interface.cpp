@@ -37,8 +37,6 @@ extern "C"
 
         EmulatorSDLGUI gui(emulator);
 
-        gui.enableAudio(false);
-
         if (!gui.create())
         {
             std::cerr << "Error while creating GUI." << std::endl;
