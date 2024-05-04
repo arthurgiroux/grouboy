@@ -132,8 +132,8 @@ add_executable(grouboy src/main.cpp
 
 target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
-add_dependencies(grouboy gbemulator_core SDL3::SDL3)
-target_link_libraries(grouboy PRIVATE gbemulator_core SDL3::SDL3)
+add_dependencies(grouboy gbemulator_core SDL2::SDL2)
+target_link_libraries(grouboy PRIVATE gbemulator_core SDL2::SDL2)
 
 if (DEFINED EMSCRIPTEN)
     add_executable(grouboy_wasm
@@ -146,8 +146,8 @@ if (DEFINED EMSCRIPTEN)
     target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
     target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
-    add_dependencies(grouboy_wasm gbemulator_core SDL3::SDL3)
-    target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL3::SDL3)
+    add_dependencies(grouboy_wasm gbemulator_core SDL2::SDL2)
+    target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL2::SDL2)
 else ()
     enable_testing()
     add_subdirectory(tests/)

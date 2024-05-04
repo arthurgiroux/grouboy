@@ -42,7 +42,8 @@ bool EmulatorSDLGUI::create()
         return false;
     }
 
-    _window = SDL_CreateWindow("Grouboy", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE);
+    _window = SDL_CreateWindow("Grouboy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT,
+                               SDL_WINDOW_RESIZABLE);
     if (_window == nullptr)
     {
         std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
@@ -55,20 +56,21 @@ bool EmulatorSDLGUI::create()
         SDL_AudioSpec audio_spec;
         SDL_zero(audio_spec);
         audio_spec.freq = 44100;
-        audio_spec.format = SDL_AUDIO_F32;
+        audio_spec.format = AUDIO_F32;
         audio_spec.channels = 2;
+        audio_spec.samples = 1024;
 
-        _audioStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_OUTPUT, &audio_spec, nullptr, nullptr);
-        if (_audioStream == nullptr)
+        if (SDL_OpenAudio(&audio_spec, NULL) < 0)
         {
-            spdlog::error("Couldn't open audio stream. Error is: {}", SDL_GetError());
+            spdlog::error("Couldn't open audio device. Error is: {}", SDL_GetError());
             destroy();
             return false;
         }
-        SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(_audioStream));
+
+        SDL_PauseAudio(0); // Start playing audio
     }
 
-    _renderer = SDL_CreateRenderer(_window, nullptr, SDL_RENDERER_PRESENTVSYNC);
+    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_PRESENTVSYNC);
     if (_renderer == nullptr)
     {
         std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
@@ -93,11 +95,11 @@ void EmulatorSDLGUI::mainLoop()
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_EVENT_QUIT)
+        if (e.type == SDL_QUIT)
         {
             _shouldQuit = true;
         }
-        else if (e.type == SDL_EVENT_KEY_DOWN)
+        else if (e.type == SDL_KEYDOWN)
         {
             int keycode = e.key.keysym.sym;
             if (_buttonMapping.count(keycode))
@@ -105,7 +107,7 @@ void EmulatorSDLGUI::mainLoop()
                 _emulator.getInputController().setButtonPressed(_buttonMapping[keycode]);
             }
         }
-        else if (e.type == SDL_EVENT_KEY_UP)
+        else if (e.type == SDL_KEYUP)
         {
             int keycode = e.key.keysym.sym;
             if (_buttonMapping.count(keycode))
@@ -124,7 +126,7 @@ void EmulatorSDLGUI::mainLoop()
             auto buffer = _apu.getAudioBuffer();
             if (buffer.size() > 0)
             {
-                SDL_PutAudioStreamData(_audioStream, buffer.data(), buffer.size() * sizeof(buffer[0]));
+                SDL_QueueAudio(1, buffer.data(), buffer.size() * sizeof(buffer[0]));
                 _apu.resetAudioBuffer();
             }
         }
@@ -143,7 +145,8 @@ void EmulatorSDLGUI::mainLoop()
     SDL_LockTexture(_texture, nullptr, &pixels, &pitch);
     std::copy(data.begin(), data.end(), static_cast<char*>(pixels));
     SDL_UnlockTexture(_texture);
-    SDL_RenderTexture(_renderer, _texture, nullptr, nullptr);
+    SDL_RenderClear(_renderer);
+    SDL_RenderCopy(_renderer, _texture, nullptr, nullptr);
     SDL_RenderPresent(_renderer);
 }
 
