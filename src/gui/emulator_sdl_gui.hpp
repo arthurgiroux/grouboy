@@ -1,8 +1,8 @@
 #ifndef GROUBOY_EMULATOR_SDL_GUI_HPP
 #define GROUBOY_EMULATOR_SDL_GUI_HPP
 
-#include "SDL3/SDL.h"
 #include "emulator.hpp"
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <map>
 #include <mutex>
@@ -29,7 +29,6 @@ class EmulatorSDLGUI
     SDL_Texture* _texture = nullptr;
     int _frameId = 0;
     bool _isAudioEnabled = true;
-    SDL_AudioStream* _audioStream = nullptr;
     bool _shouldQuit = false;
 
     std::map<SDL_Keycode, InputController::Button> _buttonMapping = {
