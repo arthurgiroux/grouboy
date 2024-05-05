@@ -279,24 +279,31 @@ void MMU::writeWord(const word& addr, const word& value)
     write(addr + 1, utils::getMsbFromWord(value));
 }
 
-bool MMU::loadCartridge(const std::string& filepath)
+bool MMU::loadCartridgeFromFile(const std::string& filepath)
 {
     std::vector<byte> data;
     if (utils::readBinaryDataFromFile(filepath, data))
     {
-        cartridge = std::make_unique<Cartridge>(data);
-        memoryBankController = MemoryBankController::createMemoryBankControllerFromCartridge(cartridge.get());
-        if (memoryBankController == nullptr)
-        {
-            throw std::runtime_error(
-                utils::string_format("Memory Bus Controller '%s' is not implemented.",
-                                     Cartridge::cartridgeTypeToString(cartridge->getType()).c_str()));
-        }
-
-        return true;
+        return loadCartridgeData(data);
     }
 
     return false;
+}
+
+bool MMU::loadCartridgeData(std::vector<byte> data)
+{
+    cartridge = std::make_unique<Cartridge>(data);
+
+    memoryBankController = MemoryBankController::createMemoryBankControllerFromCartridge(cartridge.get());
+    if (memoryBankController == nullptr)
+    {
+        // TODO: Error code instead of exception
+        spdlog::error("Memory Bus Controller '{}' is not implemented.",
+                      Cartridge::cartridgeTypeToString(cartridge->getType()).c_str());
+        return false;
+    }
+
+    return true;
 }
 
 Cartridge* MMU::getCartridge()

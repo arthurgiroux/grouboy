@@ -142,7 +142,7 @@ if (DEFINED EMSCRIPTEN)
             src/gui/emulator_sdl_gui.cpp
             src/gui/emulator_sdl_gui.hpp)
 
-    target_link_libraries(grouboy_wasm PRIVATE "-sFORCE_FILESYSTEM --no-entry")
+    target_link_libraries(grouboy_wasm PRIVATE "-sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc --no-entry")
     target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
     target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 

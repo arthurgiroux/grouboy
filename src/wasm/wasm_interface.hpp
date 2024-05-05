@@ -3,7 +3,8 @@
 
 extern "C"
 {
-    void startEmulator();
+    void startEmulatorFromDefaultFile();
+    void startEmulatorFromData(const unsigned char* data, int length);
 }
 
 #endif // GROUBOY_WASM_INTERFACE_HPP

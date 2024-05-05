@@ -7,10 +7,24 @@
 <body>
 <div id="loading">Loading...</div>
 <div id="loaded" style="display: none;">
-    <button id="start" onclick="Module.startEmulator()">Start</button>
+    <button id="start" onclick="Module.startEmulatorFromDefaultFile()">Start Tic Tac Toe</button>
+    <input type="file" id="romFile" accept=".gb,.gbc">
+    <button id="start" onclick="loadROM()">Load your own ROM</button>
 </div>
+
 <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 <script type="text/javascript">
+    function loadROM() {
+        var fileInput = document.getElementById('romFile');
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            var romData = event.target.result;
+            Module.startEmulatorFromData(new Uint8Array(romData));
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
     var Module = {
         canvas: (function () {
             return document.getElementById('canvas');
@@ -19,10 +33,20 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('loaded').style.display = 'block';
         },
-        startEmulator() {
-            console.log("starting emulator");
+        startEmulatorFromDefaultFile() {
             document.getElementById('loaded').style.display = 'none';
-            return _startEmulator();
+            return _startEmulatorFromDefaultFile();
+        },
+        startEmulatorFromData(data) {
+            document.getElementById('loaded').style.display = 'none';
+
+            var dataPtr = Module._malloc(data.length);
+            var dataHeap = new Uint8Array(Module.HEAPU8.buffer, dataPtr, data.length);
+            dataHeap.set(data);
+            ret = _startEmulatorFromData(dataHeap.byteOffset, dataHeap.length);
+            Module._free(dataHeap.byteOffset);
+
+            return ret;
         }
 
     };

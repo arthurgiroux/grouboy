@@ -6,7 +6,7 @@ int main(int argc, char* args[])
 {
     const std::string file = args[1];
     Emulator emulator;
-    if (!emulator.getMMU().loadCartridge(file))
+    if (!emulator.getMMU().loadCartridgeFromFile(file))
     {
         std::cout << "Couldn't load rom file." << std::endl;
         return EXIT_FAILURE;

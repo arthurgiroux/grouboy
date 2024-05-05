@@ -99,7 +99,14 @@ class MMU
      * @param filepath The location of the cartridge file.
      * @return true if loaded successfully, false otherwise
      */
-    bool loadCartridge(const std::string& filepath);
+    bool loadCartridgeFromFile(const std::string& filepath);
+
+    /**
+     * Load a cartridge from raw data.
+     * @param data  the binary data to load
+     * @return true if loaded successfully, false otherwise
+     */
+    bool loadCartridgeData(std::vector<byte> data);
 
     /**
      * @return true if the boot rom is active, false otherwise
