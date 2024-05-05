@@ -60,7 +60,7 @@ bool EmulatorSDLGUI::create()
         audio_spec.channels = 2;
         audio_spec.samples = 1024;
 
-        if (SDL_OpenAudio(&audio_spec, NULL) < 0)
+        if (SDL_OpenAudio(&audio_spec, nullptr) < 0)
         {
             spdlog::error("Couldn't open audio device. Error is: {}", SDL_GetError());
             destroy();

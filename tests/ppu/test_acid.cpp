@@ -16,7 +16,7 @@ class AcidTest : public ::testing::Test
         ASSERT_EQ(referenceImage.width(), PPU::SCREEN_WIDTH);
         ASSERT_EQ(referenceImage.height(), PPU::SCREEN_HEIGHT);
 
-        ASSERT_TRUE(emulator.getMMU().loadCartridge(rom));
+        ASSERT_TRUE(emulator.getMMU().loadCartridgeFromFile(rom));
 
         // We wait a certain number of frames to make sure we are seeing the result of the acid test
         int expectedFrameId = 500;
