@@ -148,6 +148,10 @@ if (DEFINED EMSCRIPTEN)
 
     add_dependencies(grouboy_wasm gbemulator_core SDL2::SDL2)
     target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL2::SDL2)
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.wasm DESTINATION html)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.js DESTINATION html)
+    install(DIRECTORY html/ DESTINATION html)
 else ()
     enable_testing()
     add_subdirectory(tests/)
