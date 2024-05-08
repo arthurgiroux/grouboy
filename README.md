@@ -3,7 +3,7 @@
 This is an educational implementation of a Game Boy Color Emulator, developed using modern C++.
 The primary aim of this project is to provide an implementation that is easy to read, well architecture, with extensive
 code documentation and testing.
-It is designed to function seamlessly on Windows, Mac, and Linux.
+It is designed to function seamlessly on Windows, Mac, Linux, and WebAssembly.
 
 ## Features
 
