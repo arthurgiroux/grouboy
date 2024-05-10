@@ -142,14 +142,13 @@ if (DEFINED EMSCRIPTEN)
             src/gui/emulator_sdl_gui.cpp
             src/gui/emulator_sdl_gui.hpp)
 
-    target_link_libraries(grouboy_wasm PRIVATE "-sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc --no-entry")
+    target_link_libraries(grouboy_wasm PRIVATE "-sWASM=0 -sENVIRONMENT=web -sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc -sMODULARIZE=1 -sEXPORT_NAME='createEmulatorModule' --no-entry")
     target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
     target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
     add_dependencies(grouboy_wasm gbemulator_core SDL2::SDL2)
     target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL2::SDL2)
 
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.wasm DESTINATION html)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.js DESTINATION html)
     install(DIRECTORY html/ DESTINATION html)
 else ()
