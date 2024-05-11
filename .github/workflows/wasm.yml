@@ -45,13 +45,25 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target install
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.13.1
+
+      - name: "Install dependencies"
+        working-directory: web/grouboy
+        run: npm install
+
+      - name: "Build frontend"
+        working-directory: web/grouboy
+        run: npm run build
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '${{github.workspace}}/install/html'
+          path: '${{github.workspace}}/web/grouboy/out'
 
       - name: Deploy to GitHub Pages
         id: deployment
