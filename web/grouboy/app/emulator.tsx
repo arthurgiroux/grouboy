@@ -27,7 +27,7 @@ const Emulator: React.FC = () => {
         const files = (e.target as HTMLInputElement).files;
 
         if (files) {
-            console.log(`setting rom file ${files[0].name}.`);
+            console.log(`setting rom file ${files[0]?.name}.`);
             setRomFile(files[0]);
         }
     };
@@ -56,12 +56,25 @@ const Emulator: React.FC = () => {
         }
     };
 
+    const onLoadDefaultRomClicked = async () => {
+        if (emulatorModule) {
+            const request = await fetch("grouboy/tictactoe.gb");
+            if (request.ok) {
+                const romData = await request.arrayBuffer();
+                if (romData) {
+                    startEmulatorFromRomData(romData);
+                }
+            }
+        }
+    };
+
     return (
         <>
             {!romLoaded && (
                 <>
                     <input type="file" onChange={onFileSelected} accept=".gb,.gbc" />
                     <button onClick={onLoadRomClicked}>Load your own ROM</button>
+                    or  <button onClick={onLoadDefaultRomClicked}>Load default ROM</button>
                 </>
             )}
             <canvas ref={canvasRef} onContextMenu={(e) => e.preventDefault()} id="canvas" />
