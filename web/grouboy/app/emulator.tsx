@@ -46,12 +46,17 @@ const Emulator: React.FC = () => {
         )
     };
 
-    return (<>
-        {!romLoaded ?
-            (<><input type="file" onChange={onFileSelected} accept=".gb,.gbc" /><button onClick={onLoadRomClicked}>Load your own ROM</button></>) :
-            <></>}
-        <canvas ref={canvasRef} onContextMenu={(e) => e.preventDefault()} id="canvas" />
-    </>);
+    return (
+        <>
+            {!romLoaded && (
+                <>
+                    <input type="file" onChange={onFileSelected} accept=".gb,.gbc" />
+                    <button onClick={onLoadRomClicked}>Load your own ROM</button>
+                </>
+            )}
+            <canvas ref={canvasRef} onContextMenu={(e) => e.preventDefault()} id="canvas" />
+        </>
+    );
 };
 
 export default Emulator;
