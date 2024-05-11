@@ -50,27 +50,4 @@ extern "C"
 
         gui.destroy();
     }
-
-    EMSCRIPTEN_KEEPALIVE void startEmulatorFromDefaultFile()
-    {
-        Emulator emulator;
-        const char* file = "tictactoe.gb";
-        if (!emulator.getMMU().loadCartridgeFromFile(file))
-        {
-            std::cout << "Couldn't load rom file." << std::endl;
-            return;
-        }
-
-        EmulatorSDLGUI gui(emulator);
-
-        if (!gui.create())
-        {
-            std::cerr << "Error while creating GUI." << std::endl;
-            return;
-        }
-
-        emscripten_set_main_loop_arg(emscriptenLoop, &gui, 0, 1);
-
-        gui.destroy();
-    }
 }

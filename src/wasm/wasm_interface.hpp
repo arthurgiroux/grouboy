@@ -3,7 +3,6 @@
 
 extern "C"
 {
-    void startEmulatorFromDefaultFile();
     void startEmulatorFromData(const unsigned char* data, int length);
 }
 
