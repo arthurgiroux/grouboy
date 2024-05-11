@@ -1,12 +1,27 @@
 "use client"
 
-import React, { useRef, useState } from 'react';
-import createEmulatorModule from './grouboy_wasm';
+import React, { useEffect, useRef, useState } from 'react';
+import createEmulatorModule, { MainModuleExtended } from './grouboy_wasm';
 
 const Emulator: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [romFile, setRomFile] = useState<File>()
     const [romLoaded, setRomLoaded] = useState(false);
+    const [emulatorModule, setEmulatorModule] = useState<MainModuleExtended>();
+
+    useEffect(() => {
+        createEmulatorModule()
+        .then(module => {
+            console.log(`WebAssembly module loaded.`);
+
+            // We need to set the canvas property so that SDL2 can correcly render to it.
+            module.canvas = (function () {
+                return canvasRef.current;
+            })();
+
+            setEmulatorModule(module);
+        })
+    }, []);
 
     const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = (e.target as HTMLInputElement).files;
@@ -17,33 +32,28 @@ const Emulator: React.FC = () => {
         }
     };
 
+    const startEmulatorFromRomData = (romData: ArrayBuffer) => {
+        var data = new Uint8Array(romData as ArrayBuffer);
+        var dataPtr = emulatorModule._malloc(data.length);
+        var dataHeap = new Uint8Array(emulatorModule.HEAPU8.buffer, dataPtr, data.length);
+        dataHeap.set(data);
+        var success = emulatorModule._startEmulatorFromData(dataHeap.byteOffset, dataHeap.length);
+        emulatorModule._free(dataHeap.byteOffset);
+        setRomLoaded(success);
+    };
+
     const onLoadRomClicked = () => {
-        createEmulatorModule()
-            .then(module => {
-                console.log(`WebAssembly module loaded.`);
+        if (emulatorModule) {
+            var reader = new FileReader();
+            reader.onload = function (event: ProgressEvent<FileReader>) {
+                var romData = event.target?.result as ArrayBuffer;
+                if (romData) {
+                    startEmulatorFromRomData(romData);
+                }
+            };
 
-                // We need to set the canvas property so that SDL2 can correcly render to it.
-                module.canvas = (function () {
-                    return canvasRef.current;
-                })();
-
-                var reader = new FileReader();
-                reader.onload = function (event: ProgressEvent<FileReader>) {
-                    var romData = event.target?.result;
-                    if (romData) {
-                        var data = new Uint8Array(romData as ArrayBuffer);
-                        var dataPtr = module._malloc(data.length);
-                        var dataHeap = new Uint8Array(module.HEAPU8.buffer, dataPtr, data.length);
-                        dataHeap.set(data);
-                        module._startEmulatorFromData(dataHeap.byteOffset, dataHeap.length);
-                        module._free(dataHeap.byteOffset);
-                        setRomLoaded(true);
-                    }
-                };
-
-                reader.readAsArrayBuffer(romFile as Blob);
-            }
-        )
+            reader.readAsArrayBuffer(romFile as Blob);
+        }
     };
 
     return (
