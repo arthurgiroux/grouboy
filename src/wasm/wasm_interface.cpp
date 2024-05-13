@@ -9,45 +9,67 @@
 #include "wasm_interface.hpp"
 #include <iostream>
 
-void emscriptenLoop(void* fct)
+struct EmulatorImpl
 {
-    EmulatorSDLGUI* gui = reinterpret_cast<EmulatorSDLGUI*>(fct);
+    std::unique_ptr<Emulator> emulator;
+    std::unique_ptr<EmulatorSDLGUI> gui;
+};
 
-    if (gui->shouldQuit())
+void emscriptenLoop(void* param)
+{
+    EmulatorImpl* impl = reinterpret_cast<EmulatorImpl*>(param);
+
+    if (impl->gui->shouldQuit())
     {
         emscripten_cancel_main_loop();
-        gui->destroy();
+        impl->gui->destroy();
     }
     else
     {
-        gui->mainLoop();
+        impl->gui->mainLoop();
     }
 }
 
 extern "C"
 {
-    EMSCRIPTEN_KEEPALIVE void startEmulatorFromData(const unsigned char* data, int length)
+
+    EMSCRIPTEN_KEEPALIVE EmulatorImpl* init()
+    {
+        EmulatorImpl* impl = new EmulatorImpl;
+        impl->emulator = std::make_unique<Emulator>();
+        impl->gui = std::make_unique<EmulatorSDLGUI>(*impl->emulator);
+        if (!impl->gui->create())
+        {
+            std::cerr << "Couldn't create gui" << std::endl;
+            destroy(impl);
+            return nullptr;
+        }
+
+        return impl;
+    }
+
+    EMSCRIPTEN_KEEPALIVE void destroy(EmulatorImpl* emulator)
+    {
+        delete emulator;
+    }
+
+    EMSCRIPTEN_KEEPALIVE bool loadROM(EmulatorImpl* emulator, const unsigned char* data, int length)
     {
         std::vector<byte> dataVector(data, data + length);
 
-        Emulator emulator;
-        if (!emulator.getMMU().loadCartridgeData(dataVector))
+        if (!emulator->emulator->getMMU().loadCartridgeData(dataVector))
         {
-            std::cout << "Couldn't load rom file." << std::endl;
-            return;
+            std::cerr << "Couldn't load rom file." << std::endl;
+            return false;
         }
 
-        std::cout << "Rom loaded, starting GUI" << std::endl;
-        EmulatorSDLGUI gui(emulator);
+        return true;
+    }
 
-        if (!gui.create())
-        {
-            std::cerr << "Error while creating GUI." << std::endl;
-            return;
-        }
+    EMSCRIPTEN_KEEPALIVE void start(EmulatorImpl* emulator)
+    {
+        emscripten_set_main_loop_arg(emscriptenLoop, emulator, 0, 1);
 
-        emscripten_set_main_loop_arg(emscriptenLoop, &gui, 0, 1);
-
-        gui.destroy();
+        emulator->gui->destroy();
     }
 }
