@@ -3,7 +3,12 @@
 
 extern "C"
 {
-    void startEmulatorFromData(const unsigned char* data, int length);
+    struct EmulatorImpl;
+
+    EmulatorImpl* init();
+    void destroy(EmulatorImpl* emulator);
+    bool loadROM(EmulatorImpl* emulator, const unsigned char* data, int length);
+    void start(EmulatorImpl* emulator);
 }
 
 #endif // GROUBOY_WASM_INTERFACE_HPP

@@ -142,7 +142,7 @@ if (DEFINED EMSCRIPTEN)
             src/gui/emulator_sdl_gui.cpp
             src/gui/emulator_sdl_gui.hpp)
     target_link_options(grouboy_wasm PRIVATE
-            --emit-tsd "$<TARGET_FILE_DIR:grouboy_wasm>/grouboy_wasm_base.d.ts"
+            --emit-tsd "$<TARGET_FILE_DIR:grouboy_wasm>/grouboy_wasm.d.ts"
     )
     target_link_libraries(grouboy_wasm PRIVATE "-sWASM=0 -sENVIRONMENT=web -sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE=1 -sEXPORT_NAME='createEmulatorModule' --no-entry")
     target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
@@ -152,7 +152,7 @@ if (DEFINED EMSCRIPTEN)
     target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL2::SDL2)
 
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.js DESTINATION ${CMAKE_SOURCE_DIR}/web/grouboy/app)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm_base.d.ts DESTINATION ${CMAKE_SOURCE_DIR}/web/grouboy/app)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.d.ts DESTINATION ${CMAKE_SOURCE_DIR}/web/grouboy/app)
 else ()
     enable_testing()
     add_subdirectory(tests/)

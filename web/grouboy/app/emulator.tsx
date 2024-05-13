@@ -1,25 +1,32 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from 'react';
-import createEmulatorModule, { MainModuleExtended } from './grouboy_wasm';
+import createEmulatorModule, { MainModule } from './grouboy_wasm';
 
 const Emulator: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [romFile, setRomFile] = useState<File>()
     const [romLoaded, setRomLoaded] = useState(false);
-    const [emulatorModule, setEmulatorModule] = useState<MainModuleExtended>();
+    const [emulatorModule, setEmulatorModule] = useState<MainModule>();
+    const [output, setOutput] = useState<string>("");
+    const [emulatorPtr, setEmulatorPtr] = useState<number>(0);
 
     useEffect(() => {
-        createEmulatorModule()
+        createEmulatorModule({
+            print: (text: string) => {
+                console.log(text);
+                setOutput((prevOutput) => prevOutput + text);
+            },
+            printErr: (text: string) => {
+                console.error(text);
+                setOutput((prevOutput) => prevOutput + text);
+            },
+            canvas: canvasRef.current
+        })
         .then(module => {
             console.log(`WebAssembly module loaded.`);
-
-            // We need to set the canvas property so that SDL2 can correcly render to it.
-            module.canvas = (function () {
-                return canvasRef.current;
-            })();
-
             setEmulatorModule(module);
+            setEmulatorPtr(module._init());
         })
     }, []);
 
@@ -33,13 +40,18 @@ const Emulator: React.FC = () => {
     };
 
     const startEmulatorFromRomData = (romData: ArrayBuffer) => {
-        var data = new Uint8Array(romData as ArrayBuffer);
-        var dataPtr = emulatorModule._malloc(data.length);
-        var dataHeap = new Uint8Array(emulatorModule.HEAPU8.buffer, dataPtr, data.length);
-        dataHeap.set(data);
-        var success = emulatorModule._startEmulatorFromData(dataHeap.byteOffset, dataHeap.length);
-        emulatorModule._free(dataHeap.byteOffset);
-        setRomLoaded(success);
+        if (emulatorModule) {
+            var data = new Uint8Array(romData as ArrayBuffer);
+            var dataPtr = emulatorModule._malloc(data.length);
+            var dataHeap = new Uint8Array(emulatorModule.HEAPU8.buffer, dataPtr, data.length);
+            dataHeap.set(data);
+            var success = emulatorModule._loadROM(emulatorPtr, dataHeap.byteOffset, dataHeap.length);
+            emulatorModule._free(dataHeap.byteOffset);
+            setRomLoaded(success === 1);
+            if (success) {
+                emulatorModule._start(emulatorPtr);
+            }
+        }
     };
 
     const onLoadRomClicked = () => {
@@ -78,6 +90,7 @@ const Emulator: React.FC = () => {
                 </>
             )}
             <canvas ref={canvasRef} onContextMenu={(e) => e.preventDefault()} id="canvas" />
+            <>{output}</>
         </>
     );
 };
