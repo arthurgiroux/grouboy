@@ -3,6 +3,7 @@
 
 #include "emulator.hpp"
 #include <SDL2/SDL.h>
+#include <SDL_ttf.h>
 #include <iostream>
 #include <map>
 #include <mutex>
@@ -17,6 +18,7 @@ class EmulatorSDLGUI
     void destroy();
     void enableAudio(bool status);
     bool shouldQuit() const;
+    void renderDebugInformation();
 
   private:
     static const int WINDOW_WIDTH = 640;
@@ -27,9 +29,11 @@ class EmulatorSDLGUI
     SDL_Window* _window = nullptr;
     SDL_Renderer* _renderer = nullptr;
     SDL_Texture* _texture = nullptr;
+    TTF_Font* _font = nullptr;
     int _frameId = 0;
     bool _isAudioEnabled = true;
     bool _shouldQuit = false;
+    bool _isDebugActivated = false;
 
     std::map<SDL_Keycode, InputController::Button> _buttonMapping = {
         {SDLK_UP, InputController::Button::UP},        {SDLK_DOWN, InputController::Button::DOWN},
