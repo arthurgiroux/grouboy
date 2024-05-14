@@ -8,6 +8,11 @@ EmulatorSDLGUI::EmulatorSDLGUI(Emulator& emulator)
 
 void EmulatorSDLGUI::destroy()
 {
+    if (_font != nullptr)
+    {
+        TTF_CloseFont(_font);
+        _font = nullptr;
+    }
     if (_texture != nullptr)
     {
         SDL_DestroyTexture(_texture);
@@ -38,6 +43,21 @@ bool EmulatorSDLGUI::create()
     if (SDL_Init(flags) < 0)
     {
         std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
+        destroy();
+        return false;
+    }
+
+    if (TTF_Init() < 0)
+    {
+        std::cerr << "SDL_ttf could not initialize! SDL_ttf Error: " << TTF_GetError() << std::endl;
+        destroy();
+        return false;
+    }
+
+    _font = TTF_OpenFont("Roboto-regular.ttf", 24);
+    if (!_font)
+    {
+        std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
         destroy();
         return false;
     }
@@ -114,6 +134,11 @@ void EmulatorSDLGUI::mainLoop()
             {
                 _emulator.getInputController().setButtonReleased(_buttonMapping[keycode]);
             }
+
+            if (keycode == 'd')
+            {
+                _isDebugActivated = !_isDebugActivated;
+            }
         }
     }
 
@@ -147,6 +172,12 @@ void EmulatorSDLGUI::mainLoop()
     SDL_UnlockTexture(_texture);
     SDL_RenderClear(_renderer);
     SDL_RenderCopy(_renderer, _texture, nullptr, nullptr);
+
+    if (_isDebugActivated)
+    {
+        renderDebugInformation();
+    }
+
     SDL_RenderPresent(_renderer);
 }
 
@@ -158,4 +189,24 @@ bool EmulatorSDLGUI::shouldQuit() const
 void EmulatorSDLGUI::enableAudio(bool status)
 {
     _isAudioEnabled = status;
+}
+
+void EmulatorSDLGUI::renderDebugInformation()
+{
+    SDL_Surface* text;
+    SDL_Color colorBlack = {255, 0, 0};
+    SDL_Color colorRed = {0, 0, 0};
+
+    text = TTF_RenderText_Shaded(_font, "Debug", colorBlack, colorRed);
+    if (!text)
+    {
+        std::cerr << "Failed to render text: " << TTF_GetError() << std::endl;
+    }
+
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(_renderer, text);
+
+    // We render in the top-right corner
+    SDL_Rect dest = {WINDOW_WIDTH - text->w, 0, text->w, text->h};
+
+    SDL_RenderCopy(_renderer, textTexture, nullptr, &dest);
 }

@@ -126,14 +126,23 @@ endif ()
 set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
 add_subdirectory(${SDL3_DIR})
 
+set(SDL_TTF_DIR ${CMAKE_SOURCE_DIR}/libs/SDL_ttf)
+add_subdirectory(${SDL_TTF_DIR})
+
 add_executable(grouboy src/main.cpp
         src/gui/emulator_sdl_gui.cpp
         src/gui/emulator_sdl_gui.hpp)
 
-target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/)
+target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_SOURCE_DIR}/libs/SDL2_ttf)
 
-add_dependencies(grouboy gbemulator_core SDL2::SDL2)
-target_link_libraries(grouboy PRIVATE gbemulator_core SDL2::SDL2)
+add_dependencies(grouboy gbemulator_core SDL2::SDL2 SDL2_ttf::SDL2_ttf)
+target_link_libraries(grouboy PRIVATE gbemulator_core SDL2::SDL2 SDL2_ttf::SDL2_ttf)
+
+add_custom_command(
+        TARGET grouboy POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/src/gui/Roboto-Regular.ttf
+        ${CMAKE_CURRENT_BINARY_DIR}/Roboto-Regular.ttf)
 
 if (DEFINED EMSCRIPTEN)
     add_executable(grouboy_wasm
