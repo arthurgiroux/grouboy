@@ -142,6 +142,8 @@ void EmulatorSDLGUI::mainLoop()
         }
     }
 
+    Uint64 startFrameTime = SDL_GetTicks64();
+
     while (_frameId == _ppu.getFrameId())
     {
         _emulator.exec();
@@ -161,6 +163,9 @@ void EmulatorSDLGUI::mainLoop()
         }
     }
 
+    Uint64 endFrameTime = SDL_GetTicks64();
+    Uint64 timeToComputeFrame = (endFrameTime - startFrameTime);
+
     _frameId = _ppu.getFrameId();
 
     auto image = _ppu.getLastRenderedFrame();
@@ -175,7 +180,7 @@ void EmulatorSDLGUI::mainLoop()
 
     if (_isDebugActivated)
     {
-        renderDebugInformation();
+        renderDebugInformation(0, timeToComputeFrame);
     }
 
     SDL_RenderPresent(_renderer);
@@ -191,22 +196,36 @@ void EmulatorSDLGUI::enableAudio(bool status)
     _isAudioEnabled = status;
 }
 
-void EmulatorSDLGUI::renderDebugInformation()
+void EmulatorSDLGUI::renderDebugInformation(int fps, float timeToComputeFrame)
 {
-    SDL_Surface* text;
+    int marginRight = -5;
+    SDL_Surface* textFps = renderDebugText(fmt::format("FPS: {}", fps), marginRight);
+    SDL_Surface* textFrame =
+        renderDebugText(fmt::format("frame computed in: {}ms", timeToComputeFrame), marginRight, textFps->h);
+    SDL_FreeSurface(textFps);
+    SDL_FreeSurface(textFrame);
+}
+
+SDL_Surface* EmulatorSDLGUI::renderDebugText(const std::string& text, int offsetX, int offsetY)
+{
     SDL_Color colorBlack = {255, 0, 0};
     SDL_Color colorRed = {0, 0, 0};
 
-    text = TTF_RenderText_Shaded(_font, "Debug", colorBlack, colorRed);
-    if (!text)
+    SDL_Surface* textSurface = TTF_RenderText_Shaded(_font, text.c_str(), colorBlack, colorRed);
+    if (!textSurface)
     {
         std::cerr << "Failed to render text: " << TTF_GetError() << std::endl;
+        return nullptr;
     }
 
-    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(_renderer, text);
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(_renderer, textSurface);
 
     // We render in the top-right corner
-    SDL_Rect dest = {WINDOW_WIDTH - text->w, 0, text->w, text->h};
+    SDL_Rect dest = {WINDOW_WIDTH - textSurface->w + offsetX, offsetY, textSurface->w, textSurface->h};
 
     SDL_RenderCopy(_renderer, textTexture, nullptr, &dest);
+
+    SDL_DestroyTexture(textTexture);
+
+    return textSurface;
 }
