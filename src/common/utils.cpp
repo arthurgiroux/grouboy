@@ -42,7 +42,8 @@ bool isNthBitSet(int value, int bitPosition)
     return (value & (1 << bitPosition)) > 0;
 }
 
-void setNthBit(int& value, int bitPosition, bool state)
+template <typename T>
+void setNthBit(T& value, int bitPosition, bool state)
 {
     if (state)
     {
@@ -53,6 +54,9 @@ void setNthBit(int& value, int bitPosition, bool state)
         value &= ~(1 << bitPosition);
     }
 }
+
+template void setNthBit<int>(int&, int, bool);
+template void setNthBit<byte>(byte&, int, bool);
 
 bool readBinaryDataFromFile(const std::string& filepath, std::vector<byte>& out)
 {

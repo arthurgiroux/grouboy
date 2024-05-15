@@ -7,6 +7,7 @@ Emulator::Emulator()
     mmu.setAPU(&apu);
     mmu.setTimer(&timer);
     mmu.setInputController(&inputController);
+    mmu.setInterruptManager(cpu.getInterruptManager());
 }
 
 Emulator::~Emulator() = default;

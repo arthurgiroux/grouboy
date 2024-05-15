@@ -49,9 +49,8 @@ class InterruptManager
     /**
      * Create a new interrupt manager.
      * @param cpu   The CPU instance to use for calling interrupt routines.
-     * @param mmu   The MMU instance to use for memory access.
      */
-    explicit InterruptManager(CPU* cpu, MMU* mmu);
+    explicit InterruptManager(CPU* cpu);
     ~InterruptManager() = default;
 
     /**
@@ -99,28 +98,40 @@ class InterruptManager
      */
     bool handleInterrupts();
 
+    /**
+     * Retrieves the interrupt enable flag.
+     *
+     * @return The interrupt enable flag value.
+     */
+    byte getInterruptEnableFlag() const;
+
+    /**
+     * Sets the interrupt enable flag.
+     *
+     * This function sets the interrupt enable flag to the specified value.
+     *
+     * @param interruptEnableFlag The value to set the interrupt enable flag to.
+     */
+    void setInterruptEnableFlag(byte interruptEnableFlag);
+
+    /**
+     * @brief Gets the interrupt flag.
+     *
+     * This function returns the interrupt flag value.
+     *
+     * @return The interrupt flag value.
+     */
+    byte getInterruptFlag() const;
+
+    /**
+     * Sets the interrupt flag.
+     *
+     * This function sets the interrupt flag to the specified value.
+     *
+     * @param interruptFlag The value to set the interrupt flag to.
+     */
+    void setInterruptFlag(byte interruptFlag);
   private:
-    /**
-     * The address in memory of the "enable interrupt" value.
-     * This value tells us which interrupt type is enabled and should be treated
-     * when they are triggered.
-     * This value is a bitflag where bits position represents a certain interrupt type.
-     * If a bit is set, then the interrupt type is enabled.
-     *
-     * @see bitPositionInFlagForInterruptType for the bit mapping
-     */
-    static const int INTERRUPT_ENABLE_ADDR = 0xFFFF;
-
-    /**
-     * The address in memory of the "interrupt flag".
-     * The interrupt flag tells us which interrupt was triggered and is pending.
-     * This value is a bitflag where bits position represents a certain interrupt type.
-     * If a bit is set, then the interrupt type is pending.
-     *
-     * @see bitPositionInFlagForInterruptType for the bit mapping
-     */
-    static const int INTERRUPT_FLAG_ADDR = 0xFF0F;
-
     /**
      * The mapping between an interrupt type and the bit position for the
      * different bitflags.
@@ -139,9 +150,23 @@ class InterruptManager
     std::vector<std::unique_ptr<InterruptHandler>> _interruptHandlers;
 
     /**
-     * The MMU to use for memory operations.
+     * This value tells us which interrupt type is enabled and should be treated
+     * when they are triggered.
+     * This value is a bitset where bits position represents a certain interrupt type.
+     * If a bit is set, then the interrupt type is enabled.
+     *
+     * @see bitPositionInFlagForInterruptType for the bit mapping
      */
-    MMU* _mmu = nullptr;
+    byte _interruptEnableFlag = 0;
+
+    /**
+     * The interrupt flag tells us which interrupt was triggered and is pending.
+     * This value is a bitset where bits position represents a certain interrupt type.
+     * If a bit is set, then the interrupt type is pending.
+     *
+     * @see bitPositionInFlagForInterruptType for the bit mapping
+     */
+    byte _interruptFlag = 0;
 };
 
 #endif // GBEMULATOR_INTERRUPT_MANAGER_HPP
