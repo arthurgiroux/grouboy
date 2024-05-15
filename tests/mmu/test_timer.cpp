@@ -10,7 +10,7 @@ class TimerTest : public ::testing::Test
     virtual void SetUp() override
     {
         cpu = std::make_unique<CPU>(mmu);
-        interruptManager = std::make_unique<InterruptManager>(cpu.get(), &mmu);
+        interruptManager = std::make_unique<InterruptManager>(cpu.get());
         timer = std::make_unique<Timer>(interruptManager.get());
         mmu.setTimer(timer.get());
     }

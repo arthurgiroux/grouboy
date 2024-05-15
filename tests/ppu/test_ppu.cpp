@@ -8,7 +8,7 @@ class PpuTest : public ::testing::Test
   protected:
     MMU mmu;
     CPU cpu = CPU(mmu);
-    InterruptManager interruptManager = InterruptManager(&cpu, &mmu);
+    InterruptManager interruptManager = InterruptManager(&cpu);
     PPU ppu = PPU(mmu, &interruptManager);
 
     static const int ADDR_LCD_STATUS = 0xFF41;

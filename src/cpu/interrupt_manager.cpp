@@ -3,39 +3,35 @@
 
 bool InterruptManager::isInterruptEnabled(InterruptType type)
 {
-    return utils::isNthBitSet(_mmu->read(INTERRUPT_ENABLE_ADDR), bitPositionInFlagForInterruptType[type]);
+    return utils::isNthBitSet(_interruptEnableFlag, bitPositionInFlagForInterruptType[type]);
 }
 
 bool InterruptManager::isInterruptPending(InterruptType type)
 {
-    return utils::isNthBitSet(_mmu->read(INTERRUPT_FLAG_ADDR), bitPositionInFlagForInterruptType[type]);
+    return utils::isNthBitSet(_interruptFlag, bitPositionInFlagForInterruptType[type]);
 }
 
 void InterruptManager::raiseInterrupt(InterruptType type)
 {
-    int interruptFlag = _mmu->read(INTERRUPT_FLAG_ADDR);
-    utils::setNthBit(interruptFlag, bitPositionInFlagForInterruptType[type], true);
-    _mmu->write(INTERRUPT_FLAG_ADDR, static_cast<byte>(interruptFlag));
+    utils::setNthBit(_interruptFlag, bitPositionInFlagForInterruptType[type], true);
 }
 
 void InterruptManager::clearInterrupt(InterruptType type)
 {
-    int interruptFlag = _mmu->read(INTERRUPT_FLAG_ADDR);
-    utils::setNthBit(interruptFlag, bitPositionInFlagForInterruptType[type], false);
-    _mmu->write(INTERRUPT_FLAG_ADDR, static_cast<byte>(interruptFlag));
+    utils::setNthBit(_interruptFlag, bitPositionInFlagForInterruptType[type], false);
 }
 
 bool InterruptManager::isAnyInterruptEnabled()
 {
-    return _mmu->read(INTERRUPT_ENABLE_ADDR) > 0;
+    return _interruptEnableFlag > 0;
 }
 
 bool InterruptManager::isAnyInterruptPending()
 {
-    return (_mmu->read(INTERRUPT_FLAG_ADDR) & 0x1F) > 0;
+    return (_interruptFlag & 0x1F) > 0;
 }
 
-InterruptManager::InterruptManager(CPU* cpu, MMU* mmu) : _mmu(mmu)
+InterruptManager::InterruptManager(CPU* cpu)
 {
     _interruptHandlers.push_back(std::make_unique<InterruptHandlerVBlank>(cpu, this));
     _interruptHandlers.push_back(std::make_unique<InterruptHandlerLCDStat>(cpu, this));
@@ -55,4 +51,24 @@ bool InterruptManager::handleInterrupts()
     }
 
     return false;
+}
+
+byte InterruptManager::getInterruptEnableFlag() const
+{
+    return _interruptEnableFlag;
+}
+
+void InterruptManager::setInterruptEnableFlag(byte interruptEnableFlag)
+{
+    _interruptEnableFlag = interruptEnableFlag;
+}
+
+byte InterruptManager::getInterruptFlag() const
+{
+    return _interruptFlag;
+}
+
+void InterruptManager::setInterruptFlag(byte interruptFlag)
+{
+    _interruptFlag = interruptFlag;
 }

@@ -10,6 +10,7 @@
 
 #include "apu/apu.hpp"
 #include "cartridge.hpp"
+#include "cpu/interrupt_manager.hpp"
 #include "memory/bootrom.hpp"
 #include "spdlog/spdlog.h"
 
@@ -45,6 +46,16 @@ byte MMU::read(const word& addr)
     if (addr < BOOTROM.size() && isBootRomActive())
     {
         return memory[addr];
+    }
+
+    else if (_interruptManager != nullptr && addr == INTERRUPT_ENABLE_ADDR)
+    {
+        return _interruptManager->getInterruptEnableFlag();
+    }
+
+    else if (_interruptManager != nullptr && addr == INTERRUPT_FLAG_ADDR)
+    {
+        return _interruptManager->getInterruptFlag();
     }
 
     else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
@@ -181,6 +192,16 @@ void MMU::write(const word& addr, const byte& value)
         return;
     }
 
+    else if (_interruptManager != nullptr && addr == INTERRUPT_ENABLE_ADDR)
+    {
+        _interruptManager->setInterruptEnableFlag(value);
+    }
+
+    else if (_interruptManager != nullptr && addr == INTERRUPT_FLAG_ADDR)
+    {
+        _interruptManager->setInterruptFlag(value);
+    }
+
     // Writing to the bootrom address deactivates it
     else if (addr == BOOT_ROM_UNMAPPED_FLAG_ADDR)
     {
@@ -262,6 +283,7 @@ void MMU::write(const word& addr, const byte& value)
         _timer->enableTimerCounter(utils::isNthBitSet(value, 2));
         _timer->setClockDivider(value & 0b00000011);
     }
+
     else
     {
         memory[addr] = value;
@@ -377,4 +399,9 @@ ColorPaletteMemoryMapper& MMU::getColorPaletteMemoryMapperObj()
 bool MMU::isColorModeSupported()
 {
     return isBootRomActive() || (cartridge != nullptr && cartridge->isColorModeSupported());
+}
+
+void MMU::setInterruptManager(InterruptManager* interruptManager)
+{
+    _interruptManager = interruptManager;
 }

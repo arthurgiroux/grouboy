@@ -3,7 +3,7 @@
 
 using namespace utils;
 
-CPU::CPU(MMU& mmu_) : mmu(mmu_), _interruptManager(this, &mmu)
+CPU::CPU(MMU& mmu_) : mmu(mmu_), _interruptManager(this)
 {
     reset();
 }

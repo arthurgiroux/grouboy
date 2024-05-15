@@ -19,6 +19,7 @@
 class APU;
 class Timer;
 class InputController;
+class InterruptManager;
 
 /**
  * The MMU class is responsible for managing the memory access and mapping.
@@ -135,6 +136,12 @@ class MMU
      * @param timer The timer implementation to use
      */
     void setTimer(Timer* timer);
+
+    /**
+     * Set the Interrupt Manager that will be used to get/set the interrupt flags.
+     * @param interruptManager The manager to use
+     */
+    void setInterruptManager(InterruptManager* interruptManager);
 
     /**
      * Reset the state of the MMU
@@ -370,6 +377,21 @@ class MMU
 
     ColorPaletteMemoryMapper colorPaletteMemoryMapperBackground;
     ColorPaletteMemoryMapper colorPaletteMemoryMapperObjects;
+
+    /**
+     * The address in memory of the "enable interrupt" value.
+     */
+    static const int INTERRUPT_ENABLE_ADDR = 0xFFFF;
+
+    /**
+     * The address in memory of the "interrupt flag".
+     */
+    static const int INTERRUPT_FLAG_ADDR = 0xFF0F;
+
+    /**
+     * The interrupt manager to use to get/set the interrupts flags value.
+     */
+    InterruptManager* _interruptManager = nullptr;
 };
 
 #endif

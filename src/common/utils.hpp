@@ -83,7 +83,16 @@ void decrement16BitsValueStoredIn8BitsValues(byte& msb, byte& lsb);
  */
 bool isNthBitSet(int value, int bitPosition);
 
-void setNthBit(int& value, int bitPosition, bool state);
+/**
+ * Sets the nth bit of the given value to the specified state.
+ *
+ * @tparam T The type of the value.
+ * @param value The value whose bit will be set.
+ * @param bitPosition The position of the bit to be set.
+ * @param state The state to set the bit to (true for 1, false for 0).
+ */
+template <typename T>
+void setNthBit(T& value, int bitPosition, bool state);
 
 /**
  * Read the binary content of a file.
