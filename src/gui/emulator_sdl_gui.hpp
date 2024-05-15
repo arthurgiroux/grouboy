@@ -5,9 +5,9 @@
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
 #include <iostream>
+#include <list>
 #include <map>
 #include <mutex>
-#include <queue>
 
 class EmulatorSDLGUI
 {
@@ -24,6 +24,7 @@ class EmulatorSDLGUI
     static const int WINDOW_HEIGHT = 480;
     void renderDebugInformation(int fps, float timeToComputeFrame);
     SDL_Surface* renderDebugText(const std::string& text, int offsetX = 0, int offsetY = 0);
+    int computeFPS();
     Emulator& _emulator;
     APU& _apu;
     PPU& _ppu;
@@ -35,6 +36,8 @@ class EmulatorSDLGUI
     bool _isAudioEnabled = true;
     bool _shouldQuit = false;
     bool _isDebugActivated = false;
+    int nbrFramesForFps = 5;
+    std::list<Uint64> lastFramesTicks;
 
     std::map<SDL_Keycode, InputController::Button> _buttonMapping = {
         {SDLK_UP, InputController::Button::UP},        {SDLK_DOWN, InputController::Button::DOWN},
