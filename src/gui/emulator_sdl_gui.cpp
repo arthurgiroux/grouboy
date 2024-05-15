@@ -144,6 +144,13 @@ void EmulatorSDLGUI::mainLoop()
 
     Uint64 startFrameTime = SDL_GetTicks64();
 
+    if (lastFramesTicks.size() == nbrFramesForFps)
+    {
+        lastFramesTicks.pop_front();
+    }
+
+    lastFramesTicks.push_back(startFrameTime);
+
     while (_frameId == _ppu.getFrameId())
     {
         _emulator.exec();
@@ -180,7 +187,7 @@ void EmulatorSDLGUI::mainLoop()
 
     if (_isDebugActivated)
     {
-        renderDebugInformation(0, timeToComputeFrame);
+        renderDebugInformation(computeFPS(), timeToComputeFrame);
     }
 
     SDL_RenderPresent(_renderer);
@@ -228,4 +235,30 @@ SDL_Surface* EmulatorSDLGUI::renderDebugText(const std::string& text, int offset
     SDL_DestroyTexture(textTexture);
 
     return textSurface;
+}
+
+int EmulatorSDLGUI::computeFPS()
+{
+    if (lastFramesTicks.size() < 2)
+    {
+        return 0;
+    }
+
+    Uint64 sumFrameTimeDiff = 0;
+    Uint64 prevFrameTime = lastFramesTicks.front();
+    for (const auto& frameTime : lastFramesTicks)
+    {
+        sumFrameTimeDiff += frameTime - prevFrameTime;
+        prevFrameTime = frameTime;
+    }
+
+    Uint64 averageFrameTimeDiff = sumFrameTimeDiff / (lastFramesTicks.size() - 1);
+    if (averageFrameTimeDiff > 0)
+    {
+        return 1000 / averageFrameTimeDiff;
+    }
+    else
+    {
+        return 0;
+    }
 }
