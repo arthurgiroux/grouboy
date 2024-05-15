@@ -18,11 +18,12 @@ class EmulatorSDLGUI
     void destroy();
     void enableAudio(bool status);
     bool shouldQuit() const;
-    void renderDebugInformation();
 
   private:
     static const int WINDOW_WIDTH = 640;
     static const int WINDOW_HEIGHT = 480;
+    void renderDebugInformation(int fps, float timeToComputeFrame);
+    SDL_Surface* renderDebugText(const std::string& text, int offsetX = 0, int offsetY = 0);
     Emulator& _emulator;
     APU& _apu;
     PPU& _ppu;
