@@ -4,14 +4,14 @@
 TEST(SingleTileTest, HeightShouldBe8)
 {
     std::vector<byte> data(16);
-    SingleTile tile(data);
+    SingleTile tile(std::move(data));
     ASSERT_EQ(tile.getHeight(), 8);
 }
 
 TEST(SingleTileTest, WidthShouldBe8)
 {
     std::vector<byte> data(16);
-    SingleTile tile(data);
+    SingleTile tile(std::move(data));
     ASSERT_EQ(tile.getWidth(), 8);
 }
 
@@ -25,7 +25,7 @@ TEST(SingleTileTest, ColorIdShouldBeReadFromAdjacentsBytes)
      */
     data[0] = 0b01001110;
     data[1] = 0b10001011;
-    SingleTile tile(data);
+    SingleTile tile(std::move(data));
     ASSERT_EQ(tile.getColorData(0, 0), 2);
     ASSERT_EQ(tile.getColorData(1, 0), 1);
     ASSERT_EQ(tile.getColorData(2, 0), 0);
@@ -39,13 +39,13 @@ TEST(SingleTileTest, ColorIdShouldBeReadFromAdjacentsBytes)
 TEST(StackedTileTest, HeightShouldBe16)
 {
     std::vector<byte> data(16);
-    StackedTile tile(data);
+    StackedTile tile(std::move(data));
     ASSERT_EQ(tile.getHeight(), 16);
 }
 
 TEST(StackedTileTest, WidthShouldBe8)
 {
     std::vector<byte> data(16);
-    StackedTile tile(data);
+    StackedTile tile(std::move(data));
     ASSERT_EQ(tile.getWidth(), 8);
 }
