@@ -204,7 +204,6 @@ class MMU
     {
         P1 = 0xFF00,
         SC = 0xFF02,
-        IF = 0xFF0F,
         STAT = 0xFF41,
     };
 
