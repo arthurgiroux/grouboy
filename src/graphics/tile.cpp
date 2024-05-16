@@ -26,7 +26,7 @@ void Tile::convertToPixels()
     }
 }
 
-Tile::Tile(const Tile::TileDataArray& data, int height, int width) : _data(data), _height(height), _width(width)
+Tile::Tile(Tile::TileDataArray&& data, int height, int width) : _data(std::move(data)), _height(height), _width(width)
 {
     _colorData.resize(height * width);
     convertToPixels();
@@ -52,10 +52,10 @@ const std::vector<byte>& Tile::getColorData() const
     return _colorData;
 }
 
-SingleTile::SingleTile(const Tile::TileDataArray& data) : Tile(data, TILE_HEIGHT, TILE_WIDTH)
+SingleTile::SingleTile(Tile::TileDataArray&& data) : Tile(std::move(data), TILE_HEIGHT, TILE_WIDTH)
 {
 }
 
-StackedTile::StackedTile(const Tile::TileDataArray& data) : Tile(data, TILE_HEIGHT, TILE_WIDTH)
+StackedTile::StackedTile(Tile::TileDataArray&& data) : Tile(std::move(data), TILE_HEIGHT, TILE_WIDTH)
 {
 }

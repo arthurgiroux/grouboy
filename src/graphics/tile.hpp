@@ -30,7 +30,7 @@ class Tile
      * @param height    The height in pixels
      * @param width     The width in pixels
      */
-    Tile(const TileDataArray& data, int height, int width);
+    Tile(TileDataArray&& data, int height, int width);
     virtual ~Tile() = default;
 
     /**
@@ -105,7 +105,7 @@ class SingleTile : public Tile
      *
      * @param data      The raw data to read the colors from
      */
-    SingleTile(const TileDataArray& data);
+    SingleTile(TileDataArray&& data);
 
     /**
      * Number of bytes per value for the tile
@@ -134,7 +134,7 @@ class StackedTile : public Tile
      *
      * @param data      The raw data to read the colors from
      */
-    StackedTile(const TileDataArray& data);
+    StackedTile(TileDataArray&& data);
 
     /**
      * Number of bytes per value for the tile
