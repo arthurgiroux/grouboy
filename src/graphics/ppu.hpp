@@ -183,6 +183,12 @@ class PPU
     void reset();
 
     /**
+     * Get the LCD Status Register that is used to handle LCD Status flags.
+     * @return a pointer to the status register wrapper.
+     */
+    LCDStatusRegister* getLcdStatusRegister() const;
+
+    /**
      * The screen width in pixels.
      */
     static const int SCREEN_WIDTH;

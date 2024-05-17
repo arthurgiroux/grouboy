@@ -8,6 +8,7 @@ Emulator::Emulator()
     mmu.setTimer(&timer);
     mmu.setInputController(&inputController);
     mmu.setInterruptManager(cpu.getInterruptManager());
+    mmu.setLcdStatusRegister(ppu.getLcdStatusRegister());
 }
 
 Emulator::~Emulator() = default;

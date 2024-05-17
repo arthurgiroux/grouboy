@@ -20,6 +20,7 @@ class APU;
 class Timer;
 class InputController;
 class InterruptManager;
+class LCDStatusRegister;
 
 /**
  * The MMU class is responsible for managing the memory access and mapping.
@@ -173,6 +174,12 @@ class MMU
 
     ColorPaletteMemoryMapper& getColorPaletteMemoryMapperBackground();
     ColorPaletteMemoryMapper& getColorPaletteMemoryMapperObj();
+
+    /**
+     * Set the LCD Status register that will be used to get/set info about the LCD.
+     * @param lcdStatusRegister A pointer to the register
+     */
+    void setLcdStatusRegister(LCDStatusRegister* lcdStatusRegister);
 
     /**
      * The total size of the memory in bytes
@@ -391,6 +398,26 @@ class MMU
      * The interrupt manager to use to get/set the interrupts flags value.
      */
     InterruptManager* _interruptManager = nullptr;
+
+    /**
+     * The address of the LY compare register.
+     */
+    static const int LY_COMPARE_ADDR = 0xFF45;
+
+    /**
+     * The address of the LCD status register.
+     */
+    static const int ADDR_LCD_STATUS = 0xFF41;
+
+    /**
+     * The address where we store the information of the scanline being rendered.
+     */
+    static const int ADDR_SCANLINE = 0xFF44;
+
+    /**
+     * The LCD Status register to use to get/set information about the LCD Status
+     */
+    LCDStatusRegister* _lcdStatusRegister = nullptr;
 };
 
 #endif
