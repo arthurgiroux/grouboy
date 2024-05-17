@@ -14,10 +14,8 @@ class LCDStatusRegister
   public:
     /**
      * Create a new LCD Status register.
-     *
-     * @param mmu   The MMU to use to read/write the registers
      */
-    explicit LCDStatusRegister(MMU& mmu);
+    explicit LCDStatusRegister();
 
     /**
      * Update the PPU mode information
@@ -68,26 +66,50 @@ class LCDStatusRegister
      */
     bool isHBLANKStatInterruptEnabled();
 
+    /**
+     * Get the value of the line Y compare register.
+     * This register value will be compared to the current scanline value when requested.
+     * @return a byte value
+     */
+    byte getLineYCompareRegister() const;
+
+    /**
+     * Set the value of the line Y compare register.
+     * This register value will be compared to the current scanline value when requested.
+     * @param lineYCompareRegister The byte value to compare to the scanline value
+     */
+    void setLineYCompareRegister(byte lineYCompareRegister);
+
+    /**
+     * Get the LCD status register.
+     * This register holds several information about the status of the LCD and the PPU.
+     * @return the byte value of the LCD status register
+     */
+    byte getLcdStatusRegister() const;
+
+    /**
+     *  Set the LCD status register.
+     * This register holds several information about the status of the LCD and the PPU.
+     * @param lcdStatusRegister the value to set
+     */
+    void setLcdStatusRegister(byte lcdStatusRegister);
+
+    /**
+     * Get the value of the scanline which might be about to be drawn, being drawn, or just been drawn.
+     * @return a value between 0 and 153
+     */
+    byte getScanlineRegister() const;
+
+    /**
+     * Set the value of the scanline being drawn or about to be.
+     * @param scanlineRegister a value between 0 and 153
+     */
+    void setScanlineRegister(byte scanlineRegister);
+
   private:
-    /**
-     * The MMU to use to read/write the registers.
-     */
-    MMU& _mmu;
-
-    /**
-     * The address of the LY compare register.
-     */
-    static const int LY_COMPARE_ADDR = 0xFF45;
-
-    /**
-     * The address of the LCD status register.
-     */
-    static const int ADDR_LCD_STATUS = 0xFF41;
-
-    /**
-     * The address where we store the information of the scanline being rendered.
-     */
-    static const int ADDR_SCANLINE = 0xFF44;
+    byte _lineYCompareRegister = 0;
+    byte _LCDStatusRegister = 0;
+    byte _scanlineRegister = 0;
 };
 
 #endif // GBEMULATOR_LCD_STATUS_REGISTER_HPP

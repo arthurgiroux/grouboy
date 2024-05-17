@@ -11,14 +11,14 @@
 #include "apu/apu.hpp"
 #include "cartridge.hpp"
 #include "cpu/interrupt_manager.hpp"
+#include "graphics/lcd_status_register.hpp"
 #include "memory/bootrom.hpp"
 #include "spdlog/spdlog.h"
 
 const std::set<word> MMU::unmappedIOAddrs = {0xFF03, 0xFF08, 0xFF09, 0xFF0A, 0xFF0B, 0xFF0C, 0xFF0D, 0xFF0E};
 
 const std::map<word, byte> MMU::mappedIOMask = {{HardwareIOAddr::P1, static_cast<byte>(0b11000000)},
-                                                {HardwareIOAddr::SC, static_cast<byte>(0b01111110)},
-                                                {HardwareIOAddr::STAT, static_cast<byte>(0b10000000)}};
+                                                {HardwareIOAddr::SC, static_cast<byte>(0b01111110)}};
 
 const utils::AddressRange MMU::unmappedIOAddrRange = utils::AddressRange(0xFF4C, 0xFF7F);
 
@@ -136,6 +136,21 @@ byte MMU::read(const word& addr)
     else if (_timer != nullptr && addr == TIMER_CONTROL_ADDR)
     {
         return 0b11111000 | _timer->isTimerCounterEnabled() << 2 | _timer->getClockDivider();
+    }
+
+    else if (_lcdStatusRegister != nullptr && addr == LY_COMPARE_ADDR)
+    {
+        return _lcdStatusRegister->getLineYCompareRegister();
+    }
+
+    else if (_lcdStatusRegister != nullptr && addr == ADDR_LCD_STATUS)
+    {
+        return _lcdStatusRegister->getLcdStatusRegister() | 0b10000000;
+    }
+
+    else if (_lcdStatusRegister != nullptr && addr == ADDR_SCANLINE)
+    {
+        return _lcdStatusRegister->getScanlineRegister();
     }
 
     return memory[addr];
@@ -283,6 +298,21 @@ void MMU::write(const word& addr, const byte& value)
         _timer->setClockDivider(value & 0b00000011);
     }
 
+    else if (_lcdStatusRegister != nullptr && addr == LY_COMPARE_ADDR)
+    {
+        _lcdStatusRegister->setLineYCompareRegister(value);
+    }
+
+    else if (_lcdStatusRegister != nullptr && addr == ADDR_LCD_STATUS)
+    {
+        _lcdStatusRegister->setLcdStatusRegister(value);
+    }
+
+    else if (_lcdStatusRegister != nullptr && addr == ADDR_SCANLINE)
+    {
+        _lcdStatusRegister->setScanlineRegister(value);
+    }
+
     else
     {
         memory[addr] = value;
@@ -403,4 +433,9 @@ bool MMU::isColorModeSupported()
 void MMU::setInterruptManager(InterruptManager* interruptManager)
 {
     _interruptManager = interruptManager;
+}
+
+void MMU::setLcdStatusRegister(LCDStatusRegister* lcdStatusRegister)
+{
+    _lcdStatusRegister = lcdStatusRegister;
 }

@@ -1,13 +1,13 @@
 #include "lcd_status_register.hpp"
 
-LCDStatusRegister::LCDStatusRegister(MMU& mmu) : _mmu(mmu)
+LCDStatusRegister::LCDStatusRegister()
 {
 }
 
 void LCDStatusRegister::updateFlagMode(PPU::Mode value)
 {
     // We mask the bits used for the mode to reset them
-    byte status = _mmu.read(ADDR_LCD_STATUS) & 0b11111100;
+    byte status = _LCDStatusRegister & 0b11111100;
     if (value == PPU::HBLANK)
     {
         status |= 0x00;
@@ -25,37 +25,65 @@ void LCDStatusRegister::updateFlagMode(PPU::Mode value)
         status |= 0x03;
     }
 
-    _mmu.write(ADDR_LCD_STATUS, status);
+    _LCDStatusRegister = status;
 }
 
 bool LCDStatusRegister::areLYCAndLYEqual()
 {
-    return _mmu.read(LY_COMPARE_ADDR) == _mmu.read(ADDR_SCANLINE);
+    return _lineYCompareRegister == _scanlineRegister;
 }
 
 void LCDStatusRegister::setLYCompareFlag(bool value)
 {
-    int status = _mmu.read(ADDR_LCD_STATUS);
-    utils::setNthBit(status, 2, value);
-    _mmu.write(ADDR_LCD_STATUS, static_cast<byte>(status));
+    utils::setNthBit(_LCDStatusRegister, 2, value);
 }
 
 bool LCDStatusRegister::isLYCompareStatInterruptEnabled()
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 6);
+    return utils::isNthBitSet(_LCDStatusRegister, 6);
 }
 
 bool LCDStatusRegister::isOAMStatInterruptEnabled()
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 5);
+    return utils::isNthBitSet(_LCDStatusRegister, 5);
 }
 
 bool LCDStatusRegister::isVBLANKStatInterruptEnabled()
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 4);
+    return utils::isNthBitSet(_LCDStatusRegister, 4);
 }
 
 bool LCDStatusRegister::isHBLANKStatInterruptEnabled()
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_STATUS), 3);
+    return utils::isNthBitSet(_LCDStatusRegister, 3);
+}
+
+byte LCDStatusRegister::getLineYCompareRegister() const
+{
+    return _lineYCompareRegister;
+}
+
+void LCDStatusRegister::setLineYCompareRegister(byte lineYCompareRegister)
+{
+    _lineYCompareRegister = lineYCompareRegister;
+}
+
+byte LCDStatusRegister::getLcdStatusRegister() const
+{
+    return _LCDStatusRegister;
+}
+
+void LCDStatusRegister::setLcdStatusRegister(byte lcdStatusRegister)
+{
+    _LCDStatusRegister = lcdStatusRegister;
+}
+
+byte LCDStatusRegister::getScanlineRegister() const
+{
+    return _scanlineRegister;
+}
+
+void LCDStatusRegister::setScanlineRegister(byte scanlineRegister)
+{
+    _scanlineRegister = scanlineRegister;
 }

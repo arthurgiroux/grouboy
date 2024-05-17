@@ -418,8 +418,13 @@ void PPU::swapFrameBuffers()
     _frameId++;
 }
 
+LCDStatusRegister* PPU::getLcdStatusRegister() const
+{
+    return _lcdStatusRegister.get();
+}
+
 PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
-    : _mmu(mmu_), _interruptManager(interruptManager), _lcdStatusRegister(std::make_unique<LCDStatusRegister>(_mmu)),
+    : _mmu(mmu_), _interruptManager(interruptManager), _lcdStatusRegister(std::make_unique<LCDStatusRegister>()),
       _paletteBackground(_mmu, ADDR_PALETTE_BG), _paletteObj0(_mmu, ADDR_PALETTE_OBJ0),
       _paletteObj1(_mmu, ADDR_PALETTE_OBJ1)
 {

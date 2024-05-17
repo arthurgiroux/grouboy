@@ -6,6 +6,11 @@
 class PpuTest : public ::testing::Test
 {
   protected:
+    void SetUp() override
+    {
+        mmu.setLcdStatusRegister(ppu.getLcdStatusRegister());
+    }
+    
     MMU mmu;
     CPU cpu = CPU(mmu);
     InterruptManager interruptManager = InterruptManager(&cpu);
