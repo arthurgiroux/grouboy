@@ -54,7 +54,7 @@ bool EmulatorSDLGUI::create()
         return false;
     }
 
-    _font = TTF_OpenFont("Roboto-regular.ttf", 24);
+    _font = TTF_OpenFont("Roboto-Regular.ttf", 24);
     if (!_font)
     {
         std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;

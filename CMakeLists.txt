@@ -123,28 +123,30 @@ else ()
     target_compile_options(gbemulator_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif ()
 
-set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
-add_subdirectory(${SDL3_DIR})
+if (NOT DEFINED EMSCRIPTEN)
+    set(SDL3_DIR ${CMAKE_SOURCE_DIR}/libs/SDL)
+    add_subdirectory(${SDL3_DIR})
+    set(SDL_TTF_DIR ${CMAKE_SOURCE_DIR}/libs/SDL_ttf)
+    add_subdirectory(${SDL_TTF_DIR})
 
-set(SDL_TTF_DIR ${CMAKE_SOURCE_DIR}/libs/SDL_ttf)
-add_subdirectory(${SDL_TTF_DIR})
+    add_executable(grouboy src/main.cpp
+            src/gui/emulator_sdl_gui.cpp
+            src/gui/emulator_sdl_gui.hpp)
 
-add_executable(grouboy src/main.cpp
-        src/gui/emulator_sdl_gui.cpp
-        src/gui/emulator_sdl_gui.hpp)
+    target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_SOURCE_DIR}/libs/SDL2_ttf)
 
-target_include_directories(grouboy PRIVATE ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_SOURCE_DIR}/libs/SDL2_ttf)
+    add_dependencies(grouboy gbemulator_core SDL2::SDL2 SDL2_ttf::SDL2_ttf)
+    target_link_libraries(grouboy PRIVATE gbemulator_core SDL2::SDL2 SDL2_ttf::SDL2_ttf)
 
-add_dependencies(grouboy gbemulator_core SDL2::SDL2 SDL2_ttf::SDL2_ttf)
-target_link_libraries(grouboy PRIVATE gbemulator_core SDL2::SDL2 SDL2_ttf::SDL2_ttf)
+    add_custom_command(
+            TARGET grouboy POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/src/gui/Roboto-Regular.ttf
+            ${CMAKE_CURRENT_BINARY_DIR}/Roboto-Regular.ttf)
 
-add_custom_command(
-        TARGET grouboy POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/src/gui/Roboto-Regular.ttf
-        ${CMAKE_CURRENT_BINARY_DIR}/Roboto-Regular.ttf)
-
-if (DEFINED EMSCRIPTEN)
+    enable_testing()
+    add_subdirectory(tests/)
+else ()
     add_executable(grouboy_wasm
             src/wasm/wasm_interface.cpp
             src/wasm/wasm_interface.hpp
@@ -153,16 +155,13 @@ if (DEFINED EMSCRIPTEN)
     target_link_options(grouboy_wasm PRIVATE
             --emit-tsd "$<TARGET_FILE_DIR:grouboy_wasm>/grouboy_wasm.d.ts"
     )
-    target_link_libraries(grouboy_wasm PRIVATE "-sWASM=0 -sENVIRONMENT=web -sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE=1 -sEXPORT_NAME='createEmulatorModule' --no-entry")
-    target_compile_options(grouboy_wasm PRIVATE -Os -Wall -Wextra -Wpedantic)
+    target_link_libraries(grouboy_wasm PRIVATE "-sWASM=0 -sUSE_SDL=2 -sUSE_SDL_TTF=2 --embed-file ${CMAKE_SOURCE_DIR}/src/gui/Roboto-Regular.ttf@Roboto-Regular.ttf -sENVIRONMENT=web -sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE=1 -sEXPORT_NAME='createEmulatorModule' --no-entry")
+    target_compile_options(grouboy_wasm PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2 -Os -Wall -Wextra -Wpedantic)
     target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
-    add_dependencies(grouboy_wasm gbemulator_core SDL2::SDL2)
-    target_link_libraries(grouboy_wasm PRIVATE gbemulator_core SDL2::SDL2)
+    add_dependencies(grouboy_wasm gbemulator_core)
+    target_link_libraries(grouboy_wasm PRIVATE gbemulator_core)
 
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.js DESTINATION ${CMAKE_SOURCE_DIR}/web/grouboy/app)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grouboy_wasm.d.ts DESTINATION ${CMAKE_SOURCE_DIR}/web/grouboy/app)
-else ()
-    enable_testing()
-    add_subdirectory(tests/)
 endif ()
