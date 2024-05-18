@@ -43,12 +43,6 @@ class Tile
     byte getColorData(int x, int y) const;
 
     /**
-     * Get the full color data array
-     * @return The color data for the tile
-     */
-    const std::vector<byte>& getColorData() const;
-
-    /**
      * Get the tile's height
      *
      * @return the height in pixels
@@ -69,19 +63,9 @@ class Tile
 
   protected:
     /**
-     * Convert the tile data to colored pixels
-     */
-    void convertToPixels();
-
-    /**
      * The raw data of the tile
      */
     TileDataArray _data = {};
-
-    /**
-     * The tile converted to color data
-     */
-    ColorDataArray _colorData = {};
 
     /**
      * The height of the tile in pixels
