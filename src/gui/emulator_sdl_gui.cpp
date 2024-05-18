@@ -144,7 +144,7 @@ void EmulatorSDLGUI::mainLoop()
 
     Uint64 startFrameTime = SDL_GetTicks64();
 
-    if (lastFramesTicks.size() == nbrFramesForFps)
+    if (lastFramesTicks.size() == static_cast<size_t>(nbrFramesForFps))
     {
         lastFramesTicks.pop_front();
     }
@@ -215,8 +215,8 @@ void EmulatorSDLGUI::renderDebugInformation(int fps, float timeToComputeFrame)
 
 SDL_Surface* EmulatorSDLGUI::renderDebugText(const std::string& text, int offsetX, int offsetY)
 {
-    SDL_Color colorBlack = {255, 0, 0};
-    SDL_Color colorRed = {0, 0, 0};
+    SDL_Color colorBlack = {255, 0, 0, 255};
+    SDL_Color colorRed = {0, 0, 0, 255};
 
     SDL_Surface* textSurface = TTF_RenderText_Shaded(_font, text.c_str(), colorBlack, colorRed);
     if (!textSurface)

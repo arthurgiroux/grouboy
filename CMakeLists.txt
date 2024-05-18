@@ -118,6 +118,7 @@ target_link_libraries(gbemulator_core spdlog::spdlog)
 if (MSVC)
     target_compile_options(gbemulator_core PRIVATE /W4 /WX)
 elseif (DEFINED EMSCRIPTEN)
+    # We can't use Werror in emscripten because of some warnings coming from the implementation of the standard library
     target_compile_options(gbemulator_core PRIVATE -Os -Wall -Wextra -Wpedantic)
 else ()
     target_compile_options(gbemulator_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
@@ -156,7 +157,7 @@ else ()
             --emit-tsd "$<TARGET_FILE_DIR:grouboy_wasm>/grouboy_wasm.d.ts"
     )
     target_link_libraries(grouboy_wasm PRIVATE "-sWASM=0 -sUSE_SDL=2 -sUSE_SDL_TTF=2 --embed-file ${CMAKE_SOURCE_DIR}/src/gui/Roboto-Regular.ttf@Roboto-Regular.ttf -sENVIRONMENT=web -sFORCE_FILESYSTEM -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE=1 -sEXPORT_NAME='createEmulatorModule' --no-entry")
-    target_compile_options(grouboy_wasm PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2 -Os -Wall -Wextra -Wpedantic)
+    target_compile_options(grouboy_wasm PRIVATE -sUSE_SDL=2 -sUSE_SDL_TTF=2 -Wall -Wextra -Wpedantic -Werror)
     target_include_directories(grouboy_wasm PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 
     add_dependencies(grouboy_wasm gbemulator_core)
