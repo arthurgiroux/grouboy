@@ -42,11 +42,14 @@ InterruptManager::InterruptManager(CPU* cpu)
 
 bool InterruptManager::handleInterrupts()
 {
-    for (auto& handler : _interruptHandlers)
+    if (isAnyInterruptEnabled() && isAnyInterruptPending())
     {
-        if (handler->handle())
+        for (auto& handler : _interruptHandlers)
         {
-            return true;
+            if (handler->handle())
+            {
+                return true;
+            }
         }
     }
 
