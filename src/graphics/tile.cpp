@@ -1,7 +1,8 @@
 #include "tile.hpp"
-#include <bitset>
+#include "memory/vram.hpp"
 
-Tile::Tile(Tile::TileDataArray&& data, int height, int width) : _data(std::move(data)), _height(height), _width(width)
+Tile::Tile(int height, int width, VRAM* vram, int bankId, word startAddr)
+    : _height(height), _width(width), _vram(vram), _bankId(bankId), _startAddr(startAddr)
 {
 }
 
@@ -15,8 +16,21 @@ int Tile::getWidth() const
     return _width;
 }
 
-byte Tile::getColorData(int x, int y) const
+void Tile::lazyLoadTileData(int line)
 {
+    if (!_data.count(line))
+    {
+        byte msb = _vram->readFromBank(static_cast<word>(_startAddr + line * BYTES_PER_TILE_VALUE + 1), _bankId);
+        byte lsb = _vram->readFromBank(static_cast<word>(_startAddr + line * BYTES_PER_TILE_VALUE), _bankId);
+        _data[line] = (msb << 8 | lsb);
+    }
+}
+
+byte Tile::getColorData(int x, int y)
+{
+    // We load tile data if needed
+    lazyLoadTileData(y);
+
     /*
      * The color of a pixel for a tile is encoded on 2 bits of two adjacent bytes.
      * Example:
@@ -27,16 +41,21 @@ byte Tile::getColorData(int x, int y) const
      *  This data  will then be converted to a color through a palette giving a grayscale value.
      *
      */
-    std::bitset<8> msb(_data[y * BYTES_PER_TILE_VALUE + 1]);
-    std::bitset<8> lsb(_data[y * BYTES_PER_TILE_VALUE]);
+    // Extract the two adjacent bytes
+    byte msb = _data[y] >> 8;
+    byte lsb = _data[y] & 0xFF;
+
     // The pixels are ordered from left to right, the highest bit is the leftmost pixel.
-    return (msb[7 - x] << 1) | static_cast<int>(lsb[7 - x]);
+    int bitPosition = (7 - x);
+
+    return ((msb >> bitPosition) & 0x01) << 1 | ((lsb >> bitPosition) & 0x01);
 }
 
-SingleTile::SingleTile(Tile::TileDataArray&& data) : Tile(std::move(data), TILE_HEIGHT, TILE_WIDTH)
+SingleTile::SingleTile(VRAM* vram, int bankId, word startAddr) : Tile(TILE_HEIGHT, TILE_WIDTH, vram, bankId, startAddr)
 {
 }
 
-StackedTile::StackedTile(Tile::TileDataArray&& data) : Tile(std::move(data), TILE_HEIGHT, TILE_WIDTH)
+StackedTile::StackedTile(VRAM* vram, int bankId, word startAddr)
+    : Tile(TILE_HEIGHT, TILE_WIDTH, vram, bankId, startAddr)
 {
 }

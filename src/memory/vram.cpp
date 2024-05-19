@@ -17,20 +17,12 @@ Tile VRAM::getTileById(byte tileId, sbyte tileSetId, unsigned int bankId, bool i
 
     word tileBaseAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
 
-    int tileBytesPerTile = isStacked ? StackedTile::BYTES_PER_TILE : SingleTile::BYTES_PER_TILE;
-    Tile::TileDataArray dataArray(tileBytesPerTile);
-
-    for (int i = 0; i < tileBytesPerTile; ++i)
-    {
-        dataArray[i] = readFromBank(static_cast<word>(tileBaseAddr + i), bankId);
-    }
-
     if (isStacked)
     {
-        return StackedTile(std::move(dataArray));
+        return StackedTile(this, bankId, tileBaseAddr);
     }
     else
     {
-        return SingleTile(std::move(dataArray));
+        return SingleTile(this, bankId, tileBaseAddr);
     }
 }
