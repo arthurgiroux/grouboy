@@ -153,6 +153,27 @@ byte MMU::read(const word& addr)
         return _lcdStatusRegister->getScanlineRegister();
     }
 
+    else if (_ppu != nullptr && addr == ADDR_LCD_PPU_CONTROL)
+    {
+        return _ppu->getLcdControl();
+    }
+    else if (_ppu != nullptr && addr == ADDR_SCROLL_Y)
+    {
+        return _ppu->getScrollY();
+    }
+    else if (_ppu != nullptr && addr == ADDR_SCROLL_X)
+    {
+        return _ppu->getScrollX();
+    }
+    else if (_ppu != nullptr && addr == WINDOW_ADDR_SCROLL_Y)
+    {
+        return _ppu->getWindowScrollY();
+    }
+    else if (_ppu != nullptr && addr == WINDOW_ADDR_SCROLL_X)
+    {
+        return _ppu->getWindowScrollX();
+    }
+
     return memory[addr];
 }
 
@@ -313,6 +334,27 @@ void MMU::write(const word& addr, const byte& value)
         _lcdStatusRegister->setScanlineRegister(value);
     }
 
+    else if (_ppu != nullptr && addr == ADDR_LCD_PPU_CONTROL)
+    {
+        _ppu->setLcdControl(value);
+    }
+    else if (_ppu != nullptr && addr == ADDR_SCROLL_Y)
+    {
+        _ppu->setScrollY(value);
+    }
+    else if (_ppu != nullptr && addr == ADDR_SCROLL_X)
+    {
+        _ppu->setScrollX(value);
+    }
+    else if (_ppu != nullptr && addr == WINDOW_ADDR_SCROLL_Y)
+    {
+        _ppu->setWindowScrollY(value);
+    }
+    else if (_ppu != nullptr && addr == WINDOW_ADDR_SCROLL_X)
+    {
+        _ppu->setWindowScrollX(value);
+    }
+
     else
     {
         memory[addr] = value;
@@ -438,4 +480,9 @@ void MMU::setInterruptManager(InterruptManager* interruptManager)
 void MMU::setLcdStatusRegister(LCDStatusRegister* lcdStatusRegister)
 {
     _lcdStatusRegister = lcdStatusRegister;
+}
+
+void MMU::setPPU(PPU* ppu)
+{
+    _ppu = ppu;
 }

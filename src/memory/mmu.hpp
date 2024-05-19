@@ -21,6 +21,7 @@ class Timer;
 class InputController;
 class InterruptManager;
 class LCDStatusRegister;
+class PPU;
 
 /**
  * The MMU class is responsible for managing the memory access and mapping.
@@ -180,6 +181,12 @@ class MMU
      * @param lcdStatusRegister A pointer to the register
      */
     void setLcdStatusRegister(LCDStatusRegister* lcdStatusRegister);
+
+    /**
+     * Set the PPU to use to set/get the graphical registers
+     * @param ppu A pointer to the PPU implementation
+     */
+    void setPPU(PPU* ppu);
 
     /**
      * The total size of the memory in bytes
@@ -418,6 +425,36 @@ class MMU
      * The LCD Status register to use to get/set information about the LCD Status
      */
     LCDStatusRegister* _lcdStatusRegister = nullptr;
+
+    /**
+     * The PPU to use to set/get the graphical registers
+     */
+    PPU* _ppu = nullptr;
+
+    /**
+     * The address of the LCD control register.
+     */
+    static constexpr word ADDR_LCD_PPU_CONTROL = 0xFF40;
+
+    /**
+     * The address of the scroll-y register.
+     */
+    static constexpr word ADDR_SCROLL_Y = 0xFF42;
+
+    /**
+     * The address of the scroll-x register.
+     */
+    static constexpr word ADDR_SCROLL_X = 0xFF43;
+
+    /**
+     * The address of the scroll-y window register.
+     */
+    static constexpr word WINDOW_ADDR_SCROLL_Y = 0xFF4A;
+
+    /**
+     * The address of the scroll-x window register.
+     */
+    static constexpr word WINDOW_ADDR_SCROLL_X = 0xFF4B;
 };
 
 #endif

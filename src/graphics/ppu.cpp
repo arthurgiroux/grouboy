@@ -98,7 +98,7 @@ void PPU::step(int nbrTicks)
         _LYCInterruptRaisedDuringScanline = false;
     }
 
-    _mmu.write(ADDR_SCANLINE, _currentScanline);
+    _lcdStatusRegister->setScanlineRegister(_currentScanline);
 }
 
 std::vector<Sprite*> PPU::getSpritesThatShouldBeRendered(int scanline)
@@ -173,23 +173,19 @@ void PPU::renderScanline(int scanline)
 
 void PPU::renderScanlineBackground(int scanline)
 {
-    byte scrollX = _mmu.read(ADDR_SCROLL_X);
-    byte scrollY = _mmu.read(ADDR_SCROLL_Y);
-
     // Retrieve the tilemap we are going to use
     Tilemap background = getTileMap(backgroundTileMapIndex());
 
-    renderScanlineBackgroundOrWindow(scanline, scrollX, scrollY, background, false);
+    renderScanlineBackgroundOrWindow(scanline, _scrollX, _scrollY, background, false);
 }
 
 void PPU::renderScanlineWindow(int scanline)
 {
     // Window SCX value is shifted by 7 in the register
-    byte scrollX = _mmu.read(WINDOW_ADDR_SCROLL_X) - 7;
-    byte scrollY = _mmu.read(WINDOW_ADDR_SCROLL_Y);
+    byte scrollX = _windowScrollX - 7;
 
     // If the window doesn't cover the current line or is outside of the screen we can skip the rendering
-    if (scrollY > scanline || scrollX > SCREEN_WIDTH)
+    if (_windowScrollY > scanline || scrollX > SCREEN_WIDTH)
     {
         return;
     }
@@ -197,7 +193,7 @@ void PPU::renderScanlineWindow(int scanline)
     // Retrieve the tilemap we are going to use
     Tilemap tilemap = getTileMap(windowTileMapIndex());
 
-    renderScanlineBackgroundOrWindow(scanline, scrollX, scrollY, tilemap, true);
+    renderScanlineBackgroundOrWindow(scanline, scrollX, _scrollY, tilemap, true);
 }
 
 void PPU::renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scrollY, Tilemap& tilemap, bool isWindow)
@@ -444,47 +440,47 @@ Tilemap PPU::getTileMap(int index)
 
 bool PPU::isDisplayEnabled() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 7);
+    return utils::isNthBitSet(_lcdControl, 7);
 }
 
 int PPU::windowTileMapIndex() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 6);
+    return utils::isNthBitSet(_lcdControl, 6);
 }
 
 bool PPU::isWindowEnabled() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 5);
+    return utils::isNthBitSet(_lcdControl, 5);
 }
 
 sbyte PPU::backgroundAndWindowTileDataAreaIndex() const
 {
-    return static_cast<sbyte>(!utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 4));
+    return static_cast<sbyte>(!utils::isNthBitSet(_lcdControl, 4));
 }
 
 int PPU::backgroundTileMapIndex() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 3);
+    return utils::isNthBitSet(_lcdControl, 3);
 }
 
 int PPU::spriteSize() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 2) ? 16 : 8;
+    return utils::isNthBitSet(_lcdControl, 2) ? 16 : 8;
 }
 
 bool PPU::areSpritesEnabled() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 1);
+    return utils::isNthBitSet(_lcdControl, 1);
 }
 
 bool PPU::areBackgroundAndWindowEnabled() const
 {
-    return utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
+    return utils::isNthBitSet(_lcdControl, 0);
 }
 
 bool PPU::areBackgroundAndWindowDeprioritized() const
 {
-    return !utils::isNthBitSet(_mmu.read(ADDR_LCD_PPU_CONTROL), 0);
+    return !utils::isNthBitSet(_lcdControl, 0);
 }
 
 void PPU::reset()
@@ -517,4 +513,54 @@ void PPU::renderPixel()
     if (_spritesFIFO.isEmpty())
     {
     }
+}
+
+byte PPU::getLcdControl() const
+{
+    return _lcdControl;
+}
+
+void PPU::setLcdControl(byte lcdControl)
+{
+    _lcdControl = lcdControl;
+}
+
+byte PPU::getScrollX() const
+{
+    return _scrollX;
+}
+
+void PPU::setScrollX(byte scrollX)
+{
+    _scrollX = scrollX;
+}
+
+byte PPU::getScrollY() const
+{
+    return _scrollY;
+}
+
+void PPU::setScrollY(byte scrollY)
+{
+    _scrollY = scrollY;
+}
+
+byte PPU::getWindowScrollX() const
+{
+    return _windowScrollX;
+}
+
+void PPU::setWindowScrollX(byte windowScrollX)
+{
+    _windowScrollX = windowScrollX;
+}
+
+byte PPU::getWindowScrollY() const
+{
+    return _windowScrollY;
+}
+
+void PPU::setWindowScrollY(byte windowScrollY)
+{
+    _windowScrollY = windowScrollY;
 }
