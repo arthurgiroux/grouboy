@@ -3,7 +3,10 @@
 
 #include "common/types.hpp"
 #include "rgb_image.hpp"
+#include <map>
 #include <vector>
+
+class VRAM;
 
 /**
  * A tile are graphical element that can be displayed as part of the background/window maps,
@@ -14,23 +17,15 @@ class Tile
 {
   public:
     /**
-     * Type for an array holding the raw tile data
-     */
-    using TileDataArray = std::vector<byte>;
-
-    /**
-     * Type for an array holding the color representation of the tile
-     */
-    using ColorDataArray = std::vector<byte>;
-
-    /**
      * Create a new tile of a specified size from raw data
      *
-     * @param data      The raw data to read the colors from
      * @param height    The height in pixels
      * @param width     The width in pixels
+     * @param vram      The VRAM to use to retrieve the tile data
+     * @param bankId    The Bank ID of the VRAM where the tile data is stored
+     * @param startAddr The address in the VRAM where the tile data starts
      */
-    Tile(TileDataArray&& data, int height, int width);
+    Tile(int height, int width, VRAM* vram, int bankId, word startAddr);
     virtual ~Tile() = default;
 
     /**
@@ -40,7 +35,7 @@ class Tile
      * @param y the y coordinate in pixel
      * @return  the color data, values [0, 4]
      */
-    byte getColorData(int x, int y) const;
+    byte getColorData(int x, int y);
 
     /**
      * Get the tile's height
@@ -62,10 +57,7 @@ class Tile
     static const int BYTES_PER_TILE_VALUE = 2;
 
   protected:
-    /**
-     * The raw data of the tile
-     */
-    TileDataArray _data = {};
+    void lazyLoadTileData(int line);
 
     /**
      * The height of the tile in pixels
@@ -76,6 +68,27 @@ class Tile
      * The width of the image in pixels
      */
     int _width;
+
+    /**
+     * The memory from where we load
+     */
+    VRAM* _vram;
+
+    /**
+     * The bank id where the tile information are retrieved from
+     */
+    int _bankId;
+
+    /**
+     * The address where the tile data starts in the VRAM
+     */
+    word _startAddr;
+
+    /**
+     * A map of the tile data that is lazy loaded.
+     * The index is the line number.
+     */
+    std::map<int, word> _data = {};
 };
 
 /**
@@ -86,10 +99,11 @@ class SingleTile : public Tile
   public:
     /**
      * Create a new single 8x8 tile
-     *
-     * @param data      The raw data to read the colors from
+     * @param vram      The VRAM to use to retrieve the tile data
+     * @param bankId    The Bank ID of the VRAM where the tile data is stored
+     * @param startAddr The address in the VRAM where the tile data starts
      */
-    SingleTile(TileDataArray&& data);
+    SingleTile(VRAM* vram, int bankId, word startAddr);
 
     /**
      * Number of bytes per value for the tile
@@ -115,10 +129,11 @@ class StackedTile : public Tile
   public:
     /**
      * Create a 8x16 stacked tile
-     *
-     * @param data      The raw data to read the colors from
+     * @param vram      The VRAM to use to retrieve the tile data
+     * @param bankId    The Bank ID of the VRAM where the tile data is stored
+     * @param startAddr The address in the VRAM where the tile data starts
      */
-    StackedTile(TileDataArray&& data);
+    StackedTile(VRAM* vram, int bankId, word startAddr);
 
     /**
      * Number of bytes per value for the tile
