@@ -189,6 +189,66 @@ class PPU
     LCDStatusRegister* getLcdStatusRegister() const;
 
     /**
+     * Get the LCD control value.
+     * @return the flags to control the rendering of the LCD
+     */
+    byte getLcdControl() const;
+
+    /**
+     * Set the value of the LCD control flag.
+     * @param lcdControl the flags to control the rendering of the LCD
+     */
+    void setLcdControl(byte lcdControl);
+
+    /**
+     * Get the x value of the scroll for the viewport
+     * @return a scroll value in pixel
+     */
+    byte getScrollX() const;
+
+    /**
+     * Set the x value of the scroll for the viewport
+     * @param scrollX a value in pixel
+     */
+    void setScrollX(byte scrollX);
+
+    /**
+     * Get the y value of the scroll for the viewport
+     * @return a scroll value in pixel
+     */
+    byte getScrollY() const;
+
+    /**
+     * Set the y value of the scroll for the viewport
+     * @param scrollY a value in pixel
+     */
+    void setScrollY(byte scrollY);
+
+    /**
+     * Get the x value of the scroll for the window
+     * @return a scroll value in pixel
+     */
+    byte getWindowScrollX() const;
+
+    /**
+     * Set the x value of the scroll for the window
+     * @param windowScrollX a value in pixel
+     */
+    void setWindowScrollX(byte windowScrollX);
+
+    /**
+     * Get the y value of the scroll for the window
+     * @return a scroll value in pixel
+     */
+    byte getWindowScrollY() const;
+
+    /**
+     * Set the y value of the scroll for the window
+     * @param windowScrollY a value in pixel
+     */
+    void setWindowScrollY(byte windowScrollY);
+
+    /**
      * The screen width in pixels.
      */
     static const int SCREEN_WIDTH;
@@ -298,28 +358,6 @@ class PPU
      * The address of the tile map with index 1.
      */
     static constexpr word ADDR_MAP_1 = 0x9C00;
-
-    /**
-     * The address of the LCD control register.
-     */
-    static constexpr word ADDR_LCD_PPU_CONTROL = 0xFF40;
-
-    /**
-     * The address of the scroll-y register.
-     */
-    static constexpr word ADDR_SCROLL_Y = 0xFF42;
-
-    /**
-     * The address of the scroll-x register.
-     */
-    static constexpr word ADDR_SCROLL_X = 0xFF43;
-
-    /**
-     * The address where we store the information of the scanline being rendered.
-     */
-    static constexpr word ADDR_SCANLINE = 0xFF44;
-    static constexpr word WINDOW_ADDR_SCROLL_Y = 0xFF4A;
-    static constexpr word WINDOW_ADDR_SCROLL_X = 0xFF4B;
 
     /**
      * The number of sprites in the OAM.
@@ -436,6 +474,31 @@ class PPU
     PixelFIFO _backgroundWindowFIFO;
 
     PixelFIFO _spritesFIFO;
+
+    /**
+     * Flag to control the LCD rendering.
+     */
+    byte _lcdControl = 0;
+
+    /**
+     * The x-scroll value of the viewport
+     */
+    byte _scrollX = 0;
+
+    /**
+     * The y-scroll value of the viewport
+     */
+    byte _scrollY = 0;
+
+    /**
+     * The x-scroll value of the window
+     */
+    byte _windowScrollX = 0;
+
+    /**
+     * The y-scroll value of the window
+     */
+    byte _windowScrollY = 0;
 };
 
 #endif // GBEMULATOR_PPU_HPP
