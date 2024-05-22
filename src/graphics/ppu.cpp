@@ -428,7 +428,7 @@ PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
 
     for (unsigned int i = 0; i < _sprites.size(); ++i)
     {
-        _sprites[i] = std::make_unique<Sprite>(_mmu, i);
+        _sprites[i] = std::make_unique<Sprite>(_mmu.getOAM(), i);
     }
 }
 

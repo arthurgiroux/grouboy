@@ -1,7 +1,7 @@
 #ifndef GBEMULATOR_SPRITE_HPP
 #define GBEMULATOR_SPRITE_HPP
 
-#include "memory/mmu.hpp"
+#include "memory/oam.hpp"
 
 /**
  * Represents a graphical sprite, sprites are displayed on top of the background,
@@ -15,10 +15,10 @@ class Sprite
     /**
      * Create a sprite object for a specific id.
      *
-     * @param mmu	reference to the MMU, information about the sprite will be fetched from it
+     * @param oam	reference to the OAM, information about the sprite will be fetched from it
      * @param spriteId	the id of the sprite
      */
-    Sprite(MMU& mmu, int spriteId);
+    Sprite(OAM& oam, int spriteId);
     ~Sprite() = default;
 
     /**
@@ -102,7 +102,6 @@ class Sprite
      */
     byte readDataFromPayload(int idx) const;
 
-    static const int SPRITE_ATTR_TABLE_ADDR = 0xFE00;
     static const int PAYLOAD_PER_SPRITE = 4;
     static const int PAYLOAD_DATA_Y_IDX = 0;
     static const int PAYLOAD_DATA_X_IDX = 1;
@@ -116,7 +115,7 @@ class Sprite
     static const int DATA_FLAG_BIT_PALETTEID = 4;
     static const int DATA_FLAG_BIT_BANKID = 3;
 
-    MMU& _mmu;
+    OAM& _oam;
     int _id;
 };
 
