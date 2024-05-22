@@ -1,6 +1,6 @@
 #include "sprite.hpp"
 
-Sprite::Sprite(MMU& mmu, int spriteId) : _mmu(mmu), _id(spriteId)
+Sprite::Sprite(OAM& oam, int spriteId) : _oam(oam), _id(spriteId)
 {
 }
 
@@ -36,7 +36,7 @@ bool Sprite::isRenderedOverBackgroundAndWindow() const
 
 byte Sprite::readDataFromPayload(int idx) const
 {
-    return _mmu.read(static_cast<word>(SPRITE_ATTR_TABLE_ADDR + PAYLOAD_PER_SPRITE * _id + idx));
+    return _oam.read(static_cast<word>(PAYLOAD_PER_SPRITE * _id + idx));
 }
 
 int Sprite::getXPositionOnScreen() const

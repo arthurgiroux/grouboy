@@ -108,7 +108,9 @@ set(SOURCE_FILES
         src/graphics/palette/color_palette_memory_mapper.cpp
         src/graphics/palette/color_palette_memory_mapper.hpp
         src/graphics/palette/rgb555_palette.cpp
-        src/graphics/palette/rgb555_palette.hpp)
+        src/graphics/palette/rgb555_palette.hpp
+        src/memory/oam.cpp
+        src/memory/oam.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 

@@ -102,6 +102,11 @@ byte MMU::read(const word& addr)
         return wramMemoryBank.read(wramAddressRange.relative(addr));
     }
 
+    else if (_oam.addressRange.contains(addr))
+    {
+        return _oam.read(_oam.addressRange.relative(addr));
+    }
+
     else if (addr == JOYPAD_MAP_ADDR && inputController != nullptr)
     {
         return getJoypadMemoryRepresentation();
@@ -297,6 +302,11 @@ void MMU::write(const word& addr, const byte& value)
         wramMemoryBank.write(wramAddressRange.relative(addr), value);
     }
 
+    else if (_oam.addressRange.contains(addr))
+    {
+        _oam.write(_oam.addressRange.relative(addr), value);
+    }
+
     else if (_apu != nullptr && apuRegisterRange.contains(addr))
     {
         _apu->writeRegister(addr, value);
@@ -485,4 +495,9 @@ void MMU::setLcdStatusRegister(LCDStatusRegister* lcdStatusRegister)
 void MMU::setPPU(PPU* ppu)
 {
     _ppu = ppu;
+}
+
+OAM& MMU::getOAM()
+{
+    return _oam;
 }

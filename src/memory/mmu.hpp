@@ -11,6 +11,7 @@
 #include "cpu/input_controller.hpp"
 #include "graphics/palette/color_palette_memory_mapper.hpp"
 #include "memory/mbc/memory_bank_controller.hpp"
+#include "memory/oam.hpp"
 #include "switchable_memory_bank.hpp"
 #include "timer/timer.hpp"
 #include "vram.hpp"
@@ -172,6 +173,8 @@ class MMU
     bool isColorModeSupported();
 
     VRAM& getVRAM();
+
+    OAM& getOAM();
 
     ColorPaletteMemoryMapper& getColorPaletteMemoryMapperBackground();
     ColorPaletteMemoryMapper& getColorPaletteMemoryMapperObj();
@@ -455,6 +458,8 @@ class MMU
      * The address of the scroll-x window register.
      */
     static constexpr word WINDOW_ADDR_SCROLL_X = 0xFF4B;
+
+    OAM _oam;
 };
 
 #endif
