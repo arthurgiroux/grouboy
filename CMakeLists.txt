@@ -110,7 +110,9 @@ set(SOURCE_FILES
         src/graphics/palette/rgb555_palette.cpp
         src/graphics/palette/rgb555_palette.hpp
         src/memory/oam.cpp
-        src/memory/oam.hpp)
+        src/memory/oam.hpp
+        src/graphics/background_window_pixel_fetcher.cpp
+        src/graphics/background_window_pixel_fetcher.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 
