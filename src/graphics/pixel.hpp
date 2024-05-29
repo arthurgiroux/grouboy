@@ -33,6 +33,7 @@ class Pixel
      * @param priority The priority of the pixel, will be used to check if it should be overridden
      */
     Pixel(byte colorId, Palette* palette, Source source, int priority = 0);
+    Pixel(byte colorId, int paletteId, Source source, int priority = 0);
     ~Pixel() = default;
 
     /**
@@ -60,6 +61,8 @@ class Pixel
      * @return The source of the pixel
      */
     Source getSource() const;
+
+    int getPaletteId() const;
     bool operator==(const Pixel& rhs) const;
     bool operator!=(const Pixel& rhs) const;
 
@@ -83,6 +86,8 @@ class Pixel
      * The priority of the pixel.
      */
     int _priority;
+
+    int _paletteId;
 };
 
 #endif // GROUBOY_PIXEL_HPP

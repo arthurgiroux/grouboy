@@ -28,10 +28,16 @@ Pixel::Source Pixel::getSource() const
 
 bool Pixel::operator==(const Pixel& rhs) const
 {
-    return _colorId == rhs._colorId && _palette == rhs._palette && _priority == rhs._priority && _source == rhs._source;
+    return _colorId == rhs._colorId && _palette == rhs._palette && _priority == rhs._priority &&
+           _source == rhs._source && _paletteId == rhs._paletteId;
 }
 
 bool Pixel::operator!=(const Pixel& rhs) const
 {
     return !(rhs == *this);
+}
+
+Pixel::Pixel(byte colorId, int paletteId, Pixel::Source source, int priority)
+    : _colorId(colorId), _paletteId(paletteId), _source(source), _priority(priority)
+{
 }

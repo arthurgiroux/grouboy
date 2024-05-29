@@ -1,6 +1,7 @@
 #ifndef GBEMULATOR_PPU_HPP
 #define GBEMULATOR_PPU_HPP
 
+#include "background_window_pixel_fetcher.hpp"
 #include "graphics/palette/grayscale_palette.hpp"
 #include "memory/mmu.hpp"
 #include "pixel.hpp"
@@ -248,6 +249,8 @@ class PPU
      */
     void setWindowScrollY(byte windowScrollY);
 
+    MMU& getMMU();
+
     /**
      * The screen width in pixels.
      */
@@ -347,7 +350,7 @@ class PPU
      */
     std::vector<Sprite*> getSpritesThatShouldBeRendered(int scanline);
 
-    void renderPixel();
+    void stepFifo(int ticks);
 
     /**
      * The address of the tile map with index 0.
@@ -499,6 +502,8 @@ class PPU
      * The y-scroll value of the window
      */
     byte _windowScrollY = 0;
+
+    BackgroundWindowPixelFetcher _bgWindowPixelFetcher;
 };
 
 #endif // GBEMULATOR_PPU_HPP
