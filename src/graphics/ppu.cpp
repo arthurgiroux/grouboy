@@ -41,7 +41,7 @@ void PPU::step(int nbrTicks)
     }
     else if (_currentMode == VRAM_ACCESS)
     {
-        renderPixel();
+        stepFifo(nbrTicks);
         if (_ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
         {
             if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
@@ -422,7 +422,7 @@ LCDStatusRegister* PPU::getLcdStatusRegister() const
 PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     : _mmu(mmu_), _interruptManager(interruptManager), _lcdStatusRegister(std::make_unique<LCDStatusRegister>()),
       _paletteBackground(_mmu, ADDR_PALETTE_BG), _paletteObj0(_mmu, ADDR_PALETTE_OBJ0),
-      _paletteObj1(_mmu, ADDR_PALETTE_OBJ1)
+      _paletteObj1(_mmu, ADDR_PALETTE_OBJ1), _bgWindowPixelFetcher(&_mmu.getVRAM(), this, _backgroundWindowFIFO)
 {
     reset();
 
@@ -503,18 +503,6 @@ void PPU::setMode(PPU::Mode value)
     _ticksSpentInCurrentMode = 0;
 }
 
-void PPU::renderPixel()
-{
-    if (_backgroundWindowFIFO.isEmpty())
-    {
-        // TODO: Fill FIFO
-    }
-
-    if (_spritesFIFO.isEmpty())
-    {
-    }
-}
-
 byte PPU::getLcdControl() const
 {
     return _lcdControl;
@@ -563,4 +551,19 @@ byte PPU::getWindowScrollY() const
 void PPU::setWindowScrollY(byte windowScrollY)
 {
     _windowScrollY = windowScrollY;
+}
+
+MMU& PPU::getMMU()
+{
+    return _mmu;
+}
+
+void PPU::stepFifo(int ticks)
+{
+    _bgWindowPixelFetcher.step(ticks);
+
+    if (_backgroundWindowFIFO.size() >= 8)
+    {
+        // TODO: mix pixels
+    }
 }
