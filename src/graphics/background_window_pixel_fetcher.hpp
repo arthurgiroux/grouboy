@@ -47,11 +47,12 @@ class BackgroundWindowPixelFetcher
     int _y = 0;
     int _bankId = 0;
     int _tileAddr = 0;
+    int _tileIndex = 0;
     int _tileLine = 0;
     byte _dataHigh = 0;
     byte _dataLow = 0;
 
-    std::vector<Tilemap> tilemaps{};
+    std::vector<Tilemap> _tilemaps{};
 
     /**
      * The address of the tile map with index 0.
@@ -63,7 +64,8 @@ class BackgroundWindowPixelFetcher
      */
     static constexpr word ADDR_MAP_1 = 0x9C00;
 
-    bool _flipHorizontally = false;
+    bool _flippedHorizontally = false;
+    bool _flippedVertically = false;
     int _priority = 0;
     int _paletteId = 0;
 };
