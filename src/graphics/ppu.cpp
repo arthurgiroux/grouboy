@@ -562,8 +562,17 @@ void PPU::stepFifo(int ticks)
 {
     _bgWindowPixelFetcher.step(ticks);
 
-    if (_backgroundWindowFIFO.size() >= 8)
+    if (_backgroundWindowFIFO.size() > 0)
     {
         // TODO: mix pixels
+        Pixel pixel = _backgroundWindowFIFO.pop();
+        // TODO: Compute y
+        int y = 0;
+        Palette* palette = &_paletteBackground;
+        if (_mmu.isColorModeSupported())
+        {
+            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(pixel.getPaletteId());
+        }
+        _temporaryFrame.setPixel(_currentScanline, y, palette->getColorForId(pixel.getColorId()));
     }
 }
