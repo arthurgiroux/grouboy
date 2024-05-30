@@ -32,9 +32,9 @@ void BackgroundWindowPixelFetcher::stepGetTile()
 BackgroundWindowPixelFetcher::BackgroundWindowPixelFetcher(VRAM* vram, PPU* ppu, PixelFIFO& pixelFifo)
     : _ppu(ppu), _vram(vram), _pixelFifo(pixelFifo)
 {
-    tilemaps.reserve(2);
-    tilemaps.emplace_back(_vram, ADDR_MAP_0);
-    tilemaps.emplace_back(_vram, ADDR_MAP_1);
+    _tilemaps.reserve(2);
+    _tilemaps.emplace_back(_vram, ADDR_MAP_0);
+    _tilemaps.emplace_back(_vram, ADDR_MAP_1);
 }
 
 void BackgroundWindowPixelFetcher::step(int cycles)
@@ -73,29 +73,24 @@ void BackgroundWindowPixelFetcher::stepGetTileDataLow()
     if (_ticksInCurrentStep == 1)
     {
         _bankId = 0;
-        _flipHorizontally = false;
+        _paletteId = 0;
+        _flippedHorizontally = false;
+        _flippedVertically = false;
         _priority = 0;
-        /*
+
         if (_ppu->getMMU().isColorModeSupported())
         {
-            Tilemap::TileInfo tileInfo = tilemap.getTileInfoForIndex(tileIndex);
-            bankId = tileInfo.getVRAMBankId();
-            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(tileInfo.getColorPaletteId());
-
-            if (tileInfo.isFlippedHorizontally())
-            {
-                xOffsetTile = SingleTile::TILE_WIDTH - 1 - xOffsetTile;
-            }
-
-            if (tileInfo.isFlippedVertically())
-            {
-                yOffsetTile = SingleTile::TILE_HEIGHT - 1 - yOffsetTile;
-            }
-
-            bgPriority = tileInfo.isRenderedAboveSprites();
+            int tilemapId = (_mode == Mode::WINDOW) ? _ppu->windowTileMapIndex() : _ppu->backgroundTileMapIndex();
+            Tilemap::TileInfo tileInfo = _tilemaps[tilemapId].getTileInfoForIndex(_tileIndex);
+            _bankId = tileInfo.getVRAMBankId();
+            _paletteId = tileInfo.getColorPaletteId();
+            _flippedHorizontally = tileInfo.isFlippedHorizontally();
+            _flippedVertically = tileInfo.isFlippedVertically();
+            _priority = tileInfo.isRenderedAboveSprites();
         }
-        */
-        _dataLow = _vram->readFromBank(static_cast<word>(_tileAddr + _tileLine * 2), _bankId);
+
+        int line = _flippedVertically ? (SingleTile::TILE_HEIGHT - _tileLine) : _tileLine;
+        _dataLow = _vram->readFromBank(static_cast<word>(_tileAddr + line * 2), _bankId);
         goToStep(Step::GetTileDataHigh);
     }
     else
@@ -108,7 +103,8 @@ void BackgroundWindowPixelFetcher::stepGetTileDataHigh()
 {
     if (_ticksInCurrentStep == 1)
     {
-        _dataHigh = _vram->readFromBank(static_cast<word>(_tileAddr + _tileLine * 2 + 1), _bankId);
+        int line = _flippedVertically ? (SingleTile::TILE_HEIGHT - _tileLine) : _tileLine;
+        _dataHigh = _vram->readFromBank(static_cast<word>(_tileAddr + line * 2 + 1), _bankId);
         goToStep(Step::Push);
     }
     else
@@ -126,7 +122,7 @@ void BackgroundWindowPixelFetcher::pushToFifo()
             // The pixels are ordered from left to right, the highest bit is the leftmost pixel.
             int bitPosition = (7 - x);
 
-            if (_flipHorizontally)
+            if (_flippedHorizontally)
             {
                 bitPosition = (x - 7);
             }
