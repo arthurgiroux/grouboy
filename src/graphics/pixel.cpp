@@ -38,6 +38,11 @@ bool Pixel::operator!=(const Pixel& rhs) const
 }
 
 Pixel::Pixel(byte colorId, int paletteId, Pixel::Source source, int priority)
-    : _colorId(colorId), _paletteId(paletteId), _source(source), _priority(priority)
+    : _colorId(colorId), _source(source), _priority(priority), _paletteId(paletteId)
 {
+}
+
+int Pixel::getPaletteId() const
+{
+    return _paletteId;
 }
