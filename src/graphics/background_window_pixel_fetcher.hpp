@@ -18,7 +18,7 @@ class BackgroundWindowPixelFetcher
     };
 
     BackgroundWindowPixelFetcher(VRAM* vram, PPU* ppu, PixelFIFO& pixelFifo);
-    void step(int cycles);
+    void step();
     void setMode(Mode mode);
 
   private:

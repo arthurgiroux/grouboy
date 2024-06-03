@@ -251,6 +251,9 @@ class PPU
 
     MMU& getMMU();
 
+    int getX() const;
+    void setX(int x);
+
     /**
      * The screen width in pixels.
      */
@@ -504,6 +507,8 @@ class PPU
     byte _windowScrollY = 0;
 
     BackgroundWindowPixelFetcher _bgWindowPixelFetcher;
+
+    int _x;
 };
 
 #endif // GBEMULATOR_PPU_HPP
