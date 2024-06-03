@@ -560,19 +560,42 @@ MMU& PPU::getMMU()
 
 void PPU::stepFifo(int ticks)
 {
-    _bgWindowPixelFetcher.step(ticks);
-
-    if (_backgroundWindowFIFO.size() > 0)
+    int ticksLeft = ticks;
+    while (ticksLeft > 0)
     {
-        // TODO: mix pixels
-        Pixel pixel = _backgroundWindowFIFO.pop();
-        // TODO: Compute y
-        int y = 0;
-        Palette* palette = &_paletteBackground;
-        if (_mmu.isColorModeSupported())
+        _bgWindowPixelFetcher.step();
+
+        if (_backgroundWindowFIFO.size() >= 8)
         {
-            palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(pixel.getPaletteId());
+            // TODO: mix pixels
+            Pixel pixel = _backgroundWindowFIFO.pop();
+            Palette* palette = &_paletteBackground;
+            if (_mmu.isColorModeSupported())
+            {
+                palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(pixel.getPaletteId());
+            }
+            _temporaryFrame.setPixel(_x, _currentScanline, palette->getColorForId(pixel.getColorId()));
+            _x++;
+
+            if (_x >= SCREEN_WIDTH)
+            {
+                if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
+                {
+                    _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
+                }
+                setMode(HBLANK);
+            }
         }
-        _temporaryFrame.setPixel(_currentScanline, y, palette->getColorForId(pixel.getColorId()));
+        ticksLeft--;
     }
+}
+
+int PPU::getX() const
+{
+    return _x;
+}
+
+void PPU::setX(int x)
+{
+    _x = x;
 }

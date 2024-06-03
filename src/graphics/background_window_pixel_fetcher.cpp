@@ -37,29 +37,23 @@ BackgroundWindowPixelFetcher::BackgroundWindowPixelFetcher(VRAM* vram, PPU* ppu,
     _tilemaps.emplace_back(_vram, ADDR_MAP_1);
 }
 
-void BackgroundWindowPixelFetcher::step(int cycles)
+void BackgroundWindowPixelFetcher::step()
 {
-    int cyclesLeft = cycles;
-    while (cyclesLeft > 0)
+    if (_currentStep == Step::GetTile)
     {
-        if (_currentStep == Step::GetTile)
-        {
-            stepGetTile();
-        }
-        else if (_currentStep == Step::GetTileDataLow)
-        {
-            stepGetTileDataLow();
-        }
-        else if (_currentStep == Step::GetTileDataHigh)
-        {
-            stepGetTileDataHigh();
-        }
-        else if (_currentStep == Step::Push)
-        {
-            pushToFifo();
-        }
-
-        cyclesLeft--;
+        stepGetTile();
+    }
+    else if (_currentStep == Step::GetTileDataLow)
+    {
+        stepGetTileDataLow();
+    }
+    else if (_currentStep == Step::GetTileDataHigh)
+    {
+        stepGetTileDataHigh();
+    }
+    else if (_currentStep == Step::Push)
+    {
+        pushToFifo();
     }
 }
 
