@@ -12,6 +12,12 @@ const Emulator: React.FC = () => {
     const [emulatorPtr, setEmulatorPtr] = useState<number>(0);
 
     useEffect(() => {
+        const cleanup = () => {
+            if (emulatorModule) {
+                emulatorModule._destroy(emulatorPtr);
+            }
+        };
+
         createEmulatorModule({
             print: (text: string) => {
                 console.log(text);
@@ -27,7 +33,9 @@ const Emulator: React.FC = () => {
             console.log(`WebAssembly module loaded.`);
             setEmulatorModule(module);
             setEmulatorPtr(module._init());
-        })
+        });
+
+        return cleanup;
     }, []);
 
     const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
