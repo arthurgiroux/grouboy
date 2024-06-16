@@ -1,5 +1,6 @@
 #include "background_window_pixel_fetcher.hpp"
 #include "ppu.hpp"
+#include "spdlog/spdlog.h"
 #include "tile.hpp"
 #include "tilemap.hpp"
 #include <cassert>
@@ -21,7 +22,28 @@ void BackgroundWindowPixelFetcher::stepGetTile()
 
         int offsetInTileMap = lineInTileMap * Tilemap::WIDTH;
 
-        int x = _mode == Mode::WINDOW ? _x : ((_ppu->getScrollX() / 8) + _x) & 0x1F;
+        int xIndexOffset = _mode == Mode::WINDOW ? _ppu->getX() : _ppu->getScrollX() + _ppu->getX();
+        // We see how many tiles we span horizontally and add it to our offset to find the tile index
+        _tileIndex = offsetInTileMap + (xIndexOffset / SingleTile::TILE_WIDTH) + _xOffset;
+        _tileLine = (xIndexOffset % SingleTile::TILE_HEIGHT);
+        _xOffset++;
+        // spdlog::info("Fetching tile {}", _tileIndex);
+
+        word ADDR_TILE_SET_0 = 0x0000;
+        word ADDR_TILE_SET_1 = 0x1000;
+
+        word tileSetOffset = ADDR_TILE_SET_0;
+        int tileIdCorrected = _tileIndex;
+        sbyte tileSetId = _ppu->backgroundAndWindowTileDataAreaIndex();
+        if (tileSetId == 1)
+        {
+            tileSetOffset = ADDR_TILE_SET_1;
+            tileIdCorrected = static_cast<sbyte>(_tileIndex);
+        }
+
+        _tileAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
+
+        goToStep(Step::GetTileDataLow);
     }
     else
     {
@@ -109,7 +131,7 @@ void BackgroundWindowPixelFetcher::stepGetTileDataHigh()
 
 void BackgroundWindowPixelFetcher::pushToFifo()
 {
-    if (_pixelFifo.isEmpty())
+    if (_pixelFifo.size() <= 8)
     {
         for (int x = 0; x < 8; ++x)
         {
@@ -124,7 +146,7 @@ void BackgroundWindowPixelFetcher::pushToFifo()
             byte colorId = ((_dataHigh >> bitPosition) & 0x01) << 1 | ((_dataLow >> bitPosition) & 0x01);
             _pixelFifo.push({colorId, _paletteId, Pixel::Source::BG_WINDOW, _priority});
         }
-        goToStep(Step::Sleep);
+        goToStep(Step::GetTile);
     }
 }
 
@@ -132,4 +154,9 @@ void BackgroundWindowPixelFetcher::goToStep(BackgroundWindowPixelFetcher::Step s
 {
     _currentStep = step;
     _ticksInCurrentStep = 0;
+}
+
+void BackgroundWindowPixelFetcher::reset()
+{
+    _xOffset = 0;
 }
