@@ -509,6 +509,8 @@ class PPU
     BackgroundWindowPixelFetcher _bgWindowPixelFetcher;
 
     int _x;
+
+    int _extraTicksSpentDrawingPixels = 0;
 };
 
 #endif // GBEMULATOR_PPU_HPP

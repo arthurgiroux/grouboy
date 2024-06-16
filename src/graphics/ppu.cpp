@@ -38,21 +38,14 @@ void PPU::step(int nbrTicks)
         setMode(VRAM_ACCESS);
         _backgroundWindowFIFO.clear();
         _spritesFIFO.clear();
+        _x = 0;
+        _bgWindowPixelFetcher.reset();
     }
     else if (_currentMode == VRAM_ACCESS)
     {
         stepFifo(nbrTicks);
-        if (_ticksSpentInCurrentMode >= VRAM_ACCESS_TICKS)
-        {
-            if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
-            {
-                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
-            }
-            setMode(HBLANK);
-            renderScanline(_currentScanline);
-        }
     }
-    else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= HBLANK_TICKS)
+    else if (_currentMode == HBLANK && _ticksSpentInCurrentMode >= (HBLANK_TICKS - _extraTicksSpentDrawingPixels))
     {
         _currentScanline++;
 
@@ -583,7 +576,11 @@ void PPU::stepFifo(int ticks)
                 {
                     _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
                 }
+                _extraTicksSpentDrawingPixels = _ticksSpentInCurrentMode - VRAM_ACCESS_TICKS;
+                spdlog::info("Mode 3 last for {} ticks, extending HBLANK by {} ticks", _ticksSpentInCurrentMode,
+                             _extraTicksSpentDrawingPixels);
                 setMode(HBLANK);
+                return;
             }
         }
         ticksLeft--;

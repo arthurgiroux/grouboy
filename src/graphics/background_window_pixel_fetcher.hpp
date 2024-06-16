@@ -20,6 +20,7 @@ class BackgroundWindowPixelFetcher
     BackgroundWindowPixelFetcher(VRAM* vram, PPU* ppu, PixelFIFO& pixelFifo);
     void step();
     void setMode(Mode mode);
+    void reset();
 
   private:
     enum class Step
@@ -43,12 +44,11 @@ class BackgroundWindowPixelFetcher
     Step _currentStep = Step::GetTile;
     Mode _mode = Mode::BACKGROUND;
     int _ticksInCurrentStep = 0;
-    int _x = 0;
-    int _y = 0;
     int _bankId = 0;
-    int _tileAddr = 0;
+    word _tileAddr = 0;
     int _tileIndex = 0;
     int _tileLine = 0;
+    int _xOffset = 0;
     byte _dataHigh = 0;
     byte _dataLow = 0;
 
