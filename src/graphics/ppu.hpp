@@ -251,9 +251,6 @@ class PPU
 
     MMU& getMMU();
 
-    int getX() const;
-    void setX(int x);
-
     /**
      * The screen width in pixels.
      */
