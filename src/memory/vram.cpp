@@ -7,15 +7,7 @@ Tile VRAM::getTileById(byte tileId, sbyte tileSetId, bool isStacked)
 
 Tile VRAM::getTileById(byte tileId, sbyte tileSetId, unsigned int bankId, bool isStacked)
 {
-    word tileSetOffset = ADDR_TILE_SET_0;
-    int tileIdCorrected = tileId;
-    if (tileSetId == 1)
-    {
-        tileSetOffset = ADDR_TILE_SET_1;
-        tileIdCorrected = static_cast<sbyte>(tileId);
-    }
-
-    word tileBaseAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
+    word tileBaseAddr = getTileAddrById(tileId, tileSetId);
 
     if (isStacked)
     {
@@ -25,4 +17,17 @@ Tile VRAM::getTileById(byte tileId, sbyte tileSetId, unsigned int bankId, bool i
     {
         return SingleTile(this, bankId, tileBaseAddr);
     }
+}
+
+word VRAM::getTileAddrById(byte tileId, sbyte tileSetId)
+{
+    word tileSetOffset = ADDR_TILE_SET_0;
+    int tileIdCorrected = tileId;
+    if (tileSetId == 1)
+    {
+        tileSetOffset = ADDR_TILE_SET_1;
+        tileIdCorrected = static_cast<sbyte>(tileId);
+    }
+
+    return static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
 }

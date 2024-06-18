@@ -22,30 +22,17 @@ void BackgroundWindowPixelFetcher::stepGetTile()
 
         int offsetInTileMap = lineInTileMap * Tilemap::WIDTH;
 
-        int xIndexOffset = _mode == Mode::WINDOW ? _ppu->getX() : _ppu->getScrollX() + _ppu->getX();
+        int xIndexOffset = _mode == Mode::WINDOW ? _x : (_ppu->getScrollX() / SingleTile::TILE_WIDTH) + _x;
         // We see how many tiles we span horizontally and add it to our offset to find the tile index
-        int tileId = offsetInTileMap + ((xIndexOffset / SingleTile::TILE_WIDTH) + _xOffset);
+        int tileId = offsetInTileMap + (xIndexOffset & 0x1F);
 
         int tilemapId = (_mode == Mode::WINDOW) ? _ppu->windowTileMapIndex() : _ppu->backgroundTileMapIndex();
         _tileIndex = _tilemaps[tilemapId].getTileIdForIndex(tileId);
 
         _tileLine = (startLine % SingleTile::TILE_HEIGHT);
-        _xOffset++;
-        // spdlog::info("Fetching tile {}", _tileIndex);
+        _x++;
 
-        word ADDR_TILE_SET_0 = 0x0000;
-        word ADDR_TILE_SET_1 = 0x1000;
-
-        word tileSetOffset = ADDR_TILE_SET_0;
-        int tileIdCorrected = _tileIndex;
-        sbyte tileSetId = _ppu->backgroundAndWindowTileDataAreaIndex();
-        if (tileSetId == 1)
-        {
-            tileSetOffset = ADDR_TILE_SET_1;
-            tileIdCorrected = static_cast<sbyte>(_tileIndex);
-        }
-
-        _tileAddr = static_cast<word>(tileSetOffset + SingleTile::BYTES_PER_TILE * tileIdCorrected);
+        _tileAddr = _vram->getTileAddrById(_tileIndex, _ppu->backgroundAndWindowTileDataAreaIndex());
 
         goToStep(Step::GetTileDataLow);
     }
@@ -162,5 +149,7 @@ void BackgroundWindowPixelFetcher::goToStep(BackgroundWindowPixelFetcher::Step s
 
 void BackgroundWindowPixelFetcher::reset()
 {
-    _xOffset = 0;
+    _x = 0;
+    _ticksInCurrentStep = 0;
+    _currentStep = Step::GetTile;
 }

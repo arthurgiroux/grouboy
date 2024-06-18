@@ -48,7 +48,7 @@ class BackgroundWindowPixelFetcher
     word _tileAddr = 0;
     int _tileIndex = 0;
     int _tileLine = 0;
-    int _xOffset = 0;
+    int _x = 0;
     byte _dataHigh = 0;
     byte _dataLow = 0;
 

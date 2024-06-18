@@ -586,13 +586,3 @@ void PPU::stepFifo(int ticks)
         ticksLeft--;
     }
 }
-
-int PPU::getX() const
-{
-    return _x;
-}
-
-void PPU::setX(int x)
-{
-    _x = x;
-}
