@@ -24,15 +24,15 @@ void BackgroundWindowPixelFetcher::stepGetTile()
 
         int xIndexOffset = _mode == Mode::WINDOW ? _x : (_ppu->getScrollX() / SingleTile::TILE_WIDTH) + _x;
         // We see how many tiles we span horizontally and add it to our offset to find the tile index
-        int tileId = offsetInTileMap + (xIndexOffset & 0x1F);
+        _tileIndex = offsetInTileMap + (xIndexOffset & 0x1F);
 
         int tilemapId = (_mode == Mode::WINDOW) ? _ppu->windowTileMapIndex() : _ppu->backgroundTileMapIndex();
-        _tileIndex = _tilemaps[tilemapId].getTileIdForIndex(tileId);
+        int tileId = _tilemaps[tilemapId].getTileIdForIndex(_tileIndex);
 
         _tileLine = (startLine % SingleTile::TILE_HEIGHT);
         _x++;
 
-        _tileAddr = _vram->getTileAddrById(_tileIndex, _ppu->backgroundAndWindowTileDataAreaIndex());
+        _tileAddr = _vram->getTileAddrById(tileId, _ppu->backgroundAndWindowTileDataAreaIndex());
 
         goToStep(Step::GetTileDataLow);
     }
