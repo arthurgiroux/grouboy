@@ -59,7 +59,7 @@ extern "C"
 
         if (!emulator->emulator->getMMU().loadCartridgeData(dataVector))
         {
-            std::cerr << "Couldn't load rom file." << std::endl;
+            std::cout << "Couldn't load rom file: " << file << std::endl;
             return false;
         }
 
