@@ -112,7 +112,9 @@ set(SOURCE_FILES
         src/memory/oam.cpp
         src/memory/oam.hpp
         src/graphics/background_window_pixel_fetcher.cpp
-        src/graphics/background_window_pixel_fetcher.hpp)
+        src/graphics/background_window_pixel_fetcher.hpp
+        src/graphics/pixel_fifo_renderer.cpp
+        src/graphics/pixel_fifo_renderer.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 

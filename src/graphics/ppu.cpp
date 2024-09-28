@@ -2,7 +2,6 @@
 #include "ppu.hpp"
 #include "cpu/interrupt_manager.hpp"
 #include "graphics/lcd_status_register.hpp"
-#include "graphics/palette/grayscale_palette.hpp"
 #include "spdlog/spdlog.h"
 #include "tilemap.hpp"
 #include <algorithm>
@@ -36,10 +35,7 @@ void PPU::step(int nbrTicks)
         }
 
         setMode(VRAM_ACCESS);
-        _backgroundWindowFIFO.clear();
-        _spritesFIFO.clear();
-        _x = 0;
-        _bgWindowPixelFetcher.reset();
+        _pixelFifoRenderer.reset();
     }
     else if (_currentMode == VRAM_ACCESS)
     {
@@ -415,7 +411,7 @@ LCDStatusRegister* PPU::getLcdStatusRegister() const
 PPU::PPU(MMU& mmu_, InterruptManager* interruptManager)
     : _mmu(mmu_), _interruptManager(interruptManager), _lcdStatusRegister(std::make_unique<LCDStatusRegister>()),
       _paletteBackground(_mmu, ADDR_PALETTE_BG), _paletteObj0(_mmu, ADDR_PALETTE_OBJ0),
-      _paletteObj1(_mmu, ADDR_PALETTE_OBJ1), _bgWindowPixelFetcher(&_mmu.getVRAM(), this, _backgroundWindowFIFO)
+      _paletteObj1(_mmu, ADDR_PALETTE_OBJ1), _pixelFifoRenderer(&_mmu, this)
 {
     reset();
 
@@ -556,33 +552,31 @@ void PPU::stepFifo(int ticks)
     int ticksLeft = ticks;
     while (ticksLeft > 0)
     {
-        _bgWindowPixelFetcher.step();
+        _pixelFifoRenderer.step();
 
-        if (_backgroundWindowFIFO.size() >= 8)
+        if (_pixelFifoRenderer.getX() >= SCREEN_WIDTH)
         {
-            // TODO: mix pixels
-            Pixel pixel = _backgroundWindowFIFO.pop();
-            Palette* palette = &_paletteBackground;
-            if (_mmu.isColorModeSupported())
+            if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
             {
-                palette = &_mmu.getColorPaletteMemoryMapperBackground().getColorPalette(pixel.getPaletteId());
+                _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
             }
-            _temporaryFrame.setPixel(_x, _currentScanline, palette->getColorForId(pixel.getColorId()));
-            _x++;
-
-            if (_x >= SCREEN_WIDTH)
-            {
-                if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
-                {
-                    _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
-                }
-                _extraTicksSpentDrawingPixels = _ticksSpentInCurrentMode - VRAM_ACCESS_TICKS;
-                spdlog::info("Mode 3 last for {} ticks, extending HBLANK by {} ticks", _ticksSpentInCurrentMode,
-                             _extraTicksSpentDrawingPixels);
-                setMode(HBLANK);
-                return;
-            }
+            _extraTicksSpentDrawingPixels = _ticksSpentInCurrentMode - VRAM_ACCESS_TICKS;
+            spdlog::info("Mode 3 last for {} ticks, extending HBLANK by {} ticks", _ticksSpentInCurrentMode,
+                         _extraTicksSpentDrawingPixels);
+            setMode(HBLANK);
+            return;
         }
+
         ticksLeft--;
     }
+}
+
+Palette* PPU::getPaletteBackground()
+{
+    return static_cast<Palette*>(&_paletteBackground);
+}
+
+RGBImage& PPU::getTemporaryFrame()
+{
+    return _temporaryFrame;
 }

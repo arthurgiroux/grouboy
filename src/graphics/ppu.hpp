@@ -1,11 +1,10 @@
 #ifndef GBEMULATOR_PPU_HPP
 #define GBEMULATOR_PPU_HPP
 
-#include "background_window_pixel_fetcher.hpp"
 #include "graphics/palette/grayscale_palette.hpp"
 #include "memory/mmu.hpp"
 #include "pixel.hpp"
-#include "pixel_fifo.hpp"
+#include "pixel_fifo_renderer.hpp"
 #include "rgb_image.hpp"
 #include "sprite.hpp"
 #include "tile.hpp"
@@ -251,6 +250,10 @@ class PPU
 
     MMU& getMMU();
 
+    Palette* getPaletteBackground();
+
+    RGBImage& getTemporaryFrame();
+
     /**
      * The screen width in pixels.
      */
@@ -474,10 +477,6 @@ class PPU
      */
     std::map<int, Pixel> _scanline;
 
-    PixelFIFO _backgroundWindowFIFO;
-
-    PixelFIFO _spritesFIFO;
-
     /**
      * Flag to control the LCD rendering.
      */
@@ -503,11 +502,9 @@ class PPU
      */
     byte _windowScrollY = 0;
 
-    BackgroundWindowPixelFetcher _bgWindowPixelFetcher;
-
-    int _x;
-
     int _extraTicksSpentDrawingPixels = 0;
+
+    PixelFifoRenderer _pixelFifoRenderer;
 };
 
 #endif // GBEMULATOR_PPU_HPP
