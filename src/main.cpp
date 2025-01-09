@@ -4,6 +4,12 @@
 
 int main(int argc, char* args[])
 {
+    if (argc <= 1)
+    {
+        std::cout << "Please specify a rom file to load." << std::endl;
+        return EXIT_FAILURE;
+    }
+
     const std::string file = args[1];
     Emulator emulator;
     if (!emulator.getMMU().loadCartridgeFromFile(file))
