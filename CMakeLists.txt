@@ -114,7 +114,9 @@ set(SOURCE_FILES
         src/graphics/background_window_pixel_fetcher.cpp
         src/graphics/background_window_pixel_fetcher.hpp
         src/graphics/pixel_fifo_renderer.cpp
-        src/graphics/pixel_fifo_renderer.hpp)
+        src/graphics/pixel_fifo_renderer.hpp
+        src/graphics/sprite_pixel_fetcher.cpp
+        src/graphics/sprite_pixel_fetcher.hpp)
 
 add_library(gbemulator_core ${SOURCE_FILES})
 

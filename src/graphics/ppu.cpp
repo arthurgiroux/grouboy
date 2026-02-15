@@ -36,6 +36,7 @@ void PPU::step(int nbrTicks)
 
         setMode(VRAM_ACCESS);
         _pixelFifoRenderer.reset();
+        _pixelFifoRenderer.setSpritesToRender(_spritesToRender);
     }
     else if (_currentMode == VRAM_ACCESS)
     {
@@ -126,6 +127,33 @@ std::vector<Sprite*> PPU::getSpritesThatShouldBeRendered(int scanline)
     if (nbrSpritesInScanline == MAX_NBR_SPRITES_PER_SCANLINE)
     {
         spdlog::debug("Rendering the maximum amount of {} sprites for scanline {}.", nbrSpritesInScanline, scanline);
+    }
+
+    /*
+     * Sort sprites by priority:
+     * - DMG: Lower X coordinate = higher priority (rendered on top). If X is equal, lower OAM index wins.
+     * - CGB: Lower OAM index = higher priority (rendered on top).
+     *
+     * We sort in REVERSE priority order (lowest priority first) so that when we process sprites
+     * in order, higher priority sprites overwrite lower priority ones.
+     */
+    if (_mmu.isColorModeSupported())
+    {
+        // CGB: Sort by OAM index descending (higher index = lower priority, processed first)
+        std::sort(spritesToRender.begin(), spritesToRender.end(),
+                  [](Sprite* a, Sprite* b) { return a->getId() > b->getId(); });
+    }
+    else
+    {
+        // DMG: Sort by X coordinate descending, then by OAM index descending
+        // Higher X = lower priority, processed first
+        std::sort(spritesToRender.begin(), spritesToRender.end(), [](Sprite* a, Sprite* b) {
+            if (a->getXPositionOnScreen() != b->getXPositionOnScreen())
+            {
+                return a->getXPositionOnScreen() > b->getXPositionOnScreen();
+            }
+            return a->getId() > b->getId();
+        });
     }
 
     return spritesToRender;
@@ -556,6 +584,13 @@ void PPU::stepFifo(int ticks)
 
         if (_pixelFifoRenderer.getX() >= SCREEN_WIDTH)
         {
+            // Increment window line counter if window was rendered on this scanline
+            // This must happen before transitioning to HBLANK
+            if (_pixelFifoRenderer.wasWindowTriggeredThisScanline())
+            {
+                _windowLineCounter++;
+            }
+
             if (_lcdStatusRegister->isHBLANKStatInterruptEnabled())
             {
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
@@ -576,7 +611,31 @@ Palette* PPU::getPaletteBackground()
     return static_cast<Palette*>(&_paletteBackground);
 }
 
+Palette* PPU::getPaletteObj(int paletteId)
+{
+    if (paletteId == 0)
+    {
+        return static_cast<Palette*>(&_paletteObj0);
+    }
+    return static_cast<Palette*>(&_paletteObj1);
+}
+
 RGBImage& PPU::getTemporaryFrame()
 {
     return _temporaryFrame;
+}
+
+PixelFifoRenderer& PPU::getPixelFifoRenderer()
+{
+    return _pixelFifoRenderer;
+}
+
+int PPU::getWindowLineCounter() const
+{
+    return _windowLineCounter;
+}
+
+void PPU::incrementWindowLineCounter()
+{
+    _windowLineCounter++;
 }

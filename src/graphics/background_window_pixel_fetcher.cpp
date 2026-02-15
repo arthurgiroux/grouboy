@@ -14,9 +14,24 @@ void BackgroundWindowPixelFetcher::stepGetTile()
          * Since we are rendering only a line here, we can already compute which
          * line of the tilemap we are going to render.
          * We can compute the line by seeing how many tiles we span vertically.
+         *
+         * For the window, we use the window line counter instead of the scanline.
+         * The window line counter only increments when the window is actually rendered,
+         * not on every scanline. This allows the window to be shown/hidden mid-frame
+         * and continue from the correct line.
          */
-        int startLine = _mode == Mode::WINDOW ? _ppu->getCurrentScanline()
-                                              : (_ppu->getCurrentScanline() + _ppu->getScrollY()) & 255;
+        int startLine;
+        if (_mode == Mode::WINDOW)
+        {
+            // Window uses its own internal line counter
+            startLine = _ppu->getWindowLineCounter();
+        }
+        else
+        {
+            // Background uses scanline + scroll Y, wrapped to 256
+            startLine = (_ppu->getCurrentScanline() + _ppu->getScrollY()) & 255;
+        }
+
         int lineInTileMap = (startLine / SingleTile::TILE_HEIGHT) % Tilemap::HEIGHT;
         assert(lineInTileMap < Tilemap::HEIGHT);
 
@@ -96,7 +111,8 @@ void BackgroundWindowPixelFetcher::stepGetTileDataLow()
             _priority = tileInfo.isRenderedAboveSprites();
         }
 
-        int line = _flippedVertically ? (SingleTile::TILE_HEIGHT - _tileLine) : _tileLine;
+        // For vertical flip: line 0 becomes line 7, line 7 becomes line 0
+        int line = _flippedVertically ? (SingleTile::TILE_HEIGHT - 1 - _tileLine) : _tileLine;
         _dataLow = _vram->readFromBank(static_cast<word>(_tileAddr + line * 2), _bankId);
         goToStep(Step::GetTileDataHigh);
     }
@@ -110,7 +126,8 @@ void BackgroundWindowPixelFetcher::stepGetTileDataHigh()
 {
     if (_ticksInCurrentStep == 1)
     {
-        int line = _flippedVertically ? (SingleTile::TILE_HEIGHT - _tileLine) : _tileLine;
+        // For vertical flip: line 0 becomes line 7, line 7 becomes line 0
+        int line = _flippedVertically ? (SingleTile::TILE_HEIGHT - 1 - _tileLine) : _tileLine;
         _dataHigh = _vram->readFromBank(static_cast<word>(_tileAddr + line * 2 + 1), _bankId);
         goToStep(Step::Push);
     }
@@ -127,12 +144,9 @@ void BackgroundWindowPixelFetcher::pushToFifo()
         for (int x = 0; x < 8; ++x)
         {
             // The pixels are ordered from left to right, the highest bit is the leftmost pixel.
-            int bitPosition = (7 - x);
-
-            if (_flippedHorizontally)
-            {
-                bitPosition = (x - 7);
-            }
+            // Normal: bit 7 is leftmost (x=0), bit 0 is rightmost (x=7)
+            // Flipped: bit 0 is leftmost (x=0), bit 7 is rightmost (x=7)
+            int bitPosition = _flippedHorizontally ? x : (7 - x);
 
             byte colorId = ((_dataHigh >> bitPosition) & 0x01) << 1 | ((_dataLow >> bitPosition) & 0x01);
             _pixelFifo.push({colorId, _paletteId, Pixel::Source::BG_WINDOW, _priority});

@@ -252,7 +252,34 @@ class PPU
 
     Palette* getPaletteBackground();
 
+    /**
+     * Get the sprite palette with the given index.
+     * @param paletteId 0 for OBJ0, 1 for OBJ1
+     * @return pointer to the palette
+     */
+    Palette* getPaletteObj(int paletteId);
+
     RGBImage& getTemporaryFrame();
+
+    /**
+     * Get a reference to the pixel FIFO renderer.
+     * @return reference to the renderer
+     */
+    PixelFifoRenderer& getPixelFifoRenderer();
+
+    /**
+     * Get the current window line counter.
+     * This counter tracks which line of the window is being rendered,
+     * independent of the scanline (window can be enabled/disabled mid-frame).
+     * @return the window line counter value
+     */
+    int getWindowLineCounter() const;
+
+    /**
+     * Increment the window line counter.
+     * Called when a window line has been rendered.
+     */
+    void incrementWindowLineCounter();
 
     /**
      * The screen width in pixels.

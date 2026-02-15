@@ -64,3 +64,47 @@ TEST_F(PixelFIFOTest, ClearShouldRemoveAllElements)
     ASSERT_FALSE(fifo.isFull());
     ASSERT_TRUE(fifo.isEmpty());
 }
+
+TEST_F(PixelFIFOTest, AtShouldReturnPixelAtGivenIndex)
+{
+    auto pixel0 = Pixel(0x00, nullptr, Pixel::Source::BG_WINDOW);
+    auto pixel1 = Pixel(0x01, nullptr, Pixel::Source::BG_WINDOW);
+    auto pixel2 = Pixel(0x02, nullptr, Pixel::Source::BG_WINDOW);
+
+    fifo.push(pixel0);
+    fifo.push(pixel1);
+    fifo.push(pixel2);
+
+    ASSERT_EQ(fifo.at(0).getColorId(), 0x00);
+    ASSERT_EQ(fifo.at(1).getColorId(), 0x01);
+    ASSERT_EQ(fifo.at(2).getColorId(), 0x02);
+}
+
+TEST_F(PixelFIFOTest, AtShouldReturnReferenceAllowingModification)
+{
+    auto pixel = Pixel(0x00, nullptr, Pixel::Source::BG_WINDOW);
+    fifo.push(pixel);
+
+    // Modify via at()
+    fifo.at(0) = Pixel(0x03, nullptr, Pixel::Source::SPRITE);
+
+    ASSERT_EQ(fifo.at(0).getColorId(), 0x03);
+    ASSERT_EQ(fifo.at(0).getSource(), Pixel::Source::SPRITE);
+}
+
+TEST_F(PixelFIFOTest, AtShouldWorkAfterPop)
+{
+    auto pixel0 = Pixel(0x00, nullptr, Pixel::Source::BG_WINDOW);
+    auto pixel1 = Pixel(0x01, nullptr, Pixel::Source::BG_WINDOW);
+    auto pixel2 = Pixel(0x02, nullptr, Pixel::Source::BG_WINDOW);
+
+    fifo.push(pixel0);
+    fifo.push(pixel1);
+    fifo.push(pixel2);
+
+    fifo.pop(); // Remove pixel0
+
+    // Now at(0) should return what was pixel1
+    ASSERT_EQ(fifo.at(0).getColorId(), 0x01);
+    ASSERT_EQ(fifo.at(1).getColorId(), 0x02);
+}

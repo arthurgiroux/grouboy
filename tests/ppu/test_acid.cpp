@@ -34,9 +34,9 @@ class AcidTest : public ::testing::Test
                 rgb_t referenceColor;
                 referenceImage.get_pixel(x, y, referenceColor);
 
-                ASSERT_EQ(image.getPixelR(x, y), referenceColor.red);
-                ASSERT_EQ(image.getPixelG(x, y), referenceColor.green);
-                ASSERT_EQ(image.getPixelB(x, y), referenceColor.blue);
+                ASSERT_EQ(image.getPixelR(x, y), referenceColor.red) << "R mismatch at (" << x << ", " << y << ")";
+                ASSERT_EQ(image.getPixelG(x, y), referenceColor.green) << "G mismatch at (" << x << ", " << y << ")";
+                ASSERT_EQ(image.getPixelB(x, y), referenceColor.blue) << "B mismatch at (" << x << ", " << y << ")";
             }
         }
     }
