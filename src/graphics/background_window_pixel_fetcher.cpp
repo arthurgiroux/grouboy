@@ -47,7 +47,7 @@ void BackgroundWindowPixelFetcher::stepGetTile()
         _tileLine = (startLine % SingleTile::TILE_HEIGHT);
         _x++;
 
-        _tileAddr = _vram->getTileAddrById(tileId, _ppu->backgroundAndWindowTileDataAreaIndex());
+        _tileAddr = _vram->getTileAddrById(static_cast<byte>(tileId), _ppu->backgroundAndWindowTileDataAreaIndex());
 
         goToStep(Step::GetTileDataLow);
     }
