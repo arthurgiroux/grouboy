@@ -17,13 +17,23 @@ class LCDStatusRegister;
 
 /**
  * This class is responsible for rendering the frame that will be displayed by the screen.
- * The rendering of the GameBoy is done per scanline and is tied to the CPU timing.
+ * The rendering of the GameBoy is done using a pixel FIFO and is tied to the CPU timing.
  * The PPU renders an image of 160x144 pixels.
  *
  * The rendering works as follows:
- *      For the 144 lines, the PPU will first block the OAM to read then content, then block the
- *      VRAM and render the scanline at the end of the Horizontal Blank.
- *      When all the 144 lines are rendered, a Vertical Blank is triggered and the image is ready.
+ *      For the 144 visible scanlines, the PPU cycles through several modes:
+ *      1. OAM Access (Mode 2): The PPU scans OAM to find sprites on the current scanline
+ *      2. VRAM Access (Mode 3): The pixel FIFO fetches and renders pixels
+ *      3. Horizontal Blank (Mode 0): Rendering complete for this scanline
+ *      After all 144 lines, a Vertical Blank (Mode 1) is triggered and the frame is ready.
+ *
+ * The pixel FIFO implementation follows the Pan Docs specification:
+ *      - Separate FIFOs for background/window and sprites (OAM)
+ *      - Background/window fetcher with 4 steps: GetTile, GetTileDataLow, GetTileDataHigh, Push
+ *      - Sprite fetcher with 5 steps: GetTileId, GetTileDataLow, GetTileDataHigh, Sleep, Push
+ *      - Proper handling of SCX % 8 pixel discard at scanline start
+ *      - Window triggering when X >= WX-7 and scanline >= WY
+ *      - Sprite/background priority mixing per DMG and CGB rules
  */
 class PPU
 {
@@ -325,45 +335,6 @@ class PPU
     void setMode(Mode value);
 
     /**
-     * Render the given scanline.
-     *
-     * @param scanline the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
-     */
-    void renderScanline(int scanline);
-
-    /**
-     * Render the background part of the given scanline.
-     *
-     * @param scanline the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
-     */
-    void renderScanlineBackground(int scanline);
-
-    /**
-     * Render the window part of the given scanline.
-     *
-     * @param scanline the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
-     */
-    void renderScanlineWindow(int scanline);
-
-    /**
-     * Common logic to render either the background or window part of the given scanline.
-     *
-     * @param scanline  the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
-     * @param scrollX   The scroll value to use for x coordinate
-     * @param scrollY   The scroll value to use for y coordinate
-     * @param tilemap   The tilemap to retrieve the tile
-     * @param isWindow  Whether or not we are rendering the window or backgroung
-     */
-    void renderScanlineBackgroundOrWindow(int scanline, byte scrollX, byte scrollY, Tilemap& tilemap, bool isWindow);
-
-    /**
-     * Render the sprite part of the given scanline.
-     *
-     * @param scanline the index of the scanline to render, between [0, MAX_SCANLINE_VALUE]
-     */
-    void renderScanlineSprite(int scanline);
-
-    /**
      * Swap the frame buffers, this will "freeze" the frame being rendered and make it
      * available for being displayed.
      * A new frame can then be rendered in the background.
@@ -498,11 +469,6 @@ class PPU
      * The list of sprites that should be render for the current scanline
      */
     std::vector<Sprite*> _spritesToRender = {};
-
-    /**
-     * A map of the pixel x-coordinate and pixel to render for the current scanline.
-     */
-    std::map<int, Pixel> _scanline;
 
     /**
      * Flag to control the LCD rendering.
