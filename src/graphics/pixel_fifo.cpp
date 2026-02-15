@@ -2,13 +2,13 @@
 
 void PixelFIFO::push(Pixel pixel)
 {
-    _fifo.push(pixel);
+    _fifo.push_back(pixel);
 }
 
 Pixel PixelFIFO::pop()
 {
     auto pixel = _fifo.front();
-    _fifo.pop();
+    _fifo.pop_front();
     return pixel;
 }
 
@@ -29,5 +29,10 @@ size_t PixelFIFO::size() const
 
 void PixelFIFO::clear()
 {
-    _fifo = {};
+    _fifo.clear();
+}
+
+Pixel& PixelFIFO::at(size_t index)
+{
+    return _fifo.at(index);
 }
