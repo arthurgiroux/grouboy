@@ -11,9 +11,13 @@ The following features are implemented:
 
 * Memory abstraction
 * All CPU instructions
-* PPU abstraction
+* PPU with accurate pixel FIFO rendering
+    * Separate background/window and sprite FIFOs
+    * Proper sprite priority handling (DMG and CGB)
+    * Window mid-scanline triggering
+    * SCX fine scrolling
 * GUI
-* Sprites
+* Sprites (8x8 and 8x16)
 * Inputs
 * Timer
 * Serial
@@ -26,12 +30,14 @@ The following features are implemented:
     * Channel 2
     * Channel 3
     * Channel 4
-* GameBoy color rendering
+* GameBoy Color support
+    * Color palettes
+    * VRAM banking
+    * CGB-specific priority rules
 
 Future work:
 
 * Sub-instruction CPU timing
-* FIFO PPU
 * Other MBCs
 * GBC Double-speed
 
