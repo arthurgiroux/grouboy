@@ -87,7 +87,7 @@ class Pixel
      */
     int _priority;
 
-    int _paletteId;
+    int _paletteId = 0;
 };
 
 #endif // GROUBOY_PIXEL_HPP

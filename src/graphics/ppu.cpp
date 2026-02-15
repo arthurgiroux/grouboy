@@ -561,7 +561,7 @@ void PPU::stepFifo(int ticks)
                 _interruptManager->raiseInterrupt(InterruptType::LCD_STAT);
             }
             _extraTicksSpentDrawingPixels = _ticksSpentInCurrentMode - VRAM_ACCESS_TICKS;
-            spdlog::info("Mode 3 last for {} ticks, extending HBLANK by {} ticks", _ticksSpentInCurrentMode,
+            spdlog::debug("Mode 3 last for {} ticks, extending HBLANK by {} ticks", _ticksSpentInCurrentMode,
                          _extraTicksSpentDrawingPixels);
             setMode(HBLANK);
             return;

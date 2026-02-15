@@ -215,10 +215,10 @@ void EmulatorSDLGUI::renderDebugInformation(int fps, float timeToComputeFrame)
 
 SDL_Surface* EmulatorSDLGUI::renderDebugText(const std::string& text, int offsetX, int offsetY)
 {
-    SDL_Color colorBlack = {255, 0, 0, 255};
-    SDL_Color colorRed = {0, 0, 0, 255};
+    SDL_Color colorRed = {255, 0, 0, 255};
+    SDL_Color colorBlack = {0, 0, 0, 255};
 
-    SDL_Surface* textSurface = TTF_RenderText_Shaded(_font, text.c_str(), colorBlack, colorRed);
+    SDL_Surface* textSurface = TTF_RenderText_Shaded(_font, text.c_str(), colorRed, colorBlack);
     if (!textSurface)
     {
         std::cerr << "Failed to render text: " << TTF_GetError() << std::endl;
