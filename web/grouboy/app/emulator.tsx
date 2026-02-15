@@ -5,19 +5,14 @@ import createEmulatorModule, { MainModule } from './grouboy_wasm';
 
 const Emulator: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const emulatorModuleRef = useRef<MainModule | null>(null);
+    const emulatorPtrRef = useRef<number>(0);
     const [romFile, setRomFile] = useState<File>()
     const [romLoaded, setRomLoaded] = useState(false);
     const [emulatorModule, setEmulatorModule] = useState<MainModule>();
     const [output, setOutput] = useState<string>("");
-    const [emulatorPtr, setEmulatorPtr] = useState<number>(0);
 
     useEffect(() => {
-        const cleanup = () => {
-            if (emulatorModule) {
-                emulatorModule._destroy(emulatorPtr);
-            }
-        };
-
         createEmulatorModule({
             print: (text: string) => {
                 console.log(text);
@@ -31,11 +26,16 @@ const Emulator: React.FC = () => {
         })
         .then(module => {
             console.log(`WebAssembly module loaded.`);
+            emulatorModuleRef.current = module;
+            emulatorPtrRef.current = module._init();
             setEmulatorModule(module);
-            setEmulatorPtr(module._init());
         });
 
-        return cleanup;
+        return () => {
+            if (emulatorModuleRef.current && emulatorPtrRef.current) {
+                emulatorModuleRef.current._destroy(emulatorPtrRef.current);
+            }
+        };
     }, []);
 
     const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,16 +48,16 @@ const Emulator: React.FC = () => {
     };
 
     const startEmulatorFromRomData = (romData: ArrayBuffer) => {
-        if (emulatorModule) {
-            var data = new Uint8Array(romData as ArrayBuffer);
-            var dataPtr = emulatorModule._malloc(data.length);
-            var dataHeap = new Uint8Array(emulatorModule.HEAPU8.buffer, dataPtr, data.length);
+        if (emulatorModule && emulatorPtrRef.current) {
+            const data = new Uint8Array(romData as ArrayBuffer);
+            const dataPtr = emulatorModule._malloc(data.length);
+            const dataHeap = new Uint8Array(emulatorModule.HEAPU8.buffer, dataPtr, data.length);
             dataHeap.set(data);
-            var success = emulatorModule._loadROM(emulatorPtr, dataHeap.byteOffset, dataHeap.length);
+            const success = emulatorModule._loadROM(emulatorPtrRef.current, dataHeap.byteOffset, dataHeap.length);
             emulatorModule._free(dataHeap.byteOffset);
             setRomLoaded(success === 1);
             if (success) {
-                emulatorModule._start(emulatorPtr);
+                emulatorModule._start(emulatorPtrRef.current);
             }
         }
     };
