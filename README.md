@@ -62,12 +62,34 @@ This project relies on SDL for the GUI, GoogleTest for the testing suite, and sp
 
 ## Compilation
 
+### Windows / Mac / Linux
 The project can be compiled using CMake, it will automatically retrieve some dependencies like SDL and GoogleTest.
 
 ```
 mkdir -p build && cd build/
 cmake ..
 cmake --build .
+```
+
+### WebAssembly
+
+The project can be compiled to WebAssembly using [Emscripten](https://emscripten.org/).
+
+```
+mkdir -p build && cd build/
+emcmake cmake ..
+cmake --build .
+cmake --install .
+```
+
+The install target copies the compiled WASM files to the frontend directory.
+
+A React/Next.js frontend is available in `web/grouboy/`. To run it locally:
+
+```
+cd web/grouboy/
+npm install
+npm run dev
 ```
 
 ## Tests
