@@ -90,7 +90,7 @@ const Emulator: React.FC = () => {
 
     const onLoadDefaultRomClicked = async () => {
         if (emulatorModule) {
-            const request = await fetch("grouboy/tictactoe.gb");
+            const request = await fetch("tictactoe.gb");
             if (request.ok) {
                 const romData = await request.arrayBuffer();
                 if (romData) {
