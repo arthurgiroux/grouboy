@@ -66,7 +66,13 @@ const Emulator: React.FC = () => {
             emulatorModule._free(dataHeap.byteOffset);
             setRomLoaded(success === 1);
             if (success) {
-                emulatorModule._start(emulatorPtrRef.current);
+                try {
+                    emulatorModule._start(emulatorPtrRef.current);
+                } catch (e) {
+                    // Emscripten throws "unwind" when emscripten_set_main_loop
+                    // is called with simulate_infinite_loop=true. This is expected.
+                    if (e !== 'unwind') throw e;
+                }
             }
         }
     }, [emulatorModule]);
