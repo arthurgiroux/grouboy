@@ -98,8 +98,13 @@ export default function Home() {
           <p className="text-slate-600 text-xs">
             Built with C++ &middot; Emscripten &middot; SDL2 &middot; Next.js
           </p>
-          <p className="text-slate-700 text-xs">
-            &copy; {new Date().getFullYear()} Arthur Giroux
+          <p className="text-slate-700 text-xs flex items-center gap-2">
+            <span>&copy; {new Date().getFullYear()} Arthur Giroux</span>
+            {process.env.NEXT_PUBLIC_COMMIT_HASH && (
+              <span className="text-slate-700" title="Commit hash">
+                &middot; {process.env.NEXT_PUBLIC_COMMIT_HASH}
+              </span>
+            )}
           </p>
         </div>
       </footer>
