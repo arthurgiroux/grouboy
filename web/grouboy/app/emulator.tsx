@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import createEmulatorModule, { MainModule } from './grouboy_wasm';
 
+const BASE_PATH = "/grouboy";
 const GB_WIDTH = 160;
 const GB_HEIGHT = 144;
 const SCALE = 4;
@@ -31,6 +32,7 @@ const Emulator: React.FC = () => {
 
     useEffect(() => {
         createEmulatorModule({
+            locateFile: (path: string) => `${BASE_PATH}/${path}`,
             print: (text: string) => {
                 console.log(text);
             },
@@ -90,7 +92,7 @@ const Emulator: React.FC = () => {
 
     const onLoadDefaultRomClicked = async () => {
         if (emulatorModule) {
-            const request = await fetch("tictactoe.gb");
+            const request = await fetch(`${BASE_PATH}/tictactoe.gb`);
             if (request.ok) {
                 const romData = await request.arrayBuffer();
                 if (romData) {
