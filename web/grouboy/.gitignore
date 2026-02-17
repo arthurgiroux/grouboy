@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# emscripten build artifacts
+/public/grouboy_wasm.wasm
