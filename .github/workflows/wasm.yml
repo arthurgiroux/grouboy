@@ -56,6 +56,8 @@ jobs:
       - name: "Build frontend"
         working-directory: web/grouboy
         run: npm run build
+        env:
+          NEXT_PUBLIC_COMMIT_HASH: ${{ github.sha }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
