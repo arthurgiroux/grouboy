@@ -21,7 +21,7 @@ class EmulatorSDLGUI
 
   private:
     static const int WINDOW_WIDTH = 640;
-    static const int WINDOW_HEIGHT = 480;
+    static const int WINDOW_HEIGHT = 576;
     void renderDebugInformation(int fps, float timeToComputeFrame);
     SDL_Surface* renderDebugText(const std::string& text, int offsetX = 0, int offsetY = 0);
     int computeFPS();

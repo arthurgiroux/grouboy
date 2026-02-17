@@ -227,8 +227,14 @@ SDL_Surface* EmulatorSDLGUI::renderDebugText(const std::string& text, int offset
 
     SDL_Texture* textTexture = SDL_CreateTextureFromSurface(_renderer, textSurface);
 
+    // Use actual renderer size instead of hardcoded WINDOW_WIDTH to handle
+    // resizable windows and different output sizes (e.g. WebAssembly canvas)
+    int rendererWidth = 0;
+    int rendererHeight = 0;
+    SDL_GetRendererOutputSize(_renderer, &rendererWidth, &rendererHeight);
+
     // We render in the top-right corner
-    SDL_Rect dest = {WINDOW_WIDTH - textSurface->w + offsetX, offsetY, textSurface->w, textSurface->h};
+    SDL_Rect dest = {rendererWidth - textSurface->w + offsetX, offsetY, textSurface->w, textSurface->h};
 
     SDL_RenderCopy(_renderer, textTexture, nullptr, &dest);
 
