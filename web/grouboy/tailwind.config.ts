@@ -10,17 +10,17 @@ const config: Config = {
     extend: {
       colors: {
         gb: {
-          darkest: "#0f380f",
-          dark: "#306230",
-          light: "#8bac0f",
-          lightest: "#9bbc0f",
+          darkest: "#3b0764",
+          dark: "#7c3aed",
+          light: "#a855f7",
+          lightest: "#c084fc",
         },
         surface: {
-          900: "#0a0a14",
-          800: "#0f0f1a",
-          700: "#161625",
-          600: "#1e1e30",
-          500: "#2a2a40",
+          900: "#09070f",
+          800: "#0e0b1a",
+          700: "#160f2a",
+          600: "#1e1438",
+          500: "#2a1d4a",
         },
       },
       fontFamily: {
@@ -42,17 +42,17 @@ const config: Config = {
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         glowPulse: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(155, 188, 15, 0.15), 0 0 40px rgba(155, 188, 15, 0.05)" },
-          "50%": { boxShadow: "0 0 30px rgba(155, 188, 15, 0.25), 0 0 60px rgba(155, 188, 15, 0.1)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(168, 85, 247, 0.15), 0 0 40px rgba(168, 85, 247, 0.05)" },
+          "50%": { boxShadow: "0 0 30px rgba(168, 85, 247, 0.25), 0 0 60px rgba(168, 85, 247, 0.1)" },
         },
         borderGlow: {
-          "0%, 100%": { borderColor: "rgba(155, 188, 15, 0.3)" },
-          "50%": { borderColor: "rgba(155, 188, 15, 0.6)" },
+          "0%, 100%": { borderColor: "rgba(168, 85, 247, 0.3)" },
+          "50%": { borderColor: "rgba(168, 85, 247, 0.6)" },
         },
       },
       boxShadow: {
         "screen-inset": "inset 0 2px 12px rgba(0, 0, 0, 0.8), inset 0 0 4px rgba(0, 0, 0, 0.5)",
-        "bezel": "0 4px 30px rgba(0, 0, 0, 0.5), 0 0 60px rgba(155, 188, 15, 0.07)",
+        "bezel": "0 4px 30px rgba(0, 0, 0, 0.6), 0 0 60px rgba(168, 85, 247, 0.1)",
       },
     },
   },

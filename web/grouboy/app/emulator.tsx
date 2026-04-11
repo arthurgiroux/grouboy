@@ -143,7 +143,7 @@ const Emulator: React.FC = () => {
                 {/* Power LED indicator */}
                 <div className="flex items-center gap-2 mb-4">
                     <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${
-                        romLoaded ? 'bg-gb-lightest shadow-[0_0_6px_rgba(155,188,15,0.6)]' : 'bg-slate-700'
+                        romLoaded ? 'bg-gb-lightest shadow-[0_0_8px_rgba(192,132,252,0.7)]' : 'bg-slate-700'
                     }`} />
                     <span className="text-[10px] tracking-widest uppercase text-slate-600">
                         {romLoaded ? 'Running' : isLoading ? 'Initializing...' : 'Ready'}
