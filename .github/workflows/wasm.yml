@@ -30,6 +30,14 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: "Install dependencies"
+        # There's an incompatibility at the moment between emsdk and TS6 so we force TS5
+        run: npm install -g typescript@5.9.3
+
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v14
         with:
@@ -44,10 +52,6 @@ jobs:
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target install
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
 
       - name: "Install dependencies"
         working-directory: web/grouboy
