@@ -33,7 +33,7 @@ export default function Home() {
               GROUBOY
             </h1>
             <span className="text-[10px] tracking-widest uppercase text-slate-600 border border-slate-700 rounded px-1.5 py-0.5">
-              v0.1
+              v1.0
             </span>
           </div>
           <a
